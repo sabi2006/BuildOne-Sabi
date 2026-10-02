@@ -1,51 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  role      Role     @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  orders    Order[]
-  cart      Cart?
-  reviews   Review[]
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  name          String?
+  role          Role           @default(CUSTOMER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  cart          Cart?
+  orders        Order[]
+  reviews       Review[]
   savedProjects SavedProject[]
 }
 
-enum Role {
-  CUSTOMER
-  ADMIN
-  STAFF
-}
-
 model Product {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
-  code        String   @unique
+  code        String         @unique
   description String
   price       Float
-  stock       Int      @default(0)
-  minStock    Int      @default(500)
+  stock       Int            @default(0)
+  minStock    Int            @default(500)
   material    String?
   strength    String?
   categoryId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category    Category @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   cartItems   CartItem[]
   orderItems  OrderItem[]
+  category    Category       @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
   reviews     Review[]
 }
 
@@ -66,10 +58,10 @@ model ProductImage {
 model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id])
-  items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
 }
 
 model CartItem {
@@ -77,22 +69,68 @@ model CartItem {
   cartId    String
   productId String
   quantity  Int     @default(1)
-  
   cart      Cart    @relation(fields: [cartId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
 }
 
 model Order {
-  id            String      @id @default(cuid())
+  id            String        @id @default(cuid())
   userId        String
-  status        OrderStatus @default(PENDING)
+  status        OrderStatus   @default(PENDING)
   totalAmount   Float
   paymentStatus PaymentStatus @default(PENDING)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  user          User        @relation(fields: [userId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id])
   items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SavedProject {
+  id             String   @id @default(cuid())
+  userId         String?
+  name           String
+  totalBricks    Int
+  totalCost      Float
+  cementBags     Float?
+  sandVolumeCft  Float?
+  buildingLength Float
+  buildingWidth  Float
+  buildingUnit   String   @default("ft")
+  floorsCount    Int      @default(1)
+  modelData      Json
+  settingsData   Json?
+  brickTypeData  Json?
+  estimationData Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  STAFF
 }
 
 enum OrderStatus {
@@ -110,52 +148,4 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
-}
-
-model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float
-
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-}
-
-model Review {
-  id        String   @id @default(cuid())
-  rating    Int
-  comment   String?
-  userId    String
-  productId String
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
-}
-
-model SavedProject {
-  id              String   @id @default(cuid())
-  userId          String?
-  name            String
-  totalBricks     Int
-  totalCost       Float
-  cementBags      Float?
-  sandVolumeCft   Float?
-  buildingLength  Float
-  buildingWidth   Float
-  buildingUnit    String   @default("ft")
-  floorsCount     Int      @default(1)
-  
-  // Full JSON tree for BuildingModel, settings, and calculation results
-  modelData       Json
-  settingsData    Json?
-  brickTypeData   Json?
-  estimationData  Json?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
