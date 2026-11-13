@@ -1,0 +1,6991 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [ 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R ] /Count 12 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >>
+endobj
+7 0 obj
+<< /Length 8293 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 1 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(1. PHYSICAL CONSTANTS & BRICK SPECIFICATIONS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(1.1 STANDARD MODULAR RED CLAY BRICK \(IS 1077\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 717.00 Tm
+(Standard Actual Brick Dimensions \(L x W x H\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 717.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 717.00 Tm
+(230 x 115 x 75 mm) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 717.00 Tm
+(\(0.230 x 0.115 x 0.075 m\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 701.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 704.00 Tm
+(Actual Solid Brick Volume \(V_actual\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 704.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 704.00 Tm
+(0.00198375 cu.m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 704.00 Tm
+(\(Pure solid clay volume\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 691.00 Tm
+(Mortar Horizontal Bed Joint \(m_H\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 691.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 691.00 Tm
+(10 mm \(0.010 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 691.00 Tm
+(\(Bed joint under brick\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 675.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 678.00 Tm
+(Mortar Vertical Cross Joint \(m_V\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 678.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 678.00 Tm
+(10 mm \(0.010 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 678.00 Tm
+(\(Head joint between bricks\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 665.00 Tm
+(Nominal Length with Mortar \(L_nom\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 665.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 665.00 Tm
+(240 mm \(0.240 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 665.00 Tm
+(\(230 mm + 10 mm\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 649.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 652.00 Tm
+(Nominal Width with Mortar \(W_nom\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 652.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 652.00 Tm
+(125 mm \(0.125 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 652.00 Tm
+(\(115 mm + 10 mm\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 639.00 Tm
+(Nominal Height with Mortar \(H_nom\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 639.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 639.00 Tm
+(85 mm \(0.085 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 639.00 Tm
+(\(75 mm + 10 mm\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 623.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 626.00 Tm
+(Nominal Modular Volume \(V_nominal\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 626.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 626.00 Tm
+(0.00255000 cu.m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 426.00 626.00 Tm
+(\(0.240 x 0.125 x 0.085 m\)) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 601.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 601.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 606.00 Tm
+(1.2 CIVIL ENGINEERING CONVERSION FACTORS) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 587.00 Tm
+(Length Conversion) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 587.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 587.00 Tm
+(1 meter = 1000 mm = 3.28084 feet = 39.3701 inches) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 571.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 574.00 Tm
+(Area Conversion) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 574.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 574.00 Tm
+(1 sq.meter = 10.7639 sq.feet \(1 sq.ft = 0.0929 sq.m\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 561.00 Tm
+(Volume Conversion) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 561.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 561.00 Tm
+(1 cu.meter = 35.3147 CFT \(1 CFT = 0.02832 cu.m\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 545.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 548.00 Tm
+(Standard Cement Bag Mass) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 548.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 548.00 Tm
+(50 kg per bag \(Density = 1440 kg/cu.m\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 535.00 Tm
+(Standard Cement Bag Volume) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 535.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 535.00 Tm
+(0.03472 cu.meter \(1.226 CFT per bag\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 519.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 522.00 Tm
+(Dry Bulking Factor for Mortar) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 522.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 522.00 Tm
+(1.33 \(+33 percent dry volume for shrinkage and voids\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 509.00 Tm
+(Dry Conversion Factor for Concrete) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 509.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 509.00 Tm
+(1.54 \(+54 percent dry volume for shrinkage and voids\)) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 484.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 484.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 489.00 Tm
+(1.3 NOMINAL VS ACTUAL BRICK VOLUMETRIC EQUATIONS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 396.00 523.00 82.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 462.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 466.00 Tm
+(FORMULA: BRICK VOLUME AND MODULAR UNIT DENSITY) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 450.00 Tm
+(V_actual) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 450.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 450.00 Tm
+(0.230 x 0.115 x 0.075) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 450.00 Tm
+(= 0.00198375 cu.m) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 438.00 Tm
+(V_nominal) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 438.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 438.00 Tm
+(0.240 x 0.125 x 0.085) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 438.00 Tm
+(= 0.00255000 cu.m) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 426.00 Tm
+(Bricks per cu.m) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 426.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 426.00 Tm
+(1.0 / V_nominal = 1.0 / 0.00255) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 426.00 Tm
+(= 392.15 bricks/cu.m) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 418.00 m
+550.00 418.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 408.00 Tm
+(-  Pure brick density without mortar displacement is 1 / 0.001984 = 504 bricks per cu.m.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 398.00 Tm
+(-  Nominal volume correctly accounts for 10 mm mortar joints surrounding each brick unit.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 1 of 12) Tj
+ET
+endstream
+endobj
+8 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 7 0 R
+>>
+endobj
+9 0 obj
+<< /Length 7114 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 2 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(2. BRICK MASONRY & OPENING DEDUCTIONS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(2.1 GROSS WALL GEOMETRY AND VOLUME) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 660.00 523.00 65.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: WALL GROSS AREA AND VOLUME) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(A_gross) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Length_wall x Height_wall) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(V_gross) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(A_gross x Thickness_wall) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 677.00 m
+550.00 677.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 667.00 Tm
+(-  Standard Wall Thickness: 4.5 inch \(0.1143 m\) partition wall | 9.0 inch \(0.2286 m\) load wall.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 657.00 Tm
+(-  Wall height represents clear floor-to-beam height.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 648.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 648.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 653.00 Tm
+(2.2 DOOR, WINDOW AND VENTILATOR OPENING DEDUCTIONS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 557.00 523.00 85.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 626.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 630.00 Tm
+(FORMULA: OPENING AREA DEDUCTION AND NET WALL AREA) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 614.00 Tm
+(A_openings) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 614.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 614.00 Tm
+(Sum of \( Width x Height x Count \) for all openings) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 614.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 602.00 Tm
+(A_net) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 602.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 602.00 Tm
+(Max\( 0, A_gross - A_openings \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 602.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 590.00 Tm
+(V_net) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 590.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 590.00 Tm
+(A_net x Thickness_wall) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 590.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 582.00 m
+550.00 582.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 572.00 Tm
+(-  Standard Main Door: 3.5 ft x 7.0 ft = 2.277 sq.m | Room Door: 3.0 ft x 7.0 ft = 1.951 sq.m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 562.00 Tm
+(-  Standard Window: 4.0 ft x 4.0 ft = 1.486 sq.m | Large Window: 5.0 ft x 4.0 ft = 1.858 sq.m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 552.00 Tm
+(-  Standard Ventilator: 2.0 ft x 1.5 ft = 0.279 sq.m) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 545.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 545.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 550.00 Tm
+(2.3 EXACT BRICK COUNT AND PURCHASE ORDER) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 449.00 523.00 90.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 523.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 527.00 Tm
+(FORMULA: EXACT BRICK QUANTITY WITH SITE WASTAGE ALLOWANCE) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 511.00 Tm
+(Q_exact) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 511.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 511.00 Tm
+(V_net / V_nominal = V_net / 0.00255) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 511.00 Tm
+(exact bricks) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 499.00 Tm
+(Q_base) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 499.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 499.00 Tm
+(RoundUp\( Q_exact \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 499.00 Tm
+(base brick units) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 487.00 Tm
+(Q_purchase) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 487.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 487.00 Tm
+(RoundUp\( Q_base x \( 1 + WastagePercent / 100 \) \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 487.00 Tm
+(recommended order) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 475.00 Tm
+(Q_wastage) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 475.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 475.00 Tm
+(Q_purchase - Q_base) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 475.00 Tm
+(site buffer units) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 467.00 m
+550.00 467.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 457.00 Tm
+(-  Recommended Wastage Allowance: 5 percent for regular walls, 8 to 10 percent for complex walls.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 447.00 Tm
+(-  Site buffer covers transit breakages, corner cutting, and header-stretcher bond adjustments.) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 441.00 Tm
+(Tamil Nadu Field Rule of Thumb \(sq.ft\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 441.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 441.00 Tm
+(4.5 inch wall: 4.5 bricks/sq.ft | 9.0 inch wall: 9.0 bricks/sq.ft) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 425.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 428.00 Tm
+(Metric Field Rule of Thumb \(sq.m\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 258.00 428.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 266.00 428.00 Tm
+(4.5 inch wall: 48 bricks/sq.m | 9.0 inch wall: 96 bricks/sq.m) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 2 of 12) Tj
+ET
+endstream
+endobj
+10 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 9 0 R
+>>
+endobj
+11 0 obj
+<< /Length 7116 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 3 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(3. PILLAR COLLISION & MASONRY RECALCULATION) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(3.1 THE PHYSICAL PROBLEM: COLUMN FOOTPRINT INTERSECTION) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 717.00 Tm
+(Physical Principle) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 717.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 717.00 Tm
+(Brick infill walls stop flush at concrete column faces) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 701.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 704.00 Tm
+(Error Without Deduction) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 704.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 704.00 Tm
+(8 to 15 percent excess bricks ordered if columns are ignored) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 691.00 Tm
+(3D Visual Splitting) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 691.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 691.00 Tm
+(Bricks must terminate at column faces with 0.00 percent overlap) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 666.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 666.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 671.00 Tm
+(3.2 LINEAR SPAN COLUMN WIDTH DEDUCTION METHOD) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 562.00 523.00 98.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 644.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 648.00 Tm
+(FORMULA: CLEAR WALL SPAN AND RECALCULATED NET VOLUME) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 632.00 Tm
+(L_col_overlap) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 632.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 632.00 Tm
+(Sum of \( Pillar_Width_in_wall_line \) for all pillars) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 632.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 620.00 Tm
+(L_clear_wall) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 620.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 620.00 Tm
+(L_gross_wall - L_col_overlap) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 620.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 608.00 Tm
+(A_clear_wall) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 608.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 608.00 Tm
+(L_clear_wall x Height_wall) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 608.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 596.00 Tm
+(V_net_recalc) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 596.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 596.00 Tm
+(Max\( 0, \( A_clear_wall - A_openings \) x Thickness_wall \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 596.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 584.00 Tm
+(Q_recalculated) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 584.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 584.00 Tm
+(RoundUp\( V_net_recalc / 0.00255 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 584.00 Tm
+(exact bricks) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 576.00 m
+550.00 576.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 566.00 Tm
+(-  Deducts full pillar footprint for interior columns and half-width for corner junctions.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 556.00 Tm
+(-  Prevents double-counting between masonry estimator and concrete frame estimator.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 550.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 550.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 555.00 Tm
+(3.3 3D GEOMETRIC WALL SPLITTING \(SPLITWALLBYPILLARS\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 449.00 523.00 95.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 528.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 532.00 Tm
+(FORMULA: WALL PARTITIONING AT COLUMN BOUNDARIES) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 516.00 Tm
+(Input Wall) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 516.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 516.00 Tm
+(Segment W from Start\(x, y\) to End\(x, y\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 516.00 Tm
+(full line) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 504.00 Tm
+(Sort Columns) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 504.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 504.00 Tm
+(Order intersecting pillars by distance from Start point) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 504.00 Tm
+(ordered list) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 492.00 Tm
+(Sub-Span 1) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 492.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 492.00 Tm
+(From Start point to near face of Pillar 1) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 492.00 Tm
+(mesh 1) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 480.00 Tm
+(Sub-Span k) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 480.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 480.00 Tm
+(From far face of Pillar \(k-1\) to near face of Pillar k) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 480.00 Tm
+(mesh k) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 468.00 Tm
+(Collision Overlap) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 468.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 468.00 Tm
+(Exactly 0.00 percent \(zero visual clipping\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 468.00 Tm
+(verified) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 460.00 m
+550.00 460.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 450.00 Tm
+(-  Openings located on split walls are dynamically transferred to their respective sub-span.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 440.00 Tm
+(-  Ensures 100 percent geometric consistency between 2D canvas plans and 3D WebGL models.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 3 of 12) Tj
+ET
+endstream
+endobj
+12 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 11 0 R
+>>
+endobj
+13 0 obj
+<< /Length 7287 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 4 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(4. CONCRETE & MORTAR BETWEEN BRICKS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(4.1 INTER-BRICK JOINT MORTAR VOLUME EXTRACTION) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 650.00 523.00 75.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: WET MORTAR VOLUMETRIC DERIVATION) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(V_solid_clay) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Q_base x V_actual = Q_base x 0.00198375) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(V_wet_mortar) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(Max\( 0, V_net_recalc - V_solid_clay \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Mortar Proportion) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(V_wet_mortar / V_net_recalc) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(typically 22 to 24 %) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 665.00 m
+550.00 665.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 655.00 Tm
+(-  Subtracts the pure solid clay volume from the net wall volume.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 645.00 Tm
+(-  The difference represents the exact volume of 10 mm bed and head joints.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 638.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 638.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 643.00 Tm
+(4.2 DRY MORTAR VOLUME CONVERSION) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 567.00 523.00 65.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 616.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 620.00 Tm
+(FORMULA: DRY VOLUME BULKING AND VOIDS ALLOWANCE) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 604.00 Tm
+(Dry Volume Factor) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 604.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 604.00 Tm
+(1.33 \(Civil standard: 33 percent extra for voids and shrinkage\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 604.00 Tm
+(factor) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 592.00 Tm
+(V_dry_mortar) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 592.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 592.00 Tm
+(V_wet_mortar x 1.33) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 592.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 584.00 m
+550.00 584.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 574.00 Tm
+(-  Dry cement and sand reduce in volume when mixed with water.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 564.00 Tm
+(-  A factor of 1.33 guarantees sufficient raw dry material on site.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 555.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 555.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 560.00 Tm
+(4.3 MATERIAL PROPORTIONS: CEMENT BAGS AND SAND CFT) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 459.00 523.00 90.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 533.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 537.00 Tm
+(FORMULA: CEMENT AND SAND PROPORTIONS FOR MORTAR MIX \(1 : N\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 521.00 Tm
+(Mix Ratio) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 521.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 521.00 Tm
+(1 part Cement : N parts Sand \(Total Parts = 1 + N\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 521.00 Tm
+(ratio) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 509.00 Tm
+(V_cement) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 509.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 509.00 Tm
+(V_dry_mortar x \( 1.0 / \( 1 + N \) \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 509.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 497.00 Tm
+(V_sand) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 497.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 497.00 Tm
+(V_dry_mortar x \( N / \( 1 + N \) \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 497.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 485.00 Tm
+(Cement Bags \(50kg\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 485.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 485.00 Tm
+(RoundUp\( V_cement / 0.03472 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 485.00 Tm
+(bags) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 473.00 Tm
+(Sand Volume \(CFT\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 473.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 473.00 Tm
+(V_sand x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 473.00 Tm
+(cubic feet) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 465.00 m
+550.00 465.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 455.00 Tm
+(-  Standard Mix Ratios: 1:3 \(Parapets\) | 1:4 \(4.5 inch walls\) | 1:5 \(9 inch walls\) | 1:6 \(Internal\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 445.00 Tm
+(-  1 Standard Cement Bag = 50 kg = 0.03472 cu.m \(1440 kg/cu.m density\).) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 451.00 Tm
+(Mortar Yield per 50kg Bag) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 238.00 451.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 246.00 451.00 Tm
+(1:5 Mix yields ~0.208 cu.m wet mortar \(~850 bricks laid\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 435.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 438.00 Tm
+(Water Requirement) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 238.00 438.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 246.00 438.00 Tm
+(~28 Liters per 50kg cement bag \(Water-cement ratio ~0.55\)) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 4 of 12) Tj
+ET
+endstream
+endobj
+14 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 13 0 R
+>>
+endobj
+15 0 obj
+<< /Length 8281 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 5 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(5. PLASTERING ESTIMATION & IS 1200 DEDUCTIONS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(5.1 INDIAN STANDARD \(IS 1200 PART XII\) OPENING DEDUCTIONS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 635.00 523.00 90.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: OPENING DEDUCTION RULES FOR PLASTERING) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Rule 1 \(Area < 0.50 sq.m\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Deduction = 0.00 sq.m \(No deduction, no jamb addition\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(0 %) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Rule 2 \(0.50 to 3.00 sq.m\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(Deduct 50 percent of opening on ONE face only) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(50 % 1 face) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Rule 2 \(Opposite Face\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(0 percent deduction \(retained area covers jambs/reveals\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(0 % other) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(Rule 3 \(Area > 3.00 sq.m\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(Deduct 100 percent on BOTH faces. Jambs added separately) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(100 % both) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 653.00 m
+550.00 653.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 643.00 Tm
+(-  Conforms to IS 1200 Part XII Method of Measurement for Plastering.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 633.00 Tm
+(-  Eliminates laborious measurement of jambs and reveals on standard residential doors/windows.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 623.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 623.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 628.00 Tm
+(5.2 SURFACE SPECIFICATIONS AND NET AREA EQUATIONS) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 609.00 Tm
+(Inner Masonry Plaster) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 609.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 609.00 Tm
+(12 mm thickness, 1:6 cement-sand mortar) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 386.00 609.00 Tm
+(\(Single interior face per wall\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 593.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 596.00 Tm
+(Outer Masonry Plaster) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 596.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 596.00 Tm
+(15 to 20 mm thickness, 1:4 waterproof mortar) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 386.00 596.00 Tm
+(\(Exterior face of external walls\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 583.00 Tm
+(RCC Column Plaster) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 583.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 583.00 Tm
+(6 to 10 mm thickness, 1:4 mortar) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 386.00 583.00 Tm
+(\(Exposed column faces only\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 567.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 570.00 Tm
+(RCC Beam Side Plaster) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 570.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 570.00 Tm
+(6 mm thickness, 1:4 mortar) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 386.00 570.00 Tm
+(\(Side Face A + Side Face B\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 557.00 Tm
+(Ceiling / Soffit Plaster) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 557.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 557.00 Tm
+(6 mm thickness, 1:3 mortar) Tj
+ET
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 386.00 557.00 Tm
+(\(Bottom face of RCC slab\)) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 532.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 532.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 537.00 Tm
+(5.3 PLASTER MATERIAL AND LABOR REQUIREMENTS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 426.00 523.00 100.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 510.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 514.00 Tm
+(FORMULA: PLASTER MORTAR AND RAW MATERIAL REQUIREMENTS) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 498.00 Tm
+(V_wet_plaster) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 498.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 498.00 Tm
+(A_net_plaster x Thickness_plaster) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 498.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 486.00 Tm
+(V_dry_plaster) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 486.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 486.00 Tm
+(V_wet_plaster x 1.30 \(30 percent extra for joints and shrinkage\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 486.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 474.00 Tm
+(Cement Bags) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 474.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 474.00 Tm
+(RoundUp\( \( V_dry_plaster x \( 1 / \( 1 + N \) \) / 0.03472 \) x 1.05 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 474.00 Tm
+(bags \(5% waste\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 462.00 Tm
+(Sand \(CFT\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 462.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 462.00 Tm
+(RoundUp\( \( V_dry_plaster x \( N / \( 1 + N \) \) x 35.3147 \) x 1.05 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 462.00 Tm
+(CFT \(5% waste\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 450.00 Tm
+(Mason Days) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 450.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 450.00 Tm
+(RoundUp\( A_net_plaster / 10.0 sq.m per day \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 450.00 Tm
+(skilled labor) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 438.00 Tm
+(Helper Days) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 438.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 438.00 Tm
+(RoundUp\( A_net_plaster / 10.0 sq.m per day \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 438.00 Tm
+(unskilled labor) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 430.00 m
+550.00 430.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 420.00 Tm
+(-  Dry factor 1.30 covers uneven brick joint filling and shrinkage.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 410.00 Tm
+(-  Productivity: 1 Mason + 1 Helper covers approximately 10 sq.meters \(108 sq.ft\) per day.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 5 of 12) Tj
+ET
+endstream
+endobj
+16 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 15 0 R
+>>
+endobj
+17 0 obj
+<< /Length 11496 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 6 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(6. RCC COLUMN / PILLAR CONCRETE & STEEL) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(6.1 CONCRETE VOLUME AND GRADE MIX RATIOS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 623.00 523.00 102.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: PILLAR CONCRETE VOLUME AND MIX BREAKDOWN) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Rectangular Volume) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Width x Depth x Height x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Circular Volume) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(3.1416 x \( Diameter / 2 \)^2 x Height x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(V_dry_concrete) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(V_wet_concrete x 1.54 \(54 percent extra for shrinkage/voids\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(Mix Ratios) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(M20 = 1:1.5:3 \(Sum = 5.5\) | M15 = 1:2:4 \(Sum = 7.0\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(standard mixes) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 649.00 Tm
+(Cement Bags \(M20\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 649.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 649.00 Tm
+(\( V_dry x \( 1.0 / 5.5 \) \) / 0.03472) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 649.00 Tm
+(bags) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 637.00 Tm
+(Sand CFT \(M20\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 637.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 637.00 Tm
+(\( V_dry x \( 1.5 / 5.5 \) \) x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 637.00 Tm
+(CFT) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 625.00 Tm
+(Aggregate 20mm CFT) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 625.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 625.00 Tm
+(\( V_dry x \( 3.0 / 5.5 \) \) x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 625.00 Tm
+(CFT) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 617.00 m
+550.00 617.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 607.00 Tm
+(-  M20 Grade \(1:1.5:3\) is the minimum prescribed concrete grade for RCC columns \(IS 456\).) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 597.00 Tm
+(-  Coarse aggregate: 20 mm graded blue metal granite.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 611.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 611.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 616.00 Tm
+(6.2 STEEL UNIT WEIGHT DERIVATION \(D SQUARED / 162\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 545.00 523.00 60.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 589.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 593.00 Tm
+(FORMULA: METRIC REBAR UNIT WEIGHT FORMULA) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 577.00 Tm
+(Weight \(kg/m\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 577.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 577.00 Tm
+(\( Diameter_mm x Diameter_mm \) / 162) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 577.00 Tm
+(kg per meter) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 565.00 Tm
+(Exact Derivation) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 565.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 565.00 Tm
+(\( 3.1416 x \(D/1000\)^2 / 4 \) x 7850 = D^2 / 162.28) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 565.00 Tm
+(exact density) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 557.00 m
+550.00 557.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 547.00 Tm
+(-  162 is the standard civil denominator for round steel rebar in metric units.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 537.00 Tm
+(-  Standard commercial rebar length: 12 meters \(40 feet\).) Tj
+ET
+q
+0.880 0.920 0.980 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 534.00 523.00 15.00 re
+B
+Q
+BT
+/F1 8.0 Tf
+0.080 0.200 0.400 rg
+1 0 0 1 46.00 539.00 Tm
+(Bar Diameter) Tj
+ET
+BT
+/F1 8.0 Tf
+0.080 0.200 0.400 rg
+1 0 0 1 120.00 539.00 Tm
+(Unit Weight \(kg/m\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.080 0.200 0.400 rg
+1 0 0 1 220.00 539.00 Tm
+(Weight per 12m Rod) Tj
+ET
+BT
+/F1 8.0 Tf
+0.080 0.200 0.400 rg
+1 0 0 1 320.00 539.00 Tm
+(Primary Application) Tj
+ET
+q
+0.900 0.920 0.950 RG
+0.50 w
+36.00 519.00 m
+559.00 519.00 l
+S
+Q
+BT
+/F1 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 522.00 Tm
+(8 mm) Tj
+ET
+BT
+/F4 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 120.00 522.00 Tm
+(0.395 kg/m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 220.00 522.00 Tm
+(4.74 kg) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 320.00 522.00 Tm
+(Stirrup ties, slab distribution rebar) Tj
+ET
+q
+0.970 0.980 0.990 rg
+36.00 506.00 523.00 13.00 re
+f
+Q
+q
+0.900 0.920 0.950 RG
+0.50 w
+36.00 506.00 m
+559.00 506.00 l
+S
+Q
+BT
+/F1 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 509.00 Tm
+(10 mm) Tj
+ET
+BT
+/F4 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 120.00 509.00 Tm
+(0.617 kg/m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 220.00 509.00 Tm
+(7.40 kg) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 320.00 509.00 Tm
+(Slab main rebar, beam hanger bars) Tj
+ET
+q
+0.900 0.920 0.950 RG
+0.50 w
+36.00 493.00 m
+559.00 493.00 l
+S
+Q
+BT
+/F1 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 496.00 Tm
+(12 mm) Tj
+ET
+BT
+/F4 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 120.00 496.00 Tm
+(0.888 kg/m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 220.00 496.00 Tm
+(10.66 kg) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 320.00 496.00 Tm
+(Column main bars, beam top/bottom bars, footing mat) Tj
+ET
+q
+0.970 0.980 0.990 rg
+36.00 480.00 523.00 13.00 re
+f
+Q
+q
+0.900 0.920 0.950 RG
+0.50 w
+36.00 480.00 m
+559.00 480.00 l
+S
+Q
+BT
+/F1 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 483.00 Tm
+(16 mm) Tj
+ET
+BT
+/F4 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 120.00 483.00 Tm
+(1.580 kg/m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 220.00 483.00 Tm
+(18.96 kg) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 320.00 483.00 Tm
+(Column vertical bars, beam tension steel, starter dowels) Tj
+ET
+q
+0.900 0.920 0.950 RG
+0.50 w
+36.00 467.00 m
+559.00 467.00 l
+S
+Q
+BT
+/F1 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 470.00 Tm
+(20 mm) Tj
+ET
+BT
+/F4 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 120.00 470.00 Tm
+(2.469 kg/m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 220.00 470.00 Tm
+(29.63 kg) Tj
+ET
+BT
+/F2 7.5 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 320.00 470.00 Tm
+(Heavy columns, long span transfer beams) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 439.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 439.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 444.00 Tm
+(6.3 PILLAR REINFORCEMENT: MAIN VERTICAL BARS AND STIRRUP TIES) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 331.00 523.00 102.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 417.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 421.00 Tm
+(FORMULA: COLUMN STEEL CUTTING LENGTHS AND BAR COUNTS) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 405.00 Tm
+(Main Bar Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 405.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 405.00 Tm
+(Height_pillar x 1.10 \(10 percent lap splice allowance\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 405.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 393.00 Tm
+(Main Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 393.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 393.00 Tm
+(Count_bars x L_main x \( D_main^2 / 162 \) x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 393.00 Tm
+(kg) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 381.00 Tm
+(Clear Cover) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 381.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 381.00 Tm
+(40 mm \(0.040 m\) on all 4 faces \(IS 456\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 381.00 Tm
+(cover) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 369.00 Tm
+(Core Dimensions) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 369.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 369.00 Tm
+(Width_core = Width - 2*cover | Depth_core = Depth - 2*cover) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 369.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 357.00 Tm
+(Tie Cutting Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 357.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 357.00 Tm
+(2 x \( Width_core + Depth_core \) + 0.15 m \(135 deg hook pair\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 357.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 345.00 Tm
+(Tie Count per Pillar) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 345.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 345.00 Tm
+(RoundUp\( Height_pillar / Spacing \) + 1  \(Spacing = 150 mm\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 345.00 Tm
+(ties) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 333.00 Tm
+(Tie Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 333.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 333.00 Tm
+(N_ties x L_tie x \( D_tie^2 / 162 \) x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 333.00 Tm
+(kg) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 325.00 m
+550.00 325.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 315.00 Tm
+(-  Joint Confinement: Add 3 extra closely spaced stirrups inside beam-column joint.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 305.00 Tm
+(-  Cover blocks: 4 concrete cover blocks \(40 mm\) per pillar at 1.0 m vertical intervals.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 6 of 12) Tj
+ET
+endstream
+endobj
+18 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 17 0 R
+>>
+endobj
+19 0 obj
+<< /Length 8527 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 7 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(7. RCC RING BEAM & FRAME BEAMS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(7.1 BEAM SPAN DETECTION AND EXTENDED LENGTH) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 650.00 523.00 75.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: PILLAR-TO-PILLAR BEAM SPAN GEOMETRY) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Center Span \(L_span\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Sqrt\( \( EndX - StartX \)^2 + \( EndY - StartY \)^2 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Extended Length \(L_ext\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(L_span + \( Start_Col_Width / 2 \) + \( End_Col_Width / 2 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Clear Span \(L_clear\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(L_span - \( Start_Col_Width / 2 \) - \( End_Col_Width / 2 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(V_beam_concrete) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(Total_Extended_Length x Width_beam x Height_beam) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 653.00 m
+550.00 653.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 643.00 Tm
+(-  Extended length ensures beams frame completely through column heads with zero gap.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 633.00 Tm
+(-  Standard beam dimensions: 9 inch width \(0.2286 m\) x 12 inch height \(0.3048 m\).) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 638.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 638.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 643.00 Tm
+(7.2 LONGITUDINAL REBAR \(TOP AND BOTTOM STEEL\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 557.00 523.00 75.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 616.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 620.00 Tm
+(FORMULA: TOP \(COMPRESSION\) AND BOTTOM \(TENSION\) STEEL) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 604.00 Tm
+(Top Bars \(Hangers\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 604.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 604.00 Tm
+(N_top x L_total x 1.10 x \( D_top^2 / 162 \)  \(Standard: 2 x 12mm\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 604.00 Tm
+(kg) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 592.00 Tm
+(Bottom Bars \(Main\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 592.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 592.00 Tm
+(N_bottom x L_total x 1.10 x \( D_bottom^2 / 162 \) \(Standard: 2 x 12mm\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 592.00 Tm
+(kg) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 580.00 Tm
+(Total Main Steel) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 580.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 580.00 Tm
+(Top_Bars_Weight + Bottom_Bars_Weight) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 580.00 Tm
+(kg) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 572.00 m
+550.00 572.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 562.00 Tm
+(-  1.10 multiplier accounts for 10 percent lap splices and 90-degree end development anchorage.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 552.00 Tm
+(-  For heavier spans, bottom bars increase to 3 x 16mm or 4 x 16mm.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 545.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 545.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 550.00 Tm
+(7.3 TRANSVERSE CLOSED STIRRUP TIES \(SHEAR LINKS\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 444.00 523.00 95.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 523.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 527.00 Tm
+(FORMULA: STIRRUP TIE CUTTING LENGTH AND TOTAL WEIGHT) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 511.00 Tm
+(Clear Cover) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 511.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 511.00 Tm
+(25 mm \(0.025 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 511.00 Tm
+(cover) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 499.00 Tm
+(Core Width) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 499.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 499.00 Tm
+(Width_beam - 2 x 0.025 = 0.2286 - 0.050) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 499.00 Tm
+(= 0.1786 m) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 487.00 Tm
+(Core Height) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 487.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 487.00 Tm
+(Height_beam - 2 x 0.025 = 0.3048 - 0.050) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 487.00 Tm
+(= 0.2548 m) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 475.00 Tm
+(Stirrup Cut Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 475.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 475.00 Tm
+(2 x \( Core_Width + Core_Height \) + 0.15 m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 475.00 Tm
+(= 1.017 m) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 463.00 Tm
+(Stirrup Count) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 463.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 463.00 Tm
+(RoundUp\( Total_Beam_Length / Spacing \) + 1  \(Spacing = 150 mm\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 463.00 Tm
+(ties) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 451.00 Tm
+(Stirrups Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 451.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 451.00 Tm
+(N_stirrups x L_cut x \( D_stirrup^2 / 162 \)  \(Standard: 8mm\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 451.00 Tm
+(kg) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 443.00 m
+550.00 443.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 433.00 Tm
+(-  0.15 m hook addition provides two standard 135-degree seismic hooks \(75 mm each\).) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 423.00 Tm
+(-  Binding wire requirement: approximately 10 kg per metric tonne of steel.) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 436.00 Tm
+(Total Beam Steel) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 436.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 436.00 Tm
+(W_beam = Top_Steel + Bottom_Steel + Stirrups_Steel) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 420.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 423.00 Tm
+(Beam Cover Blocks) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 423.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 423.00 Tm
+(2 concrete cover blocks \(25 mm\) per meter of beam length) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 7 of 12) Tj
+ET
+endstream
+endobj
+20 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 19 0 R
+>>
+endobj
+21 0 obj
+<< /Length 8572 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 8 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(8. FULL SLAB / RCC FULL RING BEAM) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(8.1 STRUCTURAL BAY DETECTION AND SLAB CONCRETE) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 635.00 523.00 90.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: ENCLOSED BAY GEOMETRY AND CONCRETE VOLUME) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Bay Detection) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Identifies closed rectangular cells bounded by 4 pillars) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(geometry) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Effective Bay Width) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(Inner_Bay_Width + Pillar_Width) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Effective Bay Depth) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(Inner_Bay_Depth + Pillar_Depth) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(Bay Area \(A_bay\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(Effective_Bay_Width x Effective_Bay_Depth) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 649.00 Tm
+(Total Slab Area) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 649.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 649.00 Tm
+(Sum of all Bay Areas) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 649.00 Tm
+(sq.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 637.00 Tm
+(V_slab_concrete) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 637.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 637.00 Tm
+(Total_Slab_Area x Thickness_slab  \(Thickness = 5 inches = 0.127 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 637.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 629.00 m
+550.00 629.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 619.00 Tm
+(-  Effective bay dimensions extend to outer pillar edges to cover the entire beam-slab frame.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 609.00 Tm
+(-  Standard residential roof slab thickness: 5 inches \(0.127 m\) or 6 inches \(0.152 m\).) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 623.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 623.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 628.00 Tm
+(8.2 TWO-WAY ORTHOGONAL STEEL REINFORCEMENT \(IS 456\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 502.00 523.00 115.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 601.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 605.00 Tm
+(FORMULA: MAIN AND DISTRIBUTION SLAB STEEL MESH) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 589.00 Tm
+(Main Steel \(Short Span\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 589.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 589.00 Tm
+(Diameter = 10 mm | Spacing = 150 mm \(0.15 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 589.00 Tm
+(direction 1) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 577.00 Tm
+(Main Bar Count) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 577.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 577.00 Tm
+(RoundUp\( Effective_Bay_Depth / 0.15 \) + 1) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 577.00 Tm
+(bars) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 565.00 Tm
+(Main Bar Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 565.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 565.00 Tm
+(Effective_Bay_Width + 0.20 m \(end development hooks\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 565.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 553.00 Tm
+(Main Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 553.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 553.00 Tm
+(Count x Length x \( 10^2 / 162 \) = Count x Length x 0.617) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 553.00 Tm
+(kg) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 541.00 Tm
+(Dist Steel \(Long Span\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 541.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 541.00 Tm
+(Diameter = 8 mm | Spacing = 150 mm \(0.15 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 541.00 Tm
+(direction 2) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 529.00 Tm
+(Dist Bar Count) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 529.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 529.00 Tm
+(RoundUp\( Effective_Bay_Width / 0.15 \) + 1) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 529.00 Tm
+(bars) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 517.00 Tm
+(Dist Bar Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 517.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 517.00 Tm
+(Effective_Bay_Depth + 0.20 m \(end development hooks\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 517.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 505.00 Tm
+(Dist Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 505.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 505.00 Tm
+(Count x Length x \( 8^2 / 162 \) = Count x Length x 0.395) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 505.00 Tm
+(kg) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 493.00 Tm
+(Total Slab Steel) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 493.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 493.00 Tm
+(Main_Steel_Weight + Distribution_Steel_Weight) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 493.00 Tm
+(kg) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 485.00 m
+550.00 485.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 475.00 Tm
+(-  Main bars span the shorter distance to resist maximum sagging bending moment.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 465.00 Tm
+(-  Distribution bars control shrinkage and temperature cracks along the longer span.) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 494.00 Tm
+(Slab Concrete Cover) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 494.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 494.00 Tm
+(20 mm clear cover \(top and bottom\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 478.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 481.00 Tm
+(Slab Cover Blocks) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 481.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 481.00 Tm
+(4 cover blocks \(20 mm\) per sq.meter of slab area) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 468.00 Tm
+(Waterproofing Compound) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 468.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 468.00 Tm
+(200 ml liquid integral waterproofing per 50kg cement bag) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 8 of 12) Tj
+ET
+endstream
+endobj
+22 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 21 0 R
+>>
+endobj
+23 0 obj
+<< /Length 9320 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 9 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(9. UNDERGROUND BASEMENT & FOUNDATION SUBSTRUCTURE) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(9.1 EARTHWORK EXCAVATION PIT) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 665.00 523.00 60.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: EXCAVATION VOLUME PER FOOTING PIT) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Pit Dimensions) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(Length_pit x Width_pit x Depth_pit) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(V_excavation) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(Length x Width x Depth x Pit_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 677.00 m
+550.00 677.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 667.00 Tm
+(-  Standard isolated footing pit: 5.0 ft x 5.0 ft x 5.0 ft \(1.524 m x 1.524 m x 1.524 m\).) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 657.00 Tm
+(-  Pit dimensions extend 150 mm beyond PCC mud mat on all sides for working space.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 653.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 653.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 658.00 Tm
+(9.2 FOUNDATION BED SAND FILLING) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 577.00 523.00 70.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 631.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 635.00 Tm
+(FORMULA: SAND BED LEVEL VOLUME WITH COMPACTION) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 619.00 Tm
+(V_sand_net) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 619.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 619.00 Tm
+(Length_pit x Width_pit x Depth_sand  \(Depth = 150 mm = 0.15 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 619.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 607.00 Tm
+(V_sand_compacted) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 607.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 607.00 Tm
+(V_sand_net x 1.15 \(15 percent loose bulking compaction\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 607.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 595.00 Tm
+(Sand Volume \(CFT\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 595.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 595.00 Tm
+(V_sand_compacted x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 595.00 Tm
+(cubic feet) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 587.00 m
+550.00 587.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 577.00 Tm
+(-  Sand bed levels the irregular excavation subsoil and absorbs foundation settlement stresses.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 567.00 Tm
+(-  Compacted with water tamping prior to PCC mud mat pouring.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 565.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 565.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 570.00 Tm
+(9.3 PLAIN CEMENT CONCRETE \(PCC 1:4:8 MUD MAT\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 474.00 523.00 85.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 543.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 547.00 Tm
+(FORMULA: PCC BASE CONCRETE MATERIALS \(1:4:8 LEAN MIX\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 531.00 Tm
+(V_pcc_wet) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 531.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 531.00 Tm
+(Length_pcc x Width_pcc x Depth_pcc  \(Depth = 100 mm = 0.10 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 531.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 519.00 Tm
+(V_pcc_dry) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 519.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 519.00 Tm
+(V_pcc_wet x 1.54 \(54 percent dry factor\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 519.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 507.00 Tm
+(Mix 1:4:8 \(Sum = 13\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 507.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 507.00 Tm
+(Cement = 1 part, Sand = 4 parts, Aggregate 40mm = 8 parts) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 507.00 Tm
+(parts) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 495.00 Tm
+(Cement Bags) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 495.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 495.00 Tm
+(\( V_pcc_dry x \( 1.0 / 13 \) \) / 0.03472) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 495.00 Tm
+(bags) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 483.00 Tm
+(Sand CFT) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 483.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 483.00 Tm
+(\( V_pcc_dry x \( 4.0 / 13 \) \) x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 483.00 Tm
+(CFT) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 471.00 Tm
+(Aggregate 40mm CFT) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 471.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 471.00 Tm
+(\( V_dry x \( 8.0 / 13 \) \) x 35.3147) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 471.00 Tm
+(CFT) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 463.00 m
+550.00 463.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 453.00 Tm
+(-  Provides a clean, solid, non-porous working bed for steel rebar positioning.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 443.00 Tm
+(-  Zero steel reinforcement is used in the PCC mud mat.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 462.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 462.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 467.00 Tm
+(9.4 RCC FOOTING PAD AND EARTH BACKFILLING) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 376.00 523.00 80.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 440.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 444.00 Tm
+(FORMULA: FOOTING CONCRETE VOLUME AND EARTH BACKFILL) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 428.00 Tm
+(Flat Footing Pad) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 428.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 428.00 Tm
+(Length_pad x Width_pad x Depth_pad) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 428.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 416.00 Tm
+(Trapezoidal Footing) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 416.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 416.00 Tm
+(\( A1 x D1 \) + \( D2 / 3 \) x \( A1 + A2 + Sqrt\( A1 x A2 \) \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 416.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 404.00 Tm
+(Displaced Volume) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 404.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 404.00 Tm
+(V_sand + V_pcc + V_footing + V_column_stub) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 404.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 392.00 Tm
+(V_backfill_earth) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 392.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 392.00 Tm
+(Max\( 0, V_excavation - Displaced_Volume \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 392.00 Tm
+(cu.meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 384.00 m
+550.00 384.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 374.00 Tm
+(-  A1 = Bottom pad area \(L x W\) | A2 = Top column pedestal area \(w x d\).) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 364.00 Tm
+(-  Backfilling volume determines surplus earth removal or borrowing needs.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 9 of 12) Tj
+ET
+endstream
+endobj
+24 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 23 0 R
+>>
+endobj
+25 0 obj
+<< /Length 8065 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 10 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(10. COLUMN STARTER STUBS & FOOTING STEEL) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(10.1 FOOTING BOTTOM STEEL MESH MAT \(2-WAY ORTHOGONAL\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 627.00 523.00 98.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: FOOTING MESH MAT CUTTING LENGTH AND WEIGHT) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(Clear Soil Cover) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(50 mm \(0.050 m\) \(IS 456 for earth-contact foundations\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(cover) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Upward 90 deg Hook) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(150 mm \(0.150 m\) vertical bends on all bar ends) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(hook) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Bar Cut Length \(X\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(\( Length_footing - 2 x 0.050 \) + 2 x 0.150) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(Bar Cut Length \(Y\)) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(\( Width_footing - 2 x 0.050 \) + 2 x 0.150) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 649.00 Tm
+(Bar Count in X) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 649.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 649.00 Tm
+(RoundUp\( \( Width_footing - 2 x 0.050 \) / 0.150 \) + 1) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 649.00 Tm
+(bars) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 637.00 Tm
+(Bar Count in Y) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 637.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 637.00 Tm
+(RoundUp\( \( Length_footing - 2 x 0.050 \) / 0.150 \) + 1) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 637.00 Tm
+(bars) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 625.00 Tm
+(Footing Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 625.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 625.00 Tm
+(\( Count_X x L_cut_X + Count_Y x L_cut_Y \) x \( 12^2 / 162 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 625.00 Tm
+(kg \(12mm rebar\)) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 617.00 m
+550.00 617.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 607.00 Tm
+(-  Standard footing mesh: 12 mm TMT bars spaced at 150 mm center-to-center.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 597.00 Tm
+(-  Cover blocks: 50 mm heavy-duty concrete cover blocks \(4 blocks per footing pad\).) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 615.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 615.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 620.00 Tm
+(10.2 COLUMN STARTER DOWEL STUBS \(BASEMENT TO PLINTH\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 504.00 523.00 105.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 593.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 597.00 Tm
+(FORMULA: VERTICAL STARTER DOWEL BARS AND LATERAL TIES) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 581.00 Tm
+(Stub Dimensions) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 581.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 581.00 Tm
+(Width_col x Depth_col x Height_stub  \(Height = 2.0 ft = 0.60 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 581.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 569.00 Tm
+(V_stub_concrete) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 569.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 569.00 Tm
+(Width x Depth x Height x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 569.00 Tm
+(cu.meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 557.00 Tm
+(Starter Bar Length) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 557.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 557.00 Tm
+(Depth_footing + Height_stub + 0.30 m \(300 mm 90 deg L-bend\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 557.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 545.00 Tm
+(Starter Steel Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 545.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 545.00 Tm
+(Count_bars x L_starter x \( 16^2 / 162 \) x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 545.00 Tm
+(kg \(16mm rebar\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 533.00 Tm
+(Stub Stirrup Ties) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 533.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 533.00 Tm
+(2 x \( Core_Width + Core_Depth \) + 0.15 m) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 533.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 521.00 Tm
+(Ties Count per Stub) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 521.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 521.00 Tm
+(Max\( 2, Floor\( Height_stub / 0.150 \) \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 521.00 Tm
+(ties) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 509.00 Tm
+(Stub Ties Weight) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 509.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 509.00 Tm
+(N_ties x L_tie x \( 8^2 / 162 \) x Pillar_Count) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 509.00 Tm
+(kg \(8mm rebar\)) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 501.00 m
+550.00 501.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 491.00 Tm
+(-  Starter dowels transfer column axial load and moment directly into the footing concrete.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 481.00 Tm
+(-  300 mm L-bends rest directly upon the bottom steel mesh mat.) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 496.00 Tm
+(Substructure Total Steel) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 496.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 496.00 Tm
+(W_subgrade = Footing_Mesh + Starter_Dowels + Stub_Ties) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 480.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 483.00 Tm
+(Binding Wire Requirement) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 483.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 483.00 Tm
+(10 to 12 kg per metric tonne of substructure steel) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 10 of 12) Tj
+ET
+endstream
+endobj
+26 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 25 0 R
+>>
+endobj
+27 0 obj
+<< /Length 7241 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 11 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(11. MASTER ELEVATION STACKING & JUNCTION RULE) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(11.1 THE SINGLE SOURCE OF TRUTH ELEVATION CASCADE \(GETRINGBEAMJUNCTION\)) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 553.00 523.00 172.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: VERTICAL COORDINATE PROGRESSION EQUATIONS \(Y-AXIS\)) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(1. Excavation Base) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(minus Height_excavation) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(Y_0) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(2. Sand Bed Surface) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(Y_0 + Thickness_sand) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(Y_1) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(3. PCC Mud Mat Surface) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(Y_1 + Thickness_pcc) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(Y_2) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(4. Footing Pad Surface) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(Y_2 + Depth_footing) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(Y_3) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 649.00 Tm
+(5. Ground Plinth Base) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 649.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 649.00 Tm
+(0.000 meters \(Master Zero Datum\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 649.00 Tm
+(Y_base) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 637.00 Tm
+(6. Brick Wall Top Datum) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 637.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 637.00 Tm
+(Y_base + Height_wall \(e.g. 10 ft = 3.048 m\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 637.00 Tm
+(Y_wall_top) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 625.00 Tm
+(7. RCC Ring Beam Bottom) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 625.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 625.00 Tm
+(Y_wall_top \(Zero clearance gap\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 625.00 Tm
+(Y_beam_bottom) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 613.00 Tm
+(8. Canonical Top Line) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 613.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 613.00 Tm
+(Y_wall_top + Height_beam) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 613.00 Tm
+(Y_top_line) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 601.00 Tm
+(9. RCC Ring Beam Center) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 601.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 601.00 Tm
+(Y_top_line - \( Height_beam / 2 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 601.00 Tm
+(Y_beam_center) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 589.00 Tm
+(10. RCC Roof Slab Top) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 589.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 589.00 Tm
+(Y_top_line \(Flush with beam top line\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 589.00 Tm
+(Y_slab_top) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 577.00 Tm
+(11. RCC Roof Slab Bottom) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 577.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 577.00 Tm
+(Y_top_line - Thickness_slab) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 577.00 Tm
+(Y_slab_bottom) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 565.00 Tm
+(12. Next Floor Plinth Base) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 565.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 565.00 Tm
+(Y_top_line \(Continuous upward cascade\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 565.00 Tm
+(Y_next_base) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 557.00 m
+550.00 557.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 547.00 Tm
+(-  Every floor level is mathematically verified: Wall-to-Beam Gap = 0.000 mm.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 537.00 Tm
+(-  Beam-to-Slab Gap = 0.000 mm. Canonical coplanar alignment eliminates all 3D mesh leaks.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 541.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 541.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 546.00 Tm
+(11.2 COLUMN SHAFT AND JOINT STACKING ARCHITECTURE) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 527.00 Tm
+(Column Shaft Zone) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 527.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 527.00 Tm
+(Extends from Y_base to Y_wall_top \(clear height = Height_wall\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 511.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 514.00 Tm
+(Column Joint Zone) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 514.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 514.00 Tm
+(Extends from Y_wall_top to Y_top_line \(confined height = Height_beam\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 501.00 Tm
+(Total Column Height) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 501.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 501.00 Tm
+(H_col_total = Height_wall + Height_beam \(Monolithic continuous pillar\)) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 485.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 488.00 Tm
+(Vertical Continuity) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 488.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 488.00 Tm
+(Column main bars extend continuously through beam-column junction) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 11 of 12) Tj
+ET
+endstream
+endobj
+28 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 27 0 R
+>>
+endobj
+29 0 obj
+<< /Length 8128 >>
+stream
+q
+0.080 0.180 0.360 rg
+36.00 792.00 523.00 26.00 re
+f
+Q
+BT
+/F1 9.0 Tf
+1.000 1.000 1.000 rg
+1 0 0 1 46.00 802.00 Tm
+(A V M BRICKS | BUILDING ESTIMATOR FORMULA MANUAL) Tj
+ET
+BT
+/F1 8.5 Tf
+0.850 0.920 1.000 rg
+1 0 0 1 485.00 802.00 Tm
+(SHEET 12 OF 12) Tj
+ET
+BT
+/F1 13.5 Tf
+0.080 0.180 0.360 rg
+1 0 0 1 36.00 768.00 Tm
+(12. 3D STEEL VIEW GENERATION & REBAR SHADERS) Tj
+ET
+q
+0.800 0.850 0.900 RG
+1.20 w
+36.00 760.00 m
+559.00 760.00 l
+S
+Q
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 731.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 731.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 736.00 Tm
+(12.1 THREE.JS COORDINATE SPACE AND VISUAL SCALING SAFEGUARDS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 650.00 523.00 75.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 709.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 713.00 Tm
+(FORMULA: COORDINATE MAPPING AND PIXEL-SAFE REBAR SCALING) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 697.00 Tm
+(3D Coordinate Space) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 697.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 697.00 Tm
+(X = Horizontal \(East\) | Y = Height \(Up\) | Z = Horizontal \(South\)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 697.00 Tm
+(Three.js) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 685.00 Tm
+(Physical Bar Radius) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 685.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 685.00 Tm
+(\( Bar_Diameter_mm x 0.001 \) / 2) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 685.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 673.00 Tm
+(Visual Radius Safeguard) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 673.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 673.00 Tm
+(Max\( 0.006 m, Physical_Bar_Radius \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 673.00 Tm
+(meters) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 661.00 Tm
+(Stirrup Visual Radius) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 661.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 661.00 Tm
+(Max\( 0.006 m, \( Stirrup_Diameter_mm x 0.001 \) / 2 \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 661.00 Tm
+(meters) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 653.00 m
+550.00 653.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 643.00 Tm
+(-  Actual civil rebar diameters \(8 mm to 16 mm\) become sub-pixel and flicker on WebGL canvases.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 633.00 Tm
+(-  A minimum safeguard radius of 0.006 m \(6 mm\) ensures crisp anti-aliased visibility at all zoom levels.) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 638.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 638.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 643.00 Tm
+(12.2 STEEL REBAR MATERIALS AND TRANSLUCENT CONCRETE SHADERS) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 624.00 Tm
+(Main Longitudinal Bars) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 624.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 624.00 Tm
+(Cyan Glow \(#00f0ff\) | Emissive: #0284c7 | Metalness: 0.90 | Roughness: 0.20) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 608.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 611.00 Tm
+(Stirrup Ties / Rings) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 611.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 611.00 Tm
+(Amber Gold \(#ffb703\) | Emissive: #d97706 | Metalness: 0.90 | Roughness: 0.20) Tj
+ET
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 598.00 Tm
+(Translucent Concrete Shell) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 598.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 598.00 Tm
+(Slate \(#64748b\) | Opacity: 0.20 | Transparent: true | depthWrite: false) Tj
+ET
+q
+0.970 0.980 0.990 rg
+40.00 582.00 515.00 13.00 re
+f
+Q
+BT
+/F1 8.0 Tf
+0.150 0.200 0.300 rg
+1 0 0 1 46.00 585.00 Tm
+(Rendering Order) Tj
+ET
+BT
+/F1 8.0 Tf
+0.400 0.400 0.500 rg
+1 0 0 1 218.00 585.00 Tm
+(:) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 226.00 585.00 Tm
+(Concrete Shell: renderOrder = 1 | Steel Rebar Cages: renderOrder = 10) Tj
+ET
+q
+0.920 0.950 0.980 rg
+0.750 0.830 0.920 RG
+0.80 w
+36.00 560.00 523.00 18.00 re
+B
+Q
+q
+0.080 0.350 0.650 rg
+36.00 560.00 4.00 18.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.080 0.250 0.500 rg
+1 0 0 1 46.00 565.00 Tm
+(12.3 RING BEAM REBAR CAGE LOCAL POSITIONING EQUATIONS) Tj
+ET
+q
+0.980 0.990 1.000 rg
+0.750 0.820 0.920 RG
+0.80 w
+36.00 439.00 523.00 115.00 re
+B
+Q
+q
+0.880 0.920 0.980 rg
+36.00 538.00 523.00 16.00 re
+f
+Q
+BT
+/F1 8.5 Tf
+0.060 0.200 0.450 rg
+1 0 0 1 44.00 542.00 Tm
+(FORMULA: LOCAL SPACE POSITIONING OF RING BEAM REBAR CAGES) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 526.00 Tm
+(Beam Local Rotation) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 526.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 526.00 Tm
+([ 0, -angle, 0 ] where angle = Atan2\( - \(eY - sY\), eX - sX \)) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 526.00 Tm
+(rotation) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 514.00 Tm
+(Top Bars Y Position) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 514.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 514.00 Tm
+(+ Core_Height / 2 - Stirrup_Radius - Bar_Radius) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 514.00 Tm
+(rot: [ 0, 0, pi/2 ]) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 502.00 Tm
+(Bottom Bars Y Position) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 502.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 502.00 Tm
+(- Core_Height / 2 + Stirrup_Radius + Bar_Radius) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 502.00 Tm
+(rot: [ 0, 0, pi/2 ]) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 490.00 Tm
+(Top Stirrup Rod) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 490.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 490.00 Tm
+(Pos: [ x_k, + Core_Height / 2, 0 ] | Rot: [ pi/2, 0, 0 ]) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 490.00 Tm
+(Length = Core_Width) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 478.00 Tm
+(Bottom Stirrup Rod) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 478.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 478.00 Tm
+(Pos: [ x_k, - Core_Height / 2, 0 ] | Rot: [ pi/2, 0, 0 ]) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 478.00 Tm
+(Length = Core_Width) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 466.00 Tm
+(Left Stirrup Rod) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 466.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 466.00 Tm
+(Pos: [ x_k, 0, - Core_Width / 2 ] | Rot: [ 0, 0, 0 ]) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 466.00 Tm
+(Length = Core_Height) Tj
+ET
+BT
+/F4 8.0 Tf
+0.100 0.200 0.400 rg
+1 0 0 1 46.00 454.00 Tm
+(Right Stirrup Rod) Tj
+ET
+BT
+/F1 8.5 Tf
+0.080 0.350 0.650 rg
+1 0 0 1 180.00 454.00 Tm
+(=) Tj
+ET
+BT
+/F3 8.0 Tf
+0.050 0.150 0.450 rg
+1 0 0 1 192.00 454.00 Tm
+(Pos: [ x_k, 0, + Core_Width / 2 ] | Rot: [ 0, 0, 0 ]) Tj
+ET
+BT
+/F2 7.5 Tf
+0.400 0.450 0.500 rg
+1 0 0 1 460.00 454.00 Tm
+(Length = Core_Height) Tj
+ET
+q
+0.850 0.880 0.930 RG
+0.50 w
+44.00 446.00 m
+550.00 446.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 436.00 Tm
+(-  Horizontal bars rotated by [0, 0, pi/2] along beam local X-axis.) Tj
+ET
+BT
+/F2 7.5 Tf
+0.300 0.350 0.420 rg
+1 0 0 1 46.00 426.00 Tm
+(-  Produces an authentic 3D structural steel cage meeting SP 34 reinforcement detailing standards.) Tj
+ET
+q
+0.850 0.880 0.920 RG
+0.80 w
+36.00 48.00 m
+559.00 48.00 l
+S
+Q
+BT
+/F2 7.5 Tf
+0.450 0.500 0.550 rg
+1 0 0 1 36.00 36.00 Tm
+(Civil Standards: IS 1077 \(Bricks\) | IS 1200 \(Measurements\) | IS 456:2000 \(Concrete\) | SP 34 \(Detailing\)) Tj
+ET
+BT
+/F1 8.0 Tf
+0.200 0.300 0.400 rg
+1 0 0 1 505.00 36.00 Tm
+(Page 12 of 12) Tj
+ET
+endstream
+endobj
+30 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 595.28 841.89]
+  /Resources <<
+    /Font <<
+      /F1 3 0 R
+      /F2 4 0 R
+      /F3 5 0 R
+      /F4 6 0 R
+    >>
+  >>
+  /Contents 29 0 R
+>>
+endobj
+xref
+0 31
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000195 00000 n 
+0000000270 00000 n 
+0000000340 00000 n 
+0000000408 00000 n 
+0000000481 00000 n 
+0000008826 00000 n 
+0000009032 00000 n 
+0000016198 00000 n 
+0000016405 00000 n 
+0000023574 00000 n 
+0000023782 00000 n 
+0000031122 00000 n 
+0000031330 00000 n 
+0000039664 00000 n 
+0000039872 00000 n 
+0000051422 00000 n 
+0000051630 00000 n 
+0000060210 00000 n 
+0000060418 00000 n 
+0000069043 00000 n 
+0000069251 00000 n 
+0000078624 00000 n 
+0000078832 00000 n 
+0000086950 00000 n 
+0000087158 00000 n 
+0000094452 00000 n 
+0000094660 00000 n 
+0000102841 00000 n 
+trailer
+<<
+  /Size 31
+  /Root 1 0 R
+>>
+startxref
+103049
+%%EOF

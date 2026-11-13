@@ -16,12 +16,15 @@ import {
   DEFAULT_RCC_FULL_RING_BEAM,
   RCCFullRingBeamConfig,
   DEFAULT_RCC_SLAB,
+  DEFAULT_RCC_ROOF_SLAB,
   RCCSlabConfig,
   FoundationFooting,
   FoundationConfig,
   DEFAULT_FOUNDATION_CONFIG,
   getEffectiveFootingSize,
   generateFootingsForPillars,
+  generateStructuralGridPillars,
+  calculateDynamicPillarFooting,
   calculateFootingRcc,
   trimWallByPillars, 
   splitWallByPillars,
@@ -39,23 +42,30 @@ import {
   PlasterUnit,
   PlasterScope,
   applyPillarConfigToAll,
-  CommonPillarConfig
+  CommonPillarConfig,
+  BuildingConfig,
+  DEFAULT_BUILDING_CONFIG,
+  toMeters,
+  calculateBuildingStructuralSummary,
+  getConcreteMixRatios
 } from '@/lib/brickCalculator';
-import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders } from 'lucide-react';
+import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { SaveProjectModal } from './SaveProjectModal';
+import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
 
 interface BuildingEditorProps {
   initialDetails: any;
   onGenerate: () => void;
 }
 
-type Tool = 'wall' | 'door' | 'window' | 'delete' | 'none' | 'pillar' | 'beam' | 'fullRingBeam' | 'foundation';
+type Tool = 'wall' | 'door' | 'window' | 'delete' | 'none' | 'pillar' | 'beam' | 'fullRingBeam' | 'foundation' | 'slab' | 'roof' | 'clear';
 
 export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorProps) {
-  const { setBuildingModel, buildingModel, brickType, settings, result, projectName } = useCalculator();
+  const { setBuildingModel, buildingModel, updateBuildingConfig, updateSettings, brickType, settings, result, projectName } = useCalculator();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isStructuralModalOpen, setIsStructuralModalOpen] = useState(false);
   
   // Helper to build initial floors with automatic structural pillars
   const createInitialModel = (): BuildingModel => {
@@ -144,13 +154,18 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       pillars: allInitialPillars,
       ringBeam: DEFAULT_RCC_RING_BEAM,
       fullRingBeam: DEFAULT_RCC_FULL_RING_BEAM,
-      slab: DEFAULT_RCC_SLAB,
+      slab: { ...DEFAULT_RCC_SLAB },
+      roofSlab: { ...DEFAULT_RCC_ROOF_SLAB },
       foundation: {
         ...DEFAULT_FOUNDATION_CONFIG,
         enabled: false,
         footings: []
       },
       plaster: { ...DEFAULT_PLASTER_CONFIG },
+      buildingConfig: {
+        ...DEFAULT_BUILDING_CONFIG,
+        floorCount: numFloors
+      },
       layoutMode: 'auto'
     };
   };
@@ -161,13 +176,18 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         ...buildingModel,
         ringBeam: buildingModel.ringBeam || DEFAULT_RCC_RING_BEAM,
         fullRingBeam: buildingModel.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM,
-        slab: buildingModel.slab || DEFAULT_RCC_SLAB,
+        slab: buildingModel.slab ? { ...buildingModel.slab } : { ...DEFAULT_RCC_SLAB },
+        roofSlab: buildingModel.roofSlab ? { ...buildingModel.roofSlab } : { ...DEFAULT_RCC_ROOF_SLAB },
         plaster: buildingModel.plaster || { ...DEFAULT_PLASTER_CONFIG },
+        buildingConfig: buildingModel.buildingConfig || {
+          ...DEFAULT_BUILDING_CONFIG,
+          floorCount: buildingModel.floors.length || 1
+        },
         floors: buildingModel.floors.map(fl => ({
           ...fl,
-          ringBeam: fl.ringBeam || buildingModel.ringBeam || DEFAULT_RCC_RING_BEAM,
-          fullRingBeam: fl.fullRingBeam || buildingModel.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM,
-          slab: fl.slab || DEFAULT_RCC_SLAB,
+          ringBeam: fl.ringBeam ? { ...fl.ringBeam } : (buildingModel.ringBeam ? { ...buildingModel.ringBeam } : { ...DEFAULT_RCC_RING_BEAM }),
+          fullRingBeam: fl.fullRingBeam ? { ...fl.fullRingBeam } : (buildingModel.fullRingBeam ? { ...buildingModel.fullRingBeam } : { ...DEFAULT_RCC_FULL_RING_BEAM }),
+          slab: fl.slab ? { ...fl.slab } : { ...DEFAULT_RCC_SLAB },
           plaster: fl.plaster || buildingModel.plaster || { ...DEFAULT_PLASTER_CONFIG },
           externalWalls: fl.externalWalls.map(w => ({ ...w, floorId: fl.id })),
           internalWalls: fl.internalWalls.map(w => ({ ...w, floorId: fl.id }))
@@ -207,6 +227,24 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const [useCommonOuter, setUseCommonOuter] = useState<boolean>(true);
   const [useCommonRccSideBeam, setUseCommonRccSideBeam] = useState<boolean>(true);
   const activeFloor = model.floors.find(f => f.id === activeFloorId) || model.floors[0];
+
+  // Keep global buildingModel continuously synchronized with 2D editor state
+  useEffect(() => {
+    setBuildingModel(model);
+  }, [model, setBuildingModel]);
+
+  // Synchronize Floor-Level Pillar dimensions when switching floors
+  useEffect(() => {
+    if (!activeFloor) return;
+    const flPillars = activeFloor.pillars || (model.pillars || []).filter(p => p.floorId === activeFloorId);
+    if (flPillars.length > 0) {
+      setFloorPillarWidth(flPillars[0].width || activeFloor.pillarWidth || 9);
+      setFloorPillarDepth(flPillars[0].depth || activeFloor.pillarDepth || 9);
+    } else {
+      setFloorPillarWidth(activeFloor.pillarWidth || 9);
+      setFloorPillarDepth(activeFloor.pillarDepth || 9);
+    }
+  }, [activeFloorId, activeFloor, model.pillars]);
 
   // Plaster configuration helpers for active floor & model
   const plasterConfig: PlasterConfig = {
@@ -638,6 +676,49 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const [applyPillarScope, setApplyPillarScope] = useState<'current' | 'all'>('current');
   const [showApplyAllConfirm, setShowApplyAllConfirm] = useState<boolean>(false);
   const [applyAllSuccessNotice, setApplyAllSuccessNotice] = useState<string | null>(null);
+  const [gridSpacingX, setGridSpacingX] = useState<number>(model.buildingUnit === 'm' ? 4 : 13);
+  const [gridSpacingY, setGridSpacingY] = useState<number>(model.buildingUnit === 'm' ? 4 : 13);
+  const [floorPillarWidth, setFloorPillarWidth] = useState<number>(12);
+  const [floorPillarDepth, setFloorPillarDepth] = useState<number>(12);
+  const [pillarRemovalModal, setPillarRemovalModal] = useState<{
+    isOpen: boolean;
+    targetPillar: Pillar;
+    selectedFloorIds: string[];
+  } | null>(null);
+
+  // Clean Graph / Remove All State
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [clearScope, setClearScope] = useState<'current' | 'all'>('current');
+  const [clearSelectedCategories, setClearSelectedCategories] = useState<{
+    pillars: boolean;
+    internalWalls: boolean;
+    externalWalls: boolean;
+    foundation: boolean;
+    slabs: boolean;
+    openings: boolean;
+  }>({
+    pillars: true,
+    internalWalls: true,
+    externalWalls: false,
+    foundation: false,
+    slabs: false,
+    openings: false,
+  });
+  const [clearConfirmModal, setClearConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmLabel?: string;
+    isDestructive?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
+  const [clearToast, setClearToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!clearToast) return;
+    const timer = setTimeout(() => setClearToast(null), 3500);
+    return () => clearTimeout(timer);
+  }, [clearToast]);
 
   // RCC Ring Beam Tool Config State
   const [beamEnabled, setBeamEnabled] = useState<boolean>(
@@ -1373,6 +1454,34 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     });
   };
 
+  const handleUpdateActiveFloorSlab = (changes: Partial<RCCSlabConfig>) => {
+    setModel(prev => ({
+      ...prev,
+      floors: prev.floors.map(fl => {
+        if (fl.id === activeFloorId) {
+          const curSlab = fl.slab ? { ...fl.slab } : { ...DEFAULT_RCC_SLAB };
+          const updatedSlab: RCCSlabConfig = { ...curSlab, ...changes };
+          if (changes.thickness !== undefined) {
+            updatedSlab.height = convertUnit(changes.thickness, changes.thicknessUnit || 'in', 'ft');
+          }
+          return { ...fl, slab: updatedSlab };
+        }
+        return fl;
+      })
+    }));
+  };
+
+  const handleUpdateRoofSlab = (changes: Partial<RCCSlabConfig>) => {
+    setModel(prev => {
+      const curRoof = prev.roofSlab ? { ...prev.roofSlab } : { ...DEFAULT_RCC_ROOF_SLAB };
+      const updatedRoof: RCCSlabConfig = { ...curRoof, ...changes };
+      if (changes.thickness !== undefined) {
+        updatedRoof.height = convertUnit(changes.thickness, changes.thicknessUnit || 'in', 'ft');
+      }
+      return { ...prev, roofSlab: updatedRoof };
+    });
+  };
+
   useEffect(() => {
     if (activeFloor) {
       const curRing = activeFloor.ringBeam ?? model.ringBeam ?? DEFAULT_RCC_RING_BEAM;
@@ -1387,9 +1496,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     }
   }, [activeFloorId]);
 
-  useEffect(() => {
-    setBuildingModel(model);
-  }, [model, setBuildingModel]);
 
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
@@ -1493,11 +1599,21 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         if (draggingFootingId) {
           setDraggingFootingId(null);
         }
+        if (draggingPillarId) {
+          setDraggingPillarId(null);
+          setDragStartPillarMouse(null);
+          setDragStartPillarPos(null);
+        }
       }
     };
     const handleWindowMouseUp = () => {
       if (draggingFootingId) {
         setDraggingFootingId(null);
+      }
+      if (draggingPillarId) {
+        setDraggingPillarId(null);
+        setDragStartPillarMouse(null);
+        setDragStartPillarPos(null);
       }
     };
 
@@ -1510,7 +1626,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       window.removeEventListener('mouseup', handleWindowMouseUp);
       window.removeEventListener('touchend', handleWindowMouseUp);
     };
-  }, [isPlacingFooting, draggingFootingId]);
+  }, [isPlacingFooting, draggingFootingId, draggingPillarId]);
 
   useEffect(() => {
     // Only auto-generate external walls in Auto mode
@@ -1630,11 +1746,19 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       slab: { ...DEFAULT_RCC_SLAB }
     };
 
-    setModel(prev => ({
-      ...prev,
-      floors: [...prev.floors, newFloor],
-      pillars: [...(prev.pillars || []), ...newFloorPillars]
-    }));
+    setModel(prev => {
+      const nextFloors = [...prev.floors, newFloor];
+      return {
+        ...prev,
+        floors: nextFloors,
+        pillars: [...(prev.pillars || []), ...newFloorPillars],
+        buildingConfig: {
+          ...DEFAULT_BUILDING_CONFIG,
+          ...(prev.buildingConfig || {}),
+          floorCount: nextFloors.length
+        }
+      };
+    });
     setActiveFloorId(newFloorId);
   };
 
@@ -1650,7 +1774,16 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     
     const updatedPillars = (model.pillars || []).filter(p => p.floorId !== floorIdToRemove);
 
-    setModel(prev => ({ ...prev, floors: updatedFloors, pillars: updatedPillars }));
+    setModel(prev => ({
+      ...prev,
+      floors: updatedFloors,
+      pillars: updatedPillars,
+      buildingConfig: {
+        ...DEFAULT_BUILDING_CONFIG,
+        ...(prev.buildingConfig || {}),
+        floorCount: updatedFloors.length
+      }
+    }));
     if (activeFloorId === floorIdToRemove) {
       setActiveFloorId(updatedFloors[updatedFloors.length - 1].id);
     }
@@ -1658,25 +1791,622 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
   const handleAutoGeneratePillars = () => {
     if (!activeFloor) return;
-    const generated = detectStructuralPillars(activeFloor, model.buildingLength, model.buildingWidth, model.buildingUnit, activeFloor.height).map((gp, idx) => ({
+    const existing = (model.pillars || []).filter(p => p.floorId === activeFloor.id);
+    const generated = detectStructuralPillars(
+      activeFloor,
+      model.buildingLength,
+      model.buildingWidth,
+      model.buildingUnit,
+      activeFloor.height,
+      {
+        targetSpacingX: gridSpacingX,
+        targetSpacingY: gridSpacingY,
+        existingPillars: existing,
+        preserveLocked: true
+      }
+    ).map((gp, idx) => ({
       ...gp,
-      id: `pillar-${activeFloor.id}-${Date.now()}-${idx + 1}`,
+      id: gp.isLocked && gp.id ? gp.id : `pillar-${activeFloor.id}-${Date.now()}-${idx + 1}`,
       name: gp.name || `P${idx + 1}`,
       floorId: activeFloor.id,
-      verticalColumnId: `col-${Date.now()}-${idx + 1}`,
+      verticalColumnId: gp.verticalColumnId || `col-${idx + 1}`,
       height: activeFloor.height
     }));
 
     setModel(prev => {
       const otherPillars = (prev.pillars || []).filter(p => p.floorId !== activeFloor.id);
+      let updatedFoundation = prev.foundation;
+      if (isGroundFloor && prev.foundation?.enabled) {
+        const nextConfig = prev.buildingConfig || DEFAULT_BUILDING_CONFIG;
+        const newFootings = generateFootingsForPillars(
+          generated,
+          prev.foundation,
+          prev.buildingUnit,
+          nextConfig,
+          prev.floors.length
+        );
+        updatedFoundation = {
+          ...prev.foundation,
+          footings: newFootings
+        };
+      }
+
       return {
         ...prev,
         pillars: [...otherPillars, ...generated],
         floors: prev.floors.map(fl => fl.id === activeFloor.id ? {
           ...fl,
           pillars: generated
-        } : fl)
+        } : fl),
+        foundation: updatedFoundation
       };
+    });
+  };
+
+  const handleApplyFloorPillarDimensions = (w: number, d: number) => {
+    setModel(prev => {
+      const updatedFloors = prev.floors.map(fl => {
+        if (fl.id !== activeFloorId) return fl;
+        return {
+          ...fl,
+          pillarWidth: w,
+          pillarDepth: d,
+          pillars: (fl.pillars || []).map(p => ({
+            ...p,
+            width: w,
+            depth: p.shape === 'circular' ? w : d,
+            unit: 'in' as Unit,
+            isCustomSize: true
+          }))
+        };
+      });
+
+      const updatedPillars = (prev.pillars || []).map(p => {
+        const matches = (!p.floorId && activeFloorId === prev.floors[0]?.id) || (p.floorId === activeFloorId);
+        if (!matches) return p;
+        return {
+          ...p,
+          width: w,
+          depth: p.shape === 'circular' ? w : d,
+          unit: 'in' as Unit,
+          isCustomSize: true
+        };
+      });
+
+      let updatedFoundation = prev.foundation;
+      if (activeFloorId === prev.floors[0]?.id && updatedFoundation?.footings) {
+        updatedFoundation = {
+          ...updatedFoundation,
+          footings: updatedFoundation.footings.map(f => ({
+            ...f,
+            columnStubWidth: w,
+            columnStubDepth: d
+          }))
+        };
+      }
+
+      return {
+        ...prev,
+        floors: updatedFloors,
+        pillars: updatedPillars,
+        foundation: updatedFoundation
+      };
+    });
+    setFloorPillarWidth(w);
+    setFloorPillarDepth(d);
+    setPillarWidth(w);
+    setPillarDepth(d);
+  };
+
+  const promptRemovePillar = (pillar: Pillar) => {
+    setPillarRemovalModal({
+      isOpen: true,
+      targetPillar: pillar,
+      selectedFloorIds: [pillar.floorId || activeFloorId]
+    });
+  };
+
+  const handleConfirmPillarRemoval = () => {
+    if (!pillarRemovalModal?.targetPillar) return;
+    const target = pillarRemovalModal.targetPillar;
+    const floorsToRemoveFrom = new Set(pillarRemovalModal.selectedFloorIds);
+    const targetX = target.position?.x ?? target.x ?? 0;
+    const targetY = target.position?.y ?? target.y ?? 0;
+
+    const isMatchingPillar = (p: Pillar) => {
+      if (p.id === target.id) return true;
+      if (target.verticalColumnId && p.verticalColumnId && p.verticalColumnId === target.verticalColumnId) return true;
+      const px = p.position?.x ?? p.x ?? 0;
+      const py = p.position?.y ?? p.y ?? 0;
+      return Math.hypot(px - targetX, py - targetY) < 0.3;
+    };
+
+    setModel(prev => {
+      const updatedFloors = prev.floors.map(fl => {
+        if (floorsToRemoveFrom.has(fl.id)) {
+          return {
+            ...fl,
+            pillars: (fl.pillars || []).filter(p => !isMatchingPillar(p))
+          };
+        }
+        return fl;
+      });
+
+      const updatedPillars = (prev.pillars || []).filter(p => {
+        if (isMatchingPillar(p)) {
+          const floorOfP = p.floorId || prev.floors[0]?.id;
+          return !floorsToRemoveFrom.has(floorOfP);
+        }
+        return true;
+      });
+
+      const groundFloorId = prev.floors[0]?.id || 'floor-0';
+      let updatedFoundation = prev.foundation;
+      if (floorsToRemoveFrom.has(groundFloorId) && updatedFoundation?.footings) {
+        updatedFoundation = {
+          ...updatedFoundation,
+          footings: updatedFoundation.footings.filter(f => {
+            if (f.pillarId === target.id) return false;
+            if (f.position && Math.hypot((f.position.x || 0) - targetX, (f.position.y || 0) - targetY) < 0.3) return false;
+            return true;
+          })
+        };
+      }
+
+      return {
+        ...prev,
+        floors: updatedFloors,
+        pillars: updatedPillars,
+        foundation: updatedFoundation
+      };
+    });
+
+    setSelectedPillarId(null);
+    setPillarRemovalModal(null);
+  };
+
+  // --- CLEAN GRAPH & BULK REMOVE HANDLERS ---
+
+  // 1. Clear Pillars / RCC Columns
+  const handleClearPillars = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+    
+    const countToRemove = scope === 'current'
+      ? (model.pillars || []).filter(p => p.floorId === targetFloorId).length
+      : (model.pillars || []).length;
+
+    if (countToRemove === 0) {
+      setClearToast(`No pillars to remove on ${scope === 'current' ? targetFloorName : 'any floor'}.`);
+      return;
+    }
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: scope === 'current' ? `Remove Pillars from ${targetFloorName}` : 'Remove All Pillars from All Floors',
+      description: `Are you sure you want to delete ${countToRemove} pillar(s) ${scope === 'current' ? `from ${targetFloorName}` : 'across all building floors'}?`,
+      confirmLabel: `Delete ${countToRemove} Pillar(s)`,
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => {
+          const updatedPillars = scope === 'current'
+            ? (prev.pillars || []).filter(p => p.floorId !== targetFloorId)
+            : [];
+          const updatedFloors = prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              return { ...fl, pillars: [] };
+            }
+            return fl;
+          });
+          return {
+            ...prev,
+            pillars: updatedPillars,
+            floors: updatedFloors
+          };
+        });
+        setSelectedPillarId(null);
+        setClearConfirmModal(null);
+        setClearToast(`Successfully removed ${countToRemove} pillar(s) (${scope === 'current' ? targetFloorName : 'All Floors'}).`);
+      }
+    });
+  };
+
+  // 2. Clear Internal Partition Walls
+  const handleClearInternalWalls = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+
+    const countToRemove = scope === 'current'
+      ? (activeFloor?.internalWalls || []).length
+      : model.floors.reduce((acc, fl) => acc + (fl.internalWalls?.length || 0), 0);
+
+    if (countToRemove === 0) {
+      setClearToast(`No internal partition walls found to clear.`);
+      return;
+    }
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: scope === 'current' ? `Clear Partition Walls (${targetFloorName})` : 'Clear Partition Walls (All Floors)',
+      description: `This will remove ${countToRemove} interior brick partition wall(s) while preserving outer boundary walls.`,
+      confirmLabel: `Clear ${countToRemove} Wall(s)`,
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => ({
+          ...prev,
+          floors: prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              return { ...fl, internalWalls: [] };
+            }
+            return fl;
+          })
+        }));
+        setSelectedWallForPlasterId(null);
+        setDrawingStart(null);
+        setClearConfirmModal(null);
+        setClearToast(`Cleared ${countToRemove} internal partition wall(s).`);
+      }
+    });
+  };
+
+  // 3. Clear All Walls (Full Blank Walls Reset)
+  const handleClearAllWalls = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+
+    const totalWalls = scope === 'current'
+      ? (activeFloor?.externalWalls?.length || 0) + (activeFloor?.internalWalls?.length || 0)
+      : model.floors.reduce((acc, fl) => acc + (fl.externalWalls?.length || 0) + (fl.internalWalls?.length || 0), 0);
+
+    if (totalWalls === 0) {
+      setClearToast(`No walls found to clear.`);
+      return;
+    }
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: scope === 'current' ? `Clear All Walls (${targetFloorName})` : 'Clear All Walls (All Floors)',
+      description: `This will delete ALL walls (${totalWalls} exterior & interior walls) on ${scope === 'current' ? targetFloorName : 'all floors'}, leaving a clean blank canvas.`,
+      confirmLabel: `Delete All ${totalWalls} Walls`,
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => ({
+          ...prev,
+          layoutMode: 'manual',
+          floors: prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              return { ...fl, externalWalls: [], internalWalls: [] };
+            }
+            return fl;
+          })
+        }));
+        setSelectedWallForPlasterId(null);
+        setDrawingStart(null);
+        setClearConfirmModal(null);
+        setClearToast(`Removed all ${totalWalls} walls (${scope === 'current' ? targetFloorName : 'All Floors'}).`);
+      }
+    });
+  };
+
+  // 4. Reset to Clean Default Rectangular Outer Perimeter
+  const handleResetOuterPerimeter = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const w = model.buildingLength;
+    const d = model.buildingWidth;
+    const t = model.externalWallThickness || 9;
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: 'Reset to Clean Outer Perimeter',
+      description: `This will reset outer walls to the default rectangle (${w}' × ${d}') and remove interior partitions on ${scope === 'current' ? activeFloor?.name : 'all floors'}.`,
+      confirmLabel: 'Reset Outer Perimeter',
+      isDestructive: false,
+      onConfirm: () => {
+        setModel(prev => ({
+          ...prev,
+          layoutMode: 'auto',
+          floors: prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              const extWalls = [
+                { id: `${fl.id}-front`, name: 'Front Wall', floorId: fl.id, start: { x: 0, y: 0 }, end: { x: w, y: 0 }, dimensions: { length: w, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+                { id: `${fl.id}-right`, name: 'Right Wall', floorId: fl.id, start: { x: w, y: 0 }, end: { x: w, y: d }, dimensions: { length: d, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+                { id: `${fl.id}-back`, name: 'Back Wall', floorId: fl.id, start: { x: w, y: d }, end: { x: 0, y: d }, dimensions: { length: w, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+                { id: `${fl.id}-left`, name: 'Left Wall', floorId: fl.id, start: { x: 0, y: d }, end: { x: 0, y: 0 }, dimensions: { length: d, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+              ];
+              return { ...fl, externalWalls: extWalls, internalWalls: [] };
+            }
+            return fl;
+          })
+        }));
+        setSelectedWallForPlasterId(null);
+        setDrawingStart(null);
+        setClearConfirmModal(null);
+        setClearToast('Reset outer boundary walls to standard perimeter.');
+      }
+    });
+  };
+
+  // 5. Clear Foundation Footings & Base
+  const handleClearFoundationFootings = () => {
+    const footingsCount = model.foundation?.footings?.length || 0;
+    if (footingsCount === 0 && !model.foundation?.enabled) {
+      setClearToast('Foundation is already empty.');
+      return;
+    }
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: 'Clear Foundation Footings & Base',
+      description: `This will remove all ${footingsCount} foundation footings and disable the foundation base configuration.`,
+      confirmLabel: `Delete ${footingsCount} Footing(s)`,
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => {
+          const curF = prev.foundation || DEFAULT_FOUNDATION_CONFIG;
+          return {
+            ...prev,
+            foundation: {
+              ...curF,
+              enabled: false,
+              footings: []
+            }
+          };
+        });
+        setSelectedFootingId(null);
+        setClearConfirmModal(null);
+        setClearToast(`Cleared ${footingsCount} foundation footing(s).`);
+      }
+    });
+  };
+
+  // 6. Clear Slabs & Ring Beams
+  const handleClearSlabsAndBeams = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: scope === 'current' ? `Turn Off Slabs & Beams (${targetFloorName})` : 'Turn Off Slabs & Beams (All Floors)',
+      description: `This will disable RCC floor slab, ring beam, full ring beam${scope === 'all' ? ', and roof slab' : ''} on ${scope === 'current' ? targetFloorName : 'all floors'}.`,
+      confirmLabel: 'Turn Off Slabs & Beams',
+      isDestructive: false,
+      onConfirm: () => {
+        setModel(prev => {
+          const updatedFloors = prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              return {
+                ...fl,
+                slab: { ...(fl.slab || DEFAULT_RCC_SLAB), enabled: false },
+                ringBeam: { ...(fl.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false },
+                fullRingBeam: { ...(fl.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false }
+              };
+            }
+            return fl;
+          });
+
+          return {
+            ...prev,
+            floors: updatedFloors,
+            slab: scope === 'all' ? { ...(prev.slab || DEFAULT_RCC_SLAB), enabled: false } : prev.slab,
+            ringBeam: scope === 'all' ? { ...(prev.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false } : prev.ringBeam,
+            fullRingBeam: scope === 'all' ? { ...(prev.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false } : prev.fullRingBeam,
+            roofSlab: scope === 'all' ? { ...(prev.roofSlab || DEFAULT_RCC_ROOF_SLAB), enabled: false } : prev.roofSlab
+          };
+        });
+        setClearConfirmModal(null);
+        setClearToast(`Disabled slabs & ring beams (${scope === 'current' ? targetFloorName : 'All Floors'}).`);
+      }
+    });
+  };
+
+  // 7. Clear Doors & Windows / Openings
+  const handleClearOpenings = (scope: 'current' | 'all' = 'current') => {
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+    const floorWalls = activeFloor ? [...activeFloor.externalWalls, ...activeFloor.internalWalls] : [];
+
+    const countOpenings = scope === 'current'
+      ? floorWalls.reduce((acc, w) => acc + (w.openings?.length || 0), 0)
+      : model.floors.reduce((acc, fl) => {
+          const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+          return acc + flWalls.reduce((a, w) => a + (w.openings?.length || 0), 0);
+        }, 0);
+
+    if (countOpenings === 0) {
+      setClearToast('No doors or windows found to clear.');
+      return;
+    }
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: scope === 'current' ? `Clear Doors & Windows (${targetFloorName})` : 'Clear Doors & Windows (All Floors)',
+      description: `This will remove all ${countOpenings} doors and windows from walls on ${scope === 'current' ? targetFloorName : 'all floors'}.`,
+      confirmLabel: `Remove ${countOpenings} Opening(s)`,
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => ({
+          ...prev,
+          floors: prev.floors.map(fl => {
+            if (scope === 'all' || fl.id === targetFloorId) {
+              return {
+                ...fl,
+                externalWalls: (fl.externalWalls || []).map(w => ({ ...w, openings: [] })),
+                internalWalls: (fl.internalWalls || []).map(w => ({ ...w, openings: [] }))
+              };
+            }
+            return fl;
+          })
+        }));
+        setClearConfirmModal(null);
+        setClearToast(`Removed ${countOpenings} doors and windows.`);
+      }
+    });
+  };
+
+  // 8. Master Clean Reset (Wipe Entire Canvas)
+  const handleClearEntireGraph = (options?: { resetBoundary?: boolean }) => {
+    const resetBoundary = options?.resetBoundary ?? false;
+    const w = model.buildingLength;
+    const d = model.buildingWidth;
+    const t = model.externalWallThickness || 9;
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: 'Wipe Entire Graph (Clean Canvas Reset)',
+      description: `Are you sure you want to completely clean the graph? This will remove all pillars, brick walls, openings, foundation footings, and turn off slabs/beams across all floors.`,
+      confirmLabel: 'Wipe Everything & Reset',
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => ({
+          ...prev,
+          pillars: [],
+          layoutMode: resetBoundary ? 'auto' : 'manual',
+          foundation: {
+            ...(prev.foundation || DEFAULT_FOUNDATION_CONFIG),
+            enabled: false,
+            footings: []
+          },
+          slab: { ...(prev.slab || DEFAULT_RCC_SLAB), enabled: false },
+          ringBeam: { ...(prev.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false },
+          fullRingBeam: { ...(prev.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false },
+          roofSlab: { ...(prev.roofSlab || DEFAULT_RCC_ROOF_SLAB), enabled: false },
+          floors: prev.floors.map(fl => {
+            const extWalls = resetBoundary ? [
+              { id: `${fl.id}-front`, name: 'Front Wall', floorId: fl.id, start: { x: 0, y: 0 }, end: { x: w, y: 0 }, dimensions: { length: w, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+              { id: `${fl.id}-right`, name: 'Right Wall', floorId: fl.id, start: { x: w, y: 0 }, end: { x: w, y: d }, dimensions: { length: d, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+              { id: `${fl.id}-back`, name: 'Back Wall', floorId: fl.id, start: { x: w, y: d }, end: { x: 0, y: d }, dimensions: { length: w, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+              { id: `${fl.id}-left`, name: 'Left Wall', floorId: fl.id, start: { x: 0, y: d }, end: { x: 0, y: 0 }, dimensions: { length: d, height: fl.height, thickness: t, unit: prev.buildingUnit, thicknessUnit: 'in' as Unit }, openings: [] },
+            ] : [];
+
+            return {
+              ...fl,
+              pillars: [],
+              internalWalls: [],
+              externalWalls: extWalls,
+              slab: { ...(fl.slab || DEFAULT_RCC_SLAB), enabled: false },
+              ringBeam: { ...(fl.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false },
+              fullRingBeam: { ...(fl.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false }
+            };
+          })
+        }));
+        setSelectedPillarId(null);
+        setSelectedFootingId(null);
+        setSelectedWallForPlasterId(null);
+        setDrawingStart(null);
+        setClearConfirmModal(null);
+        setClearToast('Graph completely cleaned! Canvas is ready for a fresh layout.');
+      }
+    });
+  };
+
+  // 9. Multi-Select Clean Executor
+  const handleExecuteMultiClean = () => {
+    const scope = clearScope;
+    const targetFloorId = activeFloorId;
+    const targetFloorName = activeFloor?.name || 'Current Floor';
+    const sel = clearSelectedCategories;
+
+    if (!sel.pillars && !sel.internalWalls && !sel.externalWalls && !sel.foundation && !sel.slabs && !sel.openings) {
+      setClearToast('Please select at least one component category to clean.');
+      return;
+    }
+
+    const categoriesList: string[] = [];
+    if (sel.pillars) categoriesList.push('Pillars');
+    if (sel.internalWalls) categoriesList.push('Internal Walls');
+    if (sel.externalWalls) categoriesList.push('External Walls');
+    if (sel.foundation) categoriesList.push('Foundation Footings');
+    if (sel.slabs) categoriesList.push('Slabs & Beams');
+    if (sel.openings) categoriesList.push('Doors & Windows');
+
+    setClearConfirmModal({
+      isOpen: true,
+      title: `Clean Selected Components (${scope === 'current' ? targetFloorName : 'All Floors'})`,
+      description: `You are about to remove: ${categoriesList.join(', ')} on ${scope === 'current' ? targetFloorName : 'all building floors'}. Proceed?`,
+      confirmLabel: 'Confirm Clean',
+      isDestructive: true,
+      onConfirm: () => {
+        setModel(prev => {
+          let updatedPillars = prev.pillars || [];
+          if (sel.pillars) {
+            updatedPillars = scope === 'current'
+              ? updatedPillars.filter(p => p.floorId !== targetFloorId)
+              : [];
+          }
+
+          let updatedFoundation = prev.foundation ? { ...prev.foundation } : { ...DEFAULT_FOUNDATION_CONFIG };
+          if (sel.foundation) {
+            updatedFoundation.enabled = false;
+            updatedFoundation.footings = [];
+          }
+
+          let updatedSlab = prev.slab;
+          let updatedRoofSlab = prev.roofSlab;
+          let updatedRingBeam = prev.ringBeam;
+          let updatedFullRingBeam = prev.fullRingBeam;
+
+          if (sel.slabs && scope === 'all') {
+            updatedSlab = { ...(prev.slab || DEFAULT_RCC_SLAB), enabled: false };
+            updatedRoofSlab = { ...(prev.roofSlab || DEFAULT_RCC_ROOF_SLAB), enabled: false };
+            updatedRingBeam = { ...(prev.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false };
+            updatedFullRingBeam = { ...(prev.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false };
+          }
+
+          const updatedFloors = prev.floors.map(fl => {
+            const isTarget = scope === 'all' || fl.id === targetFloorId;
+            if (!isTarget) return fl;
+
+            let extWalls = fl.externalWalls;
+            let intWalls = fl.internalWalls;
+
+            if (sel.openings) {
+              extWalls = extWalls.map(w => ({ ...w, openings: [] }));
+              intWalls = intWalls.map(w => ({ ...w, openings: [] }));
+            }
+
+            if (sel.internalWalls) {
+              intWalls = [];
+            }
+
+            if (sel.externalWalls) {
+              extWalls = [];
+            }
+
+            return {
+              ...fl,
+              pillars: sel.pillars ? [] : fl.pillars,
+              internalWalls: intWalls,
+              externalWalls: extWalls,
+              slab: sel.slabs ? { ...(fl.slab || DEFAULT_RCC_SLAB), enabled: false } : fl.slab,
+              ringBeam: sel.slabs ? { ...(fl.ringBeam || DEFAULT_RCC_RING_BEAM), enabled: false } : fl.ringBeam,
+              fullRingBeam: sel.slabs ? { ...(fl.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM), enabled: false } : fl.fullRingBeam
+            };
+          });
+
+          return {
+            ...prev,
+            pillars: updatedPillars,
+            foundation: updatedFoundation,
+            slab: updatedSlab,
+            roofSlab: updatedRoofSlab,
+            ringBeam: updatedRingBeam,
+            fullRingBeam: updatedFullRingBeam,
+            layoutMode: sel.externalWalls ? 'manual' : prev.layoutMode,
+            floors: updatedFloors
+          };
+        });
+
+        if (sel.pillars) setSelectedPillarId(null);
+        if (sel.foundation) setSelectedFootingId(null);
+        if (sel.internalWalls || sel.externalWalls) {
+          setSelectedWallForPlasterId(null);
+          setDrawingStart(null);
+        }
+
+        setIsClearModalOpen(false);
+        setClearConfirmModal(null);
+        setClearToast(`Cleaned selected components: ${categoriesList.join(', ')}.`);
+      }
     });
   };
 
@@ -1791,18 +2521,94 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const updateActiveFloorPillar = (changes: Partial<Pillar>) => {
     if (!selectedPillarId) return;
     setModel(prev => {
-      const updatedPillars = (prev.pillars || []).map(p => (p.floorId === activeFloorId && p.id === selectedPillarId) ? { ...p, ...changes } : p);
-      const updatedFloors = prev.floors.map(fl => fl.id === activeFloorId ? {
-        ...fl,
-        pillars: (fl.pillars || []).map(p => p.id === selectedPillarId ? { ...p, ...changes } : p)
-      } : fl);
+      const isSizeChange = changes.width !== undefined || changes.depth !== undefined;
+      const updatedPillars = (prev.pillars || []).map(p => {
+        const matches = (p.id === selectedPillarId) && (!p.floorId || p.floorId === activeFloorId);
+        if (!matches) return p;
+        const newWidth = changes.width !== undefined ? changes.width : p.width;
+        const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
+        const newUnit = changes.unit || p.unit || 'in';
+        
+        let warning = p.structuralWarning;
+        if (p.structuralData?.requiredAgMm2) {
+          const provW_m = toMeters(newWidth, newUnit);
+          const provD_m = (changes.shape || p.shape) === 'circular' ? provW_m : toMeters(newDepth, newUnit);
+          const provAreaMm2 = (provW_m * 1000) * (provD_m * 1000);
+          if (provAreaMm2 < p.structuralData.requiredAgMm2) {
+            const reqW_in = Math.ceil(Math.sqrt(p.structuralData.requiredAgMm2) * (1 / 25.4));
+            warning = `Section ${newWidth}"×${newDepth}" (${Math.round(provAreaMm2)} mm²) is below IS 456 required area (${Math.round(p.structuralData.requiredAgMm2)} mm²). Recommend min ${reqW_in}"×${reqW_in}".`;
+          } else {
+            warning = undefined;
+          }
+        }
+
+        return {
+          ...p,
+          ...changes,
+          unit: newUnit,
+          isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize),
+          structuralWarning: warning,
+          structuralData: p.structuralData ? { ...p.structuralData, warning } : undefined
+        };
+      });
+
+      const updatedFloors = prev.floors.map(fl => {
+        if (fl.id !== activeFloorId) return fl;
+        return {
+          ...fl,
+          pillars: (fl.pillars || []).map(p => {
+            if (p.id !== selectedPillarId) return p;
+            const newWidth = changes.width !== undefined ? changes.width : p.width;
+            const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
+            const newUnit = changes.unit || p.unit || 'in';
+            return {
+              ...p,
+              ...changes,
+              unit: newUnit,
+              isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
+            };
+          })
+        };
+      });
 
       let updatedFoundation = prev.foundation;
-      if (isGroundFloor && changes.position && updatedFoundation && updatedFoundation.footings) {
-        updatedFoundation = {
-          ...updatedFoundation,
-          footings: updatedFoundation.footings.map(f => f.pillarId === selectedPillarId ? { ...f, position: changes.position } : f)
-        };
+      const targetPillar = updatedPillars.find(p => p.id === selectedPillarId) || (prev.pillars || []).find(p => p.id === selectedPillarId);
+      if (targetPillar && updatedFoundation && updatedFoundation.footings) {
+        const linkedFootingIndex = updatedFoundation.footings.findIndex(f => f.pillarId === selectedPillarId || (isGroundFloor && f.position && Math.hypot((f.position.x || 0) - (targetPillar.position?.x || 0), (f.position.y || 0) - (targetPillar.position?.y || 0)) < 0.2));
+        if (linkedFootingIndex >= 0) {
+          const curFooting = updatedFoundation.footings[linkedFootingIndex];
+          const dynamicSizing = calculateDynamicPillarFooting(
+            targetPillar,
+            prev.buildingUnit,
+            updatedFoundation,
+            prev.buildingConfig,
+            prev.floors.length
+          );
+
+          const updatedFootings = [...updatedFoundation.footings];
+          updatedFootings[linkedFootingIndex] = {
+            ...curFooting,
+            columnStubWidth: targetPillar.width,
+            columnStubDepth: targetPillar.depth,
+            columnStubUnit: targetPillar.unit || curFooting.columnStubUnit || 'in',
+            footingLength: dynamicSizing.footingLength,
+            footingWidth: dynamicSizing.footingWidth,
+            footingDepth: dynamicSizing.footingDepth,
+            pccLength: dynamicSizing.pccLength,
+            pccWidth: dynamicSizing.pccWidth,
+            sandFillLength: dynamicSizing.sandFillLength,
+            sandFillWidth: dynamicSizing.sandFillWidth,
+            excavationLength: dynamicSizing.excavationLength,
+            excavationWidth: dynamicSizing.excavationWidth,
+            excavationDepth: dynamicSizing.excavationDepth,
+            foundationBedLevel: dynamicSizing.foundationBedLevel,
+            position: changes.position || curFooting.position
+          };
+          updatedFoundation = {
+            ...updatedFoundation,
+            footings: updatedFootings
+          };
+        }
       }
 
       return {
@@ -1812,6 +2618,442 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         foundation: updatedFoundation
       };
     });
+  };
+
+  const handleDimensionChange = (newLen: number, newWid: number) => {
+    if (newLen <= 0 || newWid <= 0 || isNaN(newLen) || isNaN(newWid)) return;
+    setModel(prev => {
+      const w = newLen;
+      const d = newWid;
+      const t = prev.externalWallThickness || 9;
+      const u = prev.buildingUnit || 'ft';
+
+      let updatedFloors = prev.floors.map(floor => {
+        if (prev.layoutMode === 'manual') return floor;
+        const currentExt = floor.externalWalls;
+        const extWalls: Wall[] = [
+          { 
+            id: `${floor.id}-front`, name: 'Front Wall', 
+            start: { x: 0, y: 0 }, end: { x: w, y: 0 },
+            dimensions: { length: w, height: floor.height, thickness: t, unit: u, thicknessUnit: 'in' as Unit }, 
+            openings: currentExt.find(ew => ew.id === `${floor.id}-front` || ew.name === 'Front Wall')?.openings || []
+          },
+          { 
+            id: `${floor.id}-right`, name: 'Right Wall', 
+            start: { x: w, y: 0 }, end: { x: w, y: d },
+            dimensions: { length: d, height: floor.height, thickness: t, unit: u, thicknessUnit: 'in' as Unit }, 
+            openings: currentExt.find(ew => ew.id === `${floor.id}-right` || ew.name === 'Right Wall')?.openings || []
+          },
+          { 
+            id: `${floor.id}-back`, name: 'Back Wall', 
+            start: { x: w, y: d }, end: { x: 0, y: d },
+            dimensions: { length: w, height: floor.height, thickness: t, unit: u, thicknessUnit: 'in' as Unit }, 
+            openings: currentExt.find(ew => ew.id === `${floor.id}-back` || ew.name === 'Back Wall')?.openings || []
+          },
+          { 
+            id: `${floor.id}-left`, name: 'Left Wall', 
+            start: { x: 0, y: d }, end: { x: 0, y: 0 },
+            dimensions: { length: d, height: floor.height, thickness: t, unit: u, thicknessUnit: 'in' as Unit }, 
+            openings: currentExt.find(ew => ew.id === `${floor.id}-left` || ew.name === 'Left Wall')?.openings || []
+          },
+        ];
+        return { ...floor, externalWalls: extWalls };
+      });
+
+      let allPillars = prev.pillars || [];
+      if (prev.layoutMode !== 'manual') {
+        const gf = updatedFloors[0];
+        const lockedPillars = (prev.pillars || []).filter(p => p.isLocked);
+        const gridSpacing = 13;
+        const groundPillars = generateStructuralGridPillars(
+          gf,
+          w,
+          d,
+          u,
+          gf?.height || 10,
+          {
+            targetSpacingX: gridSpacing,
+            targetSpacingY: gridSpacing,
+            maxSpan: gridSpacing > 15 ? gridSpacing : 15,
+            existingPillars: lockedPillars,
+            preserveLocked: true
+          }
+        );
+
+        allPillars = [];
+        updatedFloors = updatedFloors.map(floor => {
+          const flId = floor.id;
+          const flPillars: Pillar[] = groundPillars.map((gp, pIdx) => ({
+            ...gp,
+            id: `pillar-${flId}-${pIdx + 1}`,
+            floorId: flId,
+            verticalColumnId: gp.verticalColumnId || `col-${pIdx + 1}`,
+            height: floor.height,
+            width: floor.pillarWidth || gp.width,
+            depth: floor.pillarDepth || gp.depth,
+            position: { x: gp.position?.x ?? gp.x ?? 0, y: gp.position?.y ?? gp.y ?? 0 },
+            x: gp.position?.x ?? gp.x ?? 0,
+            y: gp.position?.y ?? gp.y ?? 0,
+            showIn3D: true
+          }));
+          allPillars.push(...flPillars);
+          return { ...floor, pillars: flPillars };
+        });
+      }
+
+      return {
+        ...prev,
+        buildingLength: w,
+        buildingWidth: d,
+        floors: updatedFloors,
+        pillars: allPillars
+      };
+    });
+  };
+
+  const handleUpdateStructuralConfig = (
+    newConfig: BuildingConfig,
+    buildingDetails?: BuildingDetailsConfig
+  ) => {
+    updateBuildingConfig(newConfig);
+
+    const newLength = (buildingDetails && buildingDetails.length > 0) ? buildingDetails.length : model.buildingLength;
+    const newWidth = (buildingDetails && buildingDetails.width > 0) ? buildingDetails.width : model.buildingWidth;
+    const newUnit = buildingDetails?.unit || model.buildingUnit || 'ft';
+    const newThickness = (buildingDetails && buildingDetails.wallThickness !== undefined && buildingDetails.wallThickness > 0)
+      ? buildingDetails.wallThickness
+      : (model.externalWallThickness || 9);
+
+    const targetCount = newConfig.floorCount;
+    const h = newConfig.floorHeight || 10;
+    const gridSpacingX = 13.0;
+    const gridSpacingY = 13.0;
+
+    // 1. Build updated floors matching targetCount and new dimensions
+    let updatedFloors: Floor[] = [];
+    for (let i = 0; i < targetCount; i++) {
+      const existingFloor = model.floors[i];
+      const floorId = existingFloor ? existingFloor.id : `floor-${i}-${Date.now()}`;
+      const floorLevel = i;
+      const floorName = i === 0 ? 'Ground Floor' : `Floor ${i}`;
+
+      const currentExt = existingFloor?.externalWalls || [];
+      const extWalls: Wall[] = (model.layoutMode === 'manual' && existingFloor && existingFloor.externalWalls.length > 0)
+        ? existingFloor.externalWalls.map(ew => ({
+            ...ew,
+            dimensions: { ...ew.dimensions, height: h }
+          }))
+        : [
+            {
+              id: `${floorId}-front`,
+              name: 'Front Wall',
+              floorId,
+              start: { x: 0, y: 0 },
+              end: { x: newLength, y: 0 },
+              dimensions: { length: newLength, height: h, thickness: newThickness, unit: newUnit, thicknessUnit: 'in' },
+              openings: currentExt.find(ew => ew.id === `${floorId}-front` || ew.name === 'Front Wall')?.openings || []
+            },
+            {
+              id: `${floorId}-right`,
+              name: 'Right Wall',
+              floorId,
+              start: { x: newLength, y: 0 },
+              end: { x: newLength, y: newWidth },
+              dimensions: { length: newWidth, height: h, thickness: newThickness, unit: newUnit, thicknessUnit: 'in' },
+              openings: currentExt.find(ew => ew.id === `${floorId}-right` || ew.name === 'Right Wall')?.openings || []
+            },
+            {
+              id: `${floorId}-back`,
+              name: 'Back Wall',
+              floorId,
+              start: { x: newLength, y: newWidth },
+              end: { x: 0, y: newWidth },
+              dimensions: { length: newLength, height: h, thickness: newThickness, unit: newUnit, thicknessUnit: 'in' },
+              openings: currentExt.find(ew => ew.id === `${floorId}-back` || ew.name === 'Back Wall')?.openings || []
+            },
+            {
+              id: `${floorId}-left`,
+              name: 'Left Wall',
+              floorId,
+              start: { x: 0, y: newWidth },
+              end: { x: 0, y: 0 },
+              dimensions: { length: newWidth, height: h, thickness: newThickness, unit: newUnit, thicknessUnit: 'in' },
+              openings: currentExt.find(ew => ew.id === `${floorId}-left` || ew.name === 'Left Wall')?.openings || []
+            }
+          ];
+
+      const intWalls: Wall[] = (existingFloor?.internalWalls || []).map(iw => ({
+        ...iw,
+        floorId,
+        dimensions: { ...iw.dimensions, height: h }
+      }));
+
+      updatedFloors.push({
+        id: floorId,
+        name: existingFloor?.name || floorName,
+        level: floorLevel,
+        height: h,
+        unit: newUnit,
+        externalWalls: extWalls,
+        internalWalls: intWalls,
+        pillars: existingFloor?.pillars || [],
+        ringBeam: existingFloor?.ringBeam ? { ...existingFloor.ringBeam } : (model.ringBeam ? { ...model.ringBeam } : { ...DEFAULT_RCC_RING_BEAM }),
+        fullRingBeam: existingFloor?.fullRingBeam ? { ...existingFloor.fullRingBeam } : (model.fullRingBeam ? { ...model.fullRingBeam } : { ...DEFAULT_RCC_FULL_RING_BEAM }),
+        slab: existingFloor?.slab ? { ...existingFloor.slab } : (model.slab ? { ...model.slab } : { ...DEFAULT_RCC_SLAB }),
+        plaster: existingFloor?.plaster ? { ...existingFloor.plaster } : (model.plaster ? { ...model.plaster } : { ...DEFAULT_PLASTER_CONFIG }),
+        pillarWidth: existingFloor?.pillarWidth,
+        pillarDepth: existingFloor?.pillarDepth
+      });
+    }
+
+    // 2. Generate intelligent structural column grid covering the entire building footprint
+    const groundFloor = updatedFloors[0];
+    const lockedPillars = (model.pillars || []).filter(p => p.isLocked);
+    const groundPillars = generateStructuralGridPillars(
+      groundFloor,
+      newLength,
+      newWidth,
+      newUnit,
+      h,
+      {
+        targetSpacingX: gridSpacingX,
+        targetSpacingY: gridSpacingY,
+        maxSpan: gridSpacingX > 15 ? gridSpacingX : 15,
+        existingPillars: lockedPillars,
+        preserveLocked: true
+      }
+    );
+
+    // Propagate columns vertically across all storeys
+    let allPillars: Pillar[] = [];
+    updatedFloors = updatedFloors.map((floor) => {
+      const flId = floor.id;
+      const existingFloorPillars = floor.pillars || [];
+
+      const floorPillars: Pillar[] = groundPillars.map((gp, pIdx) => {
+        const colId = gp.verticalColumnId || `col-${pIdx + 1}`;
+        const prevMatching = existingFloorPillars.find(p => p.verticalColumnId === colId || p.id === `pillar-${flId}-${pIdx + 1}`);
+
+        const customW = prevMatching?.isCustomSize ? prevMatching.width : (floor.pillarWidth || gp.width);
+        const customD = prevMatching?.isCustomSize ? prevMatching.depth : (floor.pillarDepth || gp.depth);
+        const isCustom = prevMatching?.isCustomSize || floor.pillarWidth !== undefined || floor.pillarDepth !== undefined;
+
+        return {
+          ...gp,
+          id: `pillar-${flId}-${pIdx + 1}`,
+          floorId: flId,
+          verticalColumnId: colId,
+          height: h,
+          width: customW,
+          depth: customD,
+          unit: 'in' as Unit,
+          isCustomSize: isCustom,
+          position: { x: gp.position?.x ?? gp.x ?? 0, y: gp.position?.y ?? gp.y ?? 0 },
+          x: gp.position?.x ?? gp.x ?? 0,
+          y: gp.position?.y ?? gp.y ?? 0,
+          showIn3D: prevMatching?.showIn3D ?? true
+        };
+      });
+
+      allPillars.push(...floorPillars);
+      return {
+        ...floor,
+        pillars: floorPillars
+      };
+    });
+
+    // 3. Dynamic Column Cross-Section & Reinforcement Calculation
+    const bLengthM = toMeters(newLength, newUnit);
+    const bWidthM = toMeters(newWidth, newUnit);
+    const allWallsForStructural = updatedFloors.flatMap(f => [...f.externalWalls, ...f.internalWalls]);
+
+    const fineAggRate = newConfig.fineAggregateType === 'river_sand' ? 80 : 55;
+    const cr = newConfig.customRates || {};
+    const structuralRates = {
+      cementBagPrice: cr.cementBagPrice || 400,
+      sandPricePerCft: cr.sandPricePerCft || fineAggRate,
+      aggregatePricePerCft: cr.aggregatePricePerCft ?? 45,
+      steelRatePerKg: cr.steelRatePerKg || 65,
+      brickPrice: cr.brickPrice || 8.5,
+      excavationRatePerM3: cr.excavationRatePerM3 || 250,
+      pccRatePerM3: cr.pccLabourRatePerM3 || 3200,
+      footingLabourRatePerM3: cr.footingLabourRatePerM3 || 3500,
+      columnLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+      beamLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+      slabLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+      masonWagePerDay: cr.masonWagePerDay || 900,
+      helperWagePerDay: cr.helperWagePerDay || 600,
+      formworkRatePerM2: cr.formworkRatePerM2 || 350,
+      wastagePercent: cr.wastagePercent ?? 5,
+      overheadPercent: 5,
+      contingencyPercent: cr.contingencyPercent ?? 5,
+      taxPercent: cr.taxPercent ?? 18,
+      transportCost: 0,
+      equipmentCost: 0
+    };
+
+    const structuralSummary = calculateBuildingStructuralSummary(
+      allPillars,
+      allWallsForStructural,
+      bLengthM,
+      bWidthM,
+      newConfig,
+      structuralRates,
+      updatedFloors,
+      model.roofSlab
+    );
+
+    // Mutate pillar dimensions and rebar according to calculated loads
+    const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
+    allPillars = allPillars.map(p => {
+      const calc = calcMap.get(p.id);
+      if (calc) {
+        const autoW = Math.round(calc.providedWidthMm * (1 / 25.4));
+        const autoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+        const widthIn = p.isCustomSize ? p.width : autoW;
+        const depthIn = p.isCustomSize ? p.depth : autoD;
+
+        const provW_m = toMeters(widthIn, p.unit || 'in');
+        const provD_m = p.shape === 'circular' ? provW_m : toMeters(depthIn, p.unit || 'in');
+        const provAreaMm2 = (provW_m * 1000) * (provD_m * 1000);
+        const structuralWarning = provAreaMm2 < calc.requiredGrossAreaAgMm2
+          ? `Section ${widthIn}"×${depthIn}" (${Math.round(provAreaMm2)} mm²) is below IS 456 required area (${Math.round(calc.requiredGrossAreaAgMm2)} mm²) for ${calc.factoredUltimateLoadKn.toFixed(0)} kN load. Recommend minimum ${Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4))}"×${Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4))}".`
+          : undefined;
+
+        return {
+          ...p,
+          width: widthIn,
+          depth: depthIn,
+          unit: 'in' as Unit,
+          structuralWarning,
+          structuralRole: calc.role,
+          rebarConfig: {
+            pillarMainBarCount: calc.providedBarCount,
+            pillarMainBarDiaMm: calc.providedBarDiaMm,
+            pillarStirrupDiaMm: calc.stirrupDiaMm,
+            pillarStirrupSpacingMm: calc.stirrupSpacingMm,
+            pillarCoverMm: 40,
+            mainSteelWeightKg: calc.mainSteelWeightKg,
+            stirrupSteelWeightKg: calc.stirrupWeightKg
+          },
+          structuralData: {
+            role: calc.role,
+            tributaryAreaM2: calc.tributaryAreaM2,
+            tributaryAreaSqFt: calc.tributaryAreaSqFt,
+            serviceLoadKn: calc.totalServiceLoadKn,
+            factoredLoadKn: calc.factoredUltimateLoadKn,
+            capacityKn: calc.axialCapacityPuzKn,
+            capacityUtilization: calc.capacityUtilizationRatio,
+            slendernessRatio: calc.slendernessRatioLambda,
+            isShortColumn: calc.isShortColumn,
+            requiredAgMm2: calc.requiredGrossAreaAgMm2,
+            providedAgMm2: calc.providedGrossAreaAgMm2,
+            steelPercentage: calc.steelPercentageP
+          },
+          calculatedFooting: {
+            lengthM: calc.providedFootingLengthM,
+            widthM: calc.providedFootingWidthM,
+            depthM: calc.providedFootingDepthM,
+            areaM2: calc.requiredFootingAreaM2,
+            serviceLoadKn: calc.serviceFootingLoadKn,
+            excavationM3: calc.footingExcavationM3,
+            pccM3: calc.footingPccM3,
+            rccM3: calc.footingRccM3,
+            steelKg: calc.footingSteelKg
+          }
+        };
+      }
+      return p;
+    });
+
+    // Synchronize updated pillars back into each floor
+    updatedFloors = updatedFloors.map(fl => ({
+      ...fl,
+      pillars: allPillars.filter(p => p.floorId === fl.id)
+    }));
+
+    // 4. Update foundation configuration & footings dynamically
+    const gf = updatedFloors[0];
+    const gfPillars = allPillars.filter(p => !p.floorId || String(p.floorId) === String(gf?.id));
+    const fType = newConfig.foundationType || model.foundation?.foundationType || 'isolated';
+    const fDepthFt = newConfig.foundationDepthM ? (newConfig.foundationDepthM * 3.28084) : (model.foundation?.depth || 5.0);
+
+    const updatedFoundation: FoundationConfig = {
+      ...DEFAULT_FOUNDATION_CONFIG,
+      ...(model.foundation || {}),
+      enabled: true,
+      autoGenerateMode: true,
+      foundationType: fType,
+      soilBearingCapacityKnM2: newConfig.allowableSoilBearingPressureKnM2 || 150,
+      soilClassification: newConfig.soilClassification,
+      soilType: newConfig.soilClassification,
+      depth: fDepthFt,
+      defaultExcavationDepth: fDepthFt,
+      concreteGrade: newConfig.concreteGrade
+    };
+
+    updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, newUnit, newConfig, updatedFloors.length);
+
+    const updatedRoofSlab = model.roofSlab ? {
+      ...model.roofSlab,
+      ...(newConfig.roofConfig?.type ? { type: newConfig.roofConfig.type } : {})
+    } : model.roofSlab;
+
+    const finalUpdatedModel: BuildingModel = {
+      ...model,
+      buildingLength: newLength,
+      buildingWidth: newWidth,
+      buildingUnit: newUnit,
+      externalWallThickness: newThickness,
+      buildingConfig: newConfig,
+      roofSlab: updatedRoofSlab,
+      structuralSummary,
+      foundation: updatedFoundation,
+      floors: updatedFloors,
+      pillars: allPillars
+    };
+
+    setModel(finalUpdatedModel);
+    setBuildingModel(finalUpdatedModel);
+
+    if (!updatedFloors.some(f => f.id === activeFloorId)) {
+      setActiveFloorId(updatedFloors[0]?.id || 'floor-0');
+    }
+
+    const fineAggPrice = newConfig.fineAggregateType === 'river_sand' ? 80 : 55;
+    const sandPricePerCft = cr.sandPricePerCft || fineAggPrice;
+    const aggPricePerCft = cr.aggregatePricePerCft ?? 45;
+    const mix = getConcreteMixRatios(newConfig.concreteGrade);
+
+    updateSettings({
+      concreteGrade: newConfig.concreteGrade,
+      rccConcreteMixRatio: mix.ratioString as any,
+      rccCementRatio: mix.cement,
+      rccSandRatio: mix.sand,
+      rccAggregateRatio: mix.aggregate,
+      cementPrice: cr.cementBagPrice || 400,
+      sandPrice: sandPricePerCft * 35.3147,
+      sandPricePerCft: sandPricePerCft,
+      aggregatePrice: aggPricePerCft * 35.3147,
+      aggregatePricePerCft: aggPricePerCft,
+      steelRate: cr.steelRatePerKg || 65,
+      brickPrice: cr.brickPrice || 8.5,
+      sandFillRatePerCft: cr.sandFillRatePerCft || 45,
+      excavationRatePerM3: cr.excavationRatePerM3 || 250,
+      pccLabourRatePerM3: cr.pccLabourRatePerM3 || 2500,
+      footingLabourRatePerM3: cr.footingLabourRatePerM3 || 4200,
+      rccLabourRate: cr.columnLabourRatePerM3 || 3500,
+      pillarLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+      masonWagePerDay: cr.masonWagePerDay || 800,
+      helperWagePerDay: cr.helperWagePerDay || 500,
+      formworkRatePerM2: cr.formworkRatePerM2 || 350,
+      wastagePercentage: cr.wastagePercent ?? 5,
+      contingencyPercent: cr.contingencyPercent ?? 5,
+      taxPercent: cr.taxPercent ?? 18
+    });
+
+    setIsStructuralModalOpen(false);
+    setClearToast(`Applied structural config: ${newLength}${newUnit} × ${newWidth}${newUnit}, ${targetCount} Storey(s), ${allPillars.length} pillars recalculated.`);
   };
 
   const handleApplyToAllPillars = () => {
@@ -1878,6 +3120,23 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     const coords = getMouseCoords(e);
     if (!coords) return;
     
+    if (draggingPillarId && dragStartPillarMouse && dragStartPillarPos) {
+      const dx = coords.x - dragStartPillarMouse.x;
+      const dy = coords.y - dragStartPillarMouse.y;
+      let newX = snapToGrid(dragStartPillarPos.x + dx, 0.5);
+      let newY = snapToGrid(dragStartPillarPos.y + dy, 0.5);
+      newX = Math.max(0, Math.min(model.buildingLength, newX));
+      newY = Math.max(0, Math.min(model.buildingWidth, newY));
+
+      updateActiveFloorPillar({
+        position: { x: newX, y: newY },
+        placementType: 'custom'
+      });
+      setPillarPosX(newX);
+      setPillarPosZ(newY);
+      return;
+    }
+
     if (activeTool === 'wall' && drawingStart) {
       setCurrentMouse(coords);
     } else if (activeTool === 'pillar') {
@@ -2172,6 +3431,15 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
+            type="button"
+            onClick={() => setIsClearModalOpen(true)}
+            className="inline-flex items-center px-3.5 py-2 border border-rose-300 bg-rose-50 hover:bg-rose-100 rounded-lg shadow-sm text-xs font-bold text-rose-800 transition-colors cursor-pointer active:scale-95"
+            title="Clean/Remove elements from graph (Pillars, Walls/Bricks, Foundation, Slabs, or Reset Canvas)"
+          >
+            <Eraser className="w-4 h-4 mr-1.5 text-rose-600" />
+            <span>Clean Graph</span>
+          </button>
+          <button
             onClick={() => setIsSaveModalOpen(true)}
             className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg shadow-sm hover:shadow-md text-xs font-bold transition-all cursor-pointer active:scale-95"
           >
@@ -2196,7 +3464,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             <input 
               type="number" 
               value={model.buildingLength} 
-              onChange={e => setModel(p => ({...p, buildingLength: Number(e.target.value)}))} 
+              onChange={e => handleDimensionChange(Number(e.target.value), model.buildingWidth)} 
               className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
             />
             {isManualMode && <span className="text-[10px] text-gray-400">Workspace reference</span>}
@@ -2206,7 +3474,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             <input 
               type="number" 
               value={model.buildingWidth} 
-              onChange={e => setModel(p => ({...p, buildingWidth: Number(e.target.value)}))} 
+              onChange={e => handleDimensionChange(model.buildingLength, Number(e.target.value))} 
               className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
             />
             {isManualMode && <span className="text-[10px] text-gray-400">Workspace reference</span>}
@@ -2276,12 +3544,14 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       return { 
                         ...f, 
                         height: val,
+                        pillars: (f.pillars || []).map(pil => ({ ...pil, height: val })),
                         externalWalls: f.externalWalls.map(w => ({...w, dimensions: {...w.dimensions, height: val}})),
                         internalWalls: f.internalWalls.map(w => ({...w, dimensions: {...w.dimensions, height: val}}))
                       };
                     }
                     return f;
-                  })
+                  }),
+                  pillars: (p.pillars || []).map(pil => (pil.floorId === activeFloorId ? { ...pil, height: val } : pil))
                 }));
               }} 
               className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
@@ -2401,6 +3671,35 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             >
               + Add Floor
             </button>
+
+            {/* Independent Roof Slab Quick Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode('floor');
+                setActiveTool('roof');
+                setSelectedFootingId(null);
+                setSelectedPillarId(null);
+                setDrawingStart(null);
+                setCurrentMouse(null);
+              }}
+              className={cn(
+                "px-3 py-2 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm cursor-pointer",
+                activeTool === 'roof'
+                  ? "bg-amber-600 text-white border-amber-700 shadow-md ring-2 ring-amber-400/50"
+                  : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
+              )}
+              title="Configure independent Roof RCC Slab (thickness, overhang, elevation)"
+            >
+              <Box className="w-3.5 h-3.5 text-amber-700" />
+              <span>Roof Slab</span>
+              <span className={cn(
+                "text-[9px] px-1.5 py-0.2 rounded font-mono font-bold",
+                activeTool === 'roof' ? "bg-amber-800 text-amber-100" : "bg-amber-200 text-amber-900"
+              )}>
+                {model.roofSlab?.thickness || 5}" RCC
+              </span>
+            </button>
           </div>
         </div>
 
@@ -2439,6 +3738,28 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 ON
               </span>
             )}
+          </button>
+        </div>
+
+        {/* Separator Divider */}
+        <div className="hidden md:block h-7 w-px bg-gray-300"></div>
+
+        {/* 4. STRUCTURAL & ENGINEERING CONFIG */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider bg-indigo-100/80 px-2 py-0.5 rounded border border-indigo-300 shrink-0">
+            Engineering
+          </span>
+          <button
+            type="button"
+            onClick={() => setIsStructuralModalOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm border whitespace-nowrap bg-indigo-50/90 text-indigo-900 border-indigo-300 hover:bg-indigo-100 hover:border-indigo-400 cursor-pointer"
+            title="Configure Storeys, Concrete Grade, Steel Grade, Soil Bearing Capacity, and Structural Loads"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-indigo-700" />
+            <span>Structural Config</span>
+            <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold bg-indigo-200 text-indigo-900">
+              {model.buildingConfig?.floorCount || model.floors.length}F • {model.buildingConfig?.concreteGrade || 'M20'}
+            </span>
           </button>
         </div>
       </div>
@@ -2574,6 +3895,19 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 <Sparkles className="w-4 h-4" />
                 <span>Auto Generate Foundations</span>
               </button>
+
+              {/* Clear All Footings */}
+              {(model.foundation?.footings?.length || 0) > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearFoundationFootings}
+                  className="w-full py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold rounded-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  title="Remove all foundation footings from the base"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Clear All Footings ({model.foundation?.footings?.length})</span>
+                </button>
+              )}
 
               {/* Summary Counts & Missing Stub Warnings */}
               {footingsList.length > 0 && (() => {
@@ -4744,20 +6078,202 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             </button>
             {activeTool === 'pillar' && (
               <div className="pl-3 py-3 pr-2 border-l-2 border-orange-500 ml-2 mb-2 bg-white rounded shadow-sm flex flex-col space-y-3">
-                <div className="flex justify-between items-center border-b pb-1">
-                  <label className="block text-xs font-bold text-gray-800">
-                    {selectedPillarId ? `Edit ${pillarName || 'Pillar'}` : "Pillar Properties"}
-                  </label>
+                {/* Structural Grid Generator Controls */}
+                <div className="bg-amber-50/80 p-2.5 rounded-lg border border-amber-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Structural Grid</span>
+                    </span>
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                      {(model.pillars || []).filter(p => p.floorId === activeFloorId).length} Cols
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[9px] font-semibold text-amber-900 mb-0.5">Span X ({model.buildingUnit})</label>
+                      <input 
+                        type="number"
+                        min="5"
+                        max="30"
+                        step="0.5"
+                        value={gridSpacingX}
+                        onChange={e => setGridSpacingX(Number(e.target.value))}
+                        className="block w-full px-2 py-0.5 text-xs bg-white border border-amber-300 rounded font-bold text-amber-950 focus:ring-amber-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-amber-900 mb-0.5">Span Y ({model.buildingUnit})</label>
+                      <input 
+                        type="number"
+                        min="5"
+                        max="30"
+                        step="0.5"
+                        value={gridSpacingY}
+                        onChange={e => setGridSpacingY(Number(e.target.value))}
+                        className="block w-full px-2 py-0.5 text-xs bg-white border border-amber-300 rounded font-bold text-amber-950 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={handleAutoGeneratePillars}
-                    className="flex items-center px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 rounded text-[10px] font-semibold transition-colors"
-                    title="Automatically place structural columns at all corners, junctions, and central support"
+                    className="w-full flex items-center justify-center gap-1.5 py-1 px-2 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                    title="Generate structural column grid across building footprint. Locked columns (🔒) are preserved."
                   >
-                    <Sparkles className="w-3 h-3 mr-1 text-amber-600" />
-                    <span>Auto Grid</span>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Generate Structural Grid</span>
                   </button>
+                  <p className="text-[8.5px] text-amber-800 leading-tight">
+                    Divides building into structural bays (≤{gridSpacingX}' span). Locked columns (🔒) remain untouched.
+                  </p>
                 </div>
+
+                {/* Floor-Level Pillar Sizing Card (per active floor) */}
+                <div className="bg-orange-50/70 p-2.5 rounded-lg border border-orange-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-orange-950 uppercase tracking-wider flex items-center gap-1">
+                      <Layers className="w-3.5 h-3.5 text-orange-600" />
+                      <span>{activeFloor?.name || 'Floor'} Pillar Sizing</span>
+                    </span>
+                    <span className="text-[9px] font-bold text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded">
+                      Level {activeFloor?.level ?? 0}
+                    </span>
+                  </div>
+
+                  {/* Standard Cross-Section Presets */}
+                  <div>
+                    <label className="block text-[9px] font-semibold text-gray-600 mb-1">Floor Cross-Section Presets</label>
+                    <div className="grid grid-cols-3 gap-1">
+                      {[
+                        { w: 9, d: 9, label: '9"×9"' },
+                        { w: 9, d: 12, label: '9"×12"' },
+                        { w: 10, d: 10, label: '10"×10"' },
+                        { w: 12, d: 12, label: '12"×12"' },
+                        { w: 8, d: 10, label: '8"×10"' },
+                        { w: 12, d: 15, label: '12"×15"' }
+                      ].map(preset => {
+                        const isCurrent = floorPillarWidth === preset.w && floorPillarDepth === preset.d;
+                        return (
+                          <button
+                            key={preset.label}
+                            type="button"
+                            onClick={() => handleApplyFloorPillarDimensions(preset.w, preset.d)}
+                            className={cn(
+                              "px-1 py-1 text-[9.5px] font-bold rounded border transition-all cursor-pointer text-center",
+                              isCurrent
+                                ? "bg-orange-600 text-white border-orange-700 shadow-xs"
+                                : "bg-white text-gray-700 border-orange-200 hover:bg-orange-100/70"
+                            )}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Manual Width & Depth Inputs */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[9px] font-semibold text-gray-700 mb-0.5">Floor Width (in)</label>
+                      <input 
+                        type="number"
+                        min="6"
+                        max="48"
+                        value={floorPillarWidth}
+                        onChange={e => setFloorPillarWidth(Number(e.target.value))}
+                        className="block w-full px-2 py-0.5 text-xs bg-white border border-orange-300 rounded font-bold text-gray-900 focus:ring-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-semibold text-gray-700 mb-0.5">Floor Depth (in)</label>
+                      <input 
+                        type="number"
+                        min="6"
+                        max="48"
+                        value={floorPillarDepth}
+                        onChange={e => setFloorPillarDepth(Number(e.target.value))}
+                        className="block w-full px-2 py-0.5 text-xs bg-white border border-orange-300 rounded font-bold text-gray-900 focus:ring-orange-500"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyFloorPillarDimensions(floorPillarWidth, floorPillarDepth)}
+                    className="w-full flex items-center justify-center gap-1.5 py-1 px-2 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                    title={`Apply ${floorPillarWidth}"×${floorPillarDepth}" to all pillars on ${activeFloor?.name}`}
+                  >
+                    <span>Apply to All {activeFloor?.name} Pillars</span>
+                  </button>
+                  <p className="text-[8.5px] text-gray-500 leading-tight">
+                    Customizes this floor independently (e.g. Ground Floor 12×12, First Floor 10×10).
+                  </p>
+                </div>
+
+                <div className="flex justify-between items-center border-b pb-1 pt-1">
+                  <label className="block text-xs font-bold text-gray-800">
+                    {selectedPillarId ? `Edit ${pillarName || 'Column'}` : "Selected Pillar Properties"}
+                  </label>
+                  {selectedPillarId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = (model.pillars || []).find(p => p.id === selectedPillarId) || (activeFloor?.pillars || []).find(p => p.id === selectedPillarId);
+                        if (target) promptRemovePillar(target);
+                      }}
+                      className="flex items-center px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded text-[10px] font-semibold transition-colors cursor-pointer"
+                      title="Remove column from floors"
+                    >
+                      <Trash2 className="w-3 h-3 mr-1 text-red-500" />
+                      <span>Remove</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Lock Position Toggle for Selected Pillar */}
+                {selectedPillarId && (() => {
+                  const targetPillar = (model.pillars || []).find(p => p.id === selectedPillarId && p.floorId === activeFloorId);
+                  const isLocked = !!targetPillar?.isLocked;
+                  return (
+                    <label className="flex items-center justify-between p-2 rounded-lg bg-orange-50/70 border border-orange-200 cursor-pointer transition-all hover:bg-orange-100/70">
+                      <div className="flex items-center gap-1.5">
+                        {isLocked ? <Lock className="w-3.5 h-3.5 text-amber-700" /> : <Unlock className="w-3.5 h-3.5 text-gray-400" />}
+                        <div>
+                          <div className="text-[10px] font-bold text-gray-900">{isLocked ? 'Position Locked 🔒' : 'Position Unlocked'}</div>
+                          <div className="text-[8.5px] text-gray-500">
+                            {isLocked ? 'Protected from Grid regeneration' : 'Can be relocated by Auto Grid'}
+                          </div>
+                        </div>
+                      </div>
+                      <input 
+                        type="checkbox"
+                        checked={isLocked}
+                        onChange={e => updateActiveFloorPillar({ isLocked: e.target.checked })}
+                        className="h-4 w-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer"
+                      />
+                    </label>
+                  );
+                })()}
+
+                {/* Concrete Grade Selection for Pillar */}
+                {selectedPillarId && (
+                  <div>
+                    <label className="block text-[10px] font-medium text-gray-500 mb-1">Concrete Grade</label>
+                    <select 
+                      value={((model.pillars || []).find(p => p.id === selectedPillarId && p.floorId === activeFloorId)?.concreteGrade) || model.buildingConfig?.concreteGrade || 'M20'} 
+                      onChange={e => updateActiveFloorPillar({ concreteGrade: e.target.value as any })} 
+                      className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 font-semibold text-gray-800" 
+                    >
+                      <option value="M15">M15 (1:2:4)</option>
+                      <option value="M20">M20 (1:1.5:3 - Standard)</option>
+                      <option value="M25">M25 (1:1:2 - Heavy Duty)</option>
+                      <option value="M30">M30 (1:0.75:1.5 - High Strength)</option>
+                      <option value="M35">M35 (1:0.65:1.3 - Multi-Storey)</option>
+                    </select>
+                  </div>
+                )}
                 
                 <div>
                   <label className="block text-[10px] font-medium text-gray-500 mb-1">Name / ID</label>
@@ -4780,7 +6296,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                     onChange={e => {
                       const val = e.target.value as any;
                       setPillarShape(val);
-                      updateActiveFloorPillar({ shape: val, depth: val === 'circular' ? pillarWidth : pillarDepth });
+                      updateActiveFloorPillar({ shape: val, depth: val === 'circular' ? pillarWidth : pillarDepth, isCustomSize: true });
                     }} 
                     className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" 
                   >
@@ -4789,6 +6305,56 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                     <option value="circular">Circular</option>
                   </select>
                 </div>
+
+                {/* Selected Pillar Cross-Section Presets */}
+                {selectedPillarId && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[9px] font-semibold text-gray-600">Cross-Section Presets</label>
+                      <span className="text-[9px] font-bold text-blue-600 font-mono">
+                        {pillarWidth}&quot; × {pillarShape === 'circular' ? pillarWidth : pillarDepth}&quot;
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1 mb-2">
+                      {[
+                        { w: 9, d: 9, label: '9"×9"' },
+                        { w: 9, d: 12, label: '9"×12"' },
+                        { w: 10, d: 10, label: '10"×10"' },
+                        { w: 12, d: 12, label: '12"×12"' },
+                        { w: 8, d: 10, label: '8"×10"' },
+                        { w: 12, d: 15, label: '12"×15"' }
+                      ].map(pPreset => {
+                        const isSel = pillarWidth === pPreset.w && (pillarShape === 'circular' || pillarDepth === pPreset.d);
+                        return (
+                          <button
+                            key={`sel-${pPreset.label}`}
+                            type="button"
+                            onClick={() => {
+                              setPillarWidth(pPreset.w);
+                              setPillarDepth(pPreset.d);
+                              const newShape = pPreset.w !== pPreset.d && pillarShape === 'square' ? 'rectangle' : pillarShape;
+                              if (newShape !== pillarShape) setPillarShape(newShape);
+                              updateActiveFloorPillar({
+                                width: pPreset.w,
+                                depth: pillarShape === 'circular' ? pPreset.w : pPreset.d,
+                                shape: newShape,
+                                isCustomSize: true
+                              });
+                            }}
+                            className={cn(
+                              "px-1.5 py-0.5 text-[9px] font-bold rounded border transition-all cursor-pointer text-center",
+                              isSel
+                                ? "bg-blue-600 text-white border-blue-700 shadow-xs"
+                                : "bg-white text-gray-700 border-gray-200 hover:bg-blue-50"
+                            )}
+                          >
+                            {pPreset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
@@ -4799,9 +6365,9 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       onChange={e => {
                         const val = Number(e.target.value);
                         setPillarWidth(val);
-                        updateActiveFloorPillar({ width: val, depth: pillarShape === 'circular' ? val : pillarDepth });
+                        updateActiveFloorPillar({ width: val, depth: pillarShape === 'circular' ? val : pillarDepth, isCustomSize: true });
                       }} 
-                      className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" 
+                      className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 font-bold" 
                     />
                   </div>
                   <div>
@@ -4812,13 +6378,29 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       onChange={e => {
                         const val = Number(e.target.value);
                         setPillarDepth(val);
-                        updateActiveFloorPillar({ depth: val });
+                        updateActiveFloorPillar({ depth: val, isCustomSize: true });
                       }} 
                       disabled={pillarShape === 'circular'} 
-                      className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 disabled:bg-gray-100" 
+                      className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 font-bold disabled:bg-gray-100" 
                     />
                   </div>
                 </div>
+
+                {/* Structural Load Check & Warning */}
+                {selectedPillarId && (() => {
+                  const targetPillar = (model.pillars || []).find(p => p.id === selectedPillarId) || (activeFloor?.pillars || []).find(p => p.id === selectedPillarId);
+                  const warning = targetPillar?.structuralWarning || targetPillar?.structuralData?.warning;
+                  if (!warning) return null;
+                  return (
+                    <div className="p-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-[10px] leading-relaxed flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">⚠️</span>
+                      <div>
+                        <div className="font-bold text-amber-950">Structural Capacity Notice</div>
+                        <div>{warning}</div>
+                      </div>
+                    </div>
+                  );
+                })()}
                 
                 <div>
                   <label className="block text-[10px] font-medium text-gray-500 mb-1">Height ({model.buildingUnit})</label>
@@ -5162,6 +6744,275 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
               </div>
             )}
 
+            {/* 1. Floor RCC Slab Tool */}
+            <button 
+              onClick={() => { setActiveTool('slab'); setDrawingStart(null); }}
+              className={cn("flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors", activeTool === 'slab' ? 'bg-sky-600 text-white' : 'hover:bg-gray-200 text-gray-700')}
+            >
+              <Layers className="w-4 h-4" /> <span>Floor RCC Slab</span>
+            </button>
+            {activeTool === 'slab' && (() => {
+              const curSlab = activeFloor?.slab || DEFAULT_RCC_SLAB;
+              const isEnabled = curSlab.enabled !== false;
+              const sThick = curSlab.thickness || 5;
+              const sOverhang = curSlab.overhang || 0;
+              const sLen = curSlab.length ?? model.buildingLength;
+              const sWid = curSlab.width ?? model.buildingWidth;
+              const isCustom = curSlab.customDimensions === true;
+              const sElev = curSlab.elevationOffset || 0;
+
+              const effLen = isCustom ? sLen : (model.buildingLength + 2 * sOverhang);
+              const effWid = isCustom ? sWid : (model.buildingWidth + 2 * sOverhang);
+              const volCft = (effLen * effWid * (sThick / 12));
+              const volM3 = volCft / 35.3147;
+
+              return (
+                <div className="pl-3 py-3 pr-2 border-l-2 border-sky-500 ml-2 mb-2 bg-white rounded shadow-sm flex flex-col space-y-3">
+                  <div className="flex justify-between items-center border-b pb-1">
+                    <label className="block text-xs font-bold text-gray-800">
+                      {activeFloor?.name || 'Floor'} RCC Slab
+                    </label>
+                    <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded", isEnabled ? "bg-sky-100 text-sky-800" : "bg-gray-100 text-gray-500")}>
+                      {isEnabled ? "ACTIVE" : "OFF"}
+                    </span>
+                  </div>
+
+                  <label className="flex items-center space-x-2 text-xs text-gray-800 font-semibold cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={isEnabled} 
+                      onChange={e => handleUpdateActiveFloorSlab({ enabled: e.target.checked })} 
+                      className="rounded text-sky-600 focus:ring-sky-500" 
+                    />
+                    <span>Enable Slab for {activeFloor?.name || 'This Floor'}</span>
+                  </label>
+
+                  {isEnabled && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-600 mb-1">Thickness (in)</label>
+                          <input 
+                            type="number" 
+                            min="2" 
+                            max="24" 
+                            step="0.5" 
+                            value={sThick} 
+                            onChange={e => handleUpdateActiveFloorSlab({ thickness: Number(e.target.value), thicknessUnit: 'in' })} 
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500 font-bold text-sky-900" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-600 mb-1">Overhang ({model.buildingUnit})</label>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="10" 
+                            step="0.5" 
+                            value={sOverhang} 
+                            onChange={e => handleUpdateActiveFloorSlab({ overhang: Number(e.target.value), overhangUnit: model.buildingUnit })} 
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500" 
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2 text-[10px] text-gray-700 font-medium cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={isCustom} 
+                            onChange={e => handleUpdateActiveFloorSlab({ customDimensions: e.target.checked })} 
+                            className="rounded text-sky-600 focus:ring-sky-500" 
+                          />
+                          <span>Custom Plan Dimensions</span>
+                        </label>
+                      </div>
+
+                      {isCustom && (
+                        <div className="grid grid-cols-2 gap-2 bg-sky-50/50 p-2 rounded border border-sky-200">
+                          <div>
+                            <label className="block text-[9px] font-bold text-sky-900">Length ({model.buildingUnit})</label>
+                            <input 
+                              type="number" 
+                              step="0.5"
+                              value={sLen} 
+                              onChange={e => handleUpdateActiveFloorSlab({ length: Number(e.target.value), lengthUnit: model.buildingUnit })} 
+                              className="block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-sky-950 bg-white border border-sky-300 rounded focus:ring-sky-500" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-sky-900">Width ({model.buildingUnit})</label>
+                            <input 
+                              type="number" 
+                              step="0.5"
+                              value={sWid} 
+                              onChange={e => handleUpdateActiveFloorSlab({ width: Number(e.target.value), widthUnit: model.buildingUnit })} 
+                              className="block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-sky-950 bg-white border border-sky-300 rounded focus:ring-sky-500" 
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-[10px] font-medium text-gray-600 mb-1">Elevation Offset ({model.buildingUnit})</label>
+                        <input 
+                          type="number" 
+                          step="0.25" 
+                          value={sElev} 
+                          onChange={e => handleUpdateActiveFloorSlab({ elevationOffset: Number(e.target.value), elevationOffsetUnit: model.buildingUnit })} 
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500" 
+                        />
+                      </div>
+
+                      <div className="bg-sky-50 text-sky-900 p-2 rounded text-[10px] leading-relaxed border border-sky-200 space-y-0.5">
+                        <div className="font-bold flex justify-between">
+                          <span>{activeFloor?.name} Slab Size:</span>
+                          <span>{effLen.toFixed(1)}' × {effWid.toFixed(1)}'</span>
+                        </div>
+                        <div>Volume: <b>{volM3.toFixed(2)} m³</b> ({volCft.toFixed(1)} CFT)</div>
+                        <div>Est. Steel: <b>{Math.round(volM3 * 75)} kg</b> (IS 456 ~0.8%)</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* 2. Roof RCC Slab Tool */}
+            <button 
+              onClick={() => { setActiveTool('roof'); setDrawingStart(null); }}
+              className={cn("flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors", activeTool === 'roof' ? 'bg-amber-600 text-white' : 'hover:bg-gray-200 text-gray-700')}
+            >
+              <Box className="w-4 h-4 text-amber-700" /> <span>Roof RCC Slab</span>
+            </button>
+            {activeTool === 'roof' && (() => {
+              const curRoof = model.roofSlab || DEFAULT_RCC_ROOF_SLAB;
+              const isEnabled = curRoof.enabled !== false;
+              const rThick = curRoof.thickness || 5;
+              const rOverhang = curRoof.overhang !== undefined ? curRoof.overhang : 0.5;
+              const rLen = curRoof.length ?? (model.buildingLength + 2 * rOverhang);
+              const rWid = curRoof.width ?? (model.buildingWidth + 2 * rOverhang);
+              const isCustom = curRoof.customDimensions === true;
+              const rElev = curRoof.elevationOffset || 0;
+
+              const effLen = isCustom ? rLen : (model.buildingLength + 2 * rOverhang);
+              const effWid = isCustom ? rWid : (model.buildingWidth + 2 * rOverhang);
+              const volCft = (effLen * effWid * (rThick / 12));
+              const volM3 = volCft / 35.3147;
+
+              return (
+                <div className="pl-3 py-3 pr-2 border-l-2 border-amber-500 ml-2 mb-2 bg-white rounded shadow-sm flex flex-col space-y-3">
+                  <div className="flex justify-between items-center border-b pb-1">
+                    <label className="block text-xs font-bold text-gray-800">
+                      Independent Roof Slab
+                    </label>
+                    <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded", isEnabled ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-500")}>
+                      {isEnabled ? "ACTIVE" : "OFF"}
+                    </span>
+                  </div>
+
+                  <label className="flex items-center space-x-2 text-xs text-gray-800 font-semibold cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={isEnabled} 
+                      onChange={e => handleUpdateRoofSlab({ enabled: e.target.checked })} 
+                      className="rounded text-amber-600 focus:ring-amber-500" 
+                    />
+                    <span>Enable Independent Roof Slab</span>
+                  </label>
+
+                  {isEnabled && (
+                    <>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-600 mb-1">Thickness (in)</label>
+                          <input 
+                            type="number" 
+                            min="2" 
+                            max="24" 
+                            step="0.5" 
+                            value={rThick} 
+                            onChange={e => handleUpdateRoofSlab({ thickness: Number(e.target.value), thicknessUnit: 'in' })} 
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500 font-bold text-amber-900" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-600 mb-1">Overhang ({model.buildingUnit})</label>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="10" 
+                            step="0.25" 
+                            value={rOverhang} 
+                            onChange={e => handleUpdateRoofSlab({ overhang: Number(e.target.value), overhangUnit: model.buildingUnit })} 
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500" 
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="flex items-center space-x-2 text-[10px] text-gray-700 font-medium cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={isCustom} 
+                            onChange={e => handleUpdateRoofSlab({ customDimensions: e.target.checked })} 
+                            className="rounded text-amber-600 focus:ring-amber-500" 
+                          />
+                          <span>Custom Roof Dimensions</span>
+                        </label>
+                      </div>
+
+                      {isCustom && (
+                        <div className="grid grid-cols-2 gap-2 bg-amber-50/50 p-2 rounded border border-amber-200">
+                          <div>
+                            <label className="block text-[9px] font-bold text-amber-900">Length ({model.buildingUnit})</label>
+                            <input 
+                              type="number" 
+                              step="0.5"
+                              value={rLen} 
+                              onChange={e => handleUpdateRoofSlab({ length: Number(e.target.value), lengthUnit: model.buildingUnit })} 
+                              className="block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-amber-950 bg-white border border-amber-300 rounded focus:ring-amber-500" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-amber-900">Width ({model.buildingUnit})</label>
+                            <input 
+                              type="number" 
+                              step="0.5"
+                              value={rWid} 
+                              onChange={e => handleUpdateRoofSlab({ width: Number(e.target.value), widthUnit: model.buildingUnit })} 
+                              className="block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-amber-950 bg-white border border-amber-300 rounded focus:ring-amber-500" 
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-[10px] font-medium text-gray-600 mb-1">Elevation Offset ({model.buildingUnit})</label>
+                        <input 
+                          type="number" 
+                          step="0.25" 
+                          value={rElev} 
+                          onChange={e => handleUpdateRoofSlab({ elevationOffset: Number(e.target.value), elevationOffsetUnit: model.buildingUnit })} 
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500" 
+                        />
+                      </div>
+
+                      <div className="bg-amber-50 text-amber-900 p-2 rounded text-[10px] leading-relaxed border border-amber-200 space-y-0.5">
+                        <div className="font-bold flex justify-between">
+                          <span>Roof Slab Area:</span>
+                          <span>{effLen.toFixed(1)}' × {effWid.toFixed(1)}'</span>
+                        </div>
+                        <div>Volume: <b>{volM3.toFixed(2)} m³</b> ({volCft.toFixed(1)} CFT)</div>
+                        <div>Est. Steel: <b>{Math.round(volM3 * 75)} kg</b></div>
+                        <div className="text-[9px] text-amber-800 italic pt-0.5">Placed at topmost building elevation.</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
+
             <button 
               onClick={() => { 
                 setActiveTool('delete'); 
@@ -5171,6 +7022,245 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             >
               <Trash2 className="w-4 h-4" /> <span>Delete</span>
             </button>
+            {activeTool === 'delete' && (
+              <div className="p-2 bg-red-50 border border-red-200 rounded text-[11px] text-red-800 space-y-1.5">
+                <div className="font-semibold flex items-center gap-1">
+                  <Trash2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                  <span>Single Delete: Click any wall, pillar, or opening to delete.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setActiveTool('clear'); setDrawingStart(null); }}
+                  className="w-full py-1.5 px-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-bold transition-colors flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+                >
+                  <Eraser className="w-3.5 h-3.5" />
+                  <span>Or Clean All / Bulk Remove ▾</span>
+                </button>
+              </div>
+            )}
+
+            {/* Clean Graph / Bulk Remove Tool */}
+            <button 
+              onClick={() => { 
+                setActiveTool('clear'); 
+                setDrawingStart(null); 
+              }}
+              className={cn(
+                "flex items-center space-x-2 px-3 py-2 rounded text-sm transition-all mt-1.5 border font-semibold",
+                activeTool === 'clear' 
+                  ? 'bg-rose-600 text-white border-rose-700 shadow-md ring-2 ring-rose-400/50' 
+                  : 'hover:bg-rose-50 text-rose-800 border-rose-200 bg-rose-50/50'
+              )}
+            >
+              <Eraser className="w-4 h-4 text-rose-600" /> <span>Clean Graph / Remove All</span>
+            </button>
+
+            {activeTool === 'clear' && (() => {
+              const activeFloorPillars = (model.pillars || []).filter(p => p.floorId === activeFloorId).length;
+              const totalPillars = (model.pillars || []).length;
+              const activeIntWalls = activeFloor?.internalWalls?.length || 0;
+              const totalIntWalls = model.floors.reduce((acc, fl) => acc + (fl.internalWalls?.length || 0), 0);
+              const activeExtWalls = activeFloor?.externalWalls?.length || 0;
+              const totalExtWalls = model.floors.reduce((acc, fl) => acc + (fl.externalWalls?.length || 0), 0);
+              const activeOpenings = allWalls.reduce((acc, w) => acc + (w.openings?.length || 0), 0);
+              const totalOpenings = model.floors.reduce((acc, fl) => {
+                const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+                return acc + flWalls.reduce((a, w) => a + (w.openings?.length || 0), 0);
+              }, 0);
+              const footingsCount = model.foundation?.footings?.length || 0;
+
+              return (
+                <div className="pl-3 py-3 pr-2 border-l-2 border-rose-500 ml-2 mb-2 bg-white rounded shadow-sm flex flex-col space-y-3">
+                  <div className="flex justify-between items-center border-b pb-1">
+                    <span className="text-xs font-bold text-gray-800 flex items-center gap-1">
+                      <Eraser className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Clean Graph Options</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsClearModalOpen(true)}
+                      className="text-[10px] font-bold text-rose-700 hover:text-rose-900 bg-rose-100/70 hover:bg-rose-100 px-2 py-0.5 rounded cursor-pointer transition-colors"
+                      title="Open multi-select clean dialog"
+                    >
+                      Wizard ↗
+                    </button>
+                  </div>
+
+                  {/* Floor Scope Selector */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 mb-1 uppercase tracking-wider">
+                      Target Scope:
+                    </label>
+                    <div className="grid grid-cols-2 gap-1 bg-gray-100 p-1 rounded">
+                      <button
+                        type="button"
+                        onClick={() => setClearScope('current')}
+                        className={cn(
+                          "py-1 text-[10px] font-bold rounded transition-colors text-center cursor-pointer",
+                          clearScope === 'current'
+                            ? "bg-rose-600 text-white shadow-xs"
+                            : "bg-white text-gray-700 hover:bg-gray-50"
+                        )}
+                      >
+                        {activeFloor?.name || 'This Floor'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setClearScope('all')}
+                        className={cn(
+                          "py-1 text-[10px] font-bold rounded transition-colors text-center cursor-pointer",
+                          clearScope === 'all'
+                            ? "bg-rose-600 text-white shadow-xs"
+                            : "bg-white text-gray-700 hover:bg-gray-50"
+                        )}
+                      >
+                        All Floors ({model.floors.length})
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Clean Category 1: Pillars */}
+                  <div className="p-2 rounded bg-gray-50 border border-gray-200 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        <Square className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Pillars / Columns</span>
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 bg-blue-100 text-blue-800 rounded font-bold">
+                        {clearScope === 'current' ? activeFloorPillars : totalPillars} cols
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleClearPillars(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 border border-rose-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Remove All Pillars</span>
+                      <span className="text-[10px] text-gray-500 font-normal">
+                        ({clearScope === 'current' ? `${activeFloor?.name || 'Floor'}` : 'All'})
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Clean Category 2: Bricks / Walls */}
+                  <div className="p-2 rounded bg-gray-50 border border-gray-200 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        <Hammer className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Bricks / Walls</span>
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 bg-amber-100 text-amber-900 rounded font-bold">
+                        {clearScope === 'current' ? `${activeIntWalls} int / ${activeExtWalls} ext` : `${totalIntWalls} int / ${totalExtWalls} ext`}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleClearInternalWalls(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-gray-700 bg-white hover:bg-amber-50 border border-gray-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                      title="Clear interior partition walls while preserving exterior boundary"
+                    >
+                      <span>Clear Partition Walls</span>
+                      <span className="text-[10px] text-amber-700 font-mono font-bold">
+                        {clearScope === 'current' ? activeIntWalls : totalIntWalls}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleResetOuterPerimeter(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                      title="Reset outer walls to clean 4-wall rectangle"
+                    >
+                      <span>Reset Outer Rectangle</span>
+                      <RotateCcw className="w-3 h-3 text-gray-500" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleClearAllWalls(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 border border-rose-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                      title="Remove ALL walls to leave a clean empty grid"
+                    >
+                      <span>Clear ALL Walls (Blank)</span>
+                      <Trash2 className="w-3 h-3 text-rose-500" />
+                    </button>
+                  </div>
+
+                  {/* Clean Category 3: Foundation Footings */}
+                  <div className="p-2 rounded bg-gray-50 border border-gray-200 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        <LandPlot className="w-3.5 h-3.5 text-amber-700" />
+                        <span>Foundation Footings</span>
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 bg-amber-100 text-amber-900 rounded font-bold">
+                        {footingsCount} footings
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearFoundationFootings}
+                      className="w-full py-1 px-2 text-xs font-semibold text-rose-700 bg-white hover:bg-rose-50 border border-rose-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Clear Foundation Footings</span>
+                      <Trash2 className="w-3 h-3 text-rose-500" />
+                    </button>
+                  </div>
+
+                  {/* Clean Category 4: Slabs & Ring Beams */}
+                  <div className="p-2 rounded bg-gray-50 border border-gray-200 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Slabs & Ring Beams</span>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleClearSlabsAndBeams(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-gray-700 bg-white hover:bg-sky-50 border border-gray-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Turn Off Slabs & Beams</span>
+                      <span className="text-[10px] text-gray-500">
+                        ({clearScope === 'current' ? activeFloor?.name || 'Floor' : 'All Floors'})
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Clean Category 5: Doors & Windows */}
+                  <div className="p-2 rounded bg-gray-50 border border-gray-200 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        <DoorOpen className="w-3.5 h-3.5 text-teal-600" />
+                        <span>Doors & Windows</span>
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 bg-teal-100 text-teal-900 rounded font-bold">
+                        {clearScope === 'current' ? activeOpenings : totalOpenings} openings
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleClearOpenings(clearScope)}
+                      className="w-full py-1 px-2 text-xs font-semibold text-gray-700 bg-white hover:bg-teal-50 border border-gray-300 rounded transition-colors flex items-center justify-between cursor-pointer"
+                    >
+                      <span>Clear Doors & Windows</span>
+                      <Trash2 className="w-3 h-3 text-gray-500" />
+                    </button>
+                  </div>
+
+                  {/* Master Reset Button */}
+                  <div className="pt-1 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => handleClearEntireGraph({ resetBoundary: false })}
+                      className="w-full py-2 px-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      title="Wipe everything and reset entire graph to blank canvas"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Wipe Entire Graph (Reset)</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="mt-auto text-xs text-gray-500 italic p-2 bg-gray-100 rounded">
               {activeTool === 'wall' && "Click to start wall, click again to finish."}
@@ -5179,7 +7269,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
               {activeTool === 'pillar' && "Click corner/grid to place solid RCC column."}
               {activeTool === 'beam' && "Configure additive RCC ring beam height and dimensions (Top remains open)."}
               {activeTool === 'fullRingBeam' && "Configure solid RCC concrete top to completely close floor top."}
+              {activeTool === 'slab' && "Configure independent RCC slab thickness, overhang, and dimensions for this floor."}
+              {activeTool === 'roof' && "Configure independent top Roof RCC slab thickness, projection, and elevation."}
               {activeTool === 'delete' && "Click on a wall, opening, or RCC pillar to delete it."}
+              {activeTool === 'clear' && "Select elements above to clean from graph (Pillars, Bricks, Foundation, Slabs, or Reset Canvas)."}
             </div>
             {activeTool === 'pillar' && pillarPreview.message && (
                <div className={cn("mt-2 text-[10px] p-2 rounded border font-medium", pillarPreview.valid ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200")}>
@@ -5194,7 +7287,9 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
           "flex-1 bg-gray-50 border border-gray-300 rounded-lg overflow-hidden relative shadow-inner",
           activeMode === 'foundation' && isPlacingFooting ? "cursor-crosshair" :
           activeMode === 'foundation' && draggingFootingId ? "cursor-grabbing" :
-          activeMode === 'foundation' ? "cursor-default" : "cursor-crosshair"
+          activeMode === 'foundation' ? "cursor-default" :
+          activeTool === 'delete' ? "cursor-pointer" :
+          activeTool === 'clear' ? "cursor-default" : "cursor-crosshair"
         )}>
           <svg 
             ref={svgRef}
@@ -5244,6 +7339,78 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   </g>
                 );
               })}
+
+              {/* 2D Slab Footprint Overlay when Slab Tool is Active */}
+              {activeMode === 'floor' && activeTool === 'slab' && (() => {
+                const curSlab = activeFloor?.slab || DEFAULT_RCC_SLAB;
+                const overhang = curSlab.overhang || 0;
+                const sL = curSlab.customDimensions && curSlab.length ? curSlab.length : (model.buildingLength + 2 * overhang);
+                const sW = curSlab.customDimensions && curSlab.width ? curSlab.width : (model.buildingWidth + 2 * overhang);
+                const sX = curSlab.customDimensions ? ((model.buildingLength - sL) / 2) : -overhang;
+                const sY = curSlab.customDimensions ? ((model.buildingWidth - sW) / 2) : -overhang;
+
+                return (
+                  <g className="pointer-events-none">
+                    <rect
+                      x={sX}
+                      y={sY}
+                      width={sL}
+                      height={sW}
+                      fill="rgba(14, 165, 233, 0.12)"
+                      stroke="#0284c7"
+                      strokeWidth="0.3"
+                      strokeDasharray="1.5,1.5"
+                    />
+                    <text
+                      x={sX + sL / 2}
+                      y={sY + sW / 2}
+                      transform={`scale(1, -1) translate(0, -${2 * (sY + sW / 2)})`}
+                      fontSize="1.1"
+                      fill="#0284c7"
+                      textAnchor="middle"
+                      fontWeight="bold"
+                    >
+                      {activeFloor?.name || 'Floor'} Slab ({sL.toFixed(1)}' × {sW.toFixed(1)}' • {curSlab.thickness || 5}" Thk)
+                    </text>
+                  </g>
+                );
+              })()}
+
+              {/* 2D Roof Footprint Overlay when Roof Tool is Active */}
+              {activeMode === 'floor' && activeTool === 'roof' && (() => {
+                const curRoof = model.roofSlab || DEFAULT_RCC_ROOF_SLAB;
+                const overhang = curRoof.overhang !== undefined ? curRoof.overhang : 0.5;
+                const rL = curRoof.customDimensions && curRoof.length ? curRoof.length : (model.buildingLength + 2 * overhang);
+                const rW = curRoof.customDimensions && curRoof.width ? curRoof.width : (model.buildingWidth + 2 * overhang);
+                const rX = curRoof.customDimensions ? ((model.buildingLength - rL) / 2) : -overhang;
+                const rY = curRoof.customDimensions ? ((model.buildingWidth - rW) / 2) : -overhang;
+
+                return (
+                  <g className="pointer-events-none">
+                    <rect
+                      x={rX}
+                      y={rY}
+                      width={rL}
+                      height={rW}
+                      fill="rgba(245, 158, 11, 0.15)"
+                      stroke="#d97706"
+                      strokeWidth="0.35"
+                      strokeDasharray="2,2"
+                    />
+                    <text
+                      x={rX + rL / 2}
+                      y={rY + rW / 2}
+                      transform={`scale(1, -1) translate(0, -${2 * (rY + rW / 2)})`}
+                      fontSize="1.2"
+                      fill="#b45309"
+                      textAnchor="middle"
+                      fontWeight="bold"
+                    >
+                      Roof Slab ({rL.toFixed(1)}' × {rW.toFixed(1)}' • {curRoof.thickness || 5}" Thk • Overhang: {overhang}')
+                    </text>
+                  </g>
+                );
+              })()}
 
               {/* Walls Rendering */}
               {activeMode === 'foundation' ? (
@@ -5694,26 +7861,43 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   const isSelected = selectedPillarId === p.id;
                   const isDeleteMode = activeTool === 'delete';
 
+                  const isDraggingThis = draggingPillarId === p.id;
+                  const isLocked = !!p.isLocked;
+
                   return (
                     <g 
                       key={p.id} 
+                      onMouseDown={(e) => {
+                        if (isDeleteMode) return;
+                        e.stopPropagation();
+                        const mouse = getMouseCoords(e);
+                        if (mouse) {
+                          setDraggingPillarId(p.id);
+                          setDragStartPillarMouse(mouse);
+                          setDragStartPillarPos(p.position ? { ...p.position } : { x: 0, y: 0 });
+                        }
+                        setSelectedPillarId(p.id);
+                        setPillarName(p.name || '');
+                        setPillarShape(p.shape || 'square');
+                        setPillarWidth(p.width);
+                        setPillarDepth(p.depth);
+                        setPillarHeight(p.height);
+                        setPillarWdUnit(p.unit);
+                        setPillarPlacement(p.placementType || 'corner');
+                        setPillarAlignment(p.alignment || 'outside_corner');
+                        setPillarFinish(p.finish || 'raw');
+                        setPillarIncludeEst(p.includeInEstimate !== false);
+                        setPillarShowRebar(!!p.showRebar);
+                        setPillarShowBeam(!!p.showBeam);
+                        setCustomOffsetX(p.customOffsetX || 0);
+                        setCustomOffsetY(p.customOffsetY || 0);
+                        setPillarPosX(p.position?.x ?? 0);
+                        setPillarPosZ(p.position?.y ?? 0);
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (isDeleteMode) {
-                          const targetId = p.id;
-                          setModel(prev => ({ 
-                            ...prev, 
-                            pillars: (prev.pillars || []).filter(pil => !(pil.floorId === activeFloorId && pil.id === targetId)),
-                            floors: prev.floors.map(fl => fl.id === activeFloorId ? {
-                              ...fl,
-                              pillars: (fl.pillars || []).filter(pil => pil.id !== targetId)
-                            } : fl),
-                            foundation: (isGroundFloor && prev.foundation) ? {
-                              ...prev.foundation,
-                              footings: prev.foundation.footings.filter(f => f.pillarId !== targetId)
-                            } : prev.foundation
-                          }));
-                          if (selectedPillarId === targetId) setSelectedPillarId(null);
+                          promptRemovePillar(p);
                         } else {
                           const willSelect = !isSelected;
                           setSelectedPillarId(willSelect ? p.id : null);
@@ -5737,23 +7921,37 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                           }
                         }
                       }}
-                      className="cursor-pointer group"
+                      className={cn(
+                        "cursor-pointer group",
+                        isDraggingThis ? "cursor-grabbing opacity-80" : "cursor-grab"
+                      )}
                     >
+                      {isSelected && (
+                        <rect 
+                          x={effPos.x - drawW / 2 - 0.25} y={effPos.y - drawD / 2 - 0.25}
+                          width={drawW + 0.5} height={drawD + 0.5}
+                          fill="none"
+                          stroke="#f97316"
+                          strokeWidth="0.2"
+                          strokeDasharray="0.4,0.4"
+                          className="animate-pulse"
+                        />
+                      )}
                       {p.shape === 'circular' ? (
                         <circle
                           cx={effPos.x} cy={effPos.y} r={Math.max(drawW, drawD) / 2}
-                          fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : "#475569")} 
-                          stroke={isDeleteMode ? "#f87171" : (isSelected ? "#38bdf8" : "#1e293b")} 
-                          strokeWidth={isSelected || isDeleteMode ? "0.25" : "0.15"}
+                          fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : (isLocked ? "#b45309" : "#475569"))} 
+                          stroke={isDeleteMode ? "#f87171" : (isSelected ? "#38bdf8" : (isLocked ? "#f59e0b" : "#1e293b"))} 
+                          strokeWidth={isSelected || isDeleteMode || isLocked ? "0.25" : "0.15"}
                           className={isDeleteMode ? "hover:fill-red-700 transition-colors" : "hover:fill-slate-600 transition-colors"}
                         />
                       ) : (
                         <rect 
                           x={effPos.x - drawW / 2} y={effPos.y - drawD / 2}
                           width={drawW} height={drawD}
-                          fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : "#475569")} 
-                          stroke={isDeleteMode ? "#f87171" : (isSelected ? "#38bdf8" : "#1e293b")} 
-                          strokeWidth={isSelected || isDeleteMode ? "0.25" : "0.15"}
+                          fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : (isLocked ? "#b45309" : "#475569"))} 
+                          stroke={isDeleteMode ? "#f87171" : (isSelected ? "#38bdf8" : (isLocked ? "#f59e0b" : "#1e293b"))} 
+                          strokeWidth={isSelected || isDeleteMode || isLocked ? "0.25" : "0.15"}
                           className={isDeleteMode ? "hover:fill-red-700 transition-colors" : "hover:fill-slate-600 transition-colors"}
                         />
                       )}
@@ -5770,6 +7968,18 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       >
                         {p.name}
                       </text>
+                      {/* Locked Indicator Badge */}
+                      {isLocked && (
+                        <text 
+                          x={effPos.x} y={effPos.y - drawD / 2 - 0.35} 
+                          transform={`scale(1, -1) translate(0, ${-(effPos.y - drawD / 2 - 0.35) * 2})`}
+                          textAnchor="middle" 
+                          fontSize="0.55" 
+                          className="pointer-events-none select-none"
+                        >
+                          🔒
+                        </text>
+                      )}
                     </g>
                   )
                 })
@@ -5853,21 +8063,12 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   </button>
                   <button
                     onClick={() => {
-                      const targetId = p.id;
-                      setModel(prev => ({
-                        ...prev,
-                        pillars: (prev.pillars || []).filter(item => !(item.floorId === activeFloorId && item.id === targetId)),
-                        floors: prev.floors.map(fl => fl.id === activeFloorId ? {
-                          ...fl,
-                          pillars: (fl.pillars || []).filter(pil => pil.id !== targetId)
-                        } : fl)
-                      }));
-                      setSelectedPillarId(null);
+                      promptRemovePillar(p);
                     }}
-                    className="py-1 px-2 bg-red-600/80 hover:bg-red-600 text-white rounded text-[10px] font-semibold transition-colors flex items-center justify-center"
-                    title="Delete Pillar on Current Floor Only"
+                    className="py-1 px-2 bg-red-600/80 hover:bg-red-600 text-white rounded text-[10px] font-semibold transition-colors flex items-center justify-center cursor-pointer"
+                    title="Remove Pillar from Selected Floors"
                   >
-                    <Trash2 className="w-3 h-3 mr-1" /> Delete
+                    <Trash2 className="w-3 h-3 mr-1" /> Remove
                   </button>
                 </div>
               </div>
@@ -6024,6 +8225,146 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         );
       })()}
 
+      {/* Floor-Wise Pillar Removal Modal */}
+      {pillarRemovalModal && pillarRemovalModal.isOpen && pillarRemovalModal.targetPillar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-2xl border border-gray-200 max-w-md w-full p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-red-50 text-red-600 rounded-lg">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Remove Pillar: {pillarRemovalModal.targetPillar.name || 'Column'}</h3>
+                  <p className="text-[11px] text-gray-500 font-mono">
+                    Position: X {pillarRemovalModal.targetPillar.position?.x.toFixed(1)}, Z {pillarRemovalModal.targetPillar.position?.y.toFixed(1)} {model.buildingUnit} • {pillarRemovalModal.targetPillar.width}&quot;×{pillarRemovalModal.targetPillar.depth}&quot;
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setPillarRemovalModal(null)} 
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-md cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-600 mb-2 font-medium">
+                Select which floors should have this pillar removed:
+              </p>
+
+              {/* Quick Select Buttons */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setPillarRemovalModal(prev => prev ? { ...prev, selectedFloorIds: [activeFloorId] } : null)}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-lg border text-xs font-semibold text-center transition-all cursor-pointer",
+                    pillarRemovalModal.selectedFloorIds.length === 1 && pillarRemovalModal.selectedFloorIds[0] === activeFloorId
+                      ? "bg-red-50 border-red-300 text-red-700 shadow-xs"
+                      : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+                  )}
+                >
+                  {activeFloor?.name || 'Current Floor'} Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPillarRemovalModal(prev => prev ? { ...prev, selectedFloorIds: model.floors.map(f => f.id) } : null)}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-lg border text-xs font-semibold text-center transition-all cursor-pointer",
+                    pillarRemovalModal.selectedFloorIds.length === model.floors.length
+                      ? "bg-red-50 border-red-300 text-red-700 shadow-xs"
+                      : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+                  )}
+                >
+                  All Floors ({model.floors.length})
+                </button>
+              </div>
+
+              {/* Floor Checklist */}
+              <div className="border border-gray-200 rounded-lg p-2.5 bg-gray-50/50 space-y-2 max-h-48 overflow-y-auto">
+                {model.floors.map(fl => {
+                  const isChecked = pillarRemovalModal.selectedFloorIds.includes(fl.id);
+                  const isCurrent = fl.id === activeFloorId;
+                  return (
+                    <label 
+                      key={fl.id} 
+                      className={cn(
+                        "flex items-center justify-between p-2 rounded border cursor-pointer transition-colors",
+                        isChecked ? "bg-red-50/80 border-red-200 text-red-900" : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setPillarRemovalModal(prev => {
+                              if (!prev) return null;
+                              const next = checked
+                                ? [...prev.selectedFloorIds, fl.id]
+                                : prev.selectedFloorIds.filter(id => id !== fl.id);
+                              return { ...prev, selectedFloorIds: next };
+                            });
+                          }}
+                          className="h-4 w-4 rounded text-red-600 focus:ring-red-500 cursor-pointer"
+                        />
+                        <span className="text-xs font-semibold">{fl.name}</span>
+                        {isCurrent && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-orange-700 font-bold">Active</span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-mono">Level {fl.level}</span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div className="mt-2.5 text-[10px] text-gray-500 flex items-center justify-between">
+                <span>Removing from: <b className="text-red-600 font-bold">{pillarRemovalModal.selectedFloorIds.length}</b> floor(s)</span>
+                <span>Preserved on: <b className="text-emerald-600 font-bold">{model.floors.length - pillarRemovalModal.selectedFloorIds.length}</b> floor(s)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setPillarRemovalModal(null)}
+                className="px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={pillarRemovalModal.selectedFloorIds.length === 0}
+                onClick={handleConfirmPillarRemoval}
+                className="px-4 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Confirm Removal</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Structural Engineering & Building Configuration Modal */}
+      <StructuralConfigModal
+        isOpen={isStructuralModalOpen}
+        config={model.buildingConfig || {
+          ...DEFAULT_BUILDING_CONFIG,
+          floorCount: model.floors.length || 1
+        }}
+        buildingLength={model.buildingLength}
+        buildingWidth={model.buildingWidth}
+        buildingUnit={model.buildingUnit}
+        wallThickness={model.externalWallThickness}
+        onClose={() => setIsStructuralModalOpen(false)}
+        onSave={handleUpdateStructuralConfig}
+      />
+
       {/* Save Project Modal */}
       <SaveProjectModal
         isOpen={isSaveModalOpen}
@@ -6041,6 +8382,344 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         onClose={() => setIsHistoryModalOpen(false)}
         onLoadModel={(loadedModel) => setModel(loadedModel)}
       />
+
+      {/* Clean Graph Multi-Select Modal */}
+      {isClearModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-gray-200 space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-start justify-between border-b pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-rose-100 text-rose-700">
+                  <Eraser className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Clean Graph / Bulk Remove Elements</h3>
+                  <p className="text-xs text-gray-500">Select components to remove from the 2D graph and 3D building.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsClearModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scope Selection */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Cleaning Scope:
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className={cn(
+                  "flex items-center space-x-2.5 p-3 rounded-lg border cursor-pointer transition-all",
+                  clearScope === 'current'
+                    ? "bg-rose-50/80 border-rose-300 ring-1 ring-rose-400"
+                    : "bg-gray-50/60 border-gray-200 hover:bg-gray-100"
+                )}>
+                  <input
+                    type="radio"
+                    name="clearModalScope"
+                    checked={clearScope === 'current'}
+                    onChange={() => setClearScope('current')}
+                    className="h-4 w-4 text-rose-600 focus:ring-rose-500"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-gray-900">{activeFloor?.name || 'Current Floor'} Only</div>
+                    <div className="text-[10px] text-gray-500">Only remove items on active floor</div>
+                  </div>
+                </label>
+
+                <label className={cn(
+                  "flex items-center space-x-2.5 p-3 rounded-lg border cursor-pointer transition-all",
+                  clearScope === 'all'
+                    ? "bg-rose-50/80 border-rose-300 ring-1 ring-rose-400"
+                    : "bg-gray-50/60 border-gray-200 hover:bg-gray-100"
+                )}>
+                  <input
+                    type="radio"
+                    name="clearModalScope"
+                    checked={clearScope === 'all'}
+                    onChange={() => setClearScope('all')}
+                    className="h-4 w-4 text-rose-600 focus:ring-rose-500"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-gray-900">All Floors</div>
+                    <div className="text-[10px] text-gray-500">Apply to all {model.floors.length} floor levels</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Selectable Categories */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Select Elements to Remove:
+                </label>
+                <div className="flex items-center gap-2 text-[10px]">
+                  <button
+                    type="button"
+                    onClick={() => setClearSelectedCategories({
+                      pillars: true,
+                      internalWalls: true,
+                      externalWalls: false,
+                      foundation: true,
+                      slabs: true,
+                      openings: true,
+                    })}
+                    className="text-blue-600 hover:underline font-semibold cursor-pointer"
+                  >
+                    Select All Items
+                  </button>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setClearSelectedCategories({
+                      pillars: false,
+                      internalWalls: false,
+                      externalWalls: false,
+                      foundation: false,
+                      slabs: false,
+                      openings: false,
+                    })}
+                    className="text-gray-500 hover:underline font-semibold cursor-pointer"
+                  >
+                    Deselect All
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                {/* 1. Pillars */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.pillars}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, pillars: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <Square className="w-4 h-4 text-blue-600" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Pillars (RCC Columns)</div>
+                      <div className="text-[10px] text-gray-500">
+                        {clearScope === 'current'
+                          ? `${(model.pillars || []).filter(p => p.floorId === activeFloorId).length} pillar(s) on ${activeFloor?.name}`
+                          : `${(model.pillars || []).length} pillar(s) total across building`}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-blue-700">
+                    {clearScope === 'current'
+                      ? (model.pillars || []).filter(p => p.floorId === activeFloorId).length
+                      : (model.pillars || []).length}
+                  </span>
+                </label>
+
+                {/* 2. Internal Partition Walls */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.internalWalls}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, internalWalls: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <Hammer className="w-4 h-4 text-amber-700" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Internal Partition Walls (Bricks)</div>
+                      <div className="text-[10px] text-gray-500">Interior dividing walls (preserves outer perimeter)</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-amber-800">
+                    {clearScope === 'current'
+                      ? activeFloor?.internalWalls?.length || 0
+                      : model.floors.reduce((acc, fl) => acc + (fl.internalWalls?.length || 0), 0)}
+                  </span>
+                </label>
+
+                {/* 3. External Boundary Walls */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.externalWalls}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, externalWalls: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <MousePointer2 className="w-4 h-4 text-rose-600" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">External Boundary Walls</div>
+                      <div className="text-[10px] text-gray-500">Outer perimeter walls (wipes walls completely)</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-rose-700">
+                    {clearScope === 'current'
+                      ? activeFloor?.externalWalls?.length || 0
+                      : model.floors.reduce((acc, fl) => acc + (fl.externalWalls?.length || 0), 0)}
+                  </span>
+                </label>
+
+                {/* 4. Foundation Footings */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.foundation}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, foundation: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <LandPlot className="w-4 h-4 text-amber-700" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Foundation Footings & Base</div>
+                      <div className="text-[10px] text-gray-500">RCC footings and base excavation below ground</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-amber-800">
+                    {model.foundation?.footings?.length || 0}
+                  </span>
+                </label>
+
+                {/* 5. Slabs & Ring Beams */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.slabs}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, slabs: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <Layers className="w-4 h-4 text-sky-600" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Slabs & RCC Ring Beams</div>
+                      <div className="text-[10px] text-gray-500">Turn off floor slabs, roof slabs, and perimeter beams</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-sky-700">RCC</span>
+                </label>
+
+                {/* 6. Doors & Windows */}
+                <label className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div className="flex items-center space-x-2.5">
+                    <input
+                      type="checkbox"
+                      checked={clearSelectedCategories.openings}
+                      onChange={e => setClearSelectedCategories(prev => ({ ...prev, openings: e.target.checked }))}
+                      className="h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
+                    />
+                    <DoorOpen className="w-4 h-4 text-teal-600" />
+                    <div>
+                      <div className="text-xs font-bold text-gray-900">Doors & Windows (Openings)</div>
+                      <div className="text-[10px] text-gray-500">Remove all door and window openings from walls</div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-teal-700">
+                    {clearScope === 'current'
+                      ? allWalls.reduce((acc, w) => acc + (w.openings?.length || 0), 0)
+                      : model.floors.reduce((acc, fl) => {
+                          const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+                          return acc + flWalls.reduce((a, w) => a + (w.openings?.length || 0), 0);
+                        }, 0)}
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Modal Action Buttons */}
+            <div className="pt-3 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsClearModalOpen(false);
+                  handleClearEntireGraph({ resetBoundary: false });
+                }}
+                className="w-full sm:w-auto px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Wipe everything across all floors"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                <span>Wipe Entire Graph (Reset)</span>
+              </button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsClearModalOpen(false)}
+                  className="px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExecuteMultiClean}
+                  className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Eraser className="w-3.5 h-3.5" />
+                  <span>Clean Selected</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog for Destructive Clear Operations */}
+      {clearConfirmModal?.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 border border-gray-200 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-3">
+              <div className={cn(
+                "p-2.5 rounded-full shrink-0",
+                clearConfirmModal.isDestructive ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-700"
+              )}>
+                {clearConfirmModal.isDestructive ? <AlertTriangle className="w-6 h-6" /> : <Info className="w-6 h-6" />}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900">{clearConfirmModal.title}</h3>
+                <p className="mt-1 text-xs text-gray-600 leading-relaxed">{clearConfirmModal.description}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setClearConfirmModal(null)}
+                className="px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={clearConfirmModal.onConfirm}
+                className={cn(
+                  "px-4 py-2 text-xs font-bold text-white rounded-lg shadow-sm transition-all cursor-pointer flex items-center gap-1.5",
+                  clearConfirmModal.isDestructive 
+                    ? "bg-red-600 hover:bg-red-700 active:bg-red-800" 
+                    : "bg-orange-600 hover:bg-orange-700"
+                )}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{clearConfirmModal.confirmLabel || "Confirm Delete"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Notification Toast */}
+      {clearToast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-slate-700 text-xs font-medium animate-in slide-in-from-bottom-2 fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{clearToast}</span>
+          <button 
+            type="button" 
+            onClick={() => setClearToast(null)} 
+            className="ml-2 text-slate-400 hover:text-white cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

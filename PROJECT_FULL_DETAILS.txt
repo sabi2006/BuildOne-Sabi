@@ -1,282 +1,667 @@
 ================================================================================
                       BRICK FACTORY - COMPLETE PROJECT DOCUMENTATION
 ================================================================================
-Generated Date : 2026-08-27
-Project Name   : Brick Factory (Web-Based 3D Brick Calculator & Management Platform)
-Platform       : Web Application (Next.js 16 / React 19 / Three.js / TypeScript / Tailwind CSS)
-Root Directory : D:\Bricks - Copy\brick-factory
+Generated Date : October 8, 2026
+Project Name   : Brick Factory (A V M Bricks - Web 3D Building Estimator & Civil Platform)
+Company / Brand: A V M Bricks (Chekkath Street, M.M. Kovilur, Dindigul - 624 005, Tamil Nadu)
+Contact        : +91 97913 16101 / +91 97514 90074 | sales@avmbricks.com
+Platform       : Web Application (Next.js 16 / React 19 / Three.js / TypeScript 5 / Tailwind CSS v4 / Prisma / PostgreSQL)
+Workspace Root : d:\brick-factory
 
 ================================================================================
-1. PROJECT OVERVIEW & PURPOSE
+1. PROJECT OVERVIEW & EXECUTIVE SUMMARY
 ================================================================================
 
-Brick Factory is a modern, high-performance web application designed for the 
-construction industry, civil engineers, building contractors, architects, and 
-individual home builders. 
+Brick Factory is a professional-grade, web-based civil engineering estimation, 
+3D architectural modeling, and construction material management platform built 
+for A V M Bricks (a premier brick manufacturing enterprise based in Dindigul, Tamil Nadu).
 
-Traditional brick estimation involves complex manual calculations prone to human 
-error, leading to material shortages or costly over-purchasing. Brick Factory 
-solves this problem by providing:
-1. Automated & Highly Accurate Estimation Engine: Computes exact brick counts, 
-   mortar requirements, cement bags, sand volume (cft / m3), and total project cost.
-2. Real-Time Interactive 3D Visualization: Uses WebGL / Three.js to render the 
-   exact structure with custom wall dimensions, doors, windows, and ventilators.
-3. Complete E-Commerce & Bulk Order Ecosystem: Browse brick varieties, check 
-   specifications, place bulk inquiries, and calculate logistics seamlessly.
-4. AI-Powered Visual Estimation: Upload architectural sketches or blueprints to 
-   extract dimensions and generate instant material estimates.
+Traditional construction estimation relies on fragmented manual calculations, 
+rough rules of thumb, and disconnected spreadsheets. This frequently results in:
+  - Inaccurate material orders (causing site stoppages or expensive surplus waste).
+  - Unaccounted corner overlaps and structural member collisions.
+  - Blind estimation without visual 3D verification of doors, windows, and columns.
+  - Separation between structural RCC framing (columns, beams, slabs, footings) 
+    and masonry infill calculations.
+  - Inability for builders and homeowners to save, edit, and share building plans.
+
+Brick Factory solves these challenges comprehensively by providing:
+1. Interactive 2D Architectural Plan Canvas:
+   - Interactive wall drawing with millimeter-accurate snapping.
+   - Dynamic door, window, and ventilator openings placement.
+   - RCC column / pillar placement with coordinate snapping and custom sections.
+   - Multi-floor building support (Ground Floor, Floor 1, Floor 2, Floor 3, etc.).
+   - Isolated foundation and footing design mode.
+   - Surface-by-surface wall and ceiling plastering configuration.
+
+2. Real-Time WebGL 3D Visualization Engine (Three.js & React Three Fiber):
+   - 60 FPS hardware-accelerated rendering utilizing Three.js `InstancedMesh`.
+   - Zero Masonry Collision: Automatic wall splitting around concrete columns (`splitWallByPillars`).
+   - Additive multi-floor stacking with zero-gap column and beam interfaces.
+   - Dual-mode framing: Open-top RCC Ring Beams vs Closed RCC Full Ring Beam slabs.
+   - Exposed Rebar Inspection Mode (X-Ray translucent concrete with high-contrast steel cages):
+     * Vertical pillar reinforcement cages with main longitudinal bars and closed stirrups.
+     * 3-tier beam-column confining joint ties.
+     * Horizontal two-way orthogonal slab reinforcement mesh (main + distribution bars).
+     * Isolated trapezoidal foundation footings with bottom rebar mesh mats and column stubs.
+   - Multi-view camera presets (Orbit, Isometric, Front, Side, Top, Wireframe, Collision Debug).
+
+3. Civil Engineering Mathematical Calculation Engine:
+   - Exact volume deductions for openings, lintels, and structural columns.
+   - Default Tamil Nadu Standard Red Clay Brick (230 × 115 × 75 mm) specification.
+   - Multi-floor itemized brick count (base count, wastage factor, recommended purchase).
+   - Mortar mix ratios (1:3, 1:4, 1:5, 1:6) with dry conversion factor (1.33).
+   - Plastering calculations conforming to IS 1200 opening deduction standards.
+   - RCC concrete volumetric mix formulas (M20, M15, M10 with dry factor 1.54).
+   - Steel reinforcement weight calculations using standard formula: Weight = D² / 162.
+   - Foundation earthwork excavation, PCC 1:4:8 base, RCC footings, and backfilling.
+   - Daily labor productivity and wage calculations (masons and helpers).
+
+4. Cloud Project Persistence & History Management:
+   - Full PostgreSQL cloud database integration via Prisma ORM (`SavedProject` model).
+   - Dual-storage architecture: Saves to PostgreSQL with transparent LocalStorage offline fallback.
+   - Dedicated Save Modal and Project History Manager for instant reload of past designs.
+
+5. Complete E-Commerce, Product Catalog & B2B Inquiry Portal:
+   - Full product catalog with technical parameters (Compressive Strength, Water Absorption, Density).
+   - Direct B2B bulk quotation system with automated Nodemailer email notifications.
+   - Direct WhatsApp quote integration connecting customers to A V M Bricks sales reps.
+
+================================================================================
+2. COMPREHENSIVE FEATURE BREAKDOWN & SYSTEM MODULES
+================================================================================
 
 --------------------------------------------------------------------------------
-2. KEY FEATURES & VALUE PROPOSITION
+[MODULE 1] 2D INTERACTIVE ARCHITECTURAL CANVAS & BUILDING EDITOR
+(Location: src/components/calculator/BuildingEditor.tsx)
 --------------------------------------------------------------------------------
+The Building Editor provides a CAD-style browser canvas with three dedicated modes:
 
-[A] Dynamic 3D Structure Preview:
-    - Real-time WebGL rendering of single walls, multi-wall rooms, and bathrooms.
-    - Uses Three.js `InstancedMesh` to render thousands of individual bricks smoothly 
-      at 60 FPS without browser lag.
-    - Interactive camera controls (Orbit, Pan, Zoom, Reset view).
-    - Camera view presets: Isometric, Front, Top, Left, Right views.
-    - Wireframe mode toggle and dimension overlay indicators.
-    - Real-time door, window, and ventilator cutout subtractions from brick count.
+A. Floor Plan Mode (`activeMode === 'floor'`):
+   - Wall Drawing Tool:
+     * Click-to-start and click-to-finish wall segment placement.
+     * Real-time grid snapping, orthogonal alignment, and length/thickness previews.
+     * Custom wall thickness presets (4.5" partition wall, 9" load-bearing wall, custom mm/in/ft).
+     * Distinction between External Perimeter Walls and Internal Partition Walls.
+   - Openings Placement Tools:
+     * Doors (Main Entrance 3.5'×7', Standard 3'×7', Bathroom 2.5'×7', custom).
+     * Windows (4'×4', 5'×4', 3'×4', custom).
+     * Ventilators (2'×1.5', custom).
+     * Interactive drag along wall edges with live offset indicator.
+   - RCC Pillars / Columns Tool:
+     * Rectangular (9"×9", 9"×12", 12"×12") or Circular column profiles.
+     * Corner snapping to wall intersections or free grid placement.
+     * Column height configuration (inherits floor height by default).
+   - RCC Ring Beam Configuration:
+     * Mode A (Perimeter Ring Beam): Adds beam height (e.g. +2 ft) around perimeter, top remains OPEN.
+     * Mode B (RCC Full Ring Beam): Pillar-defined closed structural bay detection; adds solid RCC roof slab (+1 ft).
+     * Mutually exclusive switching with zero elevation conflicts.
+   - Multi-Floor Management:
+     * Add Floor (`+ Add Floor`) with automatic deep cloning of structural axes.
+     * Floor-specific state isolation: editing Floor 1 never alters Ground Floor.
+     * Floor selector tabs with live wall count, opening count, and pillar indicators.
 
-[B] Advanced Material & Cost Calculation Engine:
-    - Custom brick dimensions (Standard Indian Red Clay, Modular, Fly Ash, AAC Blocks, etc.).
-    - Mortar thickness adjustment (10mm to 15mm standard).
-    - Mortar mix ratios (1:3, 1:4, 1:5, 1:6 cement-to-sand ratios).
-    - Wastage percentage factor (typically 5% - 10%).
-    - Plastering calculations (Single side / Double side mortar requirement).
-    - Cost breakdown: Brick cost + Cement cost + Sand cost + Labor estimation.
+B. Foundation & Footing Mode (`activeMode === 'foundation'`):
+   - Isolated Foundation Footings:
+     * Snaps under each RCC column axis or allows custom footing layout.
+     * Footing shapes: Isolated Trapezoidal Pad, Step Footing, or Flat RCC Pad.
+     * Excavation parameters: Trench Length, Width, Depth (e.g. 5'×5'×5').
+     * PCC Base: 1:4:8 Plain Cement Concrete mud mat layer (thickness: 3" - 6").
+     * RCC Footing Pad: Trapezoidal depth ($D_1$ bottom pad + $D_2$ sloped taper).
+     * Steel Rebar Mat: Bidirectional orthogonal mesh ($X$-bars and $Y$-bars, e.g. 10mm @ 150mm c/c).
+     * Column Starter Stub: Rebar starter dowels extending from footing base up to plinth level.
+     * Backfilling volume computation (Excavation volume minus concrete footings & stubs).
 
-[C] Multi-Wall & Room Layout Builder:
-    - Support for Single Wall, 4-Wall Rooms, L-Shaped Walls, and Bathroom units.
-    - Dynamic placement of openings on specific walls (Front, Right, Back, Left).
-    - Accurate wall overlap deductions at room corners to prevent over-counting.
+C. Plastering Mode (`activeMode === 'plaster'`):
+   - Surface-by-surface inspection and customized plaster configuration:
+     * Inner Masonry Wall Plaster (Standard 12mm, 1:6 cement-sand mortar).
+     * Outer Masonry Wall Plaster (Standard 15mm/20mm, 1:4 waterproof cement-sand mortar).
+     * RCC Column Face Plaster (Standard 6mm/10mm, 1:4 mortar).
+     * RCC Side Beam Face Plaster (Standard 6mm/10mm, 1:4 mortar).
+     * Ceiling / Soffit Plaster (Standard 6mm, 1:3/1:4 mortar).
+   - "Apply Standard Plaster" 1-click preset setup for rapid estimation.
+   - Individual wall overrides (e.g., disable outer plaster for party walls sharing adjacent property).
 
-[D] Product Catalog & Detailed Specifications:
-    - Comprehensive brick catalog featuring:
-        * Premium Wirecut Red Clay Bricks
-        * High-Strength Fly Ash Bricks
-        * Autoclaved Aerated Concrete (AAC) Lightweight Blocks
-        * Heavy-Duty Concrete Paver Blocks
-        * Interlocking Soil Stabilized Blocks
-        * Refractory Fire Bricks
-    - Detailed technical parameters: Compressive Strength (N/mm2), Water Absorption %, 
-      Thermal Conductivity, Density, Weight, Dimensions, and Pricing.
+--------------------------------------------------------------------------------
+[MODULE 2] REAL-TIME 3D WEBGL VISUALIZATION ENGINE
+(Location: src/components/3d/VisualEstimator3D.tsx)
+--------------------------------------------------------------------------------
+Built on Three.js and React Three Fiber, the 3D visualizer renders a photorealistic,
+structural digital twin of the building project:
 
-[E] Bulk Order & B2B Inquiry System:
-    - Dedicated inquiry form for large construction projects, builders, and developers.
-    - Automated email notification system powered by Nodemailer.
-    - Captures project location, required quantity, site delivery requirements, 
-      and timeline.
+A. High-Performance Instanced Brick Rendering:
+   - Uses `THREE.InstancedMesh` to render individual masonry bricks with stretcher bond joints.
+   - Supports thousands of bricks in real-time at 60 FPS without DOM or WebGL overhead.
+   - Dynamic mortar joints (horizontal and vertical thickness).
 
-[F] AI Visual Estimator:
-    - Upload construction drawings, hand-drawn floor plans, or wall photos.
-    - Visual feedback with step-by-step breakdown of detected dimensions.
+B. Zero Masonry Collision Architecture:
+   - `splitWallByPillars`: Walls intersecting RCC columns are algorithmically split into sub-segments.
+   - Masonry stops flush at concrete column faces with 0.00% physical intersection.
+   - 3D Collision Exclusion Debug mode highlights bounding boxes to guarantee structural integrity.
 
-[G] Ultra-Smooth UI & Modern Aesthetics:
-    - Smooth inertia scrolling via Lenis.
-    - Rich micro-animations with Framer Motion.
-    - Tailwind CSS v4 design with rich dark/light tones, glassmorphism, and responsive layout.
+C. Additive Multi-Floor Elevation Stacking:
+   - Vertical elevation order: Ground Plinth -> Wall Height (10 ft) -> Ring Beam / Slab -> Upper Floor.
+   - Exact vertical coordinate continuity: Lower column top elevation ($Y_{\text{top}}$) exactly 
+     matches upper column bottom elevation ($Y_{\text{bottom}}$) with $0.00\text{mm}$ gap.
+
+D. Pillar-to-Pillar Horizontal Beam Framing:
+   - `detectPillarToPillarBeams`: Automatically detects and renders continuous horizontal RCC beams 
+     connecting adjacent pillars along both perimeter and internal grid lines.
+
+E. Closed Structural Bay Detection:
+   - `detectClosedStructuralBays`: Detects enclosed rectangular bays formed by 4 surrounding pillars.
+   - Renders modular RCC slab panels framed neatly within column faces.
+
+F. Exposed Rebar Inspection Mode (X-Ray Visualization):
+   - Translucent Concrete Rendering: Concrete shells render at `renderOrder={1}`, `opacity: 0.20`, 
+     `transparent: true`, `depthWrite: false`, eliminating shadow artifacts and clipping.
+   - High-Contrast Metallic Steel Rebar: Rebar rendered at `renderOrder={10}`, `metalness: 0.95`, 
+     `roughness: 0.15` in dark steel (`#0f172a`).
+   - Independent Dual Controls in Scene Elements:
+     * `Show Pillar Rebar Cage`: Displays vertical main bars (4, 6, or 8 rods), closed stirrup ties, 
+       starter dowel projections, and 3-tier beam-column joint confining ties.
+     * `Show Roof/Slab Rebar`: Displays 2-way orthogonal rebar mesh (Main bars along width, 
+       Distribution bars along depth) centered at the exact mid-plane of the slab thickness.
+     * `Show Foundation`: Displays 3D concrete isolated footings, column stubs, and soil bed.
+     * `Show Footing Rebar`: Displays 3D bottom steel mat and starter column rebar cages.
+     * `Show Inner / Outer / RCC Plaster`: Displays rendered plaster skin layers over wall and column surfaces.
+
+G. Scene Elements & Camera Controls:
+   - Scene Elements drawer for individual toggles (Internal walls, Solid pillars, Pillar rebar, 
+     Slab rebar, Ring beams, Full roof, Foundation, Wireframe, Labels).
+   - Camera Presets: 3D Free Orbit, Isometric View, Front View, Side View, Top View, Reset Camera.
+
+--------------------------------------------------------------------------------
+[MODULE 3] CIVIL ENGINEERING MATHEMATICAL CALCULATION ENGINE
+(Location: src/lib/brickCalculator.ts)
+--------------------------------------------------------------------------------
+A comprehensive civil engineering calculation library running on strict mathematical 
+and volumetric principles:
+
+A. Brick Masonry Estimation:
+   - Gross Wall Volume = Length × Height × Thickness.
+   - Opening Deductions = Sum of (Door/Window Width × Height × Wall Thickness).
+   - Pillar Deductions = Volume occupied by concrete columns inside wall footprint.
+   - Net Wall Volume = Gross Volume - Opening Deductions - Pillar Deductions.
+   - Nominal Brick Volume = $(L + t_{\text{mortar}}) \times (W + t_{\text{mortar}}) \times (H + t_{\text{mortar}})$.
+   - Base Brick Count = Net Wall Volume / Nominal Brick Volume.
+   - Final Brick Count = Base Brick Count × $(1 + \text{Wastage} / 100)$.
+   - Recommended Purchase = $\text{Math.ceil}(\text{Final Brick Count})$.
+   - Wet Mortar Volume = Net Wall Volume - (Base Brick Count × Actual Brick Volume).
+   - Dry Mortar Volume = Wet Mortar Volume × 1.33 (33% dry bulking factor).
+   - Cement Requirement = Dry Mortar Volume × $(1 / (\text{Cement Parts} + \text{Sand Parts})) / 0.0347 \text{ m}^3\text{/bag}$.
+   - M-Sand Requirement = Dry Mortar Volume × $(\text{Sand Parts} / \text{Total Parts}) \times 35.3147 \text{ CFT/m}^3$.
+
+B. Plastering Estimation (Conforming to IS 1200 Opening Deductions):
+   - Net Plaster Area computed per surface (Inner Walls, Outer Walls, RCC Columns, Beams, Ceiling).
+   - IS 1200 Code Opening Deduction Rules:
+     * Opening Area < 0.5 m² : No deduction, no jamb addition.
+     * Opening Area between 0.5 m² and 3.0 m² : 50% deduction for one face, jambs included.
+     * Opening Area > 3.0 m² : 100% deduction on both faces, jambs added separately.
+   - Wet Plaster Volume = Net Plaster Area × Plaster Thickness (e.g. 12mm = 0.012m).
+   - Dry Plaster Volume = Wet Volume × 1.30 (30% bulking & joint filling factor).
+   - Material Breakdown: Cement bags (50kg) and Plastering M-Sand (CFT & m³).
+
+C. RCC Structural Framing Estimation:
+   - Concrete Mix Grades:
+     * M20 (1 : 1.5 : 3) -> Total parts = 5.5, Dry factor = 1.54.
+     * M15 (1 : 2 : 4) -> Total parts = 7.0, Dry factor = 1.54.
+     * M10 (1 : 3 : 6) -> Total parts = 10.0, Dry factor = 1.54.
+   - Pillar / Column Quantities:
+     * Concrete Volume = Pillar Width × Depth × Height × Pillar Count.
+     * Longitudinal Main Rebar: Total length × $(D^2 / 162) \text{ kg/m}$.
+     * Lateral Stirrups: Perimeter tie length × Number of ties × $(D_{\text{tie}}^2 / 162) \text{ kg/m}$.
+     * Binding Wire: 10 - 12 kg per metric tonne of steel.
+     * Concrete Cover Blocks: 4 - 6 blocks per column.
+   - Ring Beams & Floor Beams:
+     * Beam Concrete Volume = Total Span Length × Beam Width × Beam Depth.
+     * Top & Bottom Reinforcement bars + Stirrup rings at 150mm spacing.
+   - Roof & Floor Slabs:
+     * Concrete Volume = Bay Area × Slab Thickness.
+     * 2-Way Reinforcement: Main steel (10mm @ 150mm c/c) + Distribution steel (8mm @ 150mm c/c).
+   - Aggregate Breakdown:
+     * Cement (50kg bags @ 0.0347 m³/bag).
+     * M-Sand (CFT & m³).
+     * 20mm Blue Metal Jalli / Coarse Aggregate (CFT & m³).
+
+D. Foundation & Footing Estimation:
+   - Earthwork Excavation = Sum of (Pit Length × Pit Width × Pit Depth) for all footings.
+   - PCC 1:4:8 Base = Footing Pit Area × PCC Thickness (0.10m - 0.15m).
+   - RCC Footing Concrete = Trapezoidal / Pad volume per footing.
+   - Footing Steel Mat = Orthogonal rebar length × $(D^2 / 162)$.
+   - Column Starter Dowel Stubs = Vertical starter bars into column + Ties.
+   - Backfilling Volume = Earth Excavation - Total Concrete Substructure.
+
+E. Labor Costing & Productivity Analysis:
+   - Mason productivity: 450 - 550 bricks laid per day per mason.
+   - Helper productivity: 650 - 750 bricks mixed and transported per day per helper.
+   - Total Days Required = Total Bricks / (Mason Count × Mason Daily Productivity).
+   - Total Masonry Labor Cost = (Masons × Daily Wage + Helpers × Daily Wage) × Total Days.
+   - RCC Structural Labor Cost = Total RCC Concrete Volume (m³) × RCC Labor Rate (₹/m³).
+
+--------------------------------------------------------------------------------
+[MODULE 4] CLOUD PROJECT PERSISTENCE & HISTORY MANAGEMENT
+(Location: src/lib/projectStorage.ts, SaveProjectModal.tsx, ProjectHistoryModal.tsx)
+--------------------------------------------------------------------------------
+Enables builders, contractors, and users to save complete 3D construction plans, 
+store them in the database, and retrieve them at any time:
+
+A. PostgreSQL Database Model (`SavedProject` in Prisma):
+   - Stores project name, dimensions, floor count, total bricks, total cost, cement bags, 
+     and sand volume.
+   - Serializes complete 3D building model (walls, pillars, openings, beams, footings, plaster) 
+     as JSON (`modelData`).
+   - Serializes calculator settings, brick type specification, and calculation results.
+
+B. REST API Handlers:
+   - `GET /api/projects` : Lists all saved project summaries with fast indexed queries.
+   - `POST /api/projects` : Validates, sanitizes, and creates new saved project records.
+   - `GET /api/projects/[id]` : Retrieves full project record with complete 3D JSON data.
+   - `DELETE /api/projects/[id]` : Deletes saved project from database.
+
+C. Dual-Storage & Offline Fallback:
+   - If PostgreSQL is connected, projects are synchronized with the cloud.
+   - If `DATABASE_URL` is unconfigured or network is offline, automatically saves to browser 
+     `localStorage` (`brick_factory_saved_projects_v1`) without crashing or losing data.
+   - Project History Modal displays badge: "Cloud Database Connected" or "Browser Local Cache".
+
+D. Project History Management UI:
+   - Search saved projects by name.
+   - Filter by date, floor count, or brick requirement.
+   - 1-Click "Load Project" imports walls, pillars, footings, and settings directly into the active 3D scene.
+   - Delete confirmation dialog.
+
+--------------------------------------------------------------------------------
+[MODULE 5] E-COMMERCE, PRODUCT CATALOG & B2B INQUIRY
+(Location: src/app/products, src/app/bulk-orders, src/app/about)
+--------------------------------------------------------------------------------
+A complete commercial platform representing A V M Bricks:
+
+A. Landing Page (`/`):
+   - Interactive 3D Hero Scene with floating brick showcase (`Hero3DScene.tsx`).
+   - Live feature cards with micro-animations (`Framer Motion`).
+   - AI Visual Estimator promotional banner (`AIVisualEstimatePromoSection.tsx`).
+   - Customer testimonials, production capacity metrics, and company values.
+
+B. Product Catalog & Technical Details (`/products` & `/products/[id]`):
+   - Products listed:
+     * Premium Wirecut Red Clay Brick (₹8.50/pc - 230 × 110 × 75 mm, >10 N/mm² compressive strength)
+     * High-Strength Fly Ash Brick (₹6.20/pc - 230 × 115 × 75 mm)
+     * Solid Concrete Block (₹45.00/pc - 400 × 200 × 200 mm)
+     * Hollow Concrete Block (₹38.00/pc - 400 × 200 × 200 mm)
+   - Dynamic product detail page with high-res gallery, technical parameters, and minimum order limits.
+
+C. Bulk Orders & B2B Quotation Form (`/bulk-orders`):
+   - High-volume inquiry form for builders, infrastructure contractors, and dealers.
+   - Collects project location, delivery site requirements, brick quantity, and timeline.
+   - Automated email dispatch via Nodemailer (`/api/bulk-orders`).
+   - Direct WhatsApp quote trigger button.
+
+D. About A V M Bricks (`/about`):
+   - Heritage and factory overview in M.M. Kovilur, Dindigul, Tamil Nadu.
+   - Quality control processes, automated extrusion machinery, kiln firing technology.
 
 ================================================================================
 3. COMPLETE TECHNOLOGY STACK
 ================================================================================
 
 [Frontend Framework & Core]
-- Next.js (v16.3.1)       : App Router, Server Components, API Route Handlers
-- React (v19.2.8)         : Modern React with Hooks and Concurrent Features
-- TypeScript (v5)         : Strict type-safety across models, calculators, and UI
+- Next.js (v16.3.1)             : App Router, Server Components, API Route Handlers
+- React (v19.2.8)               : React 19 with Concurrent Features & Server Components
+- React DOM (v19.2.8)           : React DOM rendering engine
+- TypeScript (v5.0.0)           : Strict type-safety across models, calculators, and UI
 
 [3D Graphics & Rendering]
-- Three.js (v0.185.1)     : WebGL 3D rendering engine
-- @react-three/fiber      : Declarative React wrapper for Three.js scene graph
-- @react-three/drei       : Production-ready helpers (OrbitControls, ContactShadows, Html)
+- Three.js (v0.185.1)           : Hardware-accelerated WebGL 3D rendering engine
+- @react-three/fiber (v9.7.0)   : Declarative React Three Fiber scene graph wrapper
+- @react-three/drei (v10.7.8)   : Three.js camera helpers, shadows, and canvas controls
+- @types/three (v0.185.4)       : Strict TypeScript definitions for Three.js
 
-[Styling & Animations]
-- Tailwind CSS (v4)       : Modern utility-first CSS engine
-- Framer Motion (v13.1.0) : Physics-based UI animations, page transitions, and gestures
-- Lucide React (v1.31.0)  : Modern icon library
-- @studio-freight/lenis   : Smooth momentum scrolling
+[Styling & UI Effects]
+- Tailwind CSS (v4.0.0)         : Modern utility-first CSS engine with PostCSS plugin
+- Framer Motion (v13.1.0)       : Physics-based UI animations, page transitions, and drawers
+- Lucide React (v1.31.0)        : Icon system (100+ structural & civil icons used)
+- Lenis (v1.1.20)               : Smooth momentum scrolling provider
+- clsx (v2.1.1)                 : Dynamic class name concatenation
+- tailwind-merge (v3.6.0)       : Conflict-free Tailwind class resolution
 
 [Backend, Database & Email]
-- Prisma ORM (v5.22.0)    : Type-safe database client and migration tool
-- PostgreSQL              : Relational database for Users, Products, Orders, Reviews
-- Nodemailer (v9.0.5)     : SMTP mailer for order inquiries and notifications
+- Prisma ORM (v5.22.0)          : Type-safe database schema and query engine
+- @prisma/client (v5.22.0)      : Auto-generated client for database operations
+- PostgreSQL                    : Relational SQL cloud database (compatible with Neon, Supabase, local)
+- Nodemailer (v9.0.5)           : SMTP mailer for order inquiries and alerts
+- @types/nodemailer (v8.0.1)    : TypeScript definitions for Nodemailer
+
+[Linting & Code Quality]
+- ESLint (v9.0.0)               : Code quality and syntax linter
+- eslint-config-next (v16.3.1)  : Next.js specific linting rules
 
 ================================================================================
-4. PROJECT DIRECTORY & FILE STRUCTURE
+4. COMPLETE REPOSITORY DIRECTORY & FILE STRUCTURE
 ================================================================================
 
-d:\Bricks - Copy\brick-factory\
+d:\brick-factory\
 ├── prisma\
-│   └── schema.prisma                  --> Database schema (User, Product, Cart, Order, Review)
-├── public\                            --> Static assets, images, icons, and textures
+│   └── schema.prisma                      --> Complete PostgreSQL schema (8 models, 3 enums)
+├── public\                                --> Static images, textures, favicon, web assets
 ├── src\
-│   ├── app\                           --> Next.js App Router
+│   ├── app\                               --> Next.js 16 App Router
 │   │   ├── about\
-│   │   │   └── page.tsx               --> About Company, Quality Standards & Vision
-│   │   ├── api\
-│   │   │   └── bulk-orders\
-│   │   │       └── route.ts           --> API endpoint handling bulk order emails & storage
+│   │   │   └── page.tsx                   --> A V M Bricks heritage, factory specs & standards
+│   │   ├── api\                           --> Backend REST API endpoints
+│   │   │   ├── bulk-orders\
+│   │   │   │   └── route.ts               --> Handles B2B bulk inquiry emails via Nodemailer
+│   │   │   └── projects\
+│   │   │       ├── [id]\
+│   │   │       │   └── route.ts           --> GET single project & DELETE project endpoints
+│   │   │       └── route.ts               --> GET list of projects & POST save new project
 │   │   ├── bulk-orders\
-│   │   │   └── page.tsx               --> Bulk order submission page & pricing estimator
+│   │   │   └── page.tsx                   --> B2B quotation form & direct WhatsApp dispatch
 │   │   ├── calculator\
-│   │   │   └── page.tsx               --> Full-page dedicated 3D Brick & Material Calculator
+│   │   │   └── page.tsx                   --> Main calculator page (Standard vs AI Visual Estimator)
 │   │   ├── products\
 │   │   │   ├── [id]\
-│   │   │   │   └── page.tsx           --> Dynamic single product details & technical spec page
-│   │   │   └── page.tsx               --> Product catalog grid with filters & comparisons
-│   │   ├── globals.css                --> Global styles, custom scrollbar & Tailwind setup
-│   │   ├── layout.tsx                 --> Root layout with Navbar, Footer & SmoothScroll
-│   │   └── page.tsx                   --> High-converting landing page with 3D Hero & interactive sections
+│   │   │   │   └── page.tsx               --> Individual product technical specifications page
+│   │   │   └── page.tsx                   --> Product catalog grid with filters
+│   │   ├── favicon.ico                    --> Site favicon
+│   │   ├── globals.css                    --> Global styles, custom scrollbar & Tailwind setup
+│   │   ├── layout.tsx                     --> Root layout with Navbar, Footer & SmoothScroll
+│   │   └── page.tsx                       --> Landing page with 3D Hero, Promo, Features
 │   │
 │   ├── components\
-│   │   ├── 3d\                        --> Three.js / React Three Fiber 3D Canvas Components
-│   │   │   ├── BrickScene.tsx         --> 3D interactive wall renderer with lighting & textures
-│   │   │   ├── Hero3DScene.tsx        --> Interactive floating 3D brick showcase for Hero banner
-│   │   │   ├── ScrollStoryScene.tsx   --> Scroll-driven 3D animation scene
-│   │   │   ├── SharedBrickWall.tsx    --> Reusable 3D brick wall mesh generator
-│   │   │   └── VisualEstimator3D.tsx  --> Full 3D room/wall simulation with cutouts & controls
+│   │   ├── 3d\                            --> Three.js / WebGL 3D Canvas Components
+│   │   │   ├── BrickScene.tsx             --> Interactive wall mesh renderer with lighting
+│   │   │   ├── Hero3DScene.tsx            --> Floating 3D brick showcase for Hero banner
+│   │   │   ├── ScrollStoryScene.tsx       --> Scroll-driven 3D animation scene
+│   │   │   ├── SharedBrickWall.tsx        --> Reusable 3D brick wall mesh generator
+│   │   │   └── VisualEstimator3D.tsx      --> Complete 3D building visualizer (145 KB):
+│   │   │                                      - Multi-floor elevation stacking
+│   │   │                                      - Pillar-to-pillar horizontal beam framing
+│   │   │                                      - Closed structural bay detection
+│   │   │                                      - Exposed Rebar Inspection Mode (X-Ray)
+│   │   │                                      - Pillar rebar cages & 3-tier joint ties
+│   │   │                                      - Orthogonal 2-way slab reinforcement mesh
+│   │   │                                      - Foundation isolated footings & stub cages
+│   │   │                                      - Inner/Outer/RCC plaster skin visualization
+│   │   │                                      - Camera presets & collision debug
 │   │   │
-│   │   ├── calculator\                --> Calculator logic & UI component widgets
-│   │   │   ├── AIAnalysisResults.tsx  --> Visual display of AI-detected dimensions
-│   │   │   ├── BuildingEditor.tsx     --> Interactive room builder, wall dimension controls
-│   │   │   ├── CalculatorContext.tsx  --> React Context for cross-component calculation state
-│   │   │   ├── CalculatorSettings.tsx --> Settings modal for mortar ratio, brick size, wastage %
-│   │   │   ├── ImageUpload.tsx        --> Drag-and-drop blueprint/sketch uploader
-│   │   │   ├── ProjectForms.tsx       --> Structure dimension input forms (Single, Room, Bathroom)
-│   │   │   ├── ResultDashboard.tsx    --> Metric cards for brick count, cement bags, sand, cost
-│   │   │   ├── StructurePreview3D.tsx --> 3D wrapper with view controls & wireframe toggles
-│   │   │   ├── VisualEstimator.tsx    --> Main estimator wrapper
-│   │   │   ├── VisualEstimatorResults.tsx --> Comprehensive cost & quantity analytical breakdown
-│   │   │   └── VisualPreviews.tsx     --> 2D architectural elevation previews
+│   │   ├── calculator\                    --> 2D Canvas Editor, Forms & Results Dashboards
+│   │   │   ├── AIAnalysisResults.tsx      --> Visual feedback of detected building dimensions
+│   │   │   ├── BuildingEditor.tsx         --> Core 2D CAD Plan Editor (303 KB):
+│   │   │                                      - Floor Plan Mode (walls, openings, pillars, ring beam)
+│   │   │                                      - Foundation Mode (isolated footings, excavation, PCC)
+│   │   │                                      - Plaster Mode (surface-by-surface plaster settings)
+│   │   │                                      - Multi-floor isolated state management
+│   │   │   ├── CalculatorContext.tsx      --> Global React context for calculator & 3D state
+│   │   │   ├── CalculatorSettings.tsx     --> Settings panel for mortar, brick sizes, prices
+│   │   │   ├── ImageUpload.tsx            --> Blueprint / sketch drag-and-drop uploader
+│   │   │   ├── ProjectForms.tsx           --> Dimension forms (Simple wall, Room, Compound, Balcony)
+│   │   │   ├── ProjectHistoryModal.tsx    --> Modal to browse, search, load & delete saved projects
+│   │   │   ├── ResultDashboard.tsx        --> Summary metric cards for standard calculator
+│   │   │   ├── SaveProjectModal.tsx       --> Modal to save 3D project to PostgreSQL / LocalStorage
+│   │   │   ├── StructurePreview3D.tsx     --> 3D canvas wrapper with camera toolbar
+│   │   │   ├── VisualEstimator.tsx        --> Step 1 (Editor) to Step 2 (Results) wizard
+│   │   │   ├── VisualEstimatorResults.tsx --> Comprehensive itemized estimation report (155 KB):
+│   │   │                                      - Wall Area Breakdown Table
+│   │   │                                      - Brick Masonry Construction Estimate
+│   │   │                                      - Plastering Construction Estimate
+│   │   │                                      - Live RCC Structural Framing Estimate
+│   │   │                                      - Isolated Foundation & Footing Estimate
+│   │   │                                      - AI Visual Itemized Cost Summary & Grand Total
+│   │   │                                      - Mason & Helper Labour Estimate
+│   │   │                                      - WhatsApp Quote Request & Disclaimer
+│   │   │   └── VisualPreviews.tsx         --> 2D architectural elevation previews
 │   │   │
 │   │   ├── home\
-│   │   │   └── AIVisualEstimatePromoSection.tsx --> Landing page promo section for AI estimator
+│   │   │   └── AIVisualEstimatePromoSection.tsx --> Landing page promotion for AI 3D Estimator
 │   │   │
 │   │   └── layout\
-│   │       ├── Footer.tsx             --> Footer with quick links, contacts, social links
-│   │       ├── Navbar.tsx             --> Sticky responsive navigation with active states & mobile drawer
-│   │       └── SmoothScroll.tsx       --> Lenis smooth scrolling provider
+│   │       ├── Footer.tsx                 --> A V M Bricks footer with address, contacts, quick links
+│   │       ├── Navbar.tsx                 --> Responsive navbar with active routes and mobile drawer
+│   │       └── SmoothScroll.tsx           --> Lenis momentum scrolling wrapper
 │   │
 │   └── lib\
-│       ├── brickCalculator.ts         --> Core mathematical engine for brick & mortar calculations
-│       ├── brickCalculator.test.ts    --> Unit test suites for estimation accuracy
-│       └── utils.ts                   --> Helper utilities (clsx & twMerge wrapper)
+│       ├── brickCalculator.ts             --> Civil engineering calculation engine (162 KB):
+│       │                                      - TN Red Clay Brick default specifications
+│       │                                      - Net wall volume & opening deduction formulas
+│       │                                      - Mortar volume & mix ratios (Cement bags, M-Sand)
+│       │                                      - Plastering surface formulas & IS 1200 rules
+│       │                                      - RCC structural formulas (Pillars, Beams, Slabs)
+│       │                                      - Steel bar weight formulas (D²/162)
+│       │                                      - Foundation footings, excavation, PCC base
+│       │                                      - Wall-pillar collision segmentation
+│       │                                      - Closed structural bay detection algorithm
+│       │                                      - Pillar-to-pillar beam detection algorithm
+│       ├── brickCalculator.test.ts        --> Automated test suites (150 KB)
+│       ├── prisma.ts                      --> Prisma Client singleton instance
+│       ├── projectStorage.ts              --> Dual PostgreSQL + LocalStorage persistence manager
+│       └── utils.ts                       --> Tailwind class utility (clsx + twMerge)
 │
-├── .env.example                       --> Environment variable template
-├── next.config.ts                     --> Next.js build configuration
-├── package.json                       --> Dependencies and build scripts
-├── tsconfig.json                      --> TypeScript configuration
-└── README.md                          --> Project quickstart guide
+├── .env                                   --> Local environment configuration
+├── .env.example                           --> Template for required environment variables
+├── eslint.config.mjs                      --> ESLint configuration
+├── next.config.ts                         --> Next.js build configuration
+├── package.json                           --> Project dependencies, scripts, and metadata
+├── postcss.config.mjs                     --> PostCSS configuration for Tailwind CSS v4
+├── tsconfig.json                          --> Strict TypeScript configuration
+├── TODAYS_WORK_REPORT.txt                 --> Detailed development log of recent structural upgrades
+└── PROJECT_FULL_DETAILS.txt               --> THIS FILE (Comprehensive Project Master Documentation)
 
 ================================================================================
-5. MATHEMATICAL FORMULAS & CALCULATION ENGINE (src/lib/brickCalculator.ts)
+5. MATHEMATICAL FORMULAS & CIVIL ENGINEERING REFERENCE
 ================================================================================
 
-1. Net Wall Volume Calculation:
-   - Gross Wall Volume = Wall Length × Wall Height × Wall Thickness
-   - Total Deductions = Sum of (Opening Width × Opening Height × Wall Thickness) for all doors/windows
-   - Net Wall Volume = Gross Wall Volume - Total Deductions
+1. Brick Masonry Equations:
+   - Gross Wall Volume:
+     $$V_{\text{gross}} = L \times H \times T$$
+   - Total Deductions:
+     $$V_{\text{deductions}} = \sum (W_{\text{opening}} \times H_{\text{opening}} \times T) + \sum (W_{\text{pillar}} \times D_{\text{pillar}} \times H)$$
+   - Net Masonry Volume:
+     $$V_{\text{net}} = V_{\text{gross}} - V_{\text{deductions}}$$
+   - Nominal Brick Volume (with 10mm mortar):
+     $$V_{\text{nominal}} = (L + 0.010\text{m}) \times (W + 0.010\text{m}) \times (H + 0.010\text{m})$$
+   - Base Brick Count:
+     $$N_{\text{base}} = \frac{V_{\text{net}}}{V_{\text{nominal}}}$$
+   - Final Bricks with Wastage:
+     $$N_{\text{final}} = N_{\text{base}} \times \left(1 + \frac{\text{Wastage}\%}{100}\right)$$
+   - Recommended Purchase:
+     $$N_{\text{purchase}} = \lceil N_{\text{final}} \rceil$$
+   - Wet Mortar Volume:
+     $$V_{\text{wet mortar}} = V_{\text{net}} - (N_{\text{base}} \times L \times W \times H)$$
+   - Dry Mortar Volume (33% bulking):
+     $$V_{\text{dry mortar}} = V_{\text{wet mortar}} \times 1.33$$
+   - Cement Bags Required (Mortar Mix 1 : M, e.g. 1:5):
+     $$\text{Cement Bags} = \frac{V_{\text{dry mortar}} \times \frac{1}{1 + M}}{0.0347 \text{ m}^3\text{/bag}}$$
+   - M-Sand Volume Required:
+     $$\text{Sand CFT} = V_{\text{dry mortar}} \times \frac{M}{1 + M} \times 35.3147$$
 
-2. Single Brick Volume:
-   - Volume without Mortar = Length × Width × Height
-   - Nominal Volume with Mortar = (Length + MortarThickness) × (Width + MortarThickness) × (Height + MortarThickness)
+2. Plastering Equations (Conforming to IS 1200):
+   - Net Plaster Area:
+     $$A_{\text{net}} = A_{\text{wall surface}} - A_{\text{deductions (IS 1200)}}$$
+   - Wet Plaster Volume (e.g. 12mm thickness):
+     $$V_{\text{wet plaster}} = A_{\text{net}} \times 0.012\text{m}$$
+   - Dry Plaster Volume (30% joint filling & bulking factor):
+     $$V_{\text{dry plaster}} = V_{\text{wet plaster}} \times 1.30$$
+   - Cement Bags for Plaster:
+     $$\text{Cement Bags} = \frac{V_{\text{dry plaster}} \times \frac{1}{1 + M_{\text{plaster}}}}{0.0347}$$
+   - M-Sand for Plaster:
+     $$\text{Sand CFT} = V_{\text{dry plaster}} \times \frac{M_{\text{plaster}}}{1 + M_{\text{plaster}}} \times 35.3147$$
 
-3. Number of Bricks Required:
-   - Base Bricks = Net Wall Volume / Nominal Brick Volume
-   - Total Bricks with Wastage = Base Bricks × (1 + WastagePercentage / 100)
+3. RCC Structural Framing Equations:
+   - Dry Concrete Volume Conversion Factor:
+     $$V_{\text{dry concrete}} = V_{\text{wet concrete}} \times 1.54$$
+   - M20 Mix Ratio (1 : 1.5 : 3, Total Parts = 5.5):
+     $$\text{Cement (m}^3\text{)} = V_{\text{dry}} \times \frac{1}{5.5} \implies \text{Bags} = \frac{\text{Cement m}^3}{0.0347}$$
+     $$\text{M-Sand (CFT)} = V_{\text{dry}} \times \frac{1.5}{5.5} \times 35.3147$$
+     $$\text{20mm Blue Metal Jalli (CFT)} = V_{\text{dry}} \times \frac{3.0}{5.5} \times 35.3147$$
+   - Steel Rebar Unit Weight Formula:
+     $$\text{Weight (kg/m)} = \frac{D^2}{162} \quad (D \text{ in mm})$$
+   - Total Steel Weight:
+     $$\text{Steel Weight (kg)} = \sum \left(\text{Bar Length} \times \frac{D^2}{162}\right) \times (1 + \text{Wastage Factor})$$
+   - Binding Wire Required:
+     $$\text{Binding Wire (kg)} = \text{Total Steel (tonnes)} \times 10\text{ to }12\text{ kg}$$
 
-4. Mortar Quantity & Material Breakdown:
-   - Total Mortar Volume = Net Wall Volume - (Base Bricks × Single Brick Volume without Mortar)
-   - Dry Mortar Volume = Wet Mortar Volume × 1.33 (33% conversion factor for dry volume)
-   - For a Mortar Mix Ratio (e.g., 1:6 = Cement:Sand, Total Parts = 7):
-       * Cement Volume = Dry Mortar Volume × (1 / 7)
-       * Cement Bags Required = (Cement Volume in m3 × 1440 kg/m3) / 50 kg per bag
-       * Sand Volume in m3 = Dry Mortar Volume × (6 / 7)
-       * Sand Volume in cft = Sand Volume in m3 × 35.3147
+4. Foundation & Footing Equations:
+   - Pit Excavation Volume:
+     $$V_{\text{excavation}} = L_{\text{pit}} \times W_{\text{pit}} \times D_{\text{pit}}$$
+   - PCC 1:4:8 Mud Mat Base:
+     $$V_{\text{PCC}} = L_{\text{pit}} \times W_{\text{pit}} \times T_{\text{PCC}}$$
+   - Trapezoidal Footing Volume:
+     $$V_{\text{footing}} = \left(L_{\text{base}} \times W_{\text{base}} \times d_1\right) + \frac{d_2}{3}\left(A_1 + A_2 + \sqrt{A_1 \times A_2}\right)$$
+   - Backfilling Volume:
+     $$V_{\text{backfill}} = V_{\text{excavation}} - (V_{\text{PCC}} + V_{\text{footing}} + V_{\text{stub column}})$$
 
-5. Cost Estimation:
-   - Total Cost = (Total Bricks × Price Per Brick) + (Cement Bags × Price Per Bag) + (Sand cft × Price Per cft) + Estimated Labor
+5. Grand Total Project Cost Estimation:
+   $$\text{Grand Total Cost} = \text{Cost}_{\text{Masonry}} + \text{Cost}_{\text{Plaster}} + \text{Cost}_{\text{RCC}} + \text{Cost}_{\text{Foundation}} + \text{Cost}_{\text{Labour}} + \text{Cost}_{\text{Extras}}$$
 
 ================================================================================
 6. DATABASE SCHEMA & DATA MODELS (Prisma PostgreSQL)
 ================================================================================
 
+Defined in `prisma/schema.prisma`:
+
 1. User Model:
-   - Fields: id, email, password, name, role (CUSTOMER, ADMIN, STAFF), createdAt, updatedAt
-   - Relations: orders, cart, reviews
+   - Fields: id (String, CUID), email (Unique), password, name, role (Role: CUSTOMER, ADMIN, STAFF), 
+     createdAt, updatedAt.
+   - Relations: orders, cart, reviews, savedProjects.
 
 2. Product Model:
-   - Fields: id, name, code, description, price, stock, minStock, material, strength, categoryId
-   - Relations: category, images, cartItems, orderItems, reviews
+   - Fields: id (String, CUID), name, code (Unique), description, price (Float), stock (Int), 
+     minStock (Int), material, strength, categoryId, createdAt, updatedAt.
+   - Relations: category, images, cartItems, orderItems, reviews.
 
 3. Category Model:
-   - Fields: id, name, description
-   - Relations: products
+   - Fields: id (String, CUID), name (Unique), description.
+   - Relations: products.
 
-4. Cart & CartItem Models:
-   - Fields: id, userId, cartId, productId, quantity, createdAt, updatedAt
-   - Manages live customer cart items.
+4. ProductImage Model:
+   - Fields: id, url, productId.
+   - Relations: product.
 
-5. Order & OrderItem Models:
-   - Fields: id, userId, status (PENDING, CONFIRMED, MANUFACTURING, READY, DELIVERING, DELIVERED, CANCELLED), 
-     totalAmount, paymentStatus (PENDING, PAID, FAILED, REFUNDED), createdAt, updatedAt
-   - Tracks order fulfillment lifecycle and product snapshots.
+5. Cart & CartItem Models:
+   - Cart: id, userId (Unique), createdAt, updatedAt.
+   - CartItem: id, cartId, productId, quantity, relations to Cart and Product.
 
-6. Review Model:
-   - Fields: id, rating (1-5), comment, userId, productId, createdAt
+6. Order & OrderItem Models:
+   - Order: id, userId, status (OrderStatus: PENDING, CONFIRMED, MANUFACTURING, READY, DELIVERING, 
+     DELIVERED, CANCELLED), totalAmount, paymentStatus (PaymentStatus: PENDING, PAID, FAILED, REFUNDED), 
+     createdAt, updatedAt.
+   - OrderItem: id, orderId, productId, quantity, price.
+
+7. Review Model:
+   - Fields: id, rating (1-5), comment, userId, productId, createdAt.
+   - Relations to User and Product.
+
+8. SavedProject Model (Primary Model for Cloud 3D Estimation Persistence):
+   - Fields:
+     * id             : String (@id @default(cuid()))
+     * userId         : String? (Optional relation to User)
+     * name           : String (Project title)
+     * totalBricks    : Int (Calculated brick requirement)
+     * totalCost      : Float (Grand total estimated budget in ₹)
+     * cementBags     : Float? (Total 50kg cement bags)
+     * sandVolumeCft  : Float? (Total M-Sand in CFT)
+     * buildingLength : Float (Footprint length)
+     * buildingWidth  : Float (Footprint width)
+     * buildingUnit   : String (@default("ft"))
+     * floorsCount    : Int (@default(1))
+     * modelData      : Json (Full 3D BuildingModel tree: floors, walls, openings, pillars, footings, plaster)
+     * settingsData   : Json? (CalculatorSettings configuration)
+     * brickTypeData  : Json? (Selected BrickSpecification)
+     * estimationData : Json? (CalculationResult snapshot)
+     * createdAt      : DateTime (@default(now()))
+     * updatedAt      : DateTime (@updatedAt)
+     * user           : User? (Relation onDelete: Cascade)
 
 ================================================================================
-7. STEP-BY-STEP SETUP & EXECUTION GUIDE
+7. REST API SPECIFICATIONS
+================================================================================
+
+1. GET /api/projects
+   - Description : Retrieves list of all saved project summaries for the Project History Modal.
+   - Response    : `{ success: true, projects: SavedProjectSummary[] }`
+   - Omission    : Excludes heavy `modelData` JSON for high-speed indexing.
+
+2. POST /api/projects
+   - Description : Saves a new 3D building project to PostgreSQL.
+   - Request Body:
+     `{ name, modelData, totalBricks, totalCost, cementBags, sandVolumeCft, buildingLength, buildingWidth, buildingUnit, floorsCount, settingsData, brickTypeData, estimationData, userId? }`
+   - Response    : `{ success: true, message: string, project: SavedProject }`
+   - Status 503  : Returns friendly notice if `DATABASE_URL` is not yet configured, allowing LocalStorage fallback.
+
+3. GET /api/projects/[id]
+   - Description : Retrieves a single saved project including full 3D `modelData` JSON.
+   - Response    : `{ success: true, project: SavedProject }`
+
+4. DELETE /api/projects/[id]
+   - Description : Deletes a saved project by ID from PostgreSQL.
+   - Response    : `{ success: true, message: "Project successfully deleted from database." }`
+
+5. POST /api/bulk-orders
+   - Description : Handles B2B quotation inquiry form submissions and dispatches emails via Nodemailer.
+   - Request Body: `{ name, email, phone, company, quantity, location, message }`
+   - Response    : `{ success: true, message: "Inquiry received successfully." }`
+
+================================================================================
+8. STEP-BY-STEP INSTALLATION & RUN GUIDE
 ================================================================================
 
 [Prerequisites]
 - Node.js (v18.18+ or v20+ recommended)
-- npm or yarn or pnpm
-- PostgreSQL database instance (optional for local calculator preview, required for DB features)
+- npm, yarn, or pnpm
+- PostgreSQL database instance (Neon Serverless PostgreSQL, Supabase, or local PostgreSQL)
 
-[Installation Steps]
-1. Navigate to the project root:
-   cd "D:\Bricks - Copy\brick-factory"
+[Step 1: Clone or Navigate to Project]
+cd "d:\brick-factory"
 
-2. Install all dependencies:
-   npm install
+[Step 2: Install Dependencies]
+npm install
 
-3. Configure Environment Variables:
-   Copy `.env.example` to `.env` and fill in:
-   - DATABASE_URL="postgresql://user:password@localhost:5432/brick_factory"
-   - SMTP_HOST="smtp.gmail.com"
-   - SMTP_PORT=587
-   - SMTP_USER="your-email@gmail.com"
-   - SMTP_PASS="your-app-password"
+[Step 3: Environment Configuration]
+Create or verify `.env` file in the project root:
+```env
+# PostgreSQL Database Connection String (e.g. Neon Serverless or Local)
+DATABASE_URL="postgresql://user:password@localhost:5432/brick_factory?schema=public"
 
-4. Database Sync (if using database):
-   npx prisma db push
-   npx prisma generate
+# SMTP Email Configuration (Nodemailer)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="sales@avmbricks.com"
+SMTP_PASS="your-app-specific-password"
 
-5. Run Development Server:
-   npm run dev
+# Public Site Configuration
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
 
-6. Open in Browser:
-   http://localhost:3000
+[Step 4: Synchronize Database Schema]
+npx prisma db push
+npx prisma generate
 
-7. Build for Production:
-   npm run build
-   npm run start
+[Step 5: Run Development Server]
+npm run dev
 
-================================================================================
-8. SUMMARY OF PAGES & URL ROUTES
-================================================================================
+Open browser at: http://localhost:3000
 
-- /                    : Landing Page with 3D Hero, Features, Promo & Testimonials
-- /calculator          : Interactive 3D Wall & Room Material Estimator
-- /products            : Product Catalog with specifications & filters
-- /products/[id]       : Individual Product Detail & Quote Request
-- /bulk-orders         : B2B / Contractor Bulk Order Inquiry Form
-- /about               : About Brick Factory, Quality Labs, Sustainable Manufacturing
-- /api/bulk-orders     : API handler for bulk order submissions and email dispatch
+[Step 6: Production Build & Deployment]
+npm run build
+npm run start
 
 ================================================================================
-                      END OF PROJECT DOCUMENTATION
+9. SUMMARY OF PAGES & ROUTE SITEMAP
+================================================================================
+
+- /                    : Landing Page (3D floating brick hero, promo, features, stats, testimonials)
+- /calculator          : Dedicated 3D Civil Building & Material Estimator:
+                         * Tab 1: Standard Calculator (Single Wall, Room, Balcony, Compound wall)
+                         * Tab 2: AI Visual Estimator (2D Interactive CAD Floor/Foundation/Plaster Editor + 3D Twin)
+- /products            : Product Catalog (Red Clay Bricks, Fly Ash Bricks, Solid/Hollow Concrete Blocks)
+- /products/[id]       : Dynamic Product Specification Page with technical data & instant quotation
+- /bulk-orders         : B2B / Contractor Bulk Order Quotation Form & WhatsApp Connect
+- /about               : About A V M Bricks, Factory details in Dindigul, Quality Testing
+- /api/projects        : REST API to list and create saved building projects
+- /api/projects/[id]   : REST API to fetch and delete individual building projects
+- /api/bulk-orders     : REST API to process B2B inquiries and send Nodemailer emails
+
+================================================================================
+                      END OF COMPLETE PROJECT DOCUMENTATION
 ================================================================================

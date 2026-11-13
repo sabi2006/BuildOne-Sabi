@@ -1,5 +1,34 @@
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
 
+// Re-export full structural calculation service and types
+export * from './structuralCalculationService';
+import {
+  BuildingConfig,
+  BuildingStructuralSummary,
+  DEFAULT_BUILDING_CONFIG,
+  calculateBuildingStructuralSummary,
+  ColumnRole,
+  SoilClassification,
+  ConcreteGrade
+} from './structuralCalculationService';
+
+export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
+  switch (grade) {
+    case 'M15':
+      return { cement: 1, sand: 2, aggregate: 4, ratioString: '1:2:4' };
+    case 'M20':
+      return { cement: 1, sand: 1.5, aggregate: 3, ratioString: '1:1.5:3' };
+    case 'M25':
+      return { cement: 1, sand: 1, aggregate: 2, ratioString: '1:1:2' };
+    case 'M30':
+      return { cement: 1, sand: 0.75, aggregate: 1.5, ratioString: '1:0.75:1.5' };
+    case 'M35':
+      return { cement: 1, sand: 0.65, aggregate: 1.3, ratioString: '1:0.65:1.3' };
+    default:
+      return { cement: 1, sand: 1.5, aggregate: 3, ratioString: '1:1.5:3' };
+  }
+}
+
 export interface Dimensions {
   length: number;
   height: number;
@@ -74,11 +103,53 @@ export interface Pillar {
   showBeam?: boolean;
   includeInEstimate?: boolean;
   notes?: string;
+  isLocked?: boolean;
+  concreteGrade?: ConcreteGrade;
   continueToFloors?: 'current' | 'ground_first' | 'all' | 'custom';
   customFloorIds?: string[];
   customOffsetX?: number;
   customOffsetY?: number;
   connectedWallIds?: string[];
+  // Dynamic Structural Engineering Properties (Handbook Section 7)
+  structuralRole?: ColumnRole;
+  structuralData?: {
+    role: ColumnRole;
+    tributaryAreaM2: number;
+    tributaryAreaSqFt: number;
+    serviceLoadKn: number;
+    factoredLoadKn: number;
+    capacityKn: number;
+    capacityUtilization: number;
+    slendernessRatio: number;
+    isShortColumn: boolean;
+    requiredAgMm2: number;
+    providedAgMm2: number;
+    steelPercentage: number;
+    warning?: string;
+  };
+  rebarConfig?: {
+    pillarMainBarCount: number;
+    pillarMainBarDiaMm: number;
+    pillarStirrupDiaMm: number;
+    pillarStirrupSpacingMm: number;
+    pillarCoverMm?: number;
+    mainSteelWeightKg?: number;
+    stirrupSteelWeightKg?: number;
+  };
+  calculatedFooting?: {
+    lengthM: number;
+    widthM: number;
+    depthM: number;
+    areaM2: number;
+    serviceLoadKn: number;
+    excavationM3: number;
+    pccM3: number;
+    rccM3: number;
+    steelKg: number;
+  };
+  calculatedLoadKn?: number;
+  isCustomSize?: boolean;
+  structuralWarning?: string;
 }
 
 // Convert arbitrary unit to target unit
@@ -405,88 +476,209 @@ export const validatePillarPlacement = (
   };
 };
 
-// Detect structurally sound pillar positions for a floor (corners, major junctions, intermediate spans, center)
+// Structural Grid Generator Options (IS 456 / SP 16 Structural Column Layout)
+export interface StructuralGridOptions {
+  targetSpacingX?: number; // Target column span along X axis (default: 13 ft or 4.0 m)
+  targetSpacingY?: number; // Target column span along Y axis (default: 13 ft or 4.0 m)
+  maxSpan?: number; // Maximum permissible span before intermediate column is mandatory (default: 15 ft or 4.5 m)
+  existingPillars?: Pillar[]; // Existing pillars for floor
+  preserveLocked?: boolean; // Preserve all pillars where isLocked === true (default: true)
+  defaultWidth?: number;
+  defaultDepth?: number;
+  defaultUnit?: Unit;
+  defaultHeight?: number;
+  concreteGrade?: ConcreteGrade;
+}
+
+// Generate an intelligent, load-path-aligned structural column grid based on building dimensions, walls, and spans
+export const generateStructuralGridPillars = (
+  floor: Floor,
+  buildingLength: number,
+  buildingWidth: number,
+  buildingUnit: Unit = 'ft',
+  defaultHeight: number = 10,
+  options?: StructuralGridOptions
+): Pillar[] => {
+  const allWalls = [...floor.externalWalls, ...floor.internalWalls];
+  const isMeters = buildingUnit === 'm';
+  const defaultMaxSpan = isMeters ? 4.5 : 15.0;
+  const maxSpan = options?.maxSpan && options.maxSpan > 0 ? options.maxSpan : defaultMaxSpan;
+  const defaultTargetSpacing = isMeters ? Math.min(4.0, maxSpan) : Math.min(13.0, maxSpan);
+  const spacingX = options?.targetSpacingX && options.targetSpacingX > 0 ? options.targetSpacingX : defaultTargetSpacing;
+  const spacingY = options?.targetSpacingY && options.targetSpacingY > 0 ? options.targetSpacingY : defaultTargetSpacing;
+  const snapDist = isMeters ? 0.45 : 1.5;
+
+  interface CandidateNode {
+    coord: Coordinate;
+    type: Pillar['placementType'];
+    alignment: Pillar['alignment'];
+    isLocked?: boolean;
+    sourcePillar?: Pillar;
+  }
+
+  const candidateNodes: CandidateNode[] = [];
+
+  const addNode = (
+    coord: Coordinate,
+    type: Pillar['placementType'] = 'corner',
+    alignment: Pillar['alignment'] = 'outside_corner',
+    isLocked: boolean = false,
+    sourcePillar?: Pillar
+  ) => {
+    // If coordinate is invalid, skip
+    if (!coord || typeof coord.x !== 'number' || typeof coord.y !== 'number' || isNaN(coord.x) || isNaN(coord.y)) {
+      return;
+    }
+    const roundedCoord: Coordinate = {
+      x: Math.round(coord.x * 100) / 100,
+      y: Math.round(coord.y * 100) / 100
+    };
+
+    const existingIndex = candidateNodes.findIndex(cn => Math.hypot(cn.coord.x - roundedCoord.x, cn.coord.y - roundedCoord.y) < snapDist);
+    if (existingIndex >= 0) {
+      // If new node is locked, it takes precedence over existing auto node
+      if (isLocked && !candidateNodes[existingIndex].isLocked) {
+        candidateNodes[existingIndex] = { coord: roundedCoord, type, alignment, isLocked: true, sourcePillar };
+      }
+      return;
+    }
+
+    candidateNodes.push({ coord: roundedCoord, type, alignment, isLocked, sourcePillar });
+  };
+
+  // 1. Preserve Locked Pillars from existing configuration
+  const shouldPreserveLocked = options?.preserveLocked !== false;
+  if (shouldPreserveLocked && options?.existingPillars && options.existingPillars.length > 0) {
+    options.existingPillars.forEach(p => {
+      if (p.isLocked && p.position) {
+        addNode(p.position, p.placementType || 'custom', p.alignment || 'centre', true, p);
+      }
+    });
+  }
+
+  // 2. Footprint Boundary Corners
+  if (floor.externalWalls.length > 0) {
+    floor.externalWalls.forEach(w => {
+      if (w.start) addNode(w.start, 'corner', 'outside_corner');
+      if (w.end) addNode(w.end, 'corner', 'outside_corner');
+    });
+  } else {
+    // Default rectangular boundary
+    addNode({ x: 0, y: 0 }, 'corner', 'outside_corner');
+    addNode({ x: buildingLength, y: 0 }, 'corner', 'outside_corner');
+    addNode({ x: buildingLength, y: buildingWidth }, 'corner', 'outside_corner');
+    addNode({ x: 0, y: buildingWidth }, 'corner', 'outside_corner');
+  }
+
+  // 3. Wall junctions and intermediate spans along all walls
+  allWalls.forEach(w => {
+    if (!w.start || !w.end) return;
+    const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
+    if (len > maxSpan) {
+      const numSegments = Math.max(2, Math.ceil(len / spacingX));
+      for (let s = 1; s < numSegments; s++) {
+        const frac = s / numSegments;
+        const subPt: Coordinate = {
+          x: w.start.x + frac * (w.end.x - w.start.x),
+          y: w.start.y + frac * (w.end.y - w.start.y)
+        };
+        addNode(subPt, 'wall', 'centre');
+      }
+    }
+  });
+
+  // Internal wall junctions (T-joints, intersections, wall ends)
+  floor.internalWalls.forEach(w => {
+    if (w.start) addNode(w.start, 'wall_joint', 'centre');
+    if (w.end) addNode(w.end, 'wall_joint', 'centre');
+  });
+
+  // 4. Structural Grid Bays across the entire building footprint
+  const numBaysX = Math.max(1, Math.ceil(buildingLength / spacingX));
+  const numBaysY = Math.max(1, Math.ceil(buildingWidth / spacingY));
+
+  for (let i = 0; i <= numBaysX; i++) {
+    const gx = Math.round((i * (buildingLength / numBaysX)) * 100) / 100;
+    for (let j = 0; j <= numBaysY; j++) {
+      const gy = Math.round((j * (buildingWidth / numBaysY)) * 100) / 100;
+      const isCorner = (i === 0 || i === numBaysX) && (j === 0 || j === numBaysY);
+      const isEdge = i === 0 || i === numBaysX || j === 0 || j === numBaysY;
+      const type: Pillar['placementType'] = isCorner ? 'corner' : (isEdge ? 'wall' : 'central');
+      const align: Pillar['alignment'] = isCorner ? 'outside_corner' : (isEdge ? 'flush_exterior' : 'centre');
+      addNode({ x: gx, y: gy }, type, align);
+    }
+  }
+
+  // Always consider the central structural axis intersection
+  const midX = Math.round((buildingLength / 2) * 100) / 100;
+  const midY = Math.round((buildingWidth / 2) * 100) / 100;
+  addNode({ x: midX, y: midY }, 'central', 'centre');
+
+  // Filter candidates that conflict with door or window openings (unless explicitly locked by user)
+  const defaultPillarWidth = options?.defaultWidth || DEFAULT_RCC_PILLAR.width;
+  const defaultPillarUnit = options?.defaultUnit || DEFAULT_RCC_PILLAR.unit;
+
+  const validNodes = candidateNodes.filter(cn => {
+    if (cn.isLocked) return true;
+    const collision = checkPillarOpeningCollision(cn.coord, defaultPillarWidth, defaultPillarUnit, allWalls, buildingUnit);
+    return !collision.hasConflict;
+  });
+
+  return validNodes.map((node, idx) => {
+    if (node.sourcePillar) {
+      return {
+        ...node.sourcePillar,
+        verticalColumnId: node.sourcePillar.verticalColumnId || `col-${idx + 1}`,
+        height: defaultHeight,
+        position: node.coord,
+        x: node.coord.x,
+        y: node.coord.y,
+        isLocked: true
+      };
+    }
+
+    return {
+      id: `pillar-${floor.id}-${idx + 1}`,
+      name: `P${idx + 1}`,
+      floorId: floor.id,
+      verticalColumnId: `col-${idx + 1}`,
+      width: options?.defaultWidth || defaultPillarWidth,
+      depth: options?.defaultDepth || DEFAULT_RCC_PILLAR.depth,
+      height: defaultHeight,
+      count: 1,
+      unit: defaultPillarUnit,
+      position: node.coord,
+      x: node.coord.x,
+      y: node.coord.y,
+      placementType: node.type,
+      alignment: node.alignment,
+      shape: 'square',
+      finish: 'raw',
+      includeInEstimate: true,
+      showIn3D: true,
+      isLocked: !!node.isLocked,
+      concreteGrade: options?.concreteGrade || 'M20'
+    };
+  });
+};
+
+// Detect structurally sound pillar positions for a floor (intelligently generates load-path-aligned grid)
 export const detectStructuralPillars = (
   floor: Floor,
   buildingLength: number,
   buildingWidth: number,
   buildingUnit: Unit = 'ft',
-  defaultHeight: number = 10
+  defaultHeight: number = 10,
+  options?: StructuralGridOptions
 ): Pillar[] => {
-  const allWalls = [...floor.externalWalls, ...floor.internalWalls];
-  const candidatePoints: Array<{ coord: Coordinate; type: 'corner' | 'wall_joint' | 'wall_end' | 'central'; alignment: Pillar['alignment'] }> = [];
-
-  const addPoint = (coord: Coordinate, type: 'corner' | 'wall_joint' | 'wall_end' | 'central', alignment: Pillar['alignment'] = 'outside_corner') => {
-    const exists = candidatePoints.some(cp => Math.hypot(cp.coord.x - coord.x, cp.coord.y - coord.y) < 1.0);
-    if (!exists) {
-      candidatePoints.push({ coord, type, alignment });
-    }
-  };
-
-  // 1. Four exterior corners
-  if (floor.externalWalls.length > 0) {
-    floor.externalWalls.forEach(w => {
-      if (w.start) addPoint(w.start, 'corner', 'outside_corner');
-      if (w.end) addPoint(w.end, 'corner', 'outside_corner');
-    });
-  } else {
-    // Default building rectangle corners
-    addPoint({ x: 0, y: 0 }, 'corner', 'outside_corner');
-    addPoint({ x: buildingLength, y: 0 }, 'corner', 'outside_corner');
-    addPoint({ x: buildingLength, y: buildingWidth }, 'corner', 'outside_corner');
-    addPoint({ x: 0, y: buildingWidth }, 'corner', 'outside_corner');
-  }
-
-  // 2. Intermediate spans on long walls (if span >= 18ft, place midpoint)
-  allWalls.forEach(w => {
-    if (!w.start || !w.end) return;
-    const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
-    if (len >= 18) {
-      const mid: Coordinate = {
-        x: (w.start.x + w.end.x) / 2,
-        y: (w.start.y + w.end.y) / 2
-      };
-      addPoint(mid, 'wall_joint', 'centre');
-    }
-  });
-
-  // 3. Internal wall junctions
-  floor.internalWalls.forEach(w => {
-    if (w.start) addPoint(w.start, 'wall_joint', 'centre');
-    if (w.end) addPoint(w.end, 'wall_joint', 'centre');
-  });
-
-  // 4. Central structural support position
-  const midX = buildingLength / 2;
-  const midY = buildingWidth / 2;
-  addPoint({ x: midX, y: midY }, 'central', 'centre');
-
-  // Filter out any candidates that conflict with door or window openings
-  const defaultPillarWidth = DEFAULT_RCC_PILLAR.width;
-  const defaultPillarUnit = DEFAULT_RCC_PILLAR.unit;
-
-  const validPoints = candidatePoints.filter(cp => {
-    const collision = checkPillarOpeningCollision(cp.coord, defaultPillarWidth, defaultPillarUnit, allWalls, buildingUnit);
-    return !collision.hasConflict;
-  });
-
-  return validPoints.map((pt, idx) => ({
-    id: `pillar-${floor.id}-${idx + 1}`,
-    name: `P${idx + 1}`,
-    floorId: floor.id,
-    width: defaultPillarWidth,
-    depth: DEFAULT_RCC_PILLAR.depth,
-    height: defaultHeight,
-    count: 1,
-    unit: defaultPillarUnit,
-    position: pt.coord,
-    placementType: pt.type,
-    alignment: pt.alignment,
-    shape: 'square',
-    finish: 'raw',
-    includeInEstimate: true,
-    showIn3D: true
-  }));
+  return generateStructuralGridPillars(
+    floor,
+    buildingLength,
+    buildingWidth,
+    buildingUnit,
+    defaultHeight,
+    options
+  );
 };
 
 export interface StructuralBay {
@@ -1033,7 +1225,7 @@ export const DEFAULT_RCC_REINFORCEMENT: RCCReinforcementConfig = {
 };
 
 export interface RCCElementBreakdown {
-  elementType: 'pillar' | 'ringBeam' | 'fullRccTop';
+  elementType: 'pillar' | 'ringBeam' | 'fullRccTop' | 'slab';
   elementName: string;
   count: number;
   concreteVolumeM3: number;
@@ -1080,6 +1272,7 @@ export interface RCCFloorEstimate {
     pillars: RCCElementBreakdown;
     ringBeams: RCCElementBreakdown;
     fullRccTop: RCCElementBreakdown;
+    slab?: RCCElementBreakdown;
   };
 }
 
@@ -1122,6 +1315,7 @@ export interface RCCProjectEstimate {
     aggregateCft: number;
     steelKg: number;
   };
+  roofSlab?: RCCElementBreakdown;
   floors: RCCFloorEstimate[];
 }
 
@@ -1150,7 +1344,7 @@ export interface FoundationFooting {
   isManual?: boolean;
   linkedPillarId?: string;
   position?: Coordinate;
-  foundationType?: 'isolated' | 'combined' | 'strip' | 'raft';
+  foundationType?: 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | string;
   
   // Excavation
   excavationLength: number;
@@ -1213,8 +1407,12 @@ export interface CommonFootingSize {
 
 export interface FoundationConfig {
   enabled: boolean;
-  foundationType: 'isolated' | 'combined' | 'strip' | 'raft';
+  foundationType: 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | string;
   soilBearingCapacityKnM2: number;
+  soilClassification?: SoilClassification;
+  soilType?: string;
+  allowableSoilPressure?: number;
+  depth?: number;
   autoGenerateMode?: boolean;
   
   // Common Footing Size Mode (Synchronizes footingLength, footingWidth, footingDepth across all footings)
@@ -1249,6 +1447,7 @@ export interface FoundationConfig {
   defaultPccMixRatio: '1:3:6' | '1:4:8' | '1:2:4';
   defaultFootingMixRatio: '1:1.5:3' | '1:2:4';
   sandCompactionFactor: number;
+  concreteGrade?: ConcreteGrade;
   
   dpcThicknessMm: number;
   dpcWidthIn: number;
@@ -1495,7 +1694,8 @@ export interface CalculatorSettings {
   transportCost: number;         // total
   
   // RCC Mix & Material Prices
-  rccConcreteMixRatio?: '1:1.5:3' | '1:2:4' | '1:3:6' | 'custom';
+  concreteGrade?: ConcreteGrade;
+  rccConcreteMixRatio?: '1:1.5:3' | '1:2:4' | '1:1:2' | '1:3:6' | 'custom';
   rccCementRatio?: number;
   rccSandRatio?: number;
   rccAggregateRatio?: number;
@@ -1514,6 +1714,13 @@ export interface CalculatorSettings {
   pccLabourRatePerM3?: number;   // per m3 (default: 2500)
   footingLabourRatePerM3?: number; // per m3 (default: 3500)
   pillarLabourRatePerM3?: number;
+
+  // Additional rates & margins
+  masonWagePerDay?: number;
+  helperWagePerDay?: number;
+  formworkRatePerM2?: number;
+  contingencyPercent?: number;
+  taxPercent?: number;
 
   // Plaster & Surface Finish Configuration
   plaster?: Partial<PlasterConfig>;
@@ -1785,6 +1992,7 @@ export interface CalculationResult {
   rccProjectEstimate?: RCCProjectEstimate;
   foundationEstimate?: FoundationEstimate;
   plasterEstimate?: PlasterEstimate;
+  structuralSummary?: BuildingStructuralSummary;
 }
 
 export const toMeters = (value: number, unit: Unit): number => {
@@ -1901,13 +2109,20 @@ export const calculatePillarsRcc = (
     totalConcreteM3 += volM3;
 
     // Steel calculation
-    // Main bars
-    const mainBarCount = reinf.pillarMainBarCount || 4;
+    // Main bars (use dynamic structural rebarConfig if available)
+    const mainBarCount = p.rebarConfig?.pillarMainBarCount || reinf.pillarMainBarCount || 4;
+    const mainBarDiaMm = p.rebarConfig?.pillarMainBarDiaMm || reinf.pillarMainBarDiaMm || 12;
+    const pMainWeightPerM = getSteelBarWeightPerMeter(mainBarDiaMm);
     const mainBarLengthM = pH_M * mainBarCount * lapFactor;
-    const mainBarSteelKg = mainBarLengthM * mainWeightPerM * pCount;
+    const mainBarSteelKg = p.rebarConfig?.mainSteelWeightKg !== undefined
+      ? p.rebarConfig.mainSteelWeightKg * pCount
+      : (mainBarLengthM * pMainWeightPerM * pCount);
 
-    // Stirrups
-    const stirrupCount = Math.max(1, Math.ceil(pH_M / spacingM) + 1);
+    // Stirrups (use dynamic structural rebarConfig if available)
+    const stirrupDiaMm = p.rebarConfig?.pillarStirrupDiaMm || reinf.pillarStirrupDiaMm || 8;
+    const stirrupSpacingM = Math.max(0.05, (p.rebarConfig?.pillarStirrupSpacingMm || reinf.pillarStirrupSpacingMm || 150) * 0.001);
+    const pStirrupWeightPerM = getSteelBarWeightPerMeter(stirrupDiaMm);
+    const stirrupCount = Math.max(1, Math.ceil(pH_M / stirrupSpacingM) + 1);
     let stirrupCutLengthM = 0;
     if (p.shape === 'circular') {
       const coreR = Math.max(0.025, Math.max(pW_M, pD_M) / 2 - coverM);
@@ -1917,7 +2132,9 @@ export const calculatePillarsRcc = (
       const coreD = Math.max(0.05, pD_M - 2 * coverM);
       stirrupCutLengthM = (2 * (coreW + coreD)) + 0.15; // 15cm hook
     }
-    const stirrupSteelKg = stirrupCount * stirrupCutLengthM * stirrupWeightPerM * pCount;
+    const stirrupSteelKg = p.rebarConfig?.stirrupSteelWeightKg !== undefined
+      ? p.rebarConfig.stirrupSteelWeightKg * pCount
+      : (stirrupCount * stirrupCutLengthM * pStirrupWeightPerM * pCount);
 
     totalSteelKg += (mainBarSteelKg + stirrupSteelKg);
 
@@ -2094,9 +2311,10 @@ export const calculateRccMaterialsFromVolume = (
 ) => {
   const dryVolumeM3 = concreteVolumeM3 * 1.54;
 
-  const rC = settings.rccCementRatio ?? 1;
-  const rS = settings.rccSandRatio ?? 1.5;
-  const rA = settings.rccAggregateRatio ?? 3;
+  const gradeMix = getConcreteMixRatios(settings.concreteGrade || 'M20');
+  const rC = settings.rccCementRatio ?? gradeMix.cement;
+  const rS = settings.rccSandRatio ?? gradeMix.sand;
+  const rA = settings.rccAggregateRatio ?? gradeMix.aggregate;
   const rSum = Math.max(1, rC + rS + rA);
 
   const cementVolumeM3 = dryVolumeM3 * (rC / rSum);
@@ -2173,16 +2391,19 @@ export const calculateFloorRccEstimate = (
   floor: Floor,
   modelPillars: Pillar[] = [],
   buildingUnit: Unit = 'ft',
-  settings: CalculatorSettings
+  settings: CalculatorSettings,
+  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit }
 ): RCCFloorEstimate => {
   const reinf: RCCReinforcementConfig = {
     ...DEFAULT_RCC_REINFORCEMENT,
     ...(settings.rccReinforcement || {})
   };
 
-  const floorPillars = (modelPillars && modelPillars.length > 0)
-    ? modelPillars.filter(p => p.floorId === floor.id)
-    : (floor.pillars || []);
+  const floorPillars = (floor.pillars && floor.pillars.length > 0)
+    ? floor.pillars
+    : ((modelPillars && modelPillars.length > 0)
+        ? modelPillars.filter(p => p.floorId === floor.id || (!p.floorId && floor.level === 0))
+        : (floor.pillars || []));
 
   const allWalls = [...floor.externalWalls, ...floor.internalWalls];
 
@@ -2206,10 +2427,42 @@ export const calculateFloorRccEstimate = (
     : { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, areaM2: 0, bayCount: 0 };
   const fullRccMats = calculateRccMaterialsFromVolume(fullRccRes.concreteVolumeM3, fullRccRes.steelKg, fullRccRes.coverBlocks, settings, reinf);
 
+  // D. Floor RCC Slab (Independent per-floor slab)
+  const isFloorSlabOn = (floor.slab?.enabled !== false);
+  const slabRes = (() => {
+    if (!isFloorSlabOn) return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, areaM2: 0 };
+    const slabThickM = floor.slab?.thickness !== undefined
+      ? toMeters(floor.slab.thickness, floor.slab.thicknessUnit || 'in')
+      : (floor.slab?.height !== undefined ? toMeters(floor.slab.height, floor.slab.heightUnit || 'ft') : toMeters(5, 'in'));
+
+    let areaM2 = 0;
+    if (floor.slab?.customDimensions && floor.slab.length && floor.slab.width) {
+      areaM2 = toMeters(floor.slab.length, floor.slab.lengthUnit || buildingUnit) * toMeters(floor.slab.width, floor.slab.widthUnit || buildingUnit);
+    } else {
+      const overhangM = floor.slab?.overhang ? toMeters(floor.slab.overhang, floor.slab.overhangUnit || buildingUnit) : 0;
+      const bL = buildingDimensions?.buildingLength || 40;
+      const bW = buildingDimensions?.buildingWidth || 30;
+      const fp = getStructuralRoofFootprint(floor, { buildingLength: bL, buildingWidth: bW, buildingUnit }, floorPillars);
+      areaM2 = (fp.widthM + 2 * overhangM) * (fp.depthM + 2 * overhangM);
+    }
+
+    const volM3 = areaM2 * slabThickM;
+    const steelKg = volM3 * 75; // standard RCC slab steel 75 kg/m3
+    const coverBlocks = Math.ceil(areaM2 * 4);
+    return {
+      concreteVolumeM3: volM3,
+      concreteVolumeCft: volM3 * 35.3147,
+      steelKg,
+      coverBlocks,
+      areaM2
+    };
+  })();
+  const slabMats = calculateRccMaterialsFromVolume(slabRes.concreteVolumeM3, slabRes.steelKg, slabRes.coverBlocks, settings, reinf);
+
   // Floor Cumulative Total
-  const totalFloorConcreteM3 = pillarRes.concreteVolumeM3 + ringBeamRes.concreteVolumeM3 + fullRccRes.concreteVolumeM3;
-  const totalFloorSteelKg = pillarRes.steelKg + ringBeamRes.steelKg + fullRccRes.steelKg;
-  const totalFloorCoverBlocks = pillarRes.coverBlocks + ringBeamRes.coverBlocks + fullRccRes.coverBlocks;
+  const totalFloorConcreteM3 = pillarRes.concreteVolumeM3 + ringBeamRes.concreteVolumeM3 + fullRccRes.concreteVolumeM3 + slabRes.concreteVolumeM3;
+  const totalFloorSteelKg = pillarRes.steelKg + ringBeamRes.steelKg + fullRccRes.steelKg + slabRes.steelKg;
+  const totalFloorCoverBlocks = pillarRes.coverBlocks + ringBeamRes.coverBlocks + fullRccRes.coverBlocks + slabRes.coverBlocks;
 
   const floorMats = calculateRccMaterialsFromVolume(totalFloorConcreteM3, totalFloorSteelKg, totalFloorCoverBlocks, settings, reinf);
 
@@ -2263,34 +2516,99 @@ export const calculateFloorRccEstimate = (
         bindingWireKg: fullRccMats.bindingWireKg,
         coverBlocks: fullRccRes.coverBlocks,
         cost: fullRccMats.costs.total
+      },
+      slab: {
+        elementType: 'slab',
+        elementName: `${floor.name || 'Floor'} RCC Slab`,
+        count: 1,
+        concreteVolumeM3: slabRes.concreteVolumeM3,
+        concreteVolumeCft: slabRes.concreteVolumeCft,
+        steelKg: slabRes.steelKg,
+        cementBags: slabMats.cementBags,
+        sandCft: slabMats.sandCft,
+        aggregateCft: slabMats.aggregateCft,
+        waterLitres: slabMats.waterLitres,
+        bindingWireKg: slabMats.bindingWireKg,
+        coverBlocks: slabRes.coverBlocks,
+        cost: slabMats.costs.total
       }
     }
   };
 };
 
-// 6. Calculate Entire Project RCC Estimate (Cumulative Multi-Floor)
+// 6. Calculate Entire Project RCC Estimate (Cumulative Multi-Floor + Independent Roof Slab)
 export const calculateProjectRccEstimate = (
   floors: Floor[] = [],
   modelPillars: Pillar[] = [],
   buildingUnit: Unit = 'ft',
-  settings: CalculatorSettings
+  settings: CalculatorSettings,
+  roofSlab?: RCCSlabConfig,
+  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit }
 ): RCCProjectEstimate => {
-  const floorEstimates = floors.map(floor => calculateFloorRccEstimate(floor, modelPillars, buildingUnit, settings));
+  const floorEstimates = floors.map(floor => calculateFloorRccEstimate(floor, modelPillars, buildingUnit, settings, buildingDimensions));
 
-  const totalConcreteVolumeM3 = floorEstimates.reduce((sum, f) => sum + f.concreteVolumeM3, 0);
+  // Independent Roof Slab calculation
+  const isRoofSlabOn = Boolean(roofSlab && roofSlab.enabled !== false);
+  const reinf: RCCReinforcementConfig = {
+    ...DEFAULT_RCC_REINFORCEMENT,
+    ...(settings.rccReinforcement || {})
+  };
+
+  const roofRes = (() => {
+    if (!isRoofSlabOn || !roofSlab) return null;
+    const roofThickM = roofSlab.thickness !== undefined
+      ? toMeters(roofSlab.thickness, roofSlab.thicknessUnit || 'in')
+      : (roofSlab.height !== undefined ? toMeters(roofSlab.height, roofSlab.heightUnit || 'ft') : toMeters(5, 'in'));
+
+    let areaM2 = 0;
+    if (roofSlab.customDimensions && roofSlab.length && roofSlab.width) {
+      areaM2 = toMeters(roofSlab.length, roofSlab.lengthUnit || buildingUnit) * toMeters(roofSlab.width, roofSlab.widthUnit || buildingUnit);
+    } else {
+      const overhangM = roofSlab.overhang ? toMeters(roofSlab.overhang, roofSlab.overhangUnit || buildingUnit) : toMeters(0.5, 'ft');
+      const topFloor = floors[floors.length - 1] || floors[0];
+      const bL = buildingDimensions?.buildingLength || 40;
+      const bW = buildingDimensions?.buildingWidth || 30;
+      const fp = getStructuralRoofFootprint(topFloor, { buildingLength: bL, buildingWidth: bW, buildingUnit });
+      areaM2 = (fp.widthM + 2 * overhangM) * (fp.depthM + 2 * overhangM);
+    }
+
+    const volM3 = areaM2 * roofThickM;
+    const steelKg = volM3 * 75;
+    const coverBlocks = Math.ceil(areaM2 * 4);
+    return {
+      concreteVolumeM3: volM3,
+      concreteVolumeCft: volM3 * 35.3147,
+      steelKg,
+      coverBlocks,
+      areaM2
+    };
+  })();
+
+  const roofMats = roofRes ? calculateRccMaterialsFromVolume(roofRes.concreteVolumeM3, roofRes.steelKg, roofRes.coverBlocks, settings, reinf) : null;
+
+  const roofConcreteM3 = roofRes?.concreteVolumeM3 || 0;
+  const roofSteelKg = roofRes?.steelKg || 0;
+  const roofCementExactBags = roofMats?.cementExactBags || 0;
+  const roofSandM3 = roofMats?.sandM3 || 0;
+  const roofAggM3 = roofMats?.aggregateM3 || 0;
+  const roofWaterL = roofMats?.waterLitres || 0;
+  const roofWireKg = roofMats?.bindingWireKg || 0;
+  const roofCoverB = roofRes?.coverBlocks || 0;
+
+  const totalConcreteVolumeM3 = floorEstimates.reduce((sum, f) => sum + f.concreteVolumeM3, 0) + roofConcreteM3;
   const totalConcreteVolumeCft = totalConcreteVolumeM3 * 35.3147;
   const totalDryVolumeM3 = totalConcreteVolumeM3 * 1.54;
-  const totalCementExactBags = floorEstimates.reduce((sum, f) => sum + f.cementExactBags, 0);
+  const totalCementExactBags = floorEstimates.reduce((sum, f) => sum + f.cementExactBags, 0) + roofCementExactBags;
   const totalCementBags = Math.ceil(totalCementExactBags);
-  const totalSandM3 = floorEstimates.reduce((sum, f) => sum + f.sandM3, 0);
+  const totalSandM3 = floorEstimates.reduce((sum, f) => sum + f.sandM3, 0) + roofSandM3;
   const totalSandCft = totalSandM3 * 35.3147;
-  const totalAggregateM3 = floorEstimates.reduce((sum, f) => sum + f.aggregateM3, 0);
+  const totalAggregateM3 = floorEstimates.reduce((sum, f) => sum + f.aggregateM3, 0) + roofAggM3;
   const totalAggregateCft = totalAggregateM3 * 35.3147;
-  const totalSteelKg = floorEstimates.reduce((sum, f) => sum + f.steelKg, 0);
+  const totalSteelKg = floorEstimates.reduce((sum, f) => sum + f.steelKg, 0) + roofSteelKg;
   const totalSteelTonnes = totalSteelKg / 1000;
-  const totalWaterLitres = floorEstimates.reduce((sum, f) => sum + f.waterLitres, 0);
-  const totalBindingWireKg = floorEstimates.reduce((sum, f) => sum + f.bindingWireKg, 0);
-  const totalCoverBlocks = floorEstimates.reduce((sum, f) => sum + f.coverBlocks, 0);
+  const totalWaterLitres = floorEstimates.reduce((sum, f) => sum + f.waterLitres, 0) + roofWaterL;
+  const totalBindingWireKg = floorEstimates.reduce((sum, f) => sum + f.bindingWireKg, 0) + roofWireKg;
+  const totalCoverBlocks = floorEstimates.reduce((sum, f) => sum + f.coverBlocks, 0) + roofCoverB;
 
   // Recommended purchase with standard 3-5% wastage allowances
   const recommendedPurchase = {
@@ -2302,17 +2620,36 @@ export const calculateProjectRccEstimate = (
     coverBlocks: Math.ceil(totalCoverBlocks * 1.05)
   };
 
+  const roofCosts = roofMats?.costs || { cement: 0, sand: 0, aggregate: 0, steel: 0, bindingWire: 0, coverBlocks: 0, labour: 0, total: 0 };
   const costs = {
-    cement: floorEstimates.reduce((sum, f) => sum + f.costs.cement, 0),
-    sand: floorEstimates.reduce((sum, f) => sum + f.costs.sand, 0),
-    aggregate: floorEstimates.reduce((sum, f) => sum + f.costs.aggregate, 0),
-    steel: floorEstimates.reduce((sum, f) => sum + f.costs.steel, 0),
-    bindingWire: floorEstimates.reduce((sum, f) => sum + f.costs.bindingWire, 0),
-    coverBlocks: floorEstimates.reduce((sum, f) => sum + f.costs.coverBlocks, 0),
-    labour: floorEstimates.reduce((sum, f) => sum + f.costs.labour, 0),
+    cement: floorEstimates.reduce((sum, f) => sum + f.costs.cement, 0) + roofCosts.cement,
+    sand: floorEstimates.reduce((sum, f) => sum + f.costs.sand, 0) + roofCosts.sand,
+    aggregate: floorEstimates.reduce((sum, f) => sum + f.costs.aggregate, 0) + roofCosts.aggregate,
+    steel: floorEstimates.reduce((sum, f) => sum + f.costs.steel, 0) + roofCosts.steel,
+    bindingWire: floorEstimates.reduce((sum, f) => sum + f.costs.bindingWire, 0) + roofCosts.bindingWire,
+    coverBlocks: floorEstimates.reduce((sum, f) => sum + f.costs.coverBlocks, 0) + roofCosts.coverBlocks,
+    labour: floorEstimates.reduce((sum, f) => sum + f.costs.labour, 0) + roofCosts.labour,
     total: 0
   };
   costs.total = costs.cement + costs.sand + costs.aggregate + costs.steel + costs.bindingWire + costs.coverBlocks + costs.labour;
+
+  const roofElementBreakdown = (roofRes && roofMats) ? {
+    elementType: 'slab' as const,
+    elementName: 'Independent RCC Roof Slab',
+    count: 1,
+    concreteVolumeM3: roofRes.concreteVolumeM3,
+    concreteVolumeCft: roofRes.concreteVolumeCft,
+    steelKg: roofRes.steelKg,
+    cementBags: roofMats.cementBags,
+    sandCft: roofMats.sandCft,
+    aggregateCft: roofMats.aggregateCft,
+    waterLitres: roofMats.waterLitres,
+    bindingWireKg: roofMats.bindingWireKg,
+    coverBlocks: roofRes.coverBlocks,
+    cost: roofMats.costs.total
+  } : undefined;
+
+
 
   return {
     totalConcreteVolumeM3,
@@ -2337,6 +2674,7 @@ export const calculateProjectRccEstimate = (
       aggregateCft: totalAggregateCft,
       steelKg: totalSteelKg
     },
+    roofSlab: roofElementBreakdown,
     floors: floorEstimates
   };
 };
@@ -2404,11 +2742,12 @@ export const calculateFootingRcc = (
   const pccWaterLitres = Math.round(pccCementExact * 50 * 0.55);
 
   // RCC Footing Materials
-  const rccRatioStr = footing.footingMixRatio || settings.rccConcreteMixRatio || '1:1.5:3';
+  const gradeMix = getConcreteMixRatios((footing.concreteGrade as ConcreteGrade) || (foundationConfig?.concreteGrade as ConcreteGrade) || settings.concreteGrade || 'M20');
+  const rccRatioStr = footing.footingMixRatio || settings.rccConcreteMixRatio || gradeMix.ratioString;
   const rccParts = rccRatioStr.split(':').map(Number);
-  const rC = rccParts[0] || 1;
-  const rS = rccParts[1] || 1.5;
-  const rA = rccParts[2] || 3;
+  const rC = rccParts[0] || gradeMix.cement;
+  const rS = rccParts[1] || gradeMix.sand;
+  const rA = rccParts[2] || gradeMix.aggregate;
   const rSum = rC + rS + rA;
   const rccDryVol = rccFootingVolumeM3 * 1.54;
   const rccCementExact = (rccDryVol * (rC / rSum)) / 0.0347;
@@ -2591,27 +2930,174 @@ export const calculateFootingRcc = (
   };
 };
 
+// 7. Dynamic Structural Footing Sizing based on Pillar Dimensions, Axial Load & Soil Bearing Capacity
+export function calculateDynamicPillarFooting(
+  pillar: Pillar,
+  buildingUnit: Unit = 'ft',
+  config?: Partial<FoundationConfig>,
+  bConfig?: BuildingConfig,
+  numFloors: number = 1
+) {
+  const cfg = { ...DEFAULT_FOUNDATION_CONFIG, ...(config || {}) };
+  const colW_in = pillar.width || 9;
+  const colD_in = pillar.shape === 'circular' ? colW_in : (pillar.depth || 9);
+  
+  // Convert pillar dimensions to meters for IS 456 sizing
+  const colW_m = toMeters(colW_in, pillar.unit || 'in');
+  const colD_m = toMeters(colD_in, pillar.unit || 'in');
+  
+  const floors = Math.max(1, bConfig?.floorCount ?? numFloors);
+  const soilTypeKey = config?.soilType || config?.soilClassification || bConfig?.soilClassification || cfg.soilType || cfg.soilClassification;
+  const sbcFromSoilType = (
+    soilTypeKey === 'soft_clay' ? 100 :
+    soilTypeKey === 'medium_clay' ? 150 :
+    soilTypeKey === 'loose_sand' ? 120 :
+    soilTypeKey === 'dense_sand' || soilTypeKey === 'dense_sand_gravel' ? 300 :
+    soilTypeKey === 'hard_strata' || soilTypeKey === 'rock' ? 600 :
+    undefined
+  );
+  
+  let sbc: number;
+  if (config?.allowableSoilPressure != null && config.allowableSoilPressure > 0) {
+    sbc = config.allowableSoilPressure;
+  } else if (config?.soilBearingCapacityKnM2 != null && config.soilBearingCapacityKnM2 !== DEFAULT_FOUNDATION_CONFIG.soilBearingCapacityKnM2) {
+    sbc = config.soilBearingCapacityKnM2;
+  } else if (config?.soilType != null || config?.soilClassification != null) {
+    sbc = sbcFromSoilType ?? 150;
+  } else if (bConfig?.allowableSoilBearingPressureKnM2 != null && bConfig.allowableSoilBearingPressureKnM2 > 0) {
+    sbc = bConfig.allowableSoilBearingPressureKnM2;
+  } else if (sbcFromSoilType != null) {
+    sbc = sbcFromSoilType;
+  } else {
+    sbc = cfg.soilBearingCapacityKnM2 || 150;
+  }
+  sbc = Math.max(50, sbc);
+
+  // Column dead + live loads accumulation
+  // Tributary area load per floor ~180-240 kN for standard bay
+  const floorLoadPerBayKn = bConfig?.buildingType === 'commercial' ? 240 : 180;
+  const colSelfWeightKn = (colW_m * colD_m * 3.0 * 25) * floors; // 25 kN/m3 concrete
+  const estimatedServiceLoadKn = pillar.calculatedLoadKn ?? ((floors * floorLoadPerBayKn) + 40 + colSelfWeightKn);
+  const serviceFootingLoadKn = estimatedServiceLoadKn * 1.10; // 10% footing self-weight allowance
+
+  // Footing required area: A = P_service / SBC (Handbook Section 4.1)
+  const requiredAreaM2 = serviceFootingLoadKn / sbc;
+
+  // Proportion footing aspect ratio to match column aspect ratio
+  const aspect = Math.max(0.6, Math.min(1.8, colD_m / colW_m));
+  
+  // Minimum structural footing projection beyond column face = 0.30m (1 ft)
+  const minSideW_m = colW_m + (2 * 0.30);
+  const minSideD_m = colD_m + (2 * 0.30);
+
+  let sideW_m = Math.sqrt(requiredAreaM2 / aspect);
+  let sideD_m = sideW_m * aspect;
+
+  if (sideW_m < minSideW_m) sideW_m = minSideW_m;
+  if (sideD_m < minSideD_m) sideD_m = minSideD_m;
+
+  // Round up to convenient 0.15m (6 inches) steps
+  sideW_m = Math.ceil(sideW_m / 0.15) * 0.15;
+  sideD_m = Math.ceil(sideD_m / 0.15) * 0.15;
+
+  // Footing thickness / depth based on punching shear & bending
+  let depthM = 0.30;
+  if (estimatedServiceLoadKn > 400) depthM = 0.40;
+  if (estimatedServiceLoadKn > 700) depthM = 0.50;
+  if (estimatedServiceLoadKn > 1000) depthM = 0.60;
+
+  // Convert to buildingUnit
+  const fLen = buildingUnit === 'ft' ? Number((sideD_m * 3.28084).toFixed(2)) : Number(sideD_m.toFixed(2));
+  const fWid = buildingUnit === 'ft' ? Number((sideW_m * 3.28084).toFixed(2)) : Number(sideW_m.toFixed(2));
+  const fDep = buildingUnit === 'ft' ? Number((depthM * 3.28084).toFixed(2)) : Number(depthM.toFixed(2));
+
+  const stubH = cfg.defaultColumnStubHeight !== undefined ? cfg.defaultColumnStubHeight : 2;
+  const stubW = colW_in;
+  const stubD = colD_in;
+  const pccOffset = cfg.defaultPccOffset || (buildingUnit === 'ft' ? 0.5 : 0.15);
+
+  const pccLen = fLen + 2 * pccOffset;
+  const pccWid = fWid + 2 * pccOffset;
+  const pccThick = cfg.defaultPccThickness || (buildingUnit === 'ft' ? 0.33 : 0.10);
+  const sandDep = cfg.defaultSandFillDepth || (buildingUnit === 'ft' ? 0.5 : 0.15);
+
+  const excLen = pccLen + (buildingUnit === 'ft' ? 1.0 : 0.30);
+  const excWid = pccWid + (buildingUnit === 'ft' ? 1.0 : 0.30);
+  const excDep = stubH + fDep + pccThick + sandDep;
+
+  return {
+    footingLength: fLen,
+    footingWidth: fWid,
+    footingDepth: fDep,
+    columnStubWidth: stubW,
+    columnStubDepth: stubD,
+    columnStubHeight: stubH,
+    pccLength: pccLen,
+    pccWidth: pccWid,
+    pccThickness: pccThick,
+    sandFillLength: pccLen,
+    sandFillWidth: pccWid,
+    sandFillDepth: sandDep,
+    excavationLength: excLen,
+    excavationWidth: excWid,
+    excavationDepth: excDep,
+    plinthLevel: cfg.defaultPlinthLevel || 0,
+    foundationBedLevel: -(stubH + fDep + pccThick + sandDep),
+    serviceLoadKn: estimatedServiceLoadKn,
+    requiredAreaM2
+  };
+}
+
 // 8. Auto-generate Aligned Footings for Ground Floor RCC Pillars
 export const generateFootingsForPillars = (
   pillars: Pillar[] = [],
   config?: Partial<FoundationConfig>,
-  buildingUnit: Unit = 'ft'
+  buildingUnit: Unit = 'ft',
+  bConfig?: BuildingConfig,
+  numFloors?: number
 ): FoundationFooting[] => {
   const groundFloorPillars = pillars.filter(p => !p.floorId || p.floorId === 'floor-0' || p.floorId === 'ground');
   const targetPillars = groundFloorPillars.length > 0 ? groundFloorPillars : pillars;
 
   const footings: FoundationFooting[] = [];
   const cfg = { ...DEFAULT_FOUNDATION_CONFIG, ...(config || {}) };
+  if (bConfig?.allowableSoilBearingPressureKnM2) {
+    cfg.soilBearingCapacityKnM2 = bConfig.allowableSoilBearingPressureKnM2;
+  }
+  if (bConfig?.soilClassification) {
+    cfg.soilClassification = bConfig.soilClassification;
+    cfg.soilType = bConfig.soilClassification;
+  }
+  if (bConfig?.foundationType) {
+    cfg.foundationType = bConfig.foundationType;
+  }
+  if (bConfig?.concreteGrade) {
+    cfg.concreteGrade = bConfig.concreteGrade;
+  }
+
+  const effectiveFloors = numFloors ?? bConfig?.floorCount ?? (pillars[0] as any)?.floorCount ?? 1;
 
   targetPillars.forEach((pillar, idx) => {
     if (pillar.includeInEstimate === false) return;
     const fId = `footing-${pillar.id || idx + 1}`;
     const effPos = getEffectivePillarPosition(pillar, [], buildingUnit);
     
-    const fLen = (cfg.useCommonFootingSize && cfg.commonFootingSize?.length) ? cfg.commonFootingSize.length : (cfg.defaultFootingLength || 4);
-    const fWid = (cfg.useCommonFootingSize && cfg.commonFootingSize?.width) ? cfg.commonFootingSize.width : (cfg.defaultFootingWidth || 4);
-    const fDep = (cfg.useCommonFootingSize && cfg.commonFootingSize?.depth) ? cfg.commonFootingSize.depth : (cfg.defaultFootingDepth || 1);
-    const stubH = cfg.defaultColumnStubHeight || 2;
+    // Dynamic footing dimensioning based on calculated structural load & soil SBC
+    const dynamic = calculateDynamicPillarFooting(pillar, buildingUnit, cfg, bConfig, effectiveFloors);
+    const calcLen = pillar.calculatedFooting
+      ? (buildingUnit === 'ft' ? Number((pillar.calculatedFooting.lengthM * 3.28084).toFixed(2)) : pillar.calculatedFooting.lengthM)
+      : dynamic.footingLength;
+    const calcWid = pillar.calculatedFooting
+      ? (buildingUnit === 'ft' ? Number((pillar.calculatedFooting.widthM * 3.28084).toFixed(2)) : pillar.calculatedFooting.widthM)
+      : dynamic.footingWidth;
+    const calcDep = pillar.calculatedFooting
+      ? (buildingUnit === 'ft' ? Number((pillar.calculatedFooting.depthM * 3.28084).toFixed(2)) : pillar.calculatedFooting.depthM)
+      : dynamic.footingDepth;
+
+    const fLen = (cfg.useCommonFootingSize && cfg.commonFootingSize?.length) ? cfg.commonFootingSize.length : calcLen;
+    const fWid = (cfg.useCommonFootingSize && cfg.commonFootingSize?.width) ? cfg.commonFootingSize.width : calcWid;
+    const fDep = (cfg.useCommonFootingSize && cfg.commonFootingSize?.depth) ? cfg.commonFootingSize.depth : calcDep;
+    const stubH = cfg.defaultColumnStubHeight !== undefined ? cfg.defaultColumnStubHeight : 2;
     const stubW = pillar.width || cfg.defaultColumnStubWidthIn || 9;
     const stubD = pillar.depth || cfg.defaultColumnStubDepthIn || 9;
     const pccOffset = cfg.defaultPccOffset || 0.5;
@@ -2623,7 +3109,7 @@ export const generateFootingsForPillars = (
 
     const excLen = pccLen + 1.0; // 0.5 ft margin around PCC
     const excWid = pccWid + 1.0;
-    const excDep = cfg.defaultExcavationDepth || (stubH + fDep + pccThick + sandDep);
+    const excDep = cfg.depth || cfg.defaultExcavationDepth || (stubH + fDep + pccThick + sandDep);
 
     footings.push({
       id: fId,
@@ -2633,7 +3119,7 @@ export const generateFootingsForPillars = (
       hasFoundationPillar: true,
       foundationPillarId: `FP${idx + 1}`,
       position: { x: effPos.x, y: effPos.y },
-      foundationType: 'isolated',
+      foundationType: cfg.foundationType || 'isolated',
       excavationLength: excLen,
       excavationWidth: excWid,
       excavationDepth: excDep,
@@ -2653,22 +3139,22 @@ export const generateFootingsForPillars = (
       footingWidth: fWid,
       footingDepth: fDep,
       footingUnit: cfg.defaultUnit || buildingUnit,
-      concreteGrade: 'M20',
-      footingMixRatio: cfg.defaultFootingMixRatio || '1:1.5:3',
+      concreteGrade: cfg.concreteGrade || (cfg as any).defaultConcreteGrade || bConfig?.concreteGrade || 'M20',
+      footingMixRatio: cfg.defaultFootingMixRatio || getConcreteMixRatios(cfg.concreteGrade || bConfig?.concreteGrade || 'M20').ratioString as any,
 
       // Column Stub Configuration
       columnStubHeight: stubH,
       columnStubWidth: stubW,
       columnStubDepth: stubD,
       columnStubUnit: cfg.defaultUnit || buildingUnit,
-      columnStubConcreteGrade: 'M20',
-      columnStubMixRatio: '1:1.5:3',
+      columnStubConcreteGrade: cfg.concreteGrade || (cfg as any).defaultConcreteGrade || bConfig?.concreteGrade || 'M20',
+      columnStubMixRatio: getConcreteMixRatios(cfg.concreteGrade || bConfig?.concreteGrade || 'M20').ratioString as any,
       columnStubRebar: {
-        mainBarDiaMm: cfg.defaultStubMainBarDiaMm || 16,
-        mainBarCount: cfg.defaultStubMainBarCount || 4,
-        stirrupDiaMm: cfg.defaultStubStirrupDiaMm || 8,
-        stirrupSpacingMm: cfg.defaultStubStirrupSpacingMm || 150,
-        coverMm: cfg.defaultStubCoverMm || 40
+        mainBarDiaMm: pillar.rebarConfig?.pillarMainBarDiaMm || cfg.defaultStubMainBarDiaMm || 16,
+        mainBarCount: pillar.rebarConfig?.pillarMainBarCount || cfg.defaultStubMainBarCount || 4,
+        stirrupDiaMm: pillar.rebarConfig?.pillarStirrupDiaMm || cfg.defaultStubStirrupDiaMm || 8,
+        stirrupSpacingMm: pillar.rebarConfig?.pillarStirrupSpacingMm || cfg.defaultStubStirrupSpacingMm || 150,
+        coverMm: pillar.rebarConfig?.pillarCoverMm || cfg.defaultStubCoverMm || 40
       },
 
       // Vertical hierarchy levels
@@ -3686,7 +4172,10 @@ export const calculateProject = (
   const brickPrice = settings.brickPrice || 0;
   const brickCost = totalBricks * brickPrice;
   const cementCost = cementBags * (settings.cementPrice || 0);
-  const sandCost = sandVolume * (settings.sandPrice || 0);
+  const effectiveSandPricePerM3 = (settings.sandPricePerCft !== undefined)
+    ? settings.sandPricePerCft * 35.3147
+    : (settings.sandPrice ? (settings.sandPrice < 200 ? settings.sandPrice * 35.3147 : settings.sandPrice) : 0);
+  const sandCost = sandVolume * effectiveSandPricePerM3;
   
   const totalCost = brickCost + cementCost + sandCost + (settings.labourCost || 0) + (settings.transportCost || 0);
 
@@ -3792,14 +4281,171 @@ export const calculateProject = (
     };
   }
 
+  // Synchronize concrete grade & rates from buildingConfig if available
+  if (project.buildingModel?.buildingConfig) {
+    const bCfg = project.buildingModel.buildingConfig;
+    if (bCfg.concreteGrade && !settings.concreteGrade) {
+      settings.concreteGrade = bCfg.concreteGrade;
+      const gMix = getConcreteMixRatios(bCfg.concreteGrade);
+      if (!settings.rccCementRatio && !settings.rccSandRatio && !settings.rccAggregateRatio) {
+        settings.rccConcreteMixRatio = gMix.ratioString as any;
+        settings.rccCementRatio = gMix.cement;
+        settings.rccSandRatio = gMix.sand;
+        settings.rccAggregateRatio = gMix.aggregate;
+      }
+    }
+    if (bCfg.customRates) {
+      if (bCfg.customRates.cementBagPrice && !settings.cementPrice) settings.cementPrice = bCfg.customRates.cementBagPrice;
+      if (bCfg.customRates.sandPricePerCft && settings.sandPricePerCft === undefined) settings.sandPricePerCft = bCfg.customRates.sandPricePerCft;
+      if (bCfg.customRates.aggregatePricePerCft && settings.aggregatePricePerCft === undefined) settings.aggregatePricePerCft = bCfg.customRates.aggregatePricePerCft;
+      if (bCfg.customRates.steelRatePerKg && !settings.steelRate) settings.steelRate = bCfg.customRates.steelRatePerKg;
+      if (bCfg.customRates.excavationRatePerM3 && !settings.excavationRatePerM3) settings.excavationRatePerM3 = bCfg.customRates.excavationRatePerM3;
+      if (bCfg.customRates.pccLabourRatePerM3 && !settings.pccLabourRatePerM3) settings.pccLabourRatePerM3 = bCfg.customRates.pccLabourRatePerM3;
+      if (bCfg.customRates.footingLabourRatePerM3 && !settings.footingLabourRatePerM3) settings.footingLabourRatePerM3 = bCfg.customRates.footingLabourRatePerM3;
+      if (bCfg.customRates.columnLabourRatePerM3 && !settings.rccLabourRate) settings.rccLabourRate = bCfg.customRates.columnLabourRatePerM3;
+    }
+  }
+
   // Full RCC Project Estimate (Multi-Floor Pillars + Ring Beams + Full RCC Top)
+  // Structural Load & Engineering Calculation (Handbook & IS 456 Integration)
+  let structuralSummary: BuildingStructuralSummary | undefined;
+  if (project.buildingModel) {
+    const bModel = project.buildingModel;
+    const bConfig: BuildingConfig = {
+      ...DEFAULT_BUILDING_CONFIG,
+      ...(bModel.buildingConfig || {}),
+      floorCount: bModel.floors.length || bModel.buildingConfig?.floorCount || 1,
+      floorHeight: bModel.floors[0]?.height || bModel.buildingConfig?.floorHeight || 10,
+      floorHeightUnit: bModel.floors[0]?.unit || bModel.buildingConfig?.floorHeightUnit || 'ft'
+    };
+
+    const fineAggRate = bConfig.fineAggregateType === 'river_sand' 
+      ? 80 
+      : (settings.sandPricePerCft !== undefined ? settings.sandPricePerCft : 55);
+
+    const cr = bConfig.customRates || {};
+    const structuralRates = {
+      cementBagPrice: cr.cementBagPrice || settings.cementPrice || 400,
+      sandPricePerCft: cr.sandPricePerCft || fineAggRate,
+      aggregatePricePerCft: cr.aggregatePricePerCft ?? (settings.aggregatePricePerCft !== undefined ? settings.aggregatePricePerCft : 45),
+      steelRatePerKg: cr.steelRatePerKg || settings.steelRate || 65,
+      brickPrice: cr.brickPrice || settings.brickPrice || 8.5,
+      excavationRatePerM3: cr.excavationRatePerM3 || settings.excavationRatePerM3 || 250,
+      pccRatePerM3: cr.pccLabourRatePerM3 || 3200,
+      footingLabourRatePerM3: cr.footingLabourRatePerM3 || settings.footingLabourRatePerM3 || 3500,
+      columnLabourRatePerM3: cr.columnLabourRatePerM3 || settings.rccLabourRate || 3500,
+      beamLabourRatePerM3: cr.columnLabourRatePerM3 || settings.rccLabourRate || 3500,
+      slabLabourRatePerM3: cr.columnLabourRatePerM3 || settings.rccLabourRate || 3500,
+      masonWagePerDay: cr.masonWagePerDay || 900,
+      helperWagePerDay: cr.helperWagePerDay || 600,
+      formworkRatePerM2: cr.formworkRatePerM2 || 350,
+      wastagePercent: cr.wastagePercent ?? (settings.wastagePercentage || 5),
+      overheadPercent: 5,
+      contingencyPercent: cr.contingencyPercent ?? 5,
+      taxPercent: cr.taxPercent ?? 18,
+      transportCost: settings.transportCost || 0,
+      equipmentCost: 0
+    };
+
+    const bLengthM = toMeters(bModel.buildingLength, bModel.buildingUnit);
+    const bWidthM = toMeters(bModel.buildingWidth, bModel.buildingUnit);
+    const allWallsForStructural = bModel.floors.flatMap(f => [...f.externalWalls, ...f.internalWalls]);
+
+    structuralSummary = calculateBuildingStructuralSummary(
+      effectivePillars,
+      allWallsForStructural,
+      bLengthM,
+      bWidthM,
+      bConfig,
+      structuralRates,
+      bModel.floors,
+      bModel.roofSlab
+    );
+
+    bModel.structuralSummary = structuralSummary;
+
+    // Mutate/enrich pillars with calculated structural data for 3D visualization and inspector
+    const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
+    effectivePillars.forEach(p => {
+      const calc = calcMap.get(p.id);
+      if (calc) {
+        p.structuralRole = calc.role;
+        // Never overwrite manually customized width or depth
+        if (!p.isCustomSize) {
+          p.width = Math.round(calc.providedWidthMm * (1 / 25.4));
+          p.depth = Math.round(calc.providedDepthMm * (1 / 25.4));
+          p.unit = 'in';
+        }
+
+        // Structural load check against manual custom dimensions:
+        // If manual size does not pass structural checks, set warning instead of silently overriding it
+        const provW_m = toMeters(p.width, p.unit || 'in');
+        const provD_m = p.shape === 'circular' ? provW_m : toMeters(p.depth, p.unit || 'in');
+        const provAreaMm2 = (provW_m * 1000) * (provD_m * 1000);
+        if (provAreaMm2 < calc.requiredGrossAreaAgMm2) {
+          const reqW_in = Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4));
+          p.structuralWarning = `Section ${p.width}"×${p.depth}" (${Math.round(provAreaMm2)} mm²) is below IS 456 required area (${Math.round(calc.requiredGrossAreaAgMm2)} mm²) for ${calc.factoredUltimateLoadKn.toFixed(0)} kN load. Recommend minimum ${reqW_in}"×${reqW_in}".`;
+        } else {
+          p.structuralWarning = undefined;
+        }
+
+        p.rebarConfig = {
+          pillarMainBarCount: calc.providedBarCount,
+          pillarMainBarDiaMm: calc.providedBarDiaMm,
+          pillarStirrupDiaMm: calc.stirrupDiaMm,
+          pillarStirrupSpacingMm: calc.stirrupSpacingMm,
+          pillarCoverMm: 40,
+          mainSteelWeightKg: calc.mainSteelWeightKg,
+          stirrupSteelWeightKg: calc.stirrupWeightKg
+        };
+        p.structuralData = {
+          role: calc.role,
+          tributaryAreaM2: calc.tributaryAreaM2,
+          tributaryAreaSqFt: calc.tributaryAreaSqFt,
+          serviceLoadKn: calc.totalServiceLoadKn,
+          factoredLoadKn: calc.factoredUltimateLoadKn,
+          capacityKn: calc.axialCapacityPuzKn,
+          capacityUtilization: calc.capacityUtilizationRatio,
+          slendernessRatio: calc.slendernessRatioLambda,
+          isShortColumn: calc.isShortColumn,
+          requiredAgMm2: calc.requiredGrossAreaAgMm2,
+          providedAgMm2: provAreaMm2,
+          steelPercentage: calc.steelPercentageP,
+          warning: p.structuralWarning
+        };
+        p.calculatedFooting = {
+          lengthM: calc.providedFootingLengthM,
+          widthM: calc.providedFootingWidthM,
+          depthM: calc.providedFootingDepthM,
+          areaM2: calc.requiredFootingAreaM2,
+          serviceLoadKn: calc.serviceFootingLoadKn,
+          excavationM3: calc.footingExcavationM3,
+          pccM3: calc.footingPccM3,
+          rccM3: calc.footingRccM3,
+          steelKg: calc.footingSteelKg
+        };
+      }
+    });
+
+    // Keep individual floor pillars synchronized with structural dimensions
+    bModel.floors.forEach(fl => {
+      fl.pillars = effectivePillars.filter(p => p.floorId === fl.id);
+    });
+  }
+
   let rccProjectEstimate: RCCProjectEstimate | undefined;
   if (project.buildingModel && project.buildingModel.floors.length > 0) {
     rccProjectEstimate = calculateProjectRccEstimate(
       project.buildingModel.floors,
       project.buildingModel.pillars || effectivePillars,
       bUnit,
-      settings
+      settings,
+      project.buildingModel.roofSlab,
+      { 
+        buildingLength: project.buildingModel.buildingLength, 
+        buildingWidth: project.buildingModel.buildingWidth, 
+        buildingUnit: bUnit 
+      }
     );
   } else if (effectivePillars.length > 0 || project.walls.length > 0) {
     const syntheticFloor: Floor = {
@@ -3867,7 +4513,8 @@ export const calculateProject = (
     rccPillarEstimate,
     rccProjectEstimate,
     foundationEstimate,
-    plasterEstimate
+    plasterEstimate,
+    structuralSummary
   };
 };
 
@@ -3897,6 +4544,9 @@ export interface Floor {
   rooms?: any[];
   stairs?: Staircase[];
   pillars?: Pillar[];
+  pillarWidth?: number;
+  pillarDepth?: number;
+  pillarUnit?: Unit;
   ringBeam?: RCCRingBeamConfig;
   fullRingBeam?: RCCFullRingBeamConfig;
   fullRoof?: RCCFullRoofConfig;
@@ -3950,18 +4600,45 @@ export const DEFAULT_RCC_FULL_ROOF: RCCFullRoofConfig = {
 
 export interface RCCSlabConfig {
   enabled: boolean;
-  height: number; // in feet (default 1 ft)
+  height: number; // in feet (default 0.4167 = 5 in)
   heightUnit?: Unit;
-  thickness?: number; // optional backward compatibility
+  thickness?: number; // thickness or depth in inches/mm/ft (default 5 in)
   thicknessUnit?: Unit;
+  length?: number; // custom slab length override (e.g. ft)
+  lengthUnit?: Unit;
+  width?: number; // custom slab width override (e.g. ft)
+  widthUnit?: Unit;
+  overhang?: number; // cantilever / projection beyond frame (in ft or buildingUnit)
+  overhangUnit?: Unit;
+  elevationOffset?: number; // vertical elevation offset (in ft or buildingUnit)
+  elevationOffsetUnit?: Unit;
+  customDimensions?: boolean; // whether custom length/width is used instead of auto frame bounds
 }
 
 export const DEFAULT_RCC_SLAB: RCCSlabConfig = {
   enabled: true,
-  height: 1, // 1 ft default solid RCC floor slab height
+  height: 0.4167, // 5 inches in feet
   heightUnit: 'ft',
-  thickness: 12,
-  thicknessUnit: 'in'
+  thickness: 5,
+  thicknessUnit: 'in',
+  overhang: 0,
+  overhangUnit: 'ft',
+  elevationOffset: 0,
+  elevationOffsetUnit: 'ft',
+  customDimensions: false
+};
+
+export const DEFAULT_RCC_ROOF_SLAB: RCCSlabConfig = {
+  enabled: true,
+  height: 0.4167, // 5 inches in feet
+  heightUnit: 'ft',
+  thickness: 5,
+  thicknessUnit: 'in',
+  overhang: 0.5, // 6 in (0.5 ft) default roof projection
+  overhangUnit: 'ft',
+  elevationOffset: 0,
+  elevationOffsetUnit: 'ft',
+  customDimensions: false
 };
 
 export interface BuildingModel {
@@ -3973,13 +4650,19 @@ export interface BuildingModel {
   buildingUnit: Unit;
   externalWallThickness?: number;
   pillars?: Pillar[];
+  pillarWidth?: number;
+  pillarDepth?: number;
+  pillarUnit?: Unit;
   ringBeam?: RCCRingBeamConfig;
   fullRingBeam?: RCCFullRingBeamConfig;
   fullRoof?: RCCFullRoofConfig;
   slab?: RCCSlabConfig;
+  roofSlab?: RCCSlabConfig; // Independent Top Roof Slab
   foundation?: FoundationConfig;
   plaster?: PlasterConfig;
   layoutMode?: 'auto' | 'manual';
+  buildingConfig?: BuildingConfig;
+  structuralSummary?: BuildingStructuralSummary;
 }
 
 export interface FullCostEstimate {
@@ -4082,12 +4765,11 @@ export function getRingBeamJunction(
   const totalBeamHeight = fullRingBeamHeight;
   const beamTopY = fullRingBeamTop;
 
-  // Slab / Full Roof dimensions: integrated directly along the same canonical top structural line
+  // Slab dimensions: derived strictly from the active floor's independent slab configuration
   const floorSlab = floor.slab ?? model.slab;
-  const floorRoof = floor.fullRoof ?? model.fullRoof;
-  const slabH = floorRoof?.thickness !== undefined
-    ? toMeters(floorRoof.thickness, floorRoof.thicknessUnit || 'in')
-    : toMeters(floorSlab?.height ?? 1, floorSlab?.heightUnit || 'ft');
+  const slabH = floorSlab?.thickness !== undefined
+    ? toMeters(floorSlab.thickness, floorSlab.thicknessUnit || 'in')
+    : (floorSlab?.height !== undefined ? toMeters(floorSlab.height, floorSlab.heightUnit || 'ft') : toMeters(5, 'in'));
   const slabThickness = slabH;
 
   const slabTopY = topStructuralLineY;
@@ -4162,6 +4844,7 @@ export function getFullRoofJunction(
     fullRingBeam?: RCCFullRingBeamConfig;
     fullRoof?: RCCFullRoofConfig;
     slab?: RCCSlabConfig;
+    roofSlab?: RCCSlabConfig;
   },
   floorBaseY: number = 0
 ): FullRoofJunction {
@@ -4169,10 +4852,12 @@ export function getFullRoofJunction(
   const topStructuralLineY = ringJunc.topStructuralLineY;
   const topStructuralJunctionY = topStructuralLineY;
   const beamTopY = ringJunc.fullRingBeamTop;
-  const roofBottomY = ringJunc.slabBottomY;
-  const roofThickness = ringJunc.slabThickness;
-  const roofCenterY = ringJunc.slabCenterY;
-  const roofTopY = ringJunc.slabTopY;
+  const roofThickness = model.roofSlab?.thickness !== undefined
+    ? toMeters(model.roofSlab.thickness, model.roofSlab.thicknessUnit || 'in')
+    : ringJunc.slabThickness;
+  const roofBottomY = topStructuralLineY - roofThickness;
+  const roofCenterY = topStructuralLineY - roofThickness / 2;
+  const roofTopY = topStructuralLineY;
   const junctionY = topStructuralLineY;
   const junctionGap = Math.abs(roofTopY - beamTopY);
   const isJunctionConnected = junctionGap <= 0.0001;
@@ -4497,11 +5182,34 @@ export function applyPillarConfigToAll(
       footings: updatedFoundation.footings.map(f => {
         if (f.pillarId && affectedSet.has(f.pillarId)) {
           const targetDepth = config.shape === 'circular' ? config.width : config.depth;
+          const mockPillar: Pillar = {
+            id: f.pillarId,
+            name: f.pillarName || f.id,
+            width: config.width,
+            depth: targetDepth,
+            height: config.height ?? 10,
+            unit: config.unit ?? 'in',
+            heightUnit: model.buildingUnit,
+            position: f.position,
+            count: 1
+          };
+          const dynamic = calculateDynamicPillarFooting(mockPillar, model.buildingUnit, updatedFoundation, model.buildingConfig, model.floors.length);
           return {
             ...f,
             columnStubWidth: config.width,
             columnStubDepth: targetDepth,
-            columnStubUnit: config.unit ?? f.columnStubUnit ?? 'in'
+            columnStubUnit: config.unit ?? f.columnStubUnit ?? 'in',
+            footingLength: dynamic.footingLength,
+            footingWidth: dynamic.footingWidth,
+            footingDepth: dynamic.footingDepth,
+            pccLength: dynamic.pccLength,
+            pccWidth: dynamic.pccWidth,
+            sandFillLength: dynamic.sandFillLength,
+            sandFillWidth: dynamic.sandFillWidth,
+            excavationLength: dynamic.excavationLength,
+            excavationWidth: dynamic.excavationWidth,
+            excavationDepth: dynamic.excavationDepth,
+            foundationBedLevel: dynamic.foundationBedLevel
           };
         }
         return f;

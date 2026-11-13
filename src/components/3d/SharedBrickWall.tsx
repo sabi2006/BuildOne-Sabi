@@ -277,8 +277,8 @@ export function SharedBrickWall({
   return (
     <group position={new THREE.Vector3(...position)} rotation={new THREE.Euler(...rotation)}>
       
-      {/* Mortar Joint Fill */}
-      {!wireframe && (
+      {/* Mortar Joint Fill - Only rendered when there are NO openings, or sized without blocking openings */}
+      {!wireframe && processedOpenings.length === 0 && (
         <mesh position={[0, totalHeight / 2, 0]} castShadow receiveShadow>
           <boxGeometry args={[Math.max(0.001, totalLength - 0.01), Math.max(0.001, totalHeight - 0.01), Math.max(0.001, totalThickness - 0.01)]} />
           <meshStandardMaterial color="#8a8d91" roughness={1} metalness={0} />
@@ -297,6 +297,161 @@ export function SharedBrickWall({
           )}
         </instancedMesh>
       )}
+      
+      {/* 3D Physical Doors, Windows, and Ventilators Rendered Inside Openings */}
+      {!wireframe && processedOpenings.map((op: any, i: number) => {
+        const opW = toMeters(op.width, op.unit || wall.dimensions.unit);
+        const opH = toMeters(op.height, op.unit || wall.dimensions.unit);
+        const frameThick = Math.min(totalThickness, 0.15);
+
+        if (op.type === 'door') {
+          const postW = 0.05; // 50mm frame post
+          const leafW = Math.max(0.1, opW - postW * 2);
+          const leafH = Math.max(0.1, opH - postW);
+          const leafT = 0.038; // 38mm wooden door panel
+
+          return (
+            <group key={`3d-door-${i}`} position={[op.renderX, op.renderY, 0]}>
+              {/* Outer Timber Door Frame (Left, Right, Top) */}
+              {/* Left Post */}
+              <mesh position={[-opW / 2 + postW / 2, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[postW, opH, frameThick]} />
+                <meshStandardMaterial color="#451a03" roughness={0.7} metalness={0.1} />
+              </mesh>
+              {/* Right Post */}
+              <mesh position={[opW / 2 - postW / 2, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[postW, opH, frameThick]} />
+                <meshStandardMaterial color="#451a03" roughness={0.7} metalness={0.1} />
+              </mesh>
+              {/* Top Lintel Post */}
+              <mesh position={[0, opH / 2 - postW / 2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[opW, postW, frameThick]} />
+                <meshStandardMaterial color="#451a03" roughness={0.7} metalness={0.1} />
+              </mesh>
+
+              {/* Wooden Door Leaf Panel */}
+              <mesh position={[0, -postW / 2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[leafW, leafH, leafT]} />
+                <meshStandardMaterial color="#78350f" roughness={0.65} metalness={0.08} />
+              </mesh>
+
+              {/* Decorative Recessed Bevel Panel 1 (Top) */}
+              <mesh position={[0, leafH * 0.22 - postW / 2, leafT / 2 + 0.002]} castShadow>
+                <boxGeometry args={[leafW * 0.75, leafH * 0.35, 0.006]} />
+                <meshStandardMaterial color="#92400e" roughness={0.6} metalness={0.05} />
+              </mesh>
+              {/* Decorative Recessed Bevel Panel 2 (Bottom) */}
+              <mesh position={[0, -leafH * 0.25 - postW / 2, leafT / 2 + 0.002]} castShadow>
+                <boxGeometry args={[leafW * 0.75, leafH * 0.42, 0.006]} />
+                <meshStandardMaterial color="#92400e" roughness={0.6} metalness={0.05} />
+              </mesh>
+
+              {/* Brass Door Handle & Lockset */}
+              <mesh position={[leafW / 2 - 0.06, -0.05, leafT / 2 + 0.015]} castShadow>
+                <cylinderGeometry args={[0.012, 0.012, 0.12, 16]} />
+                <meshStandardMaterial color="#f59e0b" metalness={0.9} roughness={0.2} />
+              </mesh>
+              <mesh position={[leafW / 2 - 0.06, -0.05, -leafT / 2 - 0.015]} castShadow>
+                <cylinderGeometry args={[0.012, 0.012, 0.12, 16]} />
+                <meshStandardMaterial color="#f59e0b" metalness={0.9} roughness={0.2} />
+              </mesh>
+            </group>
+          );
+        }
+
+        if (op.type === 'window') {
+          const frameBar = 0.045; // 45mm frame profile
+          const glassW = Math.max(0.1, opW - frameBar * 2);
+          const glassH = Math.max(0.1, opH - frameBar * 2);
+
+          return (
+            <group key={`3d-window-${i}`} position={[op.renderX, op.renderY, 0]}>
+              {/* Outer Window Frame (Top, Bottom, Left, Right) */}
+              {/* Left Jamb */}
+              <mesh position={[-opW / 2 + frameBar / 2, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[frameBar, opH, frameThick]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+              {/* Right Jamb */}
+              <mesh position={[opW / 2 - frameBar / 2, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[frameBar, opH, frameThick]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+              {/* Top Rail */}
+              <mesh position={[0, opH / 2 - frameBar / 2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[opW, frameBar, frameThick]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+              {/* Bottom Sill Rail */}
+              <mesh position={[0, -opH / 2 + frameBar / 2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[opW, frameBar, frameThick]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+
+              {/* Projecting Exterior Window Sill */}
+              <mesh position={[0, -opH / 2 - 0.015, frameThick / 2 + 0.02]} receiveShadow>
+                <boxGeometry args={[opW + 0.08, 0.03, frameThick + 0.06]} />
+                <meshStandardMaterial color="#94a3b8" roughness={0.9} metalness={0.05} />
+              </mesh>
+
+              {/* Tinted Architectural Translucent Window Glass */}
+              <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[glassW, glassH, 0.008]} />
+                <meshStandardMaterial 
+                  color="#38bdf8" 
+                  transparent={true} 
+                  opacity={0.45} 
+                  roughness={0.08} 
+                  metalness={0.9} 
+                  depthWrite={false}
+                />
+              </mesh>
+
+              {/* Central Vertical Mullion Divider */}
+              <mesh position={[0, 0, 0.002]} castShadow>
+                <boxGeometry args={[0.025, glassH, frameThick * 0.7]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+
+              {/* Central Horizontal Transom Divider */}
+              <mesh position={[0, 0, 0.002]} castShadow>
+                <boxGeometry args={[glassW, 0.025, frameThick * 0.7]} />
+                <meshStandardMaterial color="#334155" roughness={0.5} metalness={0.2} />
+              </mesh>
+            </group>
+          );
+        }
+
+        if (op.type === 'ventilator') {
+          const frameBar = 0.035;
+          const innerW = Math.max(0.1, opW - frameBar * 2);
+          const innerH = Math.max(0.1, opH - frameBar * 2);
+
+          return (
+            <group key={`3d-vent-${i}`} position={[op.renderX, op.renderY, 0]}>
+              {/* Ventilator Outer Frame */}
+              <mesh position={[0, 0, 0]} castShadow receiveShadow>
+                <boxGeometry args={[opW, opH, frameThick]} />
+                <meshStandardMaterial color="#1e293b" roughness={0.6} metalness={0.2} />
+              </mesh>
+              {/* Frosted Louver Glazing */}
+              <mesh position={[0, 0, 0]}>
+                <boxGeometry args={[innerW, innerH, 0.006]} />
+                <meshStandardMaterial color="#bae6fd" transparent={true} opacity={0.6} roughness={0.3} />
+              </mesh>
+              {/* Louver Slats (3 Horizontal Angled Slats) */}
+              {[-innerH * 0.25, 0, innerH * 0.25].map((sY, sIdx) => (
+                <mesh key={`slat-${sIdx}`} position={[0, sY, 0.01]} rotation={[0.4, 0, 0]}>
+                  <boxGeometry args={[innerW, 0.02, 0.04]} />
+                  <meshStandardMaterial color="#64748b" roughness={0.5} metalness={0.3} />
+                </mesh>
+              ))}
+            </group>
+          );
+        }
+
+        return null;
+      })}
       
       {/* Ghost Box for overall dimensions reference if needed */}
       {wireframe && (

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Estimation Guide - Plain English Construction Manual</title>
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #0f2b5c;
+      --primary-light: #1e4287;
+      --secondary: #0284c7;
+      --accent: #f59e0b;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --step-bg: #f1f5f9;
+      --highlight: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.7;
+      color: var(--text);
+      background-color: var(--bg);
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 44px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .header-banner {
+      background: linear-gradient(135deg, #0b1f44 0%, #1e4287 100%);
+      color: white;
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-title h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .header-title p {
+      font-size: 14px;
+      color: #93c5fd;
+      font-weight: 400;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: #0284c7;
+      color: white;
+      text-decoration: none;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .action-btn.secondary {
+      background: #334155;
+    }
+    .action-btn.secondary:hover {
+      background: #1e293b;
+    }
+
+    .section {
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 36px;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 18px;
+    }
+
+    .section-badge {
+      background: var(--primary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .intro-text {
+      font-size: 14.5px;
+      color: #475569;
+      margin-bottom: 20px;
+      line-height: 1.75;
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .step-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--secondary);
+      border-radius: 8px;
+      padding: 18px 22px;
+      transition: transform 0.15s ease;
+    }
+
+    .step-card:hover {
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .step-number {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: #0f172a;
+    }
+
+    .step-desc {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.75;
+    }
+
+    .step-desc strong {
+      color: #0f2b5c;
+    }
+
+    .rule-box {
+      background: #eff6ff;
+      border: 1px dashed #93c5fd;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      font-size: 13.5px;
+      color: #1e40af;
+      line-height: 1.7;
+    }
+
+    .rule-box strong {
+      color: #1e3a8a;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 24px 16px;
+      }
+      .header-banner {
+        padding: 24px;
+      }
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: white;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .btn-group {
+        display: none;
+      }
+      .section {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- HEADER BANNER -->
+    <div class="header-banner">
+      <div class="header-title">
+        <h1>Building Estimation Guide in Plain English</h1>
+        <p>Complete Step-by-Step Practical Explanations (Zero Symbols & Pure Poppins Typography)</p>
+      </div>
+      <div class="btn-group">
+        <a href="/api/generate-pdf" class="action-btn" download="CIVIL_FORMULAS_MANUAL.pdf">Download 12-Page PDF</a>
+        <button class="action-btn secondary" onclick="window.print()">Print / Save as PDF</button>
+      </div>
+    </div>
+
+    <!-- 1. BRICK SIZING -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 1</span>
+        <span>Brick Sizes & Why Mortar Joints Change the Count</span>
+      </div>
+      <p class="intro-text">
+        When estimating brickwork, you must never calculate using only the physical clay brick alone. Here is how civil engineers define and calculate the brick sizes in practical construction:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">The Physical Solid Clay Brick</span>
+          </div>
+          <div class="step-desc">
+            A standard Tamil Nadu red clay brick straight from the kiln measures <strong>230 millimeters in length, 115 millimeters in width, and 75 millimeters in height</strong>. When you multiply these three dimensions together, you find that one solid brick displaces approximately 0.00198 cubic meters of pure clay.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Adding the Mortar Cushion Around Each Brick</span>
+          </div>
+          <div class="step-desc">
+            Bricks are never placed touching clay-to-clay. A <strong>10 millimeter layer of cement mortar</strong> is placed underneath the brick as a horizontal bed, and another 10 millimeters is placed vertically between neighboring bricks as a head joint.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">The Nominal Brick Size for Estimating</span>
+          </div>
+          <div class="step-desc">
+            Because of this 10 millimeter mortar joint, each brick in the wall actually occupies a larger space: <strong>240 millimeters in length, 125 millimeters in width, and 85 millimeters in height</strong>. Multiplying these nominal dimensions gives a space of 0.00255 cubic meters per brick unit.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Why This Prevents Ordering Mistakes</span>
+          </div>
+          <div class="step-desc">
+            If you ignored mortar, you would guess 504 bricks per cubic meter. But because mortar takes up space, one cubic meter of finished masonry actually requires only <strong>392 bricks</strong>. Using the nominal size saves the building owner from buying 22 percent more bricks than will physically fit into the wall.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. BRICK WALL QUANTITY -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 2</span>
+        <span>How the Total Number of Bricks for a Wall is Calculated</span>
+      </div>
+      <p class="intro-text">
+        Here is the exact step-by-step process used by the system to estimate bricks for any wall:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Calculate the Gross Wall Area and Volume</span>
+          </div>
+          <div class="step-desc">
+            First, take the total length of the wall and multiply it by the clear floor height. Then multiply that area by the thickness of the wall (which is 4.5 inches for partition walls or 9 inches for main load-bearing walls). This gives the solid gross volume of the wall.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Deduct All Doors, Windows, and Ventilators</span>
+          </div>
+          <div class="step-desc">
+            Next, calculate the area of every door, window, and ventilator opening inside that wall by multiplying their widths and heights. Subtract this total opening area from the gross wall area. Then multiply the remaining net area by the wall thickness to get the exact net masonry volume.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Calculate the Base Brick Count</span>
+          </div>
+          <div class="step-desc">
+            Take that net masonry volume and divide it by the nominal volume of one brick unit (0.00255 cubic meters). Round the answer up to the nearest whole number. This gives the exact number of whole bricks that will be built into the wall.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Add the Wastage Allowance for Purchase Orders</span>
+          </div>
+          <div class="step-desc">
+            On every real construction site, bricks chip during loading, break during unloading, and are cut into halves and quarters to turn corners and tie bond patterns. Therefore, we add <strong>5 percent extra</strong> for standard straight walls, or up to 8 percent extra for complex designs. This rounded final number is your safe order quantity.
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-box">
+        <strong>Quick Field Rule of Thumb:</strong> For standard residential work in South India, a 4.5 inch single brick wall needs approximately 4.5 bricks per square foot of wall area. A 9 inch double brick wall needs approximately 9 bricks per square foot.
+      </div>
+    </div>
+
+    <!-- 3. DOOR & WINDOW DEDUCTIONS -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 3</span>
+        <span>How Doors, Windows, and Ventilators are Deducted</span>
+      </div>
+      <p class="intro-text">
+        Openings are subtracted cleanly from the masonry wall to ensure accurate material counts:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Measuring Each Individual Opening</span>
+          </div>
+          <div class="step-desc">
+            For every door, window, or ventilator placed on the plan, we take its clear outer frame width and multiply it by its clear outer frame height. For example, a standard room door of 3 feet width by 7 feet height creates an opening of 21 square feet.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Summing All Openings Across the Wall</span>
+          </div>
+          <div class="step-desc">
+            If a long living room wall has one main door, two large windows, and a ventilator, we add up the individual areas of all four openings into one total deducted area.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Subtracting Directly from the Brickwork</span>
+          </div>
+          <div class="step-desc">
+            This total opening area is subtracted directly from the wall area. Because no bricks are laid in these gaps, the brick count drops immediately and accurately by the exact number of bricks that would have filled those openings.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. RECALCULATING BRICKS FOR PILLARS -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 4</span>
+        <span>How Bricks are Recalculated When Pillars Intersect Walls</span>
+      </div>
+      <p class="intro-text">
+        In framed buildings, heavy concrete pillars (columns) carry the roof loads. Here is how the system automatically deducts column footprints from the brickwork:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">The Physical Conflict</span>
+          </div>
+          <div class="step-desc">
+            A concrete pillar and a brick wall cannot exist in the same physical space. In real construction, masons build the brick wall up to the edge of the concrete column and stop. If an estimator calculated the wall from one corner of the house to the other without deducting the columns, the client would pay for 8 to 15 percent more bricks than could ever fit into the house.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Linear Column Width Deduction</span>
+          </div>
+          <div class="step-desc">
+            Whenever a pillar sits along a wall line, the estimator finds the width of that pillar along the wall and subtracts it directly from the wall length. If a wall is 20 feet long and has two pillars of 9 inches each along its path, the clear brickwork length is reduced to 18.5 feet before calculating the bricks.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">3D Wall Splitting at Pillar Faces</span>
+          </div>
+          <div class="step-desc">
+            In the 3D model, the software actively slices the wall into discrete sub-spans. Sub-span one runs from the corner to the first pillar face, and sub-span two starts on the opposite pillar face and runs to the end. This ensures the 3D view shows zero clipping, and the brick count matches the physical reality with 100 percent accuracy.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. MORTAR BETWEEN BRICKS -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 5</span>
+        <span>How Concrete & Mortar Between the Bricks is Calculated</span>
+      </div>
+      <p class="intro-text">
+        To know how many bags of cement and how much sand you need to lay the bricks, the software uses the physical displacement method:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Find the Pure Clay Volume of the Bricks</span>
+          </div>
+          <div class="step-desc">
+            We already know the exact count of whole bricks needed for the wall. We multiply that count by the actual solid volume of one bare brick (0.00198 cubic meters). This tells us how much space the solid clay bricks occupy.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Extract the Wet Mortar Volume</span>
+          </div>
+          <div class="step-desc">
+            We take the total net volume of the finished wall and subtract the solid clay volume. What is left over is the exact volume of wet cement mortar that fills all the horizontal bed joints and vertical cross joints. This usually represents 22 to 24 percent of the entire wall.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Convert Wet Mortar to Dry Raw Material</span>
+          </div>
+          <div class="step-desc">
+            When you mix dry cement powder and loose sand with water, the fine cement particles slip into the empty air spaces between the sand grains, causing the mixture to shrink. Therefore, to get 1 cubic meter of wet mortar, you must buy <strong>1.33 cubic meters of dry raw ingredients</strong> (adding 33 percent extra).
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Break Down into Cement Bags and Sand CFT</span>
+          </div>
+          <div class="step-desc">
+            For a standard 1 to 5 masonry mix, there are 6 total parts (1 part cement and 5 parts sand). We divide the dry mortar volume by 6 to get the cement volume, and divide by 0.0347 cubic meters to get the exact count of 50-kilogram cement bags. Then we take the 5 parts of sand and multiply by 35.31 to get the volume of sand in cubic feet (CFT).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. PLASTER CALCULATION -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 6</span>
+        <span>How Plaster is Calculated for Walls, Pillars, Beams & Ceilings</span>
+      </div>
+      <p class="intro-text">
+        Plastering is measured by surface area. The estimator follows the official Indian Standard (IS 1200 Part XII) opening deduction rules:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Small Openings Under Half a Square Meter</span>
+          </div>
+          <div class="step-desc">
+            Small openings such as air vents and pipe holes are completely ignored. No deduction is made from the wall plaster area, and no extra plaster is measured for the jamb edges. The labor saved balances the material used.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Standard Doors and Windows (Half to Three Square Meters)</span>
+          </div>
+          <div class="step-desc">
+            For standard room doors and windows, the code instructs us to <strong>deduct 50 percent of the opening area on one face of the wall only</strong>. On the opposite face, zero deduction is made. The 50 percent of wall area that is kept covers the plaster needed for the internal jamb edges, top reveal soffits, and bottom sills without requiring complicated edge measurements.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Very Large Openings Over Three Square Meters</span>
+          </div>
+          <div class="step-desc">
+            For large double-doors or panoramic windows, 100 percent of the opening is deducted from both faces of the wall, and the plaster for the wide jamb reveals is measured and added separately.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Different Thicknesses for Different Surfaces</span>
+          </div>
+          <div class="step-desc">
+            <strong>Inner walls</strong> receive 12 millimeters of smooth 1 to 6 plaster. <strong>Outer walls</strong> receive 15 to 20 millimeters of rough waterproof 1 to 4 plaster to withstand monsoon rains. <strong>Exposed pillar and beam faces</strong> receive 6 to 10 millimeters of rich 1 to 4 plaster. <strong>Soffits and ceilings</strong> receive a thin 6 millimeter coat of rich 1 to 3 mortar so it bonds tightly overhead without sagging.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 5</span>
+            <span class="step-title">Plaster Raw Materials and Labor Days</span>
+          </div>
+          <div class="step-desc">
+            We multiply the total net plaster area by the chosen thickness to get the wet volume, add 30 percent extra for dry shrinkage and filling uneven brick joints, and break it down into cement bags and sand CFT. For labor, a standard team of one skilled mason and one helper plasters approximately 10 square meters (108 square feet) per working day.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. RCC PILLARS (COLUMNS) -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 7</span>
+        <span>How RCC Pillars (Columns) Concrete & Steel are Calculated</span>
+      </div>
+      <p class="intro-text">
+        Pillars are the primary vertical load-bearing elements. Here is how their concrete, dry mix, main steel rods, and stirrup rings are estimated:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Calculate the Concrete Volume</span>
+          </div>
+          <div class="step-desc">
+            Take the column width, multiply it by the column depth, multiply by the clear height, and multiply by the total number of columns in the house. This gives the wet concrete volume.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Add 54 Percent for Concrete Dry Shrinkage</span>
+          </div>
+          <div class="step-desc">
+            Concrete contains stone aggregate, sand, cement, and water. When mixed, fine sand and cement fill the air voids between the stones. Therefore, we multiply the wet volume by <strong>1.54</strong> (adding 54 percent extra dry ingredients). For standard M20 grade concrete (1 part cement, 1.5 parts sand, and 3 parts stone gravel, making 5.5 total parts), we divide the dry volume to get the exact cement bags, sand CFT, and 20 millimeter blue metal stone gravel CFT.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Vertical Main Rebar Rods</span>
+          </div>
+          <div class="step-desc">
+            For the vertical steel rods (usually four rods of 16 millimeter TMT steel), we take the pillar height and add <strong>10 percent extra length</strong>. This extra length covers the lap splices where rods overlap across floors and the bottom anchorage hooks that bend into the foundation. We multiply this length by the number of rods and the standard weight per meter to get the total steel weight in kilograms.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Lateral Stirrup Ties (Rings)</span>
+          </div>
+          <div class="step-desc">
+            Vertical steel rods would buckle outward under heavy roof loads if they were not tied together. We deduct 40 millimeters of concrete cover from all four sides so the steel never touches the wooden shuttering boxes. We measure the outer rectangle around the remaining inner core, add 150 millimeters for the two 135-degree anti-earthquake corner hooks, and get the cutting length for each ring.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 5</span>
+            <span class="step-title">Stirrup Count and Joint Confinement</span>
+          </div>
+          <div class="step-desc">
+            We divide the pillar height by the stirrup spacing (which is 150 millimeters) and add one to get the count of rings per pillar. We also add <strong>three extra dense rings</strong> inside the beam-column junction at the very top for earthquake safety. Multiplying the count by the cut length and the 8 millimeter steel weight gives the total stirrup weight.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. UNDERGROUND BASEMENT & FOUNDATIONS -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 8</span>
+        <span>How Underground Foundations, Sand Bed, PCC & Footings are Calculated</span>
+      </div>
+      <p class="intro-text">
+        The substructure transfers the entire weight of the house into the solid soil deep underground. Here is how every layer is calculated from bottom to top:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Earthwork Excavation Pit</span>
+          </div>
+          <div class="step-desc">
+            Workers dig a square pit down into the earth for each pillar footing (typically 5 feet long by 5 feet wide by 5 feet deep). We multiply length, width, and depth to get the total cubic meters of earth that must be excavated.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Sand Bed Level Cushion (150 mm)</span>
+          </div>
+          <div class="step-desc">
+            At the bottom of the raw dug pit, a 150 millimeter (6 inch) layer of quarry sand is spread and compacted with water tamping. This levels the rough ground and cushions against uneven soil settlement. We multiply the pit area by 0.15 meters and add <strong>15 percent extra for compaction</strong> to get the required sand in CFT.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Base Plain Cement Concrete (PCC 1:4:8 Mud Mat)</span>
+          </div>
+          <div class="step-desc">
+            Steel rebar cages must never touch raw dirt or wet mud, or they will rust and cause the building to crack. Therefore, a 100 millimeter (4 inch) layer of lean plain concrete (1 part cement, 4 parts sand, and 8 parts 40 millimeter stone) is poured over the sand bed. It hardens into a clean, level stone floor. Zero steel is used in this layer.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Trapezoidal RCC Footing Pad</span>
+          </div>
+          <div class="step-desc">
+            On top of the PCC mat sits the main reinforced footing pad. It has a flat bottom rectangle and sloped trapezoidal sides that rise up toward the column base. The estimator calculates the lower flat box volume, adds the upper sloped pyramid volume, applies the 54 percent dry factor, and finds the M20 cement, sand, and aggregate required.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 5</span>
+            <span class="step-title">Footing Bottom Steel Mesh Mat</span>
+          </div>
+          <div class="step-desc">
+            A crisscross mesh of 12 millimeter steel rods spaced at 150 millimeters sits 50 millimeters above the PCC mat on concrete cover blocks. Each rod has a 150 millimeter upward 90-degree bend at both ends. We calculate the cut lengths in both horizontal directions, count the rods, and multiply by the 12 millimeter unit weight.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 6</span>
+            <span class="step-title">Column Starter Dowel Stubs & Backfilling</span>
+          </div>
+          <div class="step-desc">
+            Four vertical 16 millimeter starter rods with 300 millimeter right-angle L-bends rest directly on the bottom mesh and rise upward through the footing into the plinth level. After the concrete footing and column stub are cast, the software calculates the solid concrete volume displaced and subtracts it from the original excavation pit volume to determine the exact quantity of earth needed for <strong>backfilling and compaction</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. RCC RING BEAMS & LINTEL BEAMS -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 9</span>
+        <span>How RCC Ring Beams & Lintel Beams are Calculated</span>
+      </div>
+      <p class="intro-text">
+        Ring beams sit continuously on top of all brick walls to tie the columns together into a rigid earthquake-proof frame:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Measuring the Extended Beam Length</span>
+          </div>
+          <div class="step-desc">
+            The software measures the center-to-center distance between supporting columns, then extends the beam into both column heads by half the column width. This ensures beams pass completely through the column intersections with zero gaps. Multiplying total beam length by beam width (9 inches) and beam depth (12 inches) gives the concrete volume.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Top Hanger Steel Rods</span>
+          </div>
+          <div class="step-desc">
+            Two continuous 12 millimeter steel rods run along the top of the beam. These hold the stirrup rings upright and resist negative bending stresses near column supports. We take the beam length, add 10 percent for lap splices and end anchor bends, and calculate the weight.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Bottom Main Tension Steel Rods</span>
+          </div>
+          <div class="step-desc">
+            When a beam carries heavy floor loads, the bottom half stretches under intense tension. Concrete cannot handle stretching force, so two or three 12 or 16 millimeter high-yield TMT steel rods are placed along the bottom of the beam to take all the pulling load.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Closed Stirrup Shear Rings</span>
+          </div>
+          <div class="step-desc">
+            We deduct 25 millimeters of concrete cover from all sides of the beam, calculate the rectangular perimeter of the inner core, add 150 millimeters for the 135-degree seismic hooks, and multiply by the number of rings spaced at 150 millimeters along the entire beam length.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. FULL SLAB / FULL RING BEAM -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 10</span>
+        <span>How Full Roof Slabs & Two-Way Steel Meshes are Calculated</span>
+      </div>
+      <p class="intro-text">
+        The roof slab is the horizontal ceiling plane that seals the room and provides the floor for the level above:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">Automatic Structural Bay Detection</span>
+          </div>
+          <div class="step-desc">
+            The software searches the floor plan to find every closed room cell bounded by four supporting pillars and beams. It calculates the effective length and width of that bay, extending to the outer column edges so the roof slab covers the entire frame.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Slab Concrete Volume</span>
+          </div>
+          <div class="step-desc">
+            We multiply the total bay area by the slab thickness (which is 5 inches or 0.127 meters for standard residential roofs). We add 54 percent dry factor to get the M20 cement bags, sand CFT, and 20 millimeter stone gravel.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">Shorter Span Main Steel Mesh (10 mm)</span>
+          </div>
+          <div class="step-desc">
+            In any room, the roof bends most severely across the shorter width. Therefore, the primary 10 millimeter steel rods are placed spanning across the shorter dimension at 150 millimeter spacing. Each rod includes 200 millimeters of extra length for downward hooks that anchor into the supporting side beams.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 4</span>
+            <span class="step-title">Longer Span Distribution Steel Mesh (8 mm)</span>
+          </div>
+          <div class="step-desc">
+            Laying perpendicular to the main rods, 8 millimeter distribution rods run along the longer room length at 150 millimeter spacing. These tie the main rods together, distribute concentrated point loads, and prevent temperature cracks during hot summer afternoons.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. STEEL ESTIMATION & 162 RULE -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 11</span>
+        <span>Why Diameter Times Diameter Divided by 162 Gives Steel Weight</span>
+      </div>
+      <p class="intro-text">
+        Every civil engineer uses this famous standard rule. Here is the pure physical explanation of why it works:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">The Physical Density of Steel</span>
+          </div>
+          <div class="step-desc">
+            Structural steel is an extremely dense material. One solid cubic meter of steel weighs exactly <strong>7850 kilograms</strong> (nearly 8 metric tonnes).
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Calculating the Circular Bar Area</span>
+          </div>
+          <div class="step-desc">
+            A steel rod is a solid round cylinder. The cross-sectional area of a round circle is pi divided by 4 times the diameter squared. When you multiply this circular area by 1 meter of length and by the steel density of 7850 kilograms, all the fixed mathematical numbers (pi, 4, 1000 millimeter conversion, and 7850 density) compress into one single universal number: <strong>162.28</strong>.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">How to Use It in Real Life</span>
+          </div>
+          <div class="step-desc">
+            To find the weight of any round steel rod per meter, simply <strong>multiply its millimeter diameter by itself, and divide by 162</strong>.
+            <br>
+            For example:
+            <br>- An <strong>8 mm rod</strong> weighs 8 times 8 divided by 162, which is <strong>0.395 kg per meter</strong>.
+            <br>- A <strong>10 mm rod</strong> weighs 10 times 10 divided by 162, which is <strong>0.617 kg per meter</strong>.
+            <br>- A <strong>12 mm rod</strong> weighs 12 times 12 divided by 162, which is <strong>0.888 kg per meter</strong>.
+            <br>- A <strong>16 mm rod</strong> weighs 16 times 16 divided by 162, which is <strong>1.580 kg per meter</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. 3D STEEL VIEW PLACEMENT -->
+    <div class="section">
+      <div class="section-title">
+        <span class="section-badge">Part 12</span>
+        <span>How Things are Placed, Structured & Generated in the 3D Steel View</span>
+      </div>
+      <p class="intro-text">
+        In the interactive 3D WebGL estimator, structural elements must align with zero physical error. Here is the architectural logic that governs the placement:
+      </p>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 1</span>
+            <span class="step-title">The Single Elevation Stacking Cascade</span>
+          </div>
+          <div class="step-desc">
+            All vertical levels build upward in a strict sequence so no gaps or overlaps can ever happen:
+            <br>1. Foundation excavation base starts deep in negative height.
+            <br>2. Sand bed surface rises by 150 millimeters.
+            <br>3. PCC mud mat surface rises by 100 millimeters.
+            <br>4. Concrete footing rises to plinth ground level (Height = 0.000 meters).
+            <br>5. Brick wall rises from 0.000 meters up to 3.048 meters (10 feet clear height).
+            <br>6. Ring beam bottom rests directly on the brick top with <strong>exactly zero millimeters gap</strong>.
+            <br>7. Ring beam rises to 3.353 meters (11 feet).
+            <br>8. Roof slab top sits flush with the top of the ring beam.
+            <br>9. The upper floor starts at this exact top line.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 2</span>
+            <span class="step-title">Visual Scaling Safeguards for Steel Rods</span>
+          </div>
+          <div class="step-desc">
+            In real life, an 8 millimeter steel stirrup is less than one third of an inch thick. In a 3D perspective camera zoomed out to view an entire house, an 8 millimeter cylinder is narrower than a single screen pixel and would completely vanish or flicker. The rendering engine applies an automatic <strong>6 millimeter visual safeguard radius</strong> so steel cages remain crisp, solid, and clearly visible at any camera zoom.
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-number">Step 3</span>
+            <span class="step-title">X-Ray Translucency & High-Contrast Colors</span>
+          </div>
+          <div class="step-desc">
+            When you activate the Steel View option, the software changes the solid grey concrete and brick walls into an <strong>X-Ray translucent material with 20 percent opacity</strong>. It pushes the concrete into background rendering order and brings the steel rebar cages forward. Main vertical rods glow in high-contrast cyan blue, and stirrup rings glow in warm amber gold, allowing clients and contractors to clearly inspect the internal skeleton of the entire building.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

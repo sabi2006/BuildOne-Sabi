@@ -1,18 +1,54 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCalculator } from './CalculatorContext';
-import { Download, Share2, Phone, AlertTriangle, ArrowLeft, Info, FileText, Loader2, LandPlot, ShieldAlert, Save, FolderClock, Paintbrush } from 'lucide-react';
+import { 
+  Download, 
+  Share2, 
+  Phone, 
+  AlertTriangle, 
+  ArrowLeft, 
+  Info, 
+  FileText, 
+  Loader2, 
+  LandPlot, 
+  ShieldAlert, 
+  Save, 
+  FolderClock, 
+  Paintbrush,
+  SlidersHorizontal,
+  Layers,
+  CheckCircle2,
+  ShieldCheck,
+  Shovel,
+  ChevronDown,
+  ChevronUp,
+  Building2,
+  Check
+} from 'lucide-react';
 import { VisualEstimator3D } from '../3d/VisualEstimator3D';
 import { SaveProjectModal } from './SaveProjectModal';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
+import { StructuralConfigModal } from './StructuralConfigModal';
 
 const WhatsAppIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}>
     <path d="M11.99 0C5.367 0 0 5.366 0 11.99c0 2.12.553 4.17 1.603 5.986L.045 24l6.195-1.624C8.01 23.336 9.974 23.98 11.99 23.98 18.614 23.98 24 18.614 24 11.99 24 5.366 18.614 0 11.99 0zm0 21.986c-1.802 0-3.567-.483-5.113-1.397l-.367-.216-3.805.998.997-3.708-.237-.378C2.518 15.698 1.993 13.86 1.993 11.99 1.993 6.467 6.467 1.993 11.99 1.993 17.514 1.993 22.007 6.468 22.007 11.99c0 5.522-4.493 9.996-10.017 9.996zm5.495-7.483c-.302-.15-1.787-.882-2.062-.983-.275-.1-.475-.15-.675.15s-.775.983-.95 1.183c-.175.2-.35.225-.65.075-2.008-1-3.64-2.825-4.225-3.833-.175-.3-.025-.462.125-.612.133-.133.302-.35.452-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.242-.584-.488-.505-.675-.514-.175-.008-.375-.008-.575-.008-.2 0-.525.075-.8.375-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.113 3.225 5.113 4.525.713.313 1.263.5 1.7.638.712.225 1.362.187 1.875.112.575-.087 1.787-.725 2.037-1.425.25-.7.25-1.3.175-1.425-.075-.125-.275-.2-.575-.35z"/>
   </svg>
 );
-import { calculateProject, calculateWallMetrics, toSqMeters, CalculatorSettings, Unit, BuildingModel, DEFAULT_PLASTER_CONFIG } from '@/lib/brickCalculator';
+import { 
+  calculateProject, 
+  calculateWallMetrics, 
+  toSqMeters, 
+  CalculatorSettings, 
+  Unit, 
+  BuildingModel, 
+  DEFAULT_PLASTER_CONFIG,
+  BuildingConfig,
+  DEFAULT_BUILDING_CONFIG,
+  SOIL_CATALOG,
+  ColumnStructuralCalculation
+} from '@/lib/brickCalculator';
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
@@ -23,10 +59,25 @@ interface VisualEstimatorResultsProps {
 }
 
 export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) {
-  const { buildingModel, brickType, settings, setActiveTab, result, projectName, setBuildingModel } = useCalculator();
+  const { 
+    buildingModel, 
+    brickType, 
+    settings, 
+    setActiveTab, 
+    result, 
+    projectName, 
+    setBuildingModel,
+    buildingConfig,
+    updateBuildingConfig
+  } = useCalculator();
   const [isWhatsappLoading, setIsWhatsappLoading] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isStructuralModalOpen, setIsStructuralModalOpen] = useState(false);
+  const [isPillarsTableExpanded, setIsPillarsTableExpanded] = useState(true);
+  const [selectedColumnFilter, setSelectedColumnFilter] = useState<'all' | 'corner' | 'edge' | 'interior'>('all');
+
+  const bConfig: BuildingConfig = buildingModel?.buildingConfig || buildingConfig || DEFAULT_BUILDING_CONFIG;
 
   // Apply standard plaster helper (12mm inner, 15mm outer, 6mm RCC)
   const handleApplyStandardPlaster = () => {
@@ -128,7 +179,7 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
       ? settings.aggregatePricePerCft 
       : (settings.aggregatePrice && settings.aggregatePrice <= 200 ? settings.aggregatePrice : 45)
   ); // ₹ per CFT
-  const [rccMixRatio, setRccMixRatio] = useState<'1:1.5:3' | '1:2:4' | '1:3:6' | 'custom'>('1:1.5:3');
+  const [rccMixRatio, setRccMixRatio] = useState<'1:1.5:3' | '1:2:4' | '1:1:2' | '1:3:6' | 'custom'>('1:1.5:3');
   const [rccLabourRate, setRccLabourRate] = useState<number>(settings.rccLabourRate || 4000); // per m3
   const [steelRate, setSteelRate] = useState<number>(settings.steelRate || 65); // per kg
 
@@ -137,6 +188,46 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
   const [sandFillRate, setSandFillRate] = useState<number>(settings.sandFillRatePerCft || 45); // ₹ per CFT
   const [pccLabourRate, setPccLabourRate] = useState<number>(settings.pccLabourRatePerM3 || 2500); // ₹ per m3
   const [footingLabourRate, setFootingLabourRate] = useState<number>(settings.footingLabourRatePerM3 || 4200); // ₹ per m3
+
+  // Synchronize local states whenever buildingConfig or customRates changes
+  useEffect(() => {
+    if (buildingModel?.buildingConfig) {
+      const cfg = buildingModel.buildingConfig;
+      if (cfg.customRates) {
+        if (cfg.customRates.cementBagPrice !== undefined) setCementPrice(cfg.customRates.cementBagPrice);
+        if (cfg.customRates.sandPricePerCft !== undefined) setSandPrice(cfg.customRates.sandPricePerCft);
+        if (cfg.customRates.aggregatePricePerCft !== undefined) setAggregatePrice(cfg.customRates.aggregatePricePerCft);
+        if (cfg.customRates.steelRatePerKg !== undefined) setSteelRate(cfg.customRates.steelRatePerKg);
+        if (cfg.customRates.brickPrice !== undefined) setBrickPrice(cfg.customRates.brickPrice);
+        if (cfg.customRates.excavationRatePerM3 !== undefined) setExcavationRate(cfg.customRates.excavationRatePerM3);
+        if (cfg.customRates.pccLabourRatePerM3 !== undefined) setPccLabourRate(cfg.customRates.pccLabourRatePerM3);
+        if (cfg.customRates.footingLabourRatePerM3 !== undefined) setFootingLabourRate(cfg.customRates.footingLabourRatePerM3);
+        if (cfg.customRates.columnLabourRatePerM3 !== undefined) setRccLabourRate(cfg.customRates.columnLabourRatePerM3);
+        if (cfg.customRates.sandFillRatePerCft !== undefined) setSandFillRate(cfg.customRates.sandFillRatePerCft);
+        if (cfg.customRates.masonWagePerDay !== undefined) setMasonWage(cfg.customRates.masonWagePerDay);
+        if (cfg.customRates.helperWagePerDay !== undefined) setHelperWage(cfg.customRates.helperWagePerDay);
+        if (cfg.customRates.wastagePercent !== undefined) setWastagePercent(cfg.customRates.wastagePercent);
+        if (cfg.customRates.contingencyPercent !== undefined) setContingencyPercent(cfg.customRates.contingencyPercent);
+      }
+      
+      if (cfg.fineAggregateType === 'river_sand' && (!cfg.customRates?.sandPricePerCft || cfg.customRates.sandPricePerCft === 55 || sandPrice === 55)) {
+        setSandPrice(80);
+      } else if (cfg.fineAggregateType === 'm_sand' && (!cfg.customRates?.sandPricePerCft || cfg.customRates.sandPricePerCft === 80 || sandPrice === 80)) {
+        setSandPrice(55);
+      }
+
+      // Sync RCC concrete mix ratio with selected concrete grade
+      if (cfg.concreteGrade === 'M15') {
+        setRccMixRatio('1:2:4');
+      } else if (cfg.concreteGrade === 'M20') {
+        setRccMixRatio('1:1.5:3');
+      } else if (cfg.concreteGrade === 'M25') {
+        setRccMixRatio('1:1:2');
+      } else if (cfg.concreteGrade === 'M30' || cfg.concreteGrade === 'M35') {
+        setRccMixRatio('custom');
+      }
+    }
+  }, [buildingModel?.buildingConfig]);
 
   // Compute Results dynamically based on local state
   const computedResult = useMemo(() => {
@@ -158,10 +249,11 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
       transportCost: transportCost,
       
       // RCC Material settings (direct rate binding with unit consistency)
+      concreteGrade: buildingModel.buildingConfig?.concreteGrade || 'M20',
       rccConcreteMixRatio: rccMixRatio,
-      rccCementRatio: Number(rccMixRatio.split(':')[0]) || 1,
-      rccSandRatio: Number(rccMixRatio.split(':')[1]) || 1.5,
-      rccAggregateRatio: Number(rccMixRatio.split(':')[2]) || 3,
+      rccCementRatio: rccMixRatio === 'custom' ? (buildingModel.buildingConfig?.concreteGrade === 'M35' ? 1 : 1) : (Number(rccMixRatio.split(':')[0]) || 1),
+      rccSandRatio: rccMixRatio === 'custom' ? (buildingModel.buildingConfig?.concreteGrade === 'M35' ? 0.65 : 0.75) : (Number(rccMixRatio.split(':')[1]) || 1.5),
+      rccAggregateRatio: rccMixRatio === 'custom' ? (buildingModel.buildingConfig?.concreteGrade === 'M35' ? 1.3 : 1.5) : (Number(rccMixRatio.split(':')[2]) || 3),
       aggregatePrice: aggregatePrice,
       aggregatePricePerCft: aggregatePrice, // User input in ₹ / CFT
       rccLabourRate: rccLabourRate,
@@ -171,11 +263,18 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
       excavationRatePerM3: excavationRate,
       sandFillRatePerCft: sandFillRate,
       pccLabourRatePerM3: pccLabourRate,
-      footingLabourRatePerM3: footingLabourRate
+      footingLabourRatePerM3: footingLabourRate,
+
+      // Additional structural & labour rates
+      contingencyPercent: contingencyPercent,
+      taxPercent: buildingModel.buildingConfig?.customRates?.taxPercent ?? 18,
+      formworkRatePerM2: buildingModel.buildingConfig?.customRates?.formworkRatePerM2 ?? 350,
+      masonWagePerDay: masonWage,
+      helperWagePerDay: helperWage
     };
 
     return calculateProject({ walls: [], pillars: buildingModel.pillars || [], buildingModel }, brickType, localSettings);
-  }, [buildingModel, brickType, settings, wastagePercent, mortarRatio, brickPrice, cementPrice, sandPrice, sandUnit, transportCost, rccMixRatio, aggregatePrice, steelRate, rccLabourRate, excavationRate, sandFillRate, pccLabourRate, footingLabourRate]);
+  }, [buildingModel, brickType, settings, wastagePercent, mortarRatio, brickPrice, cementPrice, sandPrice, sandUnit, transportCost, rccMixRatio, aggregatePrice, steelRate, rccLabourRate, excavationRate, sandFillRate, pccLabourRate, footingLabourRate, contingencyPercent, masonWage, helperWage]);
 
   // Wall Area Breakdown Calculation
   const breakdown = useMemo(() => {
@@ -331,6 +430,125 @@ Please contact me.`;
           </div>
         </div>
       </div>
+
+      {/* Building & Structural Engineering Parameters Bar */}
+      {(() => {
+        const bConfig: BuildingConfig = buildingModel?.buildingConfig || buildingConfig || DEFAULT_BUILDING_CONFIG;
+        const soilInfo = SOIL_CATALOG[bConfig.soilClassification] || SOIL_CATALOG.dense_sand_gravel;
+        const structural = computedResult.structuralSummary;
+
+        return (
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-xl p-4 sm:p-5 shadow-md border border-slate-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-700/80 pb-3 mb-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-orange-600 text-white shadow-sm">
+                  <SlidersHorizontal className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">
+                      Structural & Geotechnical Parameters
+                    </span>
+                    <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-mono">
+                      {bConfig.designStatus}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-white">
+                    {bConfig.floorCount === 1 ? 'Single Storey (G+0)' : `${bConfig.floorCount} Storeys (G+${bConfig.floorCount - 1})`} • {bConfig.buildingType.charAt(0).toUpperCase() + bConfig.buildingType.slice(1)} Structure
+                  </h3>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsStructuralModalOpen(true)}
+                className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg shadow-sm text-xs font-bold transition-all self-start md:self-auto cursor-pointer"
+              >
+                <SlidersHorizontal className="w-4 h-4 mr-1.5" />
+                <span>Configure Structural Sizing</span>
+              </button>
+            </div>
+
+            {/* Quick Badges Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-1 text-xs">
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">Storeys & Height</span>
+                <span className="font-bold text-white block mt-0.5">{bConfig.floorCount}F • {bConfig.floorHeight} {bConfig.floorHeightUnit}</span>
+              </div>
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">Concrete Grade</span>
+                <span className="font-bold text-blue-300 block mt-0.5">{bConfig.concreteGrade} (fck 20 MPa)</span>
+              </div>
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">TMT Steel Grade</span>
+                <span className="font-bold text-amber-300 block mt-0.5">{bConfig.steelGrade} (fy 500 N/mm²)</span>
+              </div>
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">Fine Aggregate</span>
+                <span className="font-bold text-emerald-300 block mt-0.5">
+                  {bConfig.fineAggregateType === 'm_sand' ? 'M-Sand (Zone II)' : 'River Sand (Natural)'}
+                </span>
+              </div>
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">Soil Bearing (q)</span>
+                <span className="font-bold text-orange-400 font-mono block mt-0.5">
+                  {bConfig.allowableSoilBearingPressureKnM2} kN/m²
+                </span>
+              </div>
+              <div className="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700">
+                <span className="text-[10px] text-slate-400 font-medium block">Foundation Bed</span>
+                <span className="font-bold text-white block mt-0.5">
+                  {bConfig.foundationType.charAt(0).toUpperCase() + bConfig.foundationType.slice(1)} @ {bConfig.foundationDepthM}m
+                </span>
+              </div>
+            </div>
+
+            {/* Geotechnical Soil Advisory Banner */}
+            {soilInfo && (
+              <div className={`mt-3 p-3 rounded-lg border text-xs flex items-start gap-2.5 ${
+                soilInfo.requiresSpecialFoundation 
+                  ? 'bg-red-950/40 border-red-800/60 text-red-200' 
+                  : 'bg-slate-800/60 border-slate-700/80 text-slate-300'
+              }`}>
+                {soilInfo.requiresSpecialFoundation ? (
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                ) : (
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                )}
+                <div className="leading-relaxed">
+                  <span className="font-bold text-white">{soilInfo.name}: </span>
+                  <span>{soilInfo.description}. </span>
+                  <span className="text-amber-200">{soilInfo.recommendedFoundationNotes} </span>
+                  <span className="text-slate-400">(Allowable bearing pressure: {bConfig.allowableSoilBearingPressureKnM2} kN/m²).</span>
+                </div>
+              </div>
+            )}
+
+            {/* Superstructure Vertical Load Takeoff */}
+            {structural && (
+              <div className="mt-3 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-300 gap-3">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <span className="text-slate-400">Total Vertical Building Load: </span>
+                    <span className="font-mono font-bold text-white">{Math.round(structural.totalVerticalLoadKn).toLocaleString('en-IN')} kN</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Avg Load / Column: </span>
+                    <span className="font-mono font-bold text-amber-300">{Math.round(structural.averageLoadPerPillarKn).toLocaleString('en-IN')} kN</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Total Pillars: </span>
+                    <span className="font-bold text-emerald-400">{structural.pillarsCalculations.length} Nos</span>
+                  </div>
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Built-up Area: {Math.round(structural.totalBuiltUpAreaSqFt).toLocaleString('en-IN')} sq.ft
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* 3D Preview Component */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
@@ -1329,6 +1547,441 @@ Please contact me.`;
         );
       })()}
 
+      {/* Structural Engineering Load & Dynamic Sizing Transparency View (Handbook Section 10) */}
+      {computedResult.structuralSummary && (() => {
+        const s = computedResult.structuralSummary;
+        const bConfig = buildingModel?.buildingConfig || buildingConfig || DEFAULT_BUILDING_CONFIG;
+
+        const filteredColumns = s.pillarsCalculations.filter(c => {
+          if (selectedColumnFilter === 'all') return true;
+          return c.role === selectedColumnFilter;
+        });
+
+        return (
+          <div className="bg-white rounded-xl shadow-lg border border-indigo-200 overflow-hidden mt-8">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 px-6 py-5 border-b border-indigo-900 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider bg-indigo-950 px-2 py-0.5 rounded border border-indigo-800">
+                    IS 456 Structural Schedule & Quantity Takeoff
+                  </span>
+                  <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+                    {bConfig.designStatus}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-indigo-400" />
+                  <span>Column Load Distribution & Member Sizing Schedule</span>
+                </h3>
+                <p className="text-xs text-slate-300 mt-1">
+                  Accurate tributary area calculation per column (no equal division) • Dynamic cross-sections & reinforcement cages based on accumulated floor loads.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsStructuralModalOpen(true)}
+                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Edit Parameters</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPillarsTableExpanded(!isPillarsTableExpanded)}
+                  className="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  {isPillarsTableExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  <span>{isPillarsTableExpanded ? 'Collapse' : 'Expand Schedule'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* High-Level Metrics Summary */}
+            <div className="bg-indigo-50/50 p-4 border-b border-indigo-100 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs">
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Total Columns</span>
+                <span className="text-base font-bold text-indigo-950 block mt-0.5">{s.pillarsCalculations.length} Pillars</span>
+                <span className="text-[10px] text-indigo-600 font-mono">
+                  {s.pillarsCalculations.filter(c => c.role === 'corner').length} Corner • {s.pillarsCalculations.filter(c => c.role === 'edge').length} Edge • {s.pillarsCalculations.filter(c => c.role === 'interior').length} Int
+                </span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Total Building Load</span>
+                <span className="text-base font-bold text-slate-900 block mt-0.5 font-mono">{Math.round(s.totalVerticalLoadKn).toLocaleString('en-IN')} kN</span>
+                <span className="text-[10px] text-slate-500">{bConfig.floorCount} floor(s) dead + live</span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Average / Pillar</span>
+                <span className="text-base font-bold text-amber-700 block mt-0.5 font-mono">{Math.round(s.averageLoadPerPillarKn).toLocaleString('en-IN')} kN</span>
+                <span className="text-[10px] text-slate-500">Min: {Math.round(Math.min(...s.pillarsCalculations.map(c => c.totalServiceLoadKn)))} • Max: {Math.round(Math.max(...s.pillarsCalculations.map(c => c.totalServiceLoadKn)))} kN</span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Concrete Volume (Columns)</span>
+                <span className="text-base font-bold text-blue-900 block mt-0.5 font-mono">{s.totalColumnRccM3.toFixed(2)} m³</span>
+                <span className="text-[10px] text-blue-700">{(s.totalColumnRccM3 * 35.3147).toFixed(1)} CFT</span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Steel Weight (Columns)</span>
+                <span className="text-base font-bold text-emerald-800 block mt-0.5 font-mono">
+                  {Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.totalSteelWeightKg, 0)).toLocaleString('en-IN')} kg
+                </span>
+                <span className="text-[10px] text-emerald-600">
+                  Main: {Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.mainSteelWeightKg, 0))} • Ties: {Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.stirrupWeightKg, 0))} kg
+                </span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-indigo-100 shadow-xs">
+                <span className="text-[10px] text-slate-500 font-medium block">Footing Concrete (RCC)</span>
+                <span className="text-base font-bold text-amber-900 block mt-0.5 font-mono">{s.totalFootingRccM3.toFixed(2)} m³</span>
+                <span className="text-[10px] text-amber-700">SBC: {bConfig.allowableSoilBearingPressureKnM2} kN/m²</span>
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            {isPillarsTableExpanded && (
+              <div className="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wider mr-2">Filter Roles:</span>
+                  {(['all', 'corner', 'edge', 'interior'] as const).map(role => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => setSelectedColumnFilter(role)}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                        selectedColumnFilter === role
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {role === 'all' ? `All (${s.pillarsCalculations.length})` : `${role.charAt(0).toUpperCase() + role.slice(1)} (${s.pillarsCalculations.filter(c => c.role === role).length})`}
+                    </button>
+                  ))}
+                </div>
+                <div className="text-xs text-slate-500 font-mono">
+                  Showing {filteredColumns.length} of {s.pillarsCalculations.length} columns
+                </div>
+              </div>
+            )}
+
+            {/* Pillar Table */}
+            {isPillarsTableExpanded && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-xs">
+                  <thead className="bg-slate-100 text-slate-700 uppercase font-semibold">
+                    <tr>
+                      <th className="py-3 px-3 text-left">Pillar</th>
+                      <th className="py-3 px-3 text-left">Role</th>
+                      <th className="py-3 px-3 text-right">Trib Area (A_trib)</th>
+                      <th className="py-3 px-3 text-right">Service Load (P)</th>
+                      <th className="py-3 px-3 text-right">Factored (Pu)</th>
+                      <th className="py-3 px-3 text-center">Section (b × D)</th>
+                      <th className="py-3 px-3 text-right">Capacity (Puz)</th>
+                      <th className="py-3 px-3 text-center">Capacity Ratio</th>
+                      <th className="py-3 px-3 text-left">Longitudinal Rebar</th>
+                      <th className="py-3 px-3 text-left">Lateral Ties</th>
+                      <th className="py-3 px-3 text-right">Steel Wt</th>
+                      <th className="py-3 px-3 text-center">Footing (L × B × D)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                    {filteredColumns.map((c) => {
+                      const isHighLoad = c.totalServiceLoadKn > s.averageLoadPerPillarKn;
+                      return (
+                        <tr key={c.pillarId} className="hover:bg-indigo-50/30 transition-colors">
+                          <td className="py-3 px-3 font-bold text-slate-900 whitespace-nowrap">
+                            <span className="font-mono text-indigo-700">{c.pillarName}</span>
+                          </td>
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                              c.role === 'corner' 
+                                ? 'bg-orange-100 text-orange-800 border border-orange-200' 
+                                : c.role === 'edge' 
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                                : 'bg-purple-100 text-purple-800 border border-purple-200'
+                            }`}>
+                              {c.role}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap font-mono">
+                            <span className="font-bold text-slate-800">{c.tributaryAreaSqFt.toFixed(1)} sq.ft</span>
+                            <span className="text-slate-400 text-[10px] block">({c.tributaryAreaM2.toFixed(2)} m²)</span>
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap font-mono font-bold text-slate-900">
+                            {Math.round(c.totalServiceLoadKn)} kN
+                            {isHighLoad && <span className="text-[9px] text-amber-600 block">▲ Above Avg</span>}
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap font-mono text-amber-800 font-semibold">
+                            {Math.round(c.factoredUltimateLoadKn)} kN
+                          </td>
+                          <td className="py-3 px-3 text-center whitespace-nowrap">
+                            <span className="font-bold text-indigo-900 font-mono bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                              {Math.round(c.providedWidthMm / 25.4)}" × {Math.round(c.providedDepthMm / 25.4)}"
+                            </span>
+                            <span className="text-[10px] text-slate-400 block font-mono">({c.providedWidthMm}×{c.providedDepthMm}mm)</span>
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap font-mono font-semibold text-slate-700">
+                            {Math.round(c.axialCapacityPuzKn)} kN
+                          </td>
+                          <td className="py-3 px-3 text-center whitespace-nowrap">
+                            <span className={`px-2 py-0.5 rounded font-mono font-bold text-[10px] ${
+                              c.capacityUtilizationRatio <= 85 
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                                : c.capacityUtilizationRatio <= 100 
+                                ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                                : 'bg-red-100 text-red-800 border border-red-200'
+                            }`}>
+                              {c.capacityUtilizationRatio.toFixed(1)}%
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 whitespace-nowrap font-mono">
+                            <span className="font-bold text-slate-900">{c.providedBarCount} Nos × {c.providedBarDiaMm}mm</span>
+                            <span className="text-[10px] text-slate-500 block">p = {c.steelPercentageP.toFixed(2)}% ({bConfig.steelGrade})</span>
+                          </td>
+                          <td className="py-3 px-3 whitespace-nowrap font-mono text-[11px]">
+                            <span>{c.stirrupDiaMm}mm @ {c.stirrupSpacingMm}mm c/c</span>
+                            <span className="text-[9px] text-blue-700 block">({c.stirrupConfinementSpacingMm}mm joint zone)</span>
+                          </td>
+                          <td className="py-3 px-3 text-right whitespace-nowrap font-mono font-bold text-slate-900">
+                            {Math.round(c.totalSteelWeightKg)} kg
+                          </td>
+                          <td className="py-3 px-3 text-center whitespace-nowrap font-mono">
+                            <span className="font-bold text-slate-800">
+                              {c.providedFootingLengthM.toFixed(2)}m × {c.providedFootingWidthM.toFixed(2)}m
+                            </span>
+                            <span className="text-[10px] text-slate-500 block">
+                              Depth: {c.providedFootingDepthM.toFixed(2)}m ({(c.providedFootingLengthM * 3.28084).toFixed(1)}' × {(c.providedFootingWidthM * 3.28084).toFixed(1)}')
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Whole-Building Structural Quantity Takeoff Summary */}
+            <div className="p-6 bg-slate-50 border-t border-slate-200 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-indigo-600" />
+                  <span>Whole-Building Structural Quantity Takeoff & Material Reconciliation</span>
+                </h4>
+                <span className="text-xs text-slate-500 font-mono">
+                  All Floors Combined • IS 456 Specification
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                {/* 1. Footings / Substructure */}
+                <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-xs">
+                  <span className="font-bold text-amber-900 text-xs uppercase tracking-wider block flex items-center justify-between">
+                    <span>1. Substructure (Footings & PCC)</span>
+                    <span className="font-mono text-slate-500">{s.pillarsCalculations.length} Footings</span>
+                  </span>
+                  <div className="space-y-1 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Pit Earthwork Excavation:</span>
+                      <span className="font-mono font-bold">{s.totalExcavationM3.toFixed(2)} m³</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Plain Cement Concrete (PCC 1:4:8):</span>
+                      <span className="font-mono font-bold">{s.totalPccM3.toFixed(2)} m³</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">RCC Footing Concrete ({bConfig.concreteGrade}):</span>
+                      <span className="font-mono font-bold text-amber-800">{s.totalFootingRccM3.toFixed(2)} m³</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Footing Mat Steel ({bConfig.steelGrade}):</span>
+                      <span className="font-mono font-bold text-emerald-700">
+                        {Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.footingSteelKg, 0)).toLocaleString('en-IN')} kg
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Superstructure Columns */}
+                <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-xs">
+                  <span className="font-bold text-indigo-900 text-xs uppercase tracking-wider block flex items-center justify-between">
+                    <span>2. Columns / Pillars</span>
+                    <span className="font-mono text-slate-500">{s.pillarsCalculations.length} Columns</span>
+                  </span>
+                  <div className="space-y-1 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Column Concrete ({bConfig.concreteGrade}):</span>
+                      <span className="font-mono font-bold text-indigo-900">{s.totalColumnRccM3.toFixed(2)} m³ ({(s.totalColumnRccM3 * 35.3147).toFixed(1)} CFT)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Longitudinal Main Steel:</span>
+                      <span className="font-mono font-bold">{Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.mainSteelWeightKg, 0)).toLocaleString('en-IN')} kg</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Lateral Ties / Stirrup Steel:</span>
+                      <span className="font-mono font-bold">{Math.round(s.pillarsCalculations.reduce((acc, c) => acc + c.stirrupWeightKg, 0)).toLocaleString('en-IN')} kg</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Shuttering / Formwork Area:</span>
+                      <span className="font-mono font-bold">{s.pillarsCalculations.reduce((acc, c) => acc + c.formworkAreaM2, 0).toFixed(1)} m²</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Beams & Slabs */}
+                <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-xs">
+                  <span className="font-bold text-blue-900 text-xs uppercase tracking-wider block flex items-center justify-between">
+                    <span>3. Beams & Roof Slabs</span>
+                    <span className="font-mono text-slate-500">{bConfig.floorCount} Storey(s)</span>
+                  </span>
+                  <div className="space-y-1 text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Beam Concrete Volume:</span>
+                      <span className="font-mono font-bold">{s.totalBeamRccM3.toFixed(2)} m³</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Slab Concrete Volume:</span>
+                      <span className="font-mono font-bold">{s.totalSlabRccM3.toFixed(2)} m³</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Beams + Slabs Steel:</span>
+                      <span className="font-mono font-bold text-emerald-700">{Math.round(s.totalBeamRccM3 * 100 + s.totalSlabRccM3 * 80).toLocaleString('en-IN')} kg</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Beams + Slabs Formwork:</span>
+                      <span className="font-mono font-bold">{(s.totalBeamRccM3 * 6.5 + s.totalFloorAreaM2).toFixed(1)} m²</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fine Aggregate / Sand Segregation Card */}
+              <div className="bg-amber-50/80 border border-amber-300 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Fine Aggregate Specification:</span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-mono">
+                      {bConfig.fineAggregateType === 'm_sand' ? 'M-Sand (Manufactured Sand)' : 'River Sand (Natural Dredged)'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-amber-950 leading-relaxed">
+                    Total fine aggregate required across Footings, PCC, Columns, Beams, Slabs, Masonry, and Plaster: <b>{Math.round(s.totalFineAggregateCft).toLocaleString('en-IN')} CFT</b>.
+                    Rate: ₹{bConfig.fineAggregateType === 'river_sand' ? 80 : 55}/CFT.
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] text-amber-800 block">Total Sand Expenditure</span>
+                  <span className="text-base font-bold text-amber-950 font-mono">
+                    ₹{Math.round(s.totalFineAggregateCft * (bConfig.fineAggregateType === 'river_sand' ? 80 : 55)).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Complete Structural & Building Financial Takeoff Table */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    Full Construction Cost Takeoff (IS 456 Structural Schedule)
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-400">
+                    Grand Total: ₹{Math.round(s.costs.grandTotal).toLocaleString('en-IN')} (₹{Math.round(s.costs.costPerSqFt)} / sq.ft)
+                  </span>
+                </div>
+                <table className="min-w-full divide-y divide-slate-200 text-xs">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold uppercase">
+                    <tr>
+                      <th className="py-2.5 px-4 text-left">Trade / Construction Scope</th>
+                      <th className="py-2.5 px-4 text-right">Materials (₹)</th>
+                      <th className="py-2.5 px-4 text-right">Labour & Formwork (₹)</th>
+                      <th className="py-2.5 px-4 text-right">Scope Total (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">1. Substructure (Excavation, PCC, RCC Footings & Rebar)</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.foundation.rccFooting + s.costs.foundation.steel + s.costs.foundation.pcc).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.foundation.excavation + s.costs.foundation.sandFill + s.costs.foundation.backfill).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.foundation.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">2. RCC Columns / Pillars (IS 456 Sized Sections)</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.columns.concrete + s.costs.columns.mainSteel + s.costs.columns.stirrupSteel).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.columns.formwork + s.costs.columns.labour).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.columns.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">3. RCC Plinth Beams & Ring Beams</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.beams.concrete + s.costs.beams.steel).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.beams.formwork + s.costs.beams.labour).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.beams.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">4. RCC Floor & Roof Slabs</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.slabs.concrete + s.costs.slabs.steel).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.slabs.formwork + s.costs.slabs.labour).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.slabs.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">5. Masonry Superstructure ({computedResult.baseBrickQuantity.toLocaleString()} Bricks)</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.masonry.bricks + s.costs.masonry.mortarCement + s.costs.masonry.mortarSand).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.masonry.labour).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.masonry.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">6. Wall & Ceiling Plastering</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.plaster.materials).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.plaster.labour).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.plaster.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-semibold text-slate-900">7. Architectural Finishes (Flooring & Painting)</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.finishes.flooring).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.finishes.painting).toLocaleString('en-IN')}</td>
+                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.finishes.total).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="bg-slate-50 font-bold text-slate-900 border-t-2 border-slate-300">
+                      <td className="py-3 px-4">Direct Construction Cost Subtotal</td>
+                      <td colSpan={2} className="py-3 px-4 text-right text-slate-500 font-normal">All Trades Combined</td>
+                      <td className="py-3 px-4 text-right font-mono text-sm">₹{Math.round(s.costs.directCostSubtotal).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="text-slate-600">
+                      <td className="py-2 px-4">+ Material Wastage Allowance (5%)</td>
+                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Bricks, Cement, Rebar Off-cuts</td>
+                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.wastageAllowance).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="text-slate-600">
+                      <td className="py-2 px-4">+ Contractor Overheads (5%)</td>
+                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Site supervision, tools, safety</td>
+                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.overheads).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="text-slate-600">
+                      <td className="py-2 px-4">+ Construction Contingency (5%)</td>
+                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Unforeseen site conditions</td>
+                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.contingency).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="text-slate-600">
+                      <td className="py-2 px-4">+ Statutory GST (18%)</td>
+                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Works Contract GST Rate</td>
+                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.taxGst).toLocaleString('en-IN')}</td>
+                    </tr>
+                    <tr className="bg-slate-900 text-white font-extrabold text-sm">
+                      <td className="py-3.5 px-4 text-amber-400 uppercase tracking-wider">Grand Total Construction Estimate</td>
+                      <td colSpan={2} className="py-3.5 px-4 text-right text-xs text-slate-300 font-normal">
+                        Total Built-up: {Math.round(s.totalBuiltUpAreaSqFt).toLocaleString('en-IN')} sq.ft
+                      </td>
+                      <td className="py-3.5 px-4 text-right font-mono text-emerald-400 text-base">
+                        ₹{Math.round(s.costs.grandTotal).toLocaleString('en-IN')}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Live RCC Structural Construction Estimate (Pillars, Ring Beams, Full RCC Top) */}
       {computedResult.rccProjectEstimate && computedResult.rccProjectEstimate.totalConcreteVolumeM3 > 0 && (() => {
         const rcc = computedResult.rccProjectEstimate;
@@ -1461,7 +2114,7 @@ Please contact me.`;
                               <span className="font-bold text-slate-900 font-mono">{fl.cementBags} Bags</span>
                             </div>
                             <div className="p-2 bg-slate-50 rounded">
-                              <span className="text-[10px] text-slate-500 block">M-Sand</span>
+                              <span className="text-[10px] text-slate-500 block">{bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'}</span>
                               <span className="font-bold text-slate-900 font-mono">{fl.sandCft.toFixed(1)} CFT</span>
                             </div>
                             <div className="p-2 bg-slate-50 rounded">
@@ -1512,7 +2165,7 @@ Please contact me.`;
                           <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.cement).toLocaleString('en-IN')}</td>
                         </tr>
                         <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">M-Sand (Fine Aggregate)</td>
+                          <td className="py-2.5 px-4 font-bold text-slate-900">{bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'} (Fine Aggregate)</td>
                           <td className="py-2.5 px-4 text-right font-mono">{rcc.totalSandCft.toFixed(1)} CFT ({rcc.totalSandM3.toFixed(2)} m³)</td>
                           <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.sandCft} CFT</td>
                           <td className="py-2.5 px-4 text-right">₹{sandPrice} / CFT</td>
@@ -1581,9 +2234,10 @@ Please contact me.`;
                         onChange={e => setRccMixRatio(e.target.value as any)} 
                         className="w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-medium text-slate-900"
                       >
-                        <option value="1:1.5:3">M20 (1 : 1.5 : 3 - Cement : M-Sand : Jalli)</option>
+                        <option value="1:1.5:3">M20 (1 : 1.5 : 3 - Standard RCC)</option>
                         <option value="1:2:4">M15 (1 : 2 : 4 - Standard RCC)</option>
-                        <option value="1:3:6">M10 (1 : 3 : 6 - Lean Concrete / Base)</option>
+                        <option value="1:1:2">M25 (1 : 1 : 2 - High Strength RCC)</option>
+                        <option value="custom">Design Mix (M30 / M35 Special)</option>
                       </select>
                     </div>
 
@@ -1810,7 +2464,7 @@ Please contact me.`;
                           <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.cement).toLocaleString('en-IN')}</td>
                         </tr>
                         <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">M-Sand (PCC + Footings + Stubs)</td>
+                          <td className="py-2.5 px-4 font-bold text-slate-900">{bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'} (PCC + Footings + Stubs)</td>
                           <td className="py-2.5 px-4 text-right font-mono">{fnd.totalSandCft.toFixed(1)} CFT</td>
                           <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.sandCft} CFT</td>
                           <td className="py-2.5 px-4 text-right">₹{sandPrice} / CFT</td>
@@ -2158,6 +2812,64 @@ Please contact me.`;
           </div>
         </div>
       </div>
+
+      {/* Structural Engineering & Building Configuration Modal */}
+      <StructuralConfigModal
+        isOpen={isStructuralModalOpen}
+        config={buildingModel?.buildingConfig || buildingConfig || DEFAULT_BUILDING_CONFIG}
+        buildingLength={buildingModel?.buildingLength}
+        buildingWidth={buildingModel?.buildingWidth}
+        buildingUnit={buildingModel?.buildingUnit}
+        wallThickness={buildingModel?.externalWallThickness}
+        onClose={() => setIsStructuralModalOpen(false)}
+        onSave={(newCfg, bDetails) => {
+          updateBuildingConfig(newCfg);
+          if (buildingModel && setBuildingModel) {
+            const newL = bDetails?.length ?? buildingModel.buildingLength;
+            const newW = bDetails?.width ?? buildingModel.buildingWidth;
+            const newU = bDetails?.unit ?? buildingModel.buildingUnit;
+            const newT = bDetails?.wallThickness ?? buildingModel.externalWallThickness;
+            setBuildingModel({
+              ...buildingModel,
+              buildingLength: newL,
+              buildingWidth: newW,
+              buildingUnit: newU,
+              externalWallThickness: newT,
+              buildingConfig: newCfg
+            });
+          }
+          if (newCfg.concreteGrade === 'M15') {
+            setRccMixRatio('1:2:4');
+          } else if (newCfg.concreteGrade === 'M20') {
+            setRccMixRatio('1:1.5:3');
+          } else if (newCfg.concreteGrade === 'M25') {
+            setRccMixRatio('1:1:2');
+          } else if (newCfg.concreteGrade === 'M30' || newCfg.concreteGrade === 'M35') {
+            setRccMixRatio('custom');
+          }
+          if (newCfg.customRates) {
+            if (newCfg.customRates.cementBagPrice !== undefined) setCementPrice(newCfg.customRates.cementBagPrice);
+            if (newCfg.customRates.sandPricePerCft !== undefined) setSandPrice(newCfg.customRates.sandPricePerCft);
+            if (newCfg.customRates.aggregatePricePerCft !== undefined) setAggregatePrice(newCfg.customRates.aggregatePricePerCft);
+            if (newCfg.customRates.steelRatePerKg !== undefined) setSteelRate(newCfg.customRates.steelRatePerKg);
+            if (newCfg.customRates.brickPrice !== undefined) setBrickPrice(newCfg.customRates.brickPrice);
+            if (newCfg.customRates.excavationRatePerM3 !== undefined) setExcavationRate(newCfg.customRates.excavationRatePerM3);
+            if (newCfg.customRates.pccLabourRatePerM3 !== undefined) setPccLabourRate(newCfg.customRates.pccLabourRatePerM3);
+            if (newCfg.customRates.footingLabourRatePerM3 !== undefined) setFootingLabourRate(newCfg.customRates.footingLabourRatePerM3);
+            if (newCfg.customRates.columnLabourRatePerM3 !== undefined) setRccLabourRate(newCfg.customRates.columnLabourRatePerM3);
+            if (newCfg.customRates.sandFillRatePerCft !== undefined) setSandFillRate(newCfg.customRates.sandFillRatePerCft);
+            if (newCfg.customRates.masonWagePerDay !== undefined) setMasonWage(newCfg.customRates.masonWagePerDay);
+            if (newCfg.customRates.helperWagePerDay !== undefined) setHelperWage(newCfg.customRates.helperWagePerDay);
+            if (newCfg.customRates.wastagePercent !== undefined) setWastagePercent(newCfg.customRates.wastagePercent);
+            if (newCfg.customRates.contingencyPercent !== undefined) setContingencyPercent(newCfg.customRates.contingencyPercent);
+          }
+          if (newCfg.fineAggregateType === 'river_sand' && (!newCfg.customRates?.sandPricePerCft || newCfg.customRates.sandPricePerCft === 55 || sandPrice === 55)) {
+            setSandPrice(80);
+          } else if (newCfg.fineAggregateType === 'm_sand' && (!newCfg.customRates?.sandPricePerCft || newCfg.customRates.sandPricePerCft === 80 || sandPrice === 80)) {
+            setSandPrice(55);
+          }
+        }}
+      />
 
       {/* Save Project Modal */}
       {buildingModel && (
