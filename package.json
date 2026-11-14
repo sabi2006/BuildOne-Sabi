@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "graph:update": "python -m graphify update .",
+    "graph:watch": "python -m graphify watch .",
+    "graph:report": "python -m graphify cluster-only .",
+    "graph:status": "python -m graphify hook status"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

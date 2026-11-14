@@ -1,18 +1,22 @@
-# Final Graphify Domain Model
-**Document Version:** 2.0 (Post Phase B–E Implementation)  
-**Project:** Brick Factory (CAD, 3D WebGL & Structural Estimation System)  
-**Knowledge Graph Snapshot:** 889 Nodes · 1795 Edges · 60 Communities · Commit `238eabe2`  
-**Date:** 2026-11-14
+# Final Graphify Domain Model — Brick Factory Architecture
+
+**Document Version:** 3.0 (Post Master Implementation, Automated Validation & Production Deployment)  
+**Project:** Brick Factory (CAD, 3D WebGL & Structural Civil Engineering Estimation System)  
+**Knowledge Graph Snapshot:** 997 Nodes · 1,939 Edges · 65 Communities · Commit `6483886e`  
+**Date:** November 15, 2026  
+**Auditor:** Senior Software Architect, Structural Estimation Engineer, and Graphify Analyst  
 
 ---
 
 ## 1. Domain Model Overview
 
-The Brick Factory domain model defines a comprehensive BIM (Building Information Modeling) architecture for low-rise and mid-rise RCC (Reinforced Cement Concrete) framed buildings. It maps physical civil engineering structural entities into TypeScript domain models, mathematical estimation services, interactive 2D SVG CAD editors, and real-time Three.js 3D WebGL viewports.
+The Brick Factory domain model defines a comprehensive Building Information Modeling (BIM) architecture for low-rise and mid-rise RCC (Reinforced Cement Concrete) framed buildings. It bridges physical civil engineering structural entities into strongly typed TypeScript data models, mathematical estimation services, interactive 2D SVG CAD editors, and real-time Three.js 3D WebGL viewports.
+
+The architecture enforces a **Single Source of Truth (SSOT)** centered on the `BuildingModel` data structure. All secondary representations—including 2D canvas overlays, 3D mesh instances, structural load distributions, and material bill of quantities (BOQ)—are derived reactively from this central model.
 
 ---
 
-## 2. Core Entities & Relationships
+## 2. Core Entities & Structural Class Diagram
 
 ```mermaid
 classDiagram
@@ -41,6 +45,7 @@ classDiagram
         +RCCFullRingBeamConfig fullRingBeam
         +RCCSlabConfig slab
         +RCCFullRoofConfig fullRoof
+        +StructuralBeam[] detectedBeams
     }
 
     class Pillar {
@@ -55,10 +60,11 @@ classDiagram
         +number height
         +Unit unit
         +Coordinate position
-        +PillarPlacementType placementType
         +PillarAlignment alignment
-        +RebarConfig rebarConfig
+        +PillarPlacement placementType
+        +PillarShape shape
         +CalculatedFooting calculatedFooting
+        +number calculatedLoadKn
     }
 
     class StructuralBeam {
@@ -68,122 +74,190 @@ classDiagram
         +Coordinate start
         +Coordinate end
         +number length
+        +Unit unit
         +number width
         +number depth
-        +Unit unit
+        +BeamType type
+        +string wallId
+    }
+
+    class RCCSlabConfig {
+        +boolean enabled
+        +number thickness
+        +Unit thicknessUnit
+        +number customLength
+        +number customWidth
+        +Unit customDimensionUnit
+        +RCCReinforcementConfig reinforcement
     }
 
     class FoundationConfig {
         +boolean enabled
-        +boolean autoGenerateMode
         +FoundationType foundationType
         +number soilBearingCapacityKnM2
         +FoundationFooting[] footings
+        +boolean useCommonFootingSize
         +CommonFootingSize commonFootingSize
+        +number defaultExcavationDepth
+        +number defaultSandFillDepth
+        +number defaultPccThickness
+        +number defaultPccOffset
+        +number defaultColumnStubHeight
     }
 
     class FoundationFooting {
         +string id
-        +string floorId
         +string pillarId
+        +string pillarName
         +Coordinate position
         +number footingLength
         +number footingWidth
         +number footingDepth
-        +number columnStubWidth
-        +number columnStubDepth
-        +number columnStubHeight
+        +Unit footingUnit
         +number pccLength
         +number pccWidth
         +number pccThickness
+        +number sandFillLength
+        +number sandFillWidth
+        +number sandFillDepth
+        +number columnStubWidth
+        +number columnStubDepth
+        +number columnStubHeight
+        +RebarConfig rebar
     }
 
-    class Wall {
-        +string id
-        +string name
-        +Coordinate start
-        +Coordinate end
-        +WallDimensions dimensions
-        +Opening[] openings
-    }
-
-    class Opening {
-        +string id
-        +OpeningType type
-        +number width
-        +number height
-        +number count
-        +Unit unit
-    }
-
-    BuildingModel "1" *-- "many" Floor : contains
-    BuildingModel "1" *-- "1" FoundationConfig : contains
-    Floor "1" *-- "many" Wall : contains
-    Floor "1" *-- "many" Pillar : contains
-    Pillar "many" --> "1" FoundationFooting : links to (GF)
-    Pillar "many" --> "many" StructuralBeam : defines spans
-    Wall "1" *-- "many" Opening : cutouts
+    BuildingModel "1" *-- "1..*" Floor : contains
+    BuildingModel "1" *-- "0..1" FoundationConfig : contains
+    BuildingModel "1" *-- "0..1" RCCSlabConfig : roofSlab
+    Floor "1" *-- "0..*" Pillar : contains
+    Floor "1" *-- "0..*" StructuralBeam : detectedBeams
+    Floor "1" *-- "0..1" RCCSlabConfig : slab
+    FoundationConfig "1" *-- "0..*" FoundationFooting : footings
+    FoundationFooting "1" --> "1" Pillar : anchors
+    StructuralBeam "0..*" --> "2" Pillar : connects
 ```
 
 ---
 
-## 3. Detailed Entity Contracts
+## 3. Subsystem Architectural Relationships
 
-### 3.1 `Pillar`
-The central structural entity representing vertical RCC columns.
-- **`verticalColumnId`**: Identifies a continuous vertical structural column shaft extending from footing level through all storeys to roof level.
-- **`isStoreyOverride`**: Optional boolean (`boolean | undefined`). When `true`, this storey's pillar dimensions and properties are decoupled from the ground shaft master. When `false` or omitted, resizing the ground floor updates continuous shafts automatically.
-- **`isCustomSize`**: When `true`, preserves user-defined column dimensions against automated IS 456 preliminary resizing algorithms.
-- **`placementType` & `alignment`**: Controls edge/corner alignment (`inside`, `center`, `outside`, `flush-exterior`) with `customOffsetX` and `customOffsetY`.
-- **`calculatedFooting`**: Embedded dynamic geotechnical sizing metrics ($L_f, W_f, D_f, A_{\text{req}}, P_{\text{service}}$) synchronized with the linked foundation footing.
+### 3.1. Pillars & Continuous Column Shafts
+- **Vertical Continuity (`verticalColumnId`)**:
+  - Each continuous column in a multi-storey building shares a persistent `verticalColumnId`.
+  - In `BuildingEditor.tsx` and `updateModelPillars()` ([src/lib/brickCalculator.ts](file:///d:/brick-factory/src/lib/brickCalculator.ts)), resizing a ground-floor pillar automatically synchronizes the new cross-section (`width` and `depth`) across all upper floors sharing that column shaft.
+  - In `VisualEstimator3D.tsx`, continuous vertical shafts are rendered without step-jogs, inheriting ground dimensions unless decoupled.
+- **Storey Override Isolation (`isStoreyOverride`)**:
+  - Upper-floor columns can be resized independently by setting `isStoreyOverride: true`.
+  - Once overridden, the pillar is decoupled from ground-floor shaft propagation. Subsequent edits to ground-floor columns leave the upper-floor pillar unchanged.
+  - In `structuralCalculationService.ts`, the structural sizing engine respects `isStoreyOverride`, preventing automated load up-sizing from clobbering intentional architectural overrides.
 
-### 3.2 `StructuralBeam`
-Represents linear structural RCC framing elements connecting adjacent columns.
-- **Generated dynamically** by `detectPillarToPillarBeams()` along structural column grid lines.
-- Endpoints align with pillar effective positions ($X_{\text{eff}}, Y_{\text{eff}}$), preserving exact orthogonal orientation (`horizontal` or `vertical`).
-- Directly consumed by `calculateRingBeamsRcc()`, `structuralCalculationService`, and 2D CAD SVG rendering in `BuildingEditor.tsx`.
+### 3.2. Structural Beams & Frame Span Detection
+- **Reusable Beam Geometry (`getEffectiveFloorBeams()`)**:
+  - Replaces fragile ad-hoc beam calculations with a centralized, reusable detector that determines beam lines along column grids and load-bearing walls.
+  - Enforces strict orthogonality: horizontal beams have $\Delta y = 0$; vertical beams have $\Delta x = 0$.
+- **Volume & Estimation Deduplication**:
+  - In `calculateRingBeamsRcc()`, when structural pillars exist, concrete volume is computed from detected structural frame spans rather than wall perimeters.
+  - Thin non-structural partition walls ($\le 4.5"$) are filtered out and excluded from beam calculations.
+  - In `VisualEstimator3D.tsx`, `isWallCoveredByFrame()` suppresses duplicate exterior wall beams when structural frame beams are present, eliminating the legacy "double bubble" beam bug.
 
-### 3.3 `FoundationFooting` & `FoundationConfig`
-Subgrade geotechnical support system.
-- One footing per ground-floor pillar, dynamically synthesized from ground pillars when `footings: []`.
-- **Layer hierarchy (top to bottom)**:
-  1. Column stub / pedestal ($H_{\text{stub}} = 2\text{ ft}$, cross-section matching ground column).
-  2. RCC Footing ($L_f \times W_f \times D_f$, M20 grade concrete, 2-way rebar mesh with $90^\circ$ upward end hooks).
-  3. PCC leveling bed ($1:4:8$ lean concrete, projecting $0.5\text{ ft}$ beyond footing edges).
-  4. Sand filling cushion bed ($0.5\text{ ft}$ compacted sand).
-  5. Excavation pit ($0.5\text{ ft}$ working space around PCC).
-- Invariant: $\text{totalFootingRccVolumeM3} = \text{totalRccFootingVolumeM3} + \text{totalStubVolumeM3}$.
+### 3.3. RCC Slabs & Roof Slabs
+- **Vertical Alignment**:
+  - In physical construction, RCC slabs are cast integrally with the floor beams (T-beam / L-beam action).
+  - In the junction model, floor slabs are vertically centered with RCC Full Ring Beams rather than resting on top of them.
+- **Multi-Floor Deduplication**:
+  - Intermediate storeys calculate planar floor slabs per floor based on architectural bay enclosures.
+  - Top storeys calculate an independent `roofSlab` without injecting an extra 1-foot solid concrete plate across the beam grid.
 
-### 3.4 `Floor` Slabs and Roof Slab
-- **Intermediate Floors**: Calculate floor slab volume from slab dimensions or building envelope without double counting overhead beams.
-- **Top Floor**: Slab is designated as `roofSlab` on the `BuildingModel` level, eliminating triple-counting of overhead concrete plates.
-- **Junction Elevation**: RCC ring beam top surface matches slab top surface, with slab plate sitting flush on top of beam stem.
+### 3.4. Foundations & Dynamic Isolated Footings
+- **Dynamic Sizing (`calculateDynamicPillarFooting()`)**:
+  - Dynamic sizing replaces static 4 ft dummy mocks with engineering calculations based on service loads and soil capacity:
+    $$P_{\text{service}} = (N_{\text{floors}} \times P_{\text{bay}} + P_{\text{col}}) \times 1.10$$
+    $$A_{\text{req}} = \frac{P_{\text{service}}}{\text{SBC}}$$
+    $$L = \lceil \frac{\sqrt{A_{\text{req}}}}{0.15} \rceil \times 0.15$$
+  - Sizing accounts for column cross-section aspect ratios, enforces a minimum $0.30\text{ m}$ projection beyond column faces, and rounds up in standard $150\text{ mm}$ ($0.15\text{ m}$ / 6") construction steps.
+- **Column Stub Alignment**:
+  - Each isolated footing dynamically aligns its concrete column stub to match the ground column cross-section and coordinate location.
+  - Upper-floor storey overrides do NOT alter ground footings.
+  - Footing generation is idempotent: empty foundation arrays auto-generate without creating duplicates on repeated edits.
+
+### 3.5. 2D CAD Editor & 3D Visualization Synchronization
+- **BuildingEditor (2D CAD Canvas)**:
+  - Real-time SVG canvas supporting wall drawing, pillar snapping, grid snapping, and dynamic structural beam overlays (centerlines, width bands, and span dimensions).
+  - Multi-floor selector allows independent floor inspection without truncating inactive floor arrays.
+- **VisualEstimator3D (Three.js WebGL Viewport)**:
+  - Generates 3D structural meshes: isolated footing pads, PCC sub-bases, sand filling beds, column stubs, continuous columns, structural frame beams, and slabs.
+  - Supports rebar mode (X-ray rebar cages and distribution meshes) and architectural mode (solid concrete materials).
+
+### 3.6. State Management & Serialization
+- **CalculatorContext (`CalculatorState`)**:
+  - Central React context holding `buildingModel`, active tab, unit mode, undo/redo history stacks, and calculated estimates.
+  - Derives `structuralSummary` via `calculateBuildingStructuralSummary()` by passing detected frame beams and multi-floor pillars.
+- **Save / Load Serialization**:
+  - Deterministic JSON roundtrip preserves all structural properties (`isStoreyOverride`, `verticalColumnId`, `calculatedFooting`, `detectedBeams`, `foundation.footings`).
 
 ---
 
-## 4. God Nodes & Structural Hubs (From Graphify)
+## 4. Graphify Module Connectivity & Dependency Flow
 
-| God Node | Edges | Role |
-|---|:---:|---|
-| `calculateProject()` | 47 | Master estimation and structural synthesis entry point |
-| `toMeters()` | 38 | Universal dimensional conversion and unit normalization utility |
-| `VisualEstimator3D()` | 29 | Real-time Three.js WebGL 3D architectural rendering engine |
-| `useCalculator()` | 27 | Global application state management via `CalculatorContext` |
-| `calculateBuildingStructuralSummary()` | 26 | IS 456 structural load accumulation and tributary analysis engine |
-| `BuildingEditor()` | 25 | Interactive 2D CAD canvas with SVG snap-to-grid editing |
-| `detectPillarToPillarBeams()` | 25 | Structural beam detection and orthogonal alignment service |
-| `Pillar` | 24 | Core architectural entity anchoring vertical shaft hierarchy |
+```mermaid
+flowchart TD
+    subgraph UI ["User Interface Layer"]
+        Page["page.tsx"]
+        CalcContext["CalculatorContext.tsx"]
+        Editor["BuildingEditor.tsx (2D CAD)"]
+        Viewer["VisualEstimator3D.tsx (3D WebGL)"]
+        Results["VisualEstimatorResults.tsx"]
+    end
+
+    subgraph Domain ["Domain Model (SSOT)"]
+        Model["BuildingModel"]
+        Pillars["Pillar[] (verticalColumnId, isStoreyOverride)"]
+        Beams["detectedBeams[] (getEffectiveFloorBeams)"]
+        Foundations["FoundationConfig (Dynamic Footings)"]
+        Slabs["RCCSlabConfig (Floor & Roof)"]
+    end
+
+    subgraph Service ["Engineering & Estimation Services"]
+        CalcProj["calculateProject()"]
+        CalcRcc["calculateFloorRccMaterials()"]
+        CalcFooting["calculateDynamicPillarFooting()"]
+        StructService["calculateBuildingStructuralSummary()"]
+    end
+
+    Page --> CalcContext
+    CalcContext --> Editor
+    CalcContext --> Viewer
+    CalcContext --> Results
+
+    Editor <--> Model
+    Viewer <-- Model
+    Results <-- CalcProj
+
+    Model --> Pillars
+    Model --> Beams
+    Model --> Foundations
+    Model --> Slabs
+
+    Pillars --> StructService
+    Beams --> StructService
+    Pillars --> CalcFooting
+    Foundations --> CalcFooting
+
+    CalcContext --> StructService
+    CalcContext --> CalcProj
+    CalcProj --> CalcRcc
+    CalcProj --> CalcFooting
+```
 
 ---
 
-## 5. Architectural Invariants
+## 5. Architectural Boundaries & Limitations
 
-1. **Orthogonal Frame Geometry**: All detected structural frame beams are strictly orthogonal ($0^\circ$ or $90^\circ$). Endpoints are locked to pillar reference centers (`refX`, `refY`).
-2. **Shaft Continuity & Decoupling**: Lower-floor pillar edits synchronize continuous upper-floor shafts sharing `verticalColumnId` unless `isStoreyOverride === true`.
-3. **Subgrade Isolation**: Foundations exist strictly below ground plinth level ($Y \le 0$). Upper-floor pillars never generate footings or alter ground footing dimensions.
-4. **Volume De-duplication**:
-   - Pillar concrete volume is deducted from intersecting masonry walls (`trimWallByPillars`).
-   - Structural beam volume replaces wall-based fallback without duplicate overlay.
-   - Floor slab volume is cleanly separated from linear ring beam stem volume.
-   - Roof slab is calculated once per building.
-5. **Deterministic Single Source of Truth**: Successive executions of `calculateProject()` on an identical building model produce identical, deterministic quantities.
+1. **Concentric Axial Loading Only**:
+   - The foundation sizing module assumes vertical concentric axial loads without lateral wind, seismic, or moment transfer.
+2. **Simplified Punching Shear**:
+   - Pad footing depth is determined via stepped empirical load thresholds ($0.30\text{ m}$ to $0.60\text{ m}$) rather than rigorous two-way critical perimeter shear calculations.
+3. **Orthogonal Grid Alignment**:
+   - Beam span detection operates on orthogonal column axes. Slanted non-orthogonal beam connections fall back to load-bearing wall geometry.
+4. **Desktop Browser Requirement**:
+   - The interactive 2D SVG canvas and Three.js 3D WebGL viewport require modern desktop browser support with WebGL 2.0.
