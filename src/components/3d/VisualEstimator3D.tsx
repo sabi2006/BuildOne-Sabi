@@ -3014,7 +3014,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   const slabThickM = junction.slabThickness;
                   const floorTotalHeightM = floorWallHeightM + junction.totalStructuralTopHeight;
 
-                  const floorPillars: Pillar[] = (() => {
+                  const rawFloorPillars: Pillar[] = (() => {
                     // 1. Direct floor pillars explicitly stored on floor.pillars (highest priority - respects floor-wise sizing and removals)
                     if (floor.pillars && floor.pillars.length > 0) {
                       return floor.pillars;
@@ -3048,6 +3048,33 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                     ...p,
                     position: p.position ? p.position : { x: p.x ?? 0, y: p.y ?? 0 }
                   }));
+
+                  // Inherit bottom/ground floor pillar dimensions along the vertical column shaft
+                  // Columns maintain uniform cross-section from bottom to top without shrinking
+                  const gfPillarsList = model.floors[0]?.pillars || (model.pillars || []).filter(p => !p.floorId || String(p.floorId) === String(model.floors[0]?.id));
+                  const gfDimMap = new Map<string, { width: number; depth: number }>();
+                  gfPillarsList.forEach(gp => {
+                    const gpx = gp.position?.x ?? gp.x ?? 0;
+                    const gpy = gp.position?.y ?? gp.y ?? 0;
+                    const key = gp.verticalColumnId || `${Math.round(gpx * 10)}_${Math.round(gpy * 10)}`;
+                    gfDimMap.set(key, { width: gp.width || 9, depth: gp.depth || 9 });
+                  });
+
+                  const floorPillars: Pillar[] = rawFloorPillars.map(p => {
+                    if (p.isStoreyOverride) return p;
+                    const px = p.position?.x ?? p.x ?? 0;
+                    const py = p.position?.y ?? p.y ?? 0;
+                    const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+                    const gfDim = gfDimMap.get(key);
+                    if (gfDim) {
+                      return {
+                        ...p,
+                        width: gfDim.width,
+                        depth: gfDim.depth
+                      };
+                    }
+                    return p;
+                  });
 
                   const floorAllWalls = [...floor.externalWalls, ...floor.internalWalls];
 
@@ -3098,7 +3125,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   }];
 
                   // Structural pillar-to-pillar beams along all frame lines
-                  const detectedBeams = isAnyBeamActiveIn3D ? detectPillarToPillarBeams(effectivePillars, model.buildingUnit, floorAllWalls) : [];
+                  const detectedBeams = isAnyBeamActiveIn3D ? detectPillarToPillarBeams(floorPillars, model.buildingUnit, floorAllWalls) : [];
 
                   return (
                     <group key={floor.id}>
@@ -3155,7 +3182,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const mY = (sY + eY) / 2;
                               const pSample = floorPillars.find(p => p.id === beam.startPillarId || p.id === beam.endPillarId) || floorPillars[0];
                               const pW_M = pSample ? toMeters(pSample.width || 9, pSample.unit || 'in') : toMeters(9, 'in');
-                              const beamThickM = actualBeamThickM || pW_M;
+                              const beamThickM = actualBeamThickM || toMeters(9, 'in');
 
                               const isBeamXRay = isRebarActive;
 
@@ -3165,7 +3192,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const startPW = startPillar ? toMeters(startPillar.width || 9, startPillar.unit || 'in') : pW_M;
                               const endPW = endPillar ? toMeters(endPillar.width || 9, endPillar.unit || 'in') : pW_M;
                               const clearSpanM = Math.max(0.05, len - (startPW / 2 + endPW / 2));
-                              const extendedBeamLen = len + startPW / 2 + endPW / 2;
+                              const beamLenM = len;
 
                               return (
                                 <React.Fragment key={`frame-beam-${floor.id}-${beam.id}`}>
@@ -3174,7 +3201,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                     <group position={[mX, yOffset - actualBeamHeightM / 2, -mY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccPlinthBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[extendedBeamLen, actualBeamHeightM, beamThickM]} />
+                                          <boxGeometry args={[beamLenM, actualBeamHeightM, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3189,7 +3216,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       )}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={extendedBeamLen} 
+                                          lenM={beamLenM} 
                                           heightM={actualBeamHeightM} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3203,7 +3230,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                     <group position={[mX, junction.fullRingBeamCenterY, -mY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccFullRingBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[extendedBeamLen, junction.fullRingBeamHeight, beamThickM]} />
+                                          <boxGeometry args={[beamLenM, junction.fullRingBeamHeight, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3220,7 +3247,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       {/* Exposed Rebar Cage for Ring Beam */}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={extendedBeamLen} 
+                                          lenM={beamLenM} 
                                           heightM={junction.fullRingBeamHeight} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3282,30 +3309,53 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const len = Math.hypot(eX - sX, eY - sY);
                               if (len <= 0.05) return null;
 
-                              // Check if a line segment lies along any beam in detectedBeams
-                              const isSegmentCovered = (p1X: number, p1Y: number, p2X: number, p2Y: number) => {
-                                const segLen = Math.hypot(p2X - p1X, p2Y - p1Y);
-                                if (segLen <= 0.05) return true;
-                                return detectedBeams.some(b => {
+                              // Check if this wall is already covered by the frame beams
+                              const isWallCoveredByFrame = () => {
+                                // 1. If this floor has a structural frame (detectedBeams), ALL external perimeter walls are covered by frame beams
+                                if (detectedBeams.length > 0 && floor.externalWalls.some(ew => ew.id === w.id)) {
+                                  return true;
+                                }
+
+                                // 2. Check if pillars exist at/near the ends of this wall segment
+                                const pAtStart = floorPillars.some(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - sX, toM(p.position?.y ?? p.y ?? 0) - sY) < 0.6);
+                                const pAtEnd = floorPillars.some(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - eX, toM(p.position?.y ?? p.y ?? 0) - eY) < 0.6);
+                                if (pAtStart && pAtEnd && detectedBeams.length > 0) return true;
+
+                                // 3. Check if 2 or more pillars lie along this wall
+                                const pillarsOnWall = floorPillars.filter(p => {
+                                  const px = toM(p.position?.x ?? p.x ?? 0);
+                                  const py = toM(p.position?.y ?? p.y ?? 0);
+                                  const dist = Math.abs((eY - sY) * px - (eX - sX) * py + eX * sY - eY * sX) / len;
+                                  if (dist > 0.45) return false;
+                                  const dot = (px - sX) * (eX - sX) + (py - sY) * (eY - sY);
+                                  return dot >= -0.45 * len && dot <= len * len + 0.45 * len;
+                                });
+                                if (pillarsOnWall.length >= 2) return true;
+
+                                // 4. Check if detectedBeams already contains beams collinear with this wall
+                                const wallAng = Math.atan2(-(eY - sY), eX - sX);
+                                const collinearBeams = detectedBeams.filter(b => {
                                   const bsX = toM(b.start.x);
                                   const bsY = toM(b.start.y);
                                   const beX = toM(b.end.x);
                                   const beY = toM(b.end.y);
                                   const bLen = Math.hypot(beX - bsX, beY - bsY);
                                   if (bLen <= 0.05) return false;
-                                  const d1 = Math.hypot(p1X - bsX, p1Y - bsY) + Math.hypot(p1X - beX, p1Y - beY);
-                                  const d2 = Math.hypot(p2X - bsX, p2Y - bsY) + Math.hypot(p2X - beX, p2Y - beY);
-                                  return Math.abs(d1 - bLen) < 0.15 && Math.abs(d2 - bLen) < 0.15;
+                                  const bAng = Math.atan2(-(beY - bsY), beX - bsX);
+                                  const angleDiff = Math.abs(Math.sin(wallAng - bAng));
+                                  if (angleDiff > 0.15) return false;
+                                  const bmX = (bsX + beX) / 2;
+                                  const bmY = (bsY + beY) / 2;
+                                  const distToWall = Math.abs((eY - sY) * bmX - (eX - sX) * bmY + eX * sY - eY * sX) / len;
+                                  return distToWall <= 0.6;
                                 });
+                                if (collinearBeams.length > 0) return true;
+
+                                return false;
                               };
 
-                              // If the whole wall or all subsegments are covered by frame beams, avoid duplicate beam rendering
-                              if (isSegmentCovered(sX, sY, eX, eY)) return null;
-
-                              const subsegs = splitWallByPillars(w, floorPillars, w.dimensions.unit);
-                              if (subsegs.length > 0 && subsegs.every(seg => isSegmentCovered(toM(seg.start.x), toM(seg.start.y), toM(seg.end.x), toM(seg.end.y)))) {
-                                return null;
-                              }
+                              // If the wall is covered by the structural frame, skip to eliminate duplicate ("double bubble") ring beams
+                              if (isWallCoveredByFrame()) return null;
 
                               const ang = Math.atan2(-(eY - sY), eX - sX);
                               const mX = (sX + eX) / 2;
@@ -3321,7 +3371,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const pStartW = pStart ? toMeters(pStart.width || 9, pStart.unit || 'in') : 0;
                               const pEndW = pEnd ? toMeters(pEnd.width || 9, pEnd.unit || 'in') : 0;
                               const clearSpanWallBeam = Math.max(0.05, len - (pStartW / 2 + pEndW / 2));
-                              const extendedWallBeamLen = len + pStartW / 2 + pEndW / 2;
+                              const extendedWallBeamLen = len;
 
                               return (
                                 <React.Fragment key={`wall-beam-group-${w.id}`}>
@@ -3433,7 +3483,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                       {/* Slabs: Intermediate Floor Slab or Top Roof Slab */}
                       {(() => {
-                        const isSlabEnabled = isTopFloor ? showFullRoof : showFloorSlab;
+                        const isSlabEnabled = (isTopFloor ? showFullRoof : showFloorSlab) && (slabCfg?.enabled !== false);
                         if (!isSlabEnabled && !isRebarActive) return null;
 
                         return (
@@ -3443,7 +3493,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               return (
                                 <group 
                                   key={slabUniqueId}
-                                  position={[slab.centerX, junction.slabCenterY + (slab.elevationOffsetY || 0), -slab.centerY]}
+                                  position={[slab.centerX, (junction.fullRingBeamCenterY ?? junction.slabCenterY) + (slab.elevationOffsetY || 0), -slab.centerY]}
                                 >
                                   {/* Solid / Translucent Concrete Slab */}
                                   {isSlabEnabled && (

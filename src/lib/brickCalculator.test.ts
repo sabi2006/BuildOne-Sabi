@@ -13,6 +13,7 @@ import {
   splitWallByPillars,
   detectClosedStructuralBays,
   detectPillarToPillarBeams,
+  getEffectiveFloorBeams,
   DEFAULT_RCC_FULL_RING_BEAM,
   RCCFullRingBeamConfig,
   DEFAULT_RCC_RING_BEAM,
@@ -24,6 +25,7 @@ import {
   calculateFullRccTopRcc,
   calculateFloorRccEstimate,
   calculateProjectRccEstimate,
+  calculateRccMaterialsFromVolume,
   FoundationFooting,
   FoundationConfig,
   DEFAULT_FOUNDATION_CONFIG,
@@ -2819,11 +2821,12 @@ describe('RCC Ring Beam + Full Ring Beam Physical Connection & Junction Validati
     expect(junc.isJunctionConnected).toBe(true);
     expect(junc.intendedJunctionSurfaceY).toBeCloseTo(expectedWallTop, 4);
 
-    // Slab sits directly on top of Full Ring Beam
-    expect(junc.slabBottomY).toBeCloseTo(junc.fullRingBeamTop, 4);
+    // Slab is centered vertically with RCC Full Ring Beam
+    expect(junc.slabCenterY).toBeCloseTo(junc.fullRingBeamCenterY, 4);
     const expectedSlabH = 1.0 * 0.3048; // 0.3048m
     expect(junc.slabThickness).toBeCloseTo(expectedSlabH, 4);
-    expect(junc.slabTopY).toBeCloseTo(junc.fullRingBeamTop + expectedSlabH, 4);
+    expect(junc.slabTopY).toBeCloseTo(junc.fullRingBeamCenterY + expectedSlabH / 2, 4);
+    expect(junc.slabBottomY).toBeCloseTo(junc.fullRingBeamCenterY - expectedSlabH / 2, 4);
     expect(junc.slabGap).toBe(0);
     expect(junc.isSlabConnected).toBe(true);
   });
@@ -2842,12 +2845,12 @@ describe('RCC Ring Beam + Full Ring Beam Physical Connection & Junction Validati
     expect(calcSlabBottom).toBeCloseTo(junc.slabBottomY, 4);
     expect(calcSlabTop).toBeCloseTo(junc.slabTopY, 4);
 
-    // Crucial: BrickWallTop must equal FullRingBeamBottom, and FullRingBeamTop must equal SlabBottom
+    // Crucial: BrickWallTop must equal FullRingBeamBottom, and FullRingBeamCenterY must equal SlabCenterY
     const beamSurfaceGap = Math.abs(junc.brickWallTop - calcFullBottom);
     expect(beamSurfaceGap).toBeLessThanOrEqual(0.0001);
 
-    const slabSurfaceGap = Math.abs(calcFullTop - calcSlabBottom);
-    expect(slabSurfaceGap).toBeLessThanOrEqual(0.0001);
+    const slabCenterGap = Math.abs(junc.fullRingBeamCenterY - junc.slabCenterY);
+    expect(slabCenterGap).toBeLessThanOrEqual(0.0001);
   });
 
   it('TEST 3: verifies multi-floor continuity: Pillar -> Full Ring Beam -> Slab -> Next Floor Pillar', () => {
@@ -2899,17 +2902,15 @@ describe('RCC Ring Beam + Full Ring Beam Physical Connection & Junction Validati
     expect(junc0.isJunctionConnected).toBe(true);
     expect(junc0.isSlabConnected).toBe(true);
 
-    // Floor 1 column and walls start at Floor 0 slab top
+    // Floor 1 column and walls start at Floor 0 structural top
     const junc1 = getRingBeamJunction(f1, multiModel, junc0.structuralTopY);
     expect(junc1.floorBaseY).toBeCloseTo(junc0.structuralTopY, 4);
-    expect(junc1.floorBaseY).toBeCloseTo(junc0.slabTopY, 4);
     expect(junc1.isJunctionConnected).toBe(true);
     expect(junc1.isSlabConnected).toBe(true);
 
-    // Floor 2 column and walls start at Floor 1 slab top
+    // Floor 2 column and walls start at Floor 1 structural top
     const junc2 = getRingBeamJunction(f2, multiModel, junc1.structuralTopY);
     expect(junc2.floorBaseY).toBeCloseTo(junc1.structuralTopY, 4);
-    expect(junc2.floorBaseY).toBeCloseTo(junc1.slabTopY, 4);
     expect(junc2.isJunctionConnected).toBe(true);
     expect(junc2.isSlabConnected).toBe(true);
 
@@ -2932,15 +2933,14 @@ describe('RCC Ring Beam + Full Ring Beam Physical Connection & Junction Validati
       expect(junc.junctionGap).toBe(0);
       expect(junc.isJunctionConnected).toBe(true);
       expect(junc.fullRingBeamBottom).toBeCloseTo(junc.brickWallTop, 4);
-      expect(junc.slabBottomY).toBeCloseTo(junc.fullRingBeamTop, 4);
+      expect(junc.slabCenterY).toBeCloseTo(junc.fullRingBeamCenterY, 4);
     }
   });
 
-  it('TEST 5: verifies total structural top height equals full ring beam + slab thickness', () => {
+  it('TEST 5: verifies total structural top height equals full ring beam height', () => {
     const junc = getRingBeamJunction(sampleFloor, sampleModel, 0);
-    expect(junc.totalStructuralTopHeight).toBeCloseTo(junc.fullRingBeamHeight + junc.slabThickness, 4);
+    expect(junc.totalStructuralTopHeight).toBeCloseTo(junc.fullRingBeamHeight, 4);
     expect(junc.structuralTopY).toBeCloseTo(junc.brickWallTop + junc.totalStructuralTopHeight, 4);
-    expect(junc.structuralTopY).toBeCloseTo(junc.slabTopY, 4);
   });
 
   it('TEST 6: verifies brick masonry infill bounds (Wall Top === Full Ring Beam Bottom)', () => {
@@ -3252,10 +3252,10 @@ describe('RCC Frame First + Brick Infill Inside Frame Geometry Validation', () =
     expect(junction.junctionGap).toBeLessThan(0.0001);
     expect(junction.slabGap).toBeLessThan(0.0001);
 
-    // Sequence verification: Wall Top -> Full Ring Beam Bottom -> Full Ring Beam Top -> Slab Top
+    // Sequence verification: Wall Top -> Full Ring Beam Bottom, Slab Center -> Full Ring Beam Center
     expect(junction.fullRingBeamBottom).toBe(junction.brickWallTop);
-    expect(junction.slabBottomY).toBe(junction.fullRingBeamTop);
-    expect(junction.structuralTopY).toBe(junction.slabTopY);
+    expect(junction.slabCenterY).toBe(junction.fullRingBeamCenterY);
+    expect(junction.structuralTopY).toBe(junction.topStructuralLineY);
   });
 
   it('TEST 6: Full Roof on topmost floor directly joins RCC Full Ring Beam with zero gap', () => {
@@ -3294,10 +3294,9 @@ describe('RCC Frame First + Brick Infill Inside Frame Geometry Validation', () =
     const gfJunc = getRingBeamJunction(gf, multiModel, 0);
     const topJunc = getRingBeamJunction(topFloor, multiModel, gfJunc.structuralTopY);
 
-    // Full Roof integrates directly on top floor Full Ring Beam top structural line
+    // Full Roof integrates centered on top floor Full Ring Beam
     expect(topJunc.fullRingBeamBottom).toBe(topJunc.brickWallTop);
-    expect(topJunc.slabTopY).toBe(topJunc.fullRingBeamTop);
-    expect(topJunc.slabTopY).toBe(topJunc.topStructuralLineY);
+    expect(topJunc.slabCenterY).toBe(topJunc.fullRingBeamCenterY);
     expect(topJunc.isSlabConnected).toBe(true);
     expect(topJunc.slabGap).toBeLessThan(0.0001);
 
@@ -3372,15 +3371,16 @@ describe('RCC Frame First + Brick Infill Inside Frame Geometry Validation', () =
 
     const model = { buildingLength: 40, buildingWidth: 30, buildingUnit: 'ft' as const, floors: [gf, topFloor] };
     const gfJunc = getRingBeamJunction(gf, model, 0);
+    const topFloorJunc = getRingBeamJunction(topFloor, model, gfJunc.structuralTopY);
     const roofJunc = getFullRoofJunction(topFloor, model, gfJunc.structuralTopY);
 
-    expect(roofJunc.roofTopY).toBe(roofJunc.beamTopY);
-    expect(roofJunc.roofTopY).toBe(roofJunc.topStructuralLineY);
+    expect(roofJunc.roofCenterY).toBe(topFloorJunc.fullRingBeamCenterY);
     expect(roofJunc.junctionGap).toBe(0);
     expect(roofJunc.isJunctionConnected).toBe(true);
     expect(roofJunc.roofThickness).toBeCloseTo((5 / 12) * 0.3048, 4);
-    expect(roofJunc.roofCenterY).toBeCloseTo(roofJunc.topStructuralLineY - roofJunc.roofThickness / 2, 4);
-    expect(roofJunc.roofBottomY).toBeCloseTo(roofJunc.topStructuralLineY - roofJunc.roofThickness, 4);
+    expect(roofJunc.roofCenterY).toBeCloseTo(topFloorJunc.fullRingBeamCenterY, 4);
+    expect(roofJunc.roofBottomY).toBeCloseTo(roofJunc.roofCenterY - roofJunc.roofThickness / 2, 4);
+    expect(roofJunc.roofTopY).toBeCloseTo(roofJunc.roofCenterY + roofJunc.roofThickness / 2, 4);
   });
 
   it('TEST 9: getTopRccStructuralJunction verifies that Full Ring Beam and Full Roof are on ONE continuous top structural line', () => {
@@ -3411,8 +3411,7 @@ describe('RCC Frame First + Brick Infill Inside Frame Geometry Validation', () =
     const gfJunc = getRingBeamJunction(gf, model, 0);
     const topRccJunc = getTopRccStructuralJunction(topFloor, model, gfJunc.structuralTopY);
 
-    expect(topRccJunc.beamTopY).toBe(topRccJunc.topStructuralLineY);
-    expect(topRccJunc.roofTopY).toBe(topRccJunc.topStructuralLineY);
+    expect(topRccJunc.beamReferenceY).toBe(topRccJunc.roofReferenceY);
     expect(topRccJunc.verticalSeparation).toBe(0);
     expect(topRccJunc.isIntegrated).toBe(true);
     expect(topRccJunc.beamBottomY).toBe(topRccJunc.brickWallTop);
@@ -3859,6 +3858,194 @@ describe('RCC Frame First + Brick Infill Inside Frame Geometry Validation', () =
     expect(result.model.pillars!.find(p => p.id === 'gf-p2')?.position).toEqual({ x: 30, y: 0 });
     expect(result.model.pillars!.find(p => p.id === 'f1-p1')?.position).toEqual({ x: 0, y: 0 });
     expect(result.model.pillars!.find(p => p.id === 'f1-p2')?.position).toEqual({ x: 30, y: 0 });
+  });
+});
+
+describe('Phase 5 Stage 1: Core Beam Geometry & RCC Estimation De-duplication', () => {
+  const defaultSettings: CalculatorSettings = {
+    selectedBrickId: 'red_brick_standard',
+    includeWastage: true,
+    wastagePercentage: 5,
+    includeLaborCost: false,
+    mortarRatio: '1:6',
+    safetyMargin: 0,
+    rccReinforcement: DEFAULT_RCC_REINFORCEMENT,
+    rates: {
+      sandPricePerCft: 55,
+      cementBagPrice: 400,
+      brickPrice: 8.5,
+      steelRatePerKg: 65,
+      aggregatePricePerCft: 45
+    }
+  };
+
+  it('TEST 1: calculates correct RCC beam volume on open structural bays with zero walls', () => {
+    // 4 pillars forming an open porch / car port (40 ft x 30 ft) with NO walls
+    const porchPillars: Pillar[] = [
+      { id: 'p1', name: 'P1', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 0, y: 0 }, shape: 'square' },
+      { id: 'p2', name: 'P2', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 40, y: 0 }, shape: 'square' },
+      { id: 'p3', name: 'P3', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 40, y: 30 }, shape: 'square' },
+      { id: 'p4', name: 'P4', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 0, y: 30 }, shape: 'square' },
+    ];
+
+    // Frame beams should be detected even when walls array is completely empty
+    const beams = getEffectiveFloorBeams(porchPillars, [], 'ft');
+    expect(beams.length).toBe(4);
+
+    const totalBeamLenFt = beams.reduce((sum, b) => sum + b.length, 0);
+    expect(totalBeamLenFt).toBeCloseTo(140, 1);
+
+    // Calculate ring beam concrete volume from structural frame beams
+    const ringBeamConfig: RCCRingBeamConfig = { enabled: true, height: 2, heightUnit: 'ft', width: 9, widthUnit: 'in', depth: 9, depthUnit: 'in' };
+    const res = calculateRingBeamsRcc([], ringBeamConfig, 'ft', DEFAULT_RCC_REINFORCEMENT, beams);
+
+    // 140 ft * (9/12 ft) * 2 ft = 210 CFT = 5.946 m³
+    expect(res.concreteVolumeCft).toBeCloseTo(210, 1);
+    expect(res.concreteVolumeM3).toBeCloseTo(5.95, 2);
+    expect(res.steelKg).toBeGreaterThan(0);
+
+    // Verify through calculateFloorRccEstimate on open bay floor
+    const openFloor: Floor = {
+      id: 'open-fl',
+      name: 'Open Porch',
+      level: 0,
+      height: 10,
+      unit: 'ft',
+      externalWalls: [],
+      internalWalls: [],
+      pillars: porchPillars,
+      ringBeam: ringBeamConfig,
+      fullRingBeam: { enabled: false, thicknessFt: 1 }
+    };
+
+    const floorEst = calculateFloorRccEstimate(openFloor, porchPillars, 'ft', defaultSettings);
+    expect(floorEst.elements.ringBeams.concreteVolumeCft).toBeCloseTo(210, 1);
+    expect(floorEst.elements.ringBeams.concreteVolumeM3).toBeGreaterThan(0);
+  });
+
+  it('TEST 2: excludes internal non-structural partition walls from structural beam calculations', () => {
+    const extWalls: Wall[] = [
+      { id: 'w1', name: 'Front Wall', start: { x: 0, y: 0 }, end: { x: 40, y: 0 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w2', name: 'Right Wall', start: { x: 40, y: 0 }, end: { x: 40, y: 30 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w3', name: 'Back Wall', start: { x: 40, y: 30 }, end: { x: 0, y: 30 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w4', name: 'Left Wall', start: { x: 0, y: 30 }, end: { x: 0, y: 0 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    ];
+
+    // Non-structural 4.5" interior partition walls
+    const partitionWalls: Wall[] = [
+      { id: 'pw1', name: 'Toilet Partition', start: { x: 10, y: 0 }, end: { x: 10, y: 10 }, dimensions: { length: 10, height: 10, thickness: 4.5, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'pw2', name: 'Internal Wall Partition', start: { x: 20, y: 10 }, end: { x: 20, y: 30 }, dimensions: { length: 20, height: 10, thickness: 4.5, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    ];
+
+    const ringBeamConfig: RCCRingBeamConfig = { enabled: true, height: 1, heightUnit: 'ft', width: 9, widthUnit: 'in', depth: 9, depthUnit: 'in' };
+
+    // Estimation with ONLY external walls
+    const extOnlyRes = calculateRingBeamsRcc(extWalls, ringBeamConfig, 'ft');
+
+    // Estimation with external walls + non-structural partition walls
+    const withPartitionsRes = calculateRingBeamsRcc([...extWalls, ...partitionWalls], ringBeamConfig, 'ft');
+
+    // Both must yield the exact same perimeter beam volume (140 ft * 0.75 ft * 1 ft = 105 CFT)
+    expect(extOnlyRes.concreteVolumeCft).toBeCloseTo(105, 1);
+    expect(withPartitionsRes.concreteVolumeCft).toBeCloseTo(extOnlyRes.concreteVolumeCft, 2);
+    expect(withPartitionsRes.lengthM).toBeCloseTo(extOnlyRes.lengthM, 2);
+    expect(withPartitionsRes.steelKg).toBeCloseTo(extOnlyRes.steelKg, 2);
+  });
+
+  it('TEST 3: eliminates double-counting between Full Ring Beam and Floor RCC Slab', () => {
+    const pillars: Pillar[] = [
+      { id: 'p1', name: 'P1', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 0, y: 0 }, shape: 'square' },
+      { id: 'p2', name: 'P2', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 40, y: 0 }, shape: 'square' },
+      { id: 'p3', name: 'P3', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 40, y: 30 }, shape: 'square' },
+      { id: 'p4', name: 'P4', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 0, y: 30 }, shape: 'square' },
+    ];
+
+    const floor: Floor = {
+      id: 'fl-dedup',
+      name: 'Standard Floor',
+      level: 0,
+      height: 10,
+      unit: 'ft',
+      externalWalls: [],
+      internalWalls: [],
+      pillars,
+      fullRingBeam: { enabled: true, thicknessFt: 1, width: 9 }, // 1 ft high, 9 in wide linear beams
+      slab: { enabled: true, thickness: 5, thicknessUnit: 'in', overhang: 0 } // 5 in planar slab
+    };
+
+    const est = calculateFloorRccEstimate(floor, pillars, 'ft', defaultSettings, { buildingLength: 40, buildingWidth: 30 });
+
+    // 1. Pillar volume: 4 * (9/12 * 9/12 * 10) = 22.5 CFT
+    const expectedPillarCft = 4 * (0.75 * 0.75 * 10);
+    expect(est.elements.pillars.concreteVolumeCft).toBeCloseTo(expectedPillarCft, 1);
+
+    // 2. Linear Frame Beams: 140 ft * 0.75 ft * 1 ft = 105 CFT
+    const expectedBeamCft = 140 * 0.75 * 1.0;
+    expect(est.elements.ringBeams.concreteVolumeCft).toBeCloseTo(expectedBeamCft, 1);
+
+    // 3. Planar Floor Slab: Footprint is ~40.75 ft x 30.75 ft * (5/12 ft) ~ 522 CFT
+    expect(est.elements.slab!.concreteVolumeCft).toBeGreaterThan(450);
+    expect(est.elements.slab!.concreteVolumeCft).toBeLessThan(550);
+
+    // 4. Crucial: Total floor concrete MUST equal Pillars + Linear Beams + Planar Slab
+    const expectedTotalCft = est.elements.pillars.concreteVolumeCft + est.elements.ringBeams.concreteVolumeCft + est.elements.slab!.concreteVolumeCft;
+    expect(est.concreteVolumeCft).toBeCloseTo(expectedTotalCft, 2);
+
+    // Ensure it did NOT calculate an extra 1-foot solid slab plate (~1250 CFT) on top of the 5" slab
+    expect(est.concreteVolumeCft).toBeLessThan(1000);
+  });
+
+  it('TEST 4: preserves orthogonal geometry and clean endpoints with shifted pillar alignments', () => {
+    const walls: Wall[] = [
+      { id: 'w1', start: { x: 0, y: 0 }, end: { x: 40, y: 0 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w2', start: { x: 40, y: 0 }, end: { x: 40, y: 30 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w3', start: { x: 40, y: 30 }, end: { x: 0, y: 30 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w4', start: { x: 0, y: 30 }, end: { x: 0, y: 0 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    ];
+
+    // Pillars with 14" size and outside_corner / custom_offset alignments
+    const shiftedPillars: Pillar[] = [
+      { id: 'c1', name: 'C1', width: 14, depth: 14, height: 10, count: 1, unit: 'in', position: { x: 0, y: 0 }, alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'c2', name: 'C2', width: 14, depth: 14, height: 10, count: 1, unit: 'in', position: { x: 20, y: 0 }, alignment: 'centre', placementType: 'intermediate' },
+      { id: 'c3', name: 'C3', width: 14, depth: 14, height: 10, count: 1, unit: 'in', position: { x: 40, y: 0 }, alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'c4', name: 'C4', width: 14, depth: 14, height: 10, count: 1, unit: 'in', position: { x: 40, y: 30 }, alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'c5', name: 'C5', width: 14, depth: 14, height: 10, count: 1, unit: 'in', position: { x: 0, y: 30 }, alignment: 'outside_corner', placementType: 'corner' },
+    ];
+
+    const beams = detectPillarToPillarBeams(shiftedPillars, 'ft', walls);
+    expect(beams.length).toBeGreaterThanOrEqual(5);
+
+    // Verify strict orthogonality: horizontal beams have dy === 0, vertical beams have dx === 0
+    beams.forEach(b => {
+      const dx = Math.abs(b.end.x - b.start.x);
+      const dy = Math.abs(b.end.y - b.start.y);
+      const isStrictlyOrthogonal = dx < 0.001 || dy < 0.001;
+      expect(isStrictlyOrthogonal).toBe(true);
+      expect(b.length).toBeGreaterThan(0.5);
+    });
+
+    // Verify endpoints meet effective coordinates without diagonal slanting
+    const b_c1_c2 = beams.find(b => (b.startPillarId === 'c1' && b.endPillarId === 'c2') || (b.startPillarId === 'c2' && b.endPillarId === 'c1'));
+    expect(b_c1_c2).toBeDefined();
+    expect(b_c1_c2!.start.y).toBeCloseTo(b_c1_c2!.end.y, 4); // Perfectly horizontal
+  });
+
+  it('TEST 5: maintains backward compatibility for wall-based ring beam calculations without pillars', () => {
+    const pureWalls: Wall[] = [
+      { id: 'w1', name: 'W1', start: { x: 0, y: 0 }, end: { x: 20, y: 0 }, dimensions: { length: 20, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w2', name: 'W2', start: { x: 20, y: 0 }, end: { x: 20, y: 20 }, dimensions: { length: 20, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w3', name: 'W3', start: { x: 20, y: 20 }, end: { x: 0, y: 20 }, dimensions: { length: 20, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+      { id: 'w4', name: 'W4', start: { x: 0, y: 20 }, end: { x: 0, y: 0 }, dimensions: { length: 20, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    ];
+
+    const ringBeamConfig: RCCRingBeamConfig = { enabled: true, height: 2, heightUnit: 'ft', width: 9, widthUnit: 'in', depth: 9, depthUnit: 'in' };
+    
+    // Call calculateRingBeamsRcc without 5th argument
+    const res = calculateRingBeamsRcc(pureWalls, ringBeamConfig, 'ft');
+
+    // 80 ft * 0.75 ft * 2 ft = 120 CFT
+    expect(res.concreteVolumeCft).toBeCloseTo(120, 1);
+    expect(res.lengthM).toBeCloseTo(toMeters(80, 'ft'), 2);
   });
 });
 

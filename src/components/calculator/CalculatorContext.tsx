@@ -22,7 +22,8 @@ import {
   toMeters,
   calculateBuildingStructuralSummary,
   generateFootingsForPillars,
-  getConcreteMixRatios
+  getConcreteMixRatios,
+  getEffectiveFloorBeams
 } from "@/lib/brickCalculator";
 
 export type { CalculatorMode };
@@ -125,7 +126,14 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
         ...buildingModel,
         buildingConfig: buildingModel.buildingConfig || buildingConfig
       };
-      return calculateProject({ walls: [], pillars: modelWithConfig.pillars || [], buildingModel: modelWithConfig }, brickType, settings);
+      const allModelPillars = (modelWithConfig.floors && modelWithConfig.floors.length > 0)
+        ? modelWithConfig.floors.flatMap(f => f.pillars || [])
+        : (modelWithConfig.pillars || []);
+      return calculateProject({
+        walls: [],
+        pillars: allModelPillars.length > 0 ? allModelPillars : (modelWithConfig.pillars || []),
+        buildingModel: modelWithConfig
+      }, brickType, settings);
     }
     return calculateProject({ walls, pillars }, brickType, settings);
   }, [walls, pillars, buildingModel, buildingConfig, brickType, settings, activeTab]);
@@ -257,6 +265,17 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
         equipmentCost: 0
       };
 
+      // Attach detected structural frame beams to each floor for accurate structural calculation
+      const updatedFloorsWithBeams = updatedFloors.map(fl => {
+        const flPillars = allPillars.filter(p => p.floorId === fl.id || (!p.floorId && fl.level === 0));
+        const flWalls = [...fl.externalWalls, ...fl.internalWalls];
+        const flBeams = getEffectiveFloorBeams(flPillars, flWalls, prevModel.buildingUnit || 'ft');
+        return {
+          ...fl,
+          detectedBeams: flBeams
+        };
+      });
+
       const structuralSummary = calculateBuildingStructuralSummary(
         allPillars,
         allWallsForStructural,
@@ -264,7 +283,7 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
         bWidthM,
         nextConfig,
         structuralRates,
-        updatedFloors,
+        updatedFloorsWithBeams,
         prevModel.roofSlab
       );
 

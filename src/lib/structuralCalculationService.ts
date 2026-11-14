@@ -518,6 +518,8 @@ export function calculatePillarStructuralDetails(
     isGroundLevel?: boolean;
     supportedFloors?: number;
     singleFloorHeightM?: number;
+    customBeamWidthMm?: number;
+    customBeamDepthMm?: number;
   }
 ): ColumnStructuralCalculation {
   // 1. Determine Surrounding Spans & Tributary Area (Handbook Section 3.3)
@@ -606,9 +608,11 @@ export function calculatePillarStructuralDetails(
   const wallThicknessM = 0.23; // 9" wall
   const wallLoadKn = tributaryWallLengthM * floorHeightM * wallThicknessM * masonryUnitWeightKnM3;
 
-  // Beam self-weight (9"x12" = 0.23m x 0.30m)
+  // Beam self-weight (using configured beam cross-section or default 0.23m x 0.30m)
+  const beamWidthM = overrides?.customBeamWidthMm ? (overrides.customBeamWidthMm * 0.001) : 0.23;
+  const beamDepthM = overrides?.customBeamDepthMm ? (overrides.customBeamDepthMm * 0.001) : 0.30;
   const beamSpanM = (tributaryLengthM + tributaryWidthM);
-  const beamSelfWeightKn = beamSpanM * 0.23 * 0.30 * concreteUnitWeightKnM3;
+  const beamSelfWeightKn = beamSpanM * beamWidthM * beamDepthM * concreteUnitWeightKnM3;
 
   // Estimated column self-weight (using custom override if provided or trial 0.23x0.30m)
   const initialColW_m = overrides?.customWidthMm ? (overrides.customWidthMm * 0.001) : 0.23;
@@ -919,6 +923,8 @@ export function calculateBuildingStructuralSummary(
     name?: string;
     floorId?: string;
     isCustomSize?: boolean;
+    isStoreyOverride?: boolean;
+    verticalColumnId?: string;
     height?: number;
     heightUnit?: Unit;
     position?: { x: number; y: number };
@@ -1014,6 +1020,21 @@ export function calculateBuildingStructuralSummary(
 
   const hasMultiFloorPillars = pillars.some(p => p.floorId && p.floorId !== 'floor-0' && p.floorId !== 'ground');
 
+  // Determine floor-level beam dimensions for pillar self-weight calculation
+  const floorRingBeamMap = new Map<string, { widthMm: number; depthMm: number }>();
+  if (Array.isArray(floorsData)) {
+    floorsData.forEach(fl => {
+      const rb = (fl as any).ringBeam;
+      if (rb) {
+        const wMm = rb.width !== undefined ? Math.round(toMeters(rb.width, rb.widthUnit || 'in') * 1000) : 230;
+        const dMm = rb.depth !== undefined 
+          ? Math.round(toMeters(rb.depth, rb.depthUnit || 'in') * 1000) 
+          : (rb.height !== undefined ? Math.round(toMeters(rb.height, rb.heightUnit || 'ft') * 1000) : 300);
+        floorRingBeamMap.set((fl as any).id, { widthMm: wMm, depthMm: dMm });
+      }
+    });
+  }
+
   // Analyze each pillar individually
   const pillarsCalculations: ColumnStructuralCalculation[] = pillars.map((p, idx) => {
     const pCoords = coordsList[idx];
@@ -1039,6 +1060,10 @@ export function calculateBuildingStructuralSummary(
         : (floorHeightsM && floorHeightsM[floorIdx >= 0 ? floorIdx : 0] ? floorHeightsM[floorIdx >= 0 ? floorIdx : 0] : undefined);
     }
 
+    const flRing = p.floorId ? floorRingBeamMap.get(p.floorId) : undefined;
+    const configuredBeamWidthMm = flRing ? flRing.widthMm : undefined;
+    const configuredBeamDepthMm = flRing ? flRing.depthMm : undefined;
+
     return calculatePillarStructuralDetails(
       p.id,
       p.name || `C${idx + 1}`,
@@ -1050,14 +1075,69 @@ export function calculateBuildingStructuralSummary(
       wallLenConnected,
       config,
       {
-        customWidthMm: (p.isCustomSize && p.width) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
-        customDepthMm: (p.isCustomSize && p.depth) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
+        customWidthMm: (p.width && (p.isCustomSize || p.width !== 9)) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
+        customDepthMm: (p.depth && (p.isCustomSize || p.depth !== 9)) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
         floorHeights: floorHeightsM,
         isGroundLevel: isGround,
         supportedFloors,
-        singleFloorHeightM
+        singleFloorHeightM,
+        customBeamWidthMm: configuredBeamWidthMm,
+        customBeamDepthMm: configuredBeamDepthMm
       }
     );
+  });
+
+  // Maintain uniform column cross-section from bottom (ground floor) to top floor along each vertical column shaft.
+  // As per real-world construction and IS 456 practice, columns maintain their ground/bottom cross-section throughout all storeys.
+  const shaftMaxDimensions = new Map<string, { widthMm: number; depthMm: number; barCount: number; barDiaMm: number }>();
+
+  pillars.forEach((p, idx) => {
+    if (p.isStoreyOverride) return; // Independent storey override does not alter continuous shaft master
+    const calc = pillarsCalculations[idx];
+    if (!calc) return;
+    const pX = p.position ? p.position.x : (p.x || 0);
+    const pY = p.position ? p.position.y : (p.y || 0);
+    const shaftKey = p.verticalColumnId || `${Math.round(toMeters(pX, 'ft') * 10)}_${Math.round(toMeters(pY, 'ft') * 10)}`;
+    const existing = shaftMaxDimensions.get(shaftKey);
+    if (!existing) {
+      shaftMaxDimensions.set(shaftKey, {
+        widthMm: calc.providedWidthMm,
+        depthMm: calc.providedDepthMm,
+        barCount: calc.providedBarCount,
+        barDiaMm: calc.providedBarDiaMm
+      });
+    } else {
+      shaftMaxDimensions.set(shaftKey, {
+        widthMm: Math.max(existing.widthMm, calc.providedWidthMm),
+        depthMm: Math.max(existing.depthMm, calc.providedDepthMm),
+        barCount: Math.max(existing.barCount, calc.providedBarCount),
+        barDiaMm: Math.max(existing.barDiaMm, calc.providedBarDiaMm)
+      });
+    }
+  });
+
+  // Apply the uniform bottom-to-top column section along each vertical shaft
+  pillars.forEach((p, idx) => {
+    const calc = pillarsCalculations[idx];
+    if (!calc) return;
+    const pX = p.position ? p.position.x : (p.x || 0);
+    const pY = p.position ? p.position.y : (p.y || 0);
+    const shaftKey = p.verticalColumnId || `${Math.round(toMeters(pX, 'ft') * 10)}_${Math.round(toMeters(pY, 'ft') * 10)}`;
+    const shaft = shaftMaxDimensions.get(shaftKey);
+    if (shaft && !p.isStoreyOverride) {
+      calc.providedWidthMm = shaft.widthMm;
+      calc.providedDepthMm = shaft.depthMm;
+      calc.providedGrossAreaAgMm2 = shaft.widthMm * shaft.depthMm;
+      calc.providedBarCount = Math.max(calc.providedBarCount, shaft.barCount);
+      calc.providedBarDiaMm = Math.max(calc.providedBarDiaMm, shaft.barDiaMm);
+
+      const colWidthM = calc.providedWidthMm * 0.001;
+      const colDepthM = calc.providedDepthMm * 0.001;
+      const storeyH = p.height ? toMeters(p.height, p.heightUnit || 'ft') : 3.0;
+      calc.concreteVolumeM3 = colWidthM * colDepthM * storeyH;
+      calc.concreteVolumeCft = calc.concreteVolumeM3 * 35.3147;
+      calc.formworkAreaM2 = 2 * (colWidthM + colDepthM) * storeyH;
+    }
   });
 
   // Load metrics
@@ -1085,24 +1165,80 @@ export function calculateBuildingStructuralSummary(
   const totalPccM3 = pillarsCalculations.reduce((sum, c) => sum + c.footingPccM3, 0);
   const totalColumnRccM3 = pillarsCalculations.reduce((sum, c) => sum + c.concreteVolumeM3, 0);
 
-  // Beams: perimeter and internal spans
-  const totalWallLengthM = walls.reduce((sum, w) => {
-    if (!w) return sum;
-    if (w.dimensions && typeof w.dimensions.length === 'number') {
-      return sum + toMeters(w.dimensions.length, w.dimensions.unit || 'ft');
-    }
-    if (w.start && w.end) {
-      const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
-      return sum + toMeters(len, 'ft');
-    }
-    return sum;
-  }, 0);
-  const beamWidthM = 0.23;
-  const beamDepthM = 0.30;
-  // If walls array already contains walls across all floors, do not multiply by numFloors again
-  const wallsHaveFloorIds = walls.some(w => (w as any).floorId && (w as any).floorId !== 'floor-0' && (w as any).floorId !== 'ground');
-  const beamMultiplier = wallsHaveFloorIds ? 1 : numFloors;
-  const totalBeamRccM3 = beamMultiplier * (totalWallLengthM * beamWidthM * beamDepthM);
+  // Beams: perimeter and internal structural frame spans
+  let totalBeamRccM3 = 0;
+  let totalBeamFormworkM2 = 0;
+
+  if (Array.isArray(floorsData) && floorsData.length > 0) {
+    floorsData.forEach(fl => {
+      const ringBeam = (fl as any).ringBeam;
+      if (ringBeam && ringBeam.enabled === false) return;
+
+      const beamWidthM = ringBeam?.width !== undefined 
+        ? toMeters(ringBeam.width, ringBeam.widthUnit || 'in') 
+        : 0.23;
+      const beamDepthM = ringBeam?.depth !== undefined 
+        ? toMeters(ringBeam.depth, ringBeam.depthUnit || 'in') 
+        : (ringBeam?.height !== undefined ? toMeters(ringBeam.height, ringBeam.heightUnit || 'ft') : 0.30);
+
+      // 1. Check for explicit structural frame beams on this floor (e.g. from getEffectiveFloorBeams)
+      const flBeams: any[] = (fl as any).detectedBeams || (fl as any).structuralBeams || [];
+      if (flBeams.length > 0) {
+        const floorBeamLenM = flBeams.reduce((sum, b) => sum + toMeters(b.length, b.unit || 'ft'), 0);
+        totalBeamRccM3 += floorBeamLenM * beamWidthM * beamDepthM;
+        totalBeamFormworkM2 += floorBeamLenM * (beamWidthM + 2 * beamDepthM);
+      } else {
+        // 2. Fallback to structural load-bearing walls on this floor (strictly excluding thin 4.5" partitions)
+        const flWalls: any[] = [...((fl as any).externalWalls || []), ...((fl as any).internalWalls || [])];
+        const structuralWalls = flWalls.filter(w => {
+          if (!w) return false;
+          const thick = w.dimensions?.thickness;
+          const tM = thick !== undefined ? toMeters(thick, w.dimensions?.thicknessUnit || 'in') : 0.23;
+          return tM >= 0.15; // exclude partitions <= 5 inches (0.127m)
+        });
+
+        const floorWallLenM = structuralWalls.reduce((sum, w) => {
+          if (w.dimensions && typeof w.dimensions.length === 'number') {
+            return sum + toMeters(w.dimensions.length, w.dimensions.unit || 'ft');
+          }
+          if (w.start && w.end) {
+            const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
+            return sum + toMeters(len, 'ft');
+          }
+          return sum;
+        }, 0);
+
+        totalBeamRccM3 += floorWallLenM * beamWidthM * beamDepthM;
+        totalBeamFormworkM2 += floorWallLenM * (beamWidthM + 2 * beamDepthM);
+      }
+    });
+  } else {
+    // Single-floor or standalone test fallback
+    const beamWidthM = 0.23;
+    const beamDepthM = 0.30;
+    const structuralWalls = (walls || []).filter(w => {
+      if (!w) return false;
+      const thick = w.dimensions?.thickness;
+      const tM = thick !== undefined ? toMeters(thick, w.dimensions?.thicknessUnit || 'in') : 0.23;
+      return tM >= 0.15;
+    });
+
+    const totalWallLengthM = structuralWalls.reduce((sum, w) => {
+      if (w.dimensions && typeof w.dimensions.length === 'number') {
+        return sum + toMeters(w.dimensions.length, w.dimensions.unit || 'ft');
+      }
+      if (w.start && w.end) {
+        const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
+        return sum + toMeters(len, 'ft');
+      }
+      return sum;
+    }, 0);
+
+    const wallsHaveFloorIds = walls.some(w => (w as any).floorId && (w as any).floorId !== 'floor-0' && (w as any).floorId !== 'ground');
+    const beamMultiplier = wallsHaveFloorIds ? 1 : numFloors;
+    totalBeamRccM3 = beamMultiplier * (totalWallLengthM * beamWidthM * beamDepthM);
+    totalBeamFormworkM2 = beamMultiplier * totalWallLengthM * (beamWidthM + 2 * beamDepthM);
+  }
 
   // Slabs: calculated from individual floor slabs + independent roof slab
   let totalSlabRccM3 = 0;
@@ -1164,7 +1300,7 @@ export function calculateBuildingStructuralSummary(
 
   // Formwork
   const columnFormworkM2 = pillarsCalculations.reduce((sum, c) => sum + c.formworkAreaM2, 0);
-  const beamFormworkM2 = beamMultiplier * totalWallLengthM * (beamWidthM + 2 * beamDepthM);
+  const beamFormworkM2 = totalBeamFormworkM2;
   const slabFormworkM2 = numFloors * singleFloorAreaM2;
   const totalFormworkAreaM2 = columnFormworkM2 + beamFormworkM2 + slabFormworkM2;
 
@@ -1215,6 +1351,7 @@ export function calculateBuildingStructuralSummary(
   const slabsTotal = slabConcreteCost + slabSteelCost + slabFormworkCost + slabLabourCost;
 
   // 5. Masonry Costs
+  const wallsHaveFloorIds = walls.some(w => (w as any).floorId && (w as any).floorId !== 'floor-0' && (w as any).floorId !== 'ground');
   const wallThicknessM = 0.23;
   let totalWallAreaM2 = 0;
   let totalOpeningsAreaM2 = 0;

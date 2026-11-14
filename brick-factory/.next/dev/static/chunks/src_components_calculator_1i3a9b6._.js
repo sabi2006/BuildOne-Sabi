@@ -10,14 +10,15 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/structuralCalculationService.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
 const defaultBrick = {
-    ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_TN_RED_BRICK"]
+    ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_TN_RED_BRICK"]
 };
 const defaultSettings = {
     mortarJointHorizontal: 10,
@@ -67,17 +68,25 @@ function CalculatorProvider({ children }) {
     const [settings, setSettings] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(defaultSettings);
     const [hasCalculated, setHasCalculated] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [buildingModel, setBuildingModel] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [buildingConfig, setBuildingConfig] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_BUILDING_CONFIG"]);
     const result = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "CalculatorProvider.useMemo[result]": ()=>{
             // Single Source of Truth Synchronization
             if (activeTab === 'visual' && buildingModel) {
-                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateProject"])({
+                const modelWithConfig = {
+                    ...buildingModel,
+                    buildingConfig: buildingModel.buildingConfig || buildingConfig
+                };
+                const allModelPillars = modelWithConfig.floors && modelWithConfig.floors.length > 0 ? modelWithConfig.floors.flatMap({
+                    "CalculatorProvider.useMemo[result]": (f)=>f.pillars || []
+                }["CalculatorProvider.useMemo[result]"]) : modelWithConfig.pillars || [];
+                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["calculateProject"])({
                     walls: [],
-                    pillars: buildingModel.pillars || [],
-                    buildingModel
+                    pillars: allModelPillars.length > 0 ? allModelPillars : modelWithConfig.pillars || [],
+                    buildingModel: modelWithConfig
                 }, brickType, settings);
             }
-            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateProject"])({
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["calculateProject"])({
                 walls,
                 pillars
             }, brickType, settings);
@@ -86,10 +95,427 @@ function CalculatorProvider({ children }) {
         walls,
         pillars,
         buildingModel,
+        buildingConfig,
         brickType,
         settings,
         activeTab
     ]);
+    const updateBuildingConfig = (updates)=>{
+        setBuildingConfig((prev)=>({
+                ...prev,
+                ...updates
+            }));
+        setBuildingModel((prevModel)=>{
+            if (!prevModel) return null;
+            const nextConfig = {
+                ...prevModel.buildingConfig || buildingConfig,
+                ...updates
+            };
+            let updatedFloors = [
+                ...prevModel.floors
+            ];
+            const target = updates.floorCount !== undefined && updates.floorCount > 0 ? updates.floorCount : updatedFloors.length;
+            const cur = updatedFloors.length;
+            let allPillars = [
+                ...prevModel.pillars || []
+            ];
+            const h = updates.floorHeight || nextConfig.floorHeight || 10;
+            const w = prevModel.buildingLength || 30;
+            const d = prevModel.buildingWidth || 30;
+            const t = prevModel.externalWallThickness || 9;
+            // 1. Synchronize floor heights across existing floors
+            updatedFloors = updatedFloors.map((fl)=>({
+                    ...fl,
+                    height: h,
+                    externalWalls: fl.externalWalls.map((ew)=>({
+                            ...ew,
+                            dimensions: {
+                                ...ew.dimensions,
+                                height: h
+                            }
+                        })),
+                    internalWalls: fl.internalWalls.map((iw)=>({
+                            ...iw,
+                            dimensions: {
+                                ...iw.dimensions,
+                                height: h
+                            }
+                        })),
+                    pillars: (fl.pillars || []).map((p)=>({
+                            ...p,
+                            height: h
+                        }))
+                }));
+            allPillars = allPillars.map((p)=>({
+                    ...p,
+                    height: h
+                }));
+            // 2. Adjust floor count if changed
+            if (target !== cur) {
+                if (target > cur) {
+                    const groundFloor = updatedFloors[0];
+                    const groundPillars = allPillars && allPillars.length > 0 ? allPillars.filter((p)=>!p.floorId || String(p.floorId) === String(groundFloor?.id)) : groundFloor?.pillars || [];
+                    for(let i = cur; i < target; i++){
+                        const newFloorId = `floor-${i}-${Date.now()}`;
+                        // Clone pillars from ground floor along identical structural axes
+                        const floorPillars = groundPillars.map((gp, pIdx)=>({
+                                ...gp,
+                                id: `pillar-${newFloorId}-${pIdx + 1}`,
+                                floorId: newFloorId,
+                                verticalColumnId: gp.verticalColumnId || `col-${pIdx + 1}`,
+                                height: h,
+                                position: gp.position ? {
+                                    ...gp.position
+                                } : undefined
+                            }));
+                        const extWalls = groundFloor?.externalWalls?.map((ew)=>({
+                                ...ew,
+                                id: `${newFloorId}-${ew.name.toLowerCase().replace(/\s+/g, '-')}`,
+                                floorId: newFloorId,
+                                dimensions: {
+                                    ...ew.dimensions,
+                                    height: h
+                                }
+                            })) || [
+                            {
+                                id: `${newFloorId}-front`,
+                                name: 'Front Wall',
+                                floorId: newFloorId,
+                                start: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                end: {
+                                    x: w,
+                                    y: 0
+                                },
+                                dimensions: {
+                                    length: w,
+                                    height: h,
+                                    thickness: t,
+                                    unit: prevModel.buildingUnit,
+                                    thicknessUnit: 'in'
+                                },
+                                openings: []
+                            },
+                            {
+                                id: `${newFloorId}-right`,
+                                name: 'Right Wall',
+                                floorId: newFloorId,
+                                start: {
+                                    x: w,
+                                    y: 0
+                                },
+                                end: {
+                                    x: w,
+                                    y: d
+                                },
+                                dimensions: {
+                                    length: d,
+                                    height: h,
+                                    thickness: t,
+                                    unit: prevModel.buildingUnit,
+                                    thicknessUnit: 'in'
+                                },
+                                openings: []
+                            },
+                            {
+                                id: `${newFloorId}-back`,
+                                name: 'Back Wall',
+                                floorId: newFloorId,
+                                start: {
+                                    x: w,
+                                    y: d
+                                },
+                                end: {
+                                    x: 0,
+                                    y: d
+                                },
+                                dimensions: {
+                                    length: w,
+                                    height: h,
+                                    thickness: t,
+                                    unit: prevModel.buildingUnit,
+                                    thicknessUnit: 'in'
+                                },
+                                openings: []
+                            },
+                            {
+                                id: `${newFloorId}-left`,
+                                name: 'Left Wall',
+                                floorId: newFloorId,
+                                start: {
+                                    x: 0,
+                                    y: d
+                                },
+                                end: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                dimensions: {
+                                    length: d,
+                                    height: h,
+                                    thickness: t,
+                                    unit: prevModel.buildingUnit,
+                                    thicknessUnit: 'in'
+                                },
+                                openings: []
+                            }
+                        ];
+                        const intWalls = groundFloor?.internalWalls?.map((iw, wIdx)=>({
+                                ...iw,
+                                id: `${newFloorId}-int-${wIdx + 1}`,
+                                floorId: newFloorId,
+                                dimensions: {
+                                    ...iw.dimensions,
+                                    height: h
+                                }
+                            })) || [];
+                        updatedFloors.push({
+                            id: newFloorId,
+                            name: `Floor ${i}`,
+                            level: i,
+                            height: h,
+                            unit: prevModel.buildingUnit || 'ft',
+                            externalWalls: extWalls,
+                            internalWalls: intWalls,
+                            pillars: floorPillars,
+                            ringBeam: prevModel.ringBeam ? {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_RING_BEAM"],
+                                ...prevModel.ringBeam
+                            } : {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_RING_BEAM"]
+                            },
+                            fullRingBeam: prevModel.fullRingBeam ? {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_FULL_RING_BEAM"],
+                                ...prevModel.fullRingBeam
+                            } : {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_FULL_RING_BEAM"]
+                            },
+                            slab: prevModel.slab ? {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_SLAB"],
+                                ...prevModel.slab
+                            } : {
+                                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_SLAB"]
+                            },
+                            plaster: prevModel.plaster ? {
+                                ...prevModel.plaster
+                            } : undefined
+                        });
+                        allPillars.push(...floorPillars);
+                    }
+                } else {
+                    const keptFloorIds = new Set(updatedFloors.slice(0, target).map((f)=>f.id));
+                    allPillars = allPillars.filter((p)=>!p.floorId || keptFloorIds.has(p.floorId));
+                    updatedFloors.length = target;
+                }
+            }
+            // 3. Dynamic Column Cross-Section & Reinforcement Calculation
+            const bLengthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(prevModel.buildingLength || 30, prevModel.buildingUnit || 'ft');
+            const bWidthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(prevModel.buildingWidth || 30, prevModel.buildingUnit || 'ft');
+            const allWallsForStructural = updatedFloors.flatMap((f)=>[
+                    ...f.externalWalls,
+                    ...f.internalWalls
+                ]);
+            const fineAggRate = nextConfig.fineAggregateType === 'river_sand' ? 80 : 55;
+            const cr = nextConfig.customRates || {};
+            const structuralRates = {
+                cementBagPrice: cr.cementBagPrice || 400,
+                sandPricePerCft: cr.sandPricePerCft || fineAggRate,
+                aggregatePricePerCft: cr.aggregatePricePerCft ?? 45,
+                steelRatePerKg: cr.steelRatePerKg || 65,
+                brickPrice: cr.brickPrice || 8.5,
+                excavationRatePerM3: cr.excavationRatePerM3 || 250,
+                pccRatePerM3: cr.pccLabourRatePerM3 || 3200,
+                footingLabourRatePerM3: cr.footingLabourRatePerM3 || 3500,
+                columnLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+                beamLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+                slabLabourRatePerM3: cr.columnLabourRatePerM3 || 3500,
+                masonWagePerDay: cr.masonWagePerDay || 900,
+                helperWagePerDay: cr.helperWagePerDay || 600,
+                formworkRatePerM2: cr.formworkRatePerM2 || 350,
+                wastagePercent: cr.wastagePercent ?? 5,
+                overheadPercent: 5,
+                contingencyPercent: cr.contingencyPercent ?? 5,
+                taxPercent: cr.taxPercent ?? 18,
+                transportCost: 0,
+                equipmentCost: 0
+            };
+            // Attach detected structural frame beams to each floor for accurate structural calculation
+            const updatedFloorsWithBeams = updatedFloors.map((fl)=>{
+                const flPillars = allPillars.filter((p)=>p.floorId === fl.id || !p.floorId && fl.level === 0);
+                const flWalls = [
+                    ...fl.externalWalls,
+                    ...fl.internalWalls
+                ];
+                const flBeams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectiveFloorBeams"])(flPillars, flWalls, prevModel.buildingUnit || 'ft');
+                return {
+                    ...fl,
+                    detectedBeams: flBeams
+                };
+            });
+            const structuralSummary = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateBuildingStructuralSummary"])(allPillars, allWallsForStructural, bLengthM, bWidthM, nextConfig, structuralRates, updatedFloorsWithBeams, prevModel.roofSlab);
+            // Mutate pillar dimensions and rebar according to calculated loads
+            const calcMap = new Map(structuralSummary.pillarsCalculations.map((c)=>[
+                    c.pillarId,
+                    c
+                ]));
+            allPillars = allPillars.map((p)=>{
+                const calc = calcMap.get(p.id);
+                if (calc) {
+                    const autoW = Math.round(calc.providedWidthMm * (1 / 25.4));
+                    const autoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+                    const widthIn = p.isCustomSize ? p.width : autoW;
+                    const depthIn = p.isCustomSize ? p.depth : autoD;
+                    const provW_m = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(widthIn, p.unit || 'in');
+                    const provD_m = p.shape === 'circular' ? provW_m : (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(depthIn, p.unit || 'in');
+                    const provAreaMm2 = provW_m * 1000 * (provD_m * 1000);
+                    const structuralWarning = provAreaMm2 < calc.requiredGrossAreaAgMm2 ? `Section ${widthIn}"×${depthIn}" (${Math.round(provAreaMm2)} mm²) is below IS 456 required area (${Math.round(calc.requiredGrossAreaAgMm2)} mm²) for ${calc.factoredUltimateLoadKn.toFixed(0)} kN load. Recommend minimum ${Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4))}"×${Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4))}".` : undefined;
+                    return {
+                        ...p,
+                        width: widthIn,
+                        depth: depthIn,
+                        unit: 'in',
+                        structuralWarning,
+                        structuralRole: calc.role,
+                        rebarConfig: {
+                            pillarMainBarCount: calc.providedBarCount,
+                            pillarMainBarDiaMm: calc.providedBarDiaMm,
+                            pillarStirrupDiaMm: calc.stirrupDiaMm,
+                            pillarStirrupSpacingMm: calc.stirrupSpacingMm,
+                            pillarCoverMm: 40,
+                            mainSteelWeightKg: calc.mainSteelWeightKg,
+                            stirrupSteelWeightKg: calc.stirrupWeightKg
+                        },
+                        structuralData: {
+                            role: calc.role,
+                            tributaryAreaM2: calc.tributaryAreaM2,
+                            tributaryAreaSqFt: calc.tributaryAreaSqFt,
+                            serviceLoadKn: calc.totalServiceLoadKn,
+                            factoredLoadKn: calc.factoredUltimateLoadKn,
+                            capacityKn: calc.axialCapacityPuzKn,
+                            capacityUtilization: calc.capacityUtilizationRatio,
+                            slendernessRatio: calc.slendernessRatioLambda,
+                            isShortColumn: calc.isShortColumn,
+                            requiredAgMm2: calc.requiredGrossAreaAgMm2,
+                            providedAgMm2: calc.providedGrossAreaAgMm2,
+                            steelPercentage: calc.steelPercentageP
+                        },
+                        calculatedFooting: {
+                            lengthM: calc.providedFootingLengthM,
+                            widthM: calc.providedFootingWidthM,
+                            depthM: calc.providedFootingDepthM,
+                            areaM2: calc.requiredFootingAreaM2,
+                            serviceLoadKn: calc.serviceFootingLoadKn,
+                            excavationM3: calc.footingExcavationM3,
+                            pccM3: calc.footingPccM3,
+                            rccM3: calc.footingRccM3,
+                            steelKg: calc.footingSteelKg
+                        }
+                    };
+                }
+                return p;
+            });
+            // Synchronize updated pillars back into each floor
+            updatedFloors = updatedFloors.map((fl)=>({
+                    ...fl,
+                    pillars: allPillars.filter((p)=>p.floorId === fl.id)
+                }));
+            // 4. Update foundation configuration & footings dynamically
+            const groundFloor = updatedFloors[0];
+            const gfPillars = allPillars.filter((p)=>!p.floorId || String(p.floorId) === String(groundFloor?.id));
+            const fType = nextConfig.foundationType || prevModel.foundation?.foundationType || 'isolated';
+            const fDepthFt = nextConfig.foundationDepthM ? nextConfig.foundationDepthM * 3.28084 : prevModel.foundation?.depth || 5.0;
+            const updatedFoundation = {
+                ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_FOUNDATION_CONFIG"],
+                ...prevModel.foundation || {},
+                enabled: true,
+                autoGenerateMode: true,
+                foundationType: fType,
+                soilBearingCapacityKnM2: nextConfig.allowableSoilBearingPressureKnM2 || 150,
+                soilClassification: nextConfig.soilClassification,
+                soilType: nextConfig.soilClassification,
+                depth: fDepthFt,
+                defaultExcavationDepth: fDepthFt,
+                concreteGrade: nextConfig.concreteGrade
+            };
+            updatedFoundation.footings = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateFootingsForPillars"])(gfPillars, updatedFoundation, prevModel.buildingUnit || 'ft', nextConfig, updatedFloors.length);
+            return {
+                ...prevModel,
+                buildingConfig: nextConfig,
+                structuralSummary,
+                foundation: updatedFoundation,
+                floors: updatedFloors,
+                pillars: allPillars
+            };
+        });
+        const cr = updates.customRates || {};
+        const fineAggRate = updates.fineAggregateType === 'river_sand' ? 80 : 55;
+        const sandPricePerCft = cr.sandPricePerCft || fineAggRate;
+        const aggPricePerCft = cr.aggregatePricePerCft ?? 45;
+        const mix = updates.concreteGrade ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getConcreteMixRatios"])(updates.concreteGrade) : undefined;
+        setSettings((prev)=>({
+                ...prev,
+                ...updates.concreteGrade && mix ? {
+                    concreteGrade: updates.concreteGrade,
+                    rccConcreteMixRatio: mix.ratioString,
+                    rccCementRatio: mix.cement,
+                    rccSandRatio: mix.sand,
+                    rccAggregateRatio: mix.aggregate
+                } : {},
+                ...cr.cementBagPrice !== undefined ? {
+                    cementPrice: cr.cementBagPrice
+                } : {},
+                ...sandPricePerCft !== undefined ? {
+                    sandPrice: sandPricePerCft * 35.3147,
+                    sandPricePerCft
+                } : {},
+                ...aggPricePerCft !== undefined ? {
+                    aggregatePrice: aggPricePerCft * 35.3147,
+                    aggregatePricePerCft: aggPricePerCft
+                } : {},
+                ...cr.steelRatePerKg !== undefined ? {
+                    steelRate: cr.steelRatePerKg
+                } : {},
+                ...cr.brickPrice !== undefined ? {
+                    brickPrice: cr.brickPrice
+                } : {},
+                ...cr.sandFillRatePerCft !== undefined ? {
+                    sandFillRatePerCft: cr.sandFillRatePerCft
+                } : {},
+                ...cr.excavationRatePerM3 !== undefined ? {
+                    excavationRatePerM3: cr.excavationRatePerM3
+                } : {},
+                ...cr.pccLabourRatePerM3 !== undefined ? {
+                    pccLabourRatePerM3: cr.pccLabourRatePerM3
+                } : {},
+                ...cr.footingLabourRatePerM3 !== undefined ? {
+                    footingLabourRatePerM3: cr.footingLabourRatePerM3
+                } : {},
+                ...cr.columnLabourRatePerM3 !== undefined ? {
+                    rccLabourRate: cr.columnLabourRatePerM3,
+                    pillarLabourRatePerM3: cr.columnLabourRatePerM3
+                } : {},
+                ...cr.masonWagePerDay !== undefined ? {
+                    masonWagePerDay: cr.masonWagePerDay
+                } : {},
+                ...cr.helperWagePerDay !== undefined ? {
+                    helperWagePerDay: cr.helperWagePerDay
+                } : {},
+                ...cr.formworkRatePerM2 !== undefined ? {
+                    formworkRatePerM2: cr.formworkRatePerM2
+                } : {},
+                ...cr.wastagePercent !== undefined ? {
+                    wastagePercentage: cr.wastagePercent
+                } : {},
+                ...cr.contingencyPercent !== undefined ? {
+                    contingencyPercent: cr.contingencyPercent
+                } : {},
+                ...cr.taxPercent !== undefined ? {
+                    taxPercent: cr.taxPercent
+                } : {}
+            }));
+    };
     const calculate = ()=>{
         setHasCalculated(true);
     };
@@ -150,6 +576,7 @@ function CalculatorProvider({ children }) {
         setBrickType(defaultBrick);
         setSettings(defaultSettings);
         setBuildingModel(null);
+        setBuildingConfig(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_BUILDING_CONFIG"]);
         setHasCalculated(false);
     };
     const loadProject = (projectData)=>{
@@ -157,6 +584,7 @@ function CalculatorProvider({ children }) {
         if (projectData.model) {
             setBuildingModel(projectData.model);
             if (projectData.model.buildingUnit) setGlobalUnit(projectData.model.buildingUnit);
+            if (projectData.model.buildingConfig) setBuildingConfig(projectData.model.buildingConfig);
         }
         if (projectData.settings) {
             setSettings((prev)=>({
@@ -184,6 +612,7 @@ function CalculatorProvider({ children }) {
             result,
             hasCalculated,
             buildingModel,
+            buildingConfig,
             setActiveTab,
             setMode,
             setDifficulty,
@@ -198,6 +627,7 @@ function CalculatorProvider({ children }) {
             removeOpening,
             setBrickType,
             updateSettings,
+            updateBuildingConfig,
             setBuildingModel,
             loadProject,
             calculate,
@@ -206,11 +636,11 @@ function CalculatorProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/components/calculator/CalculatorContext.tsx",
-        lineNumber: 187,
+        lineNumber: 499,
         columnNumber: 5
     }, this);
 }
-_s(CalculatorProvider, "nb+P1n6SDZzVwSvmxZsauAkIopI=");
+_s(CalculatorProvider, "hBV0McPwL2Bd8qxiWYd/Fqsa+jI=");
 _c = CalculatorProvider;
 function useCalculator() {
     _s1();
@@ -4275,7 +4705,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$t
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$core$2f$Center$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@react-three/drei/core/Center.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@react-three/drei/web/Html.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$CalculatorContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/calculator/CalculatorContext.tsx [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$box$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/box.mjs [app-client] (ecmascript) <export default as Box>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs [app-client] (ecmascript) <export default as AlertTriangle>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/3d/SharedBrickWall.tsx [app-client] (ecmascript)");
@@ -4413,8 +4843,8 @@ function StructurePreview3D() {
                 ...wW,
                 openings: leftOpenings
             };
-            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wallFront.dimensions.length, wallFront.dimensions.unit);
-            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wallRight.dimensions.length, wallRight.dimensions.unit);
+            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wallFront.dimensions.length, wallFront.dimensions.unit);
+            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wallRight.dimensions.length, wallRight.dimensions.unit);
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -4648,9 +5078,9 @@ function StructurePreview3D() {
             const wN = walls[0];
             const wE = walls[1] || walls[0];
             const wW = walls[2] || walls[0];
-            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wN.dimensions.length, wN.dimensions.unit);
-            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wE.dimensions.length, wE.dimensions.unit);
-            const lW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wW.dimensions.length, wW.dimensions.unit);
+            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wN.dimensions.length, wN.dimensions.unit);
+            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wE.dimensions.length, wE.dimensions.unit);
+            const lW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wW.dimensions.length, wW.dimensions.unit);
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SharedBrickWall"], {
@@ -4750,8 +5180,8 @@ function StructurePreview3D() {
         }
         if (mode === 'compound') {
             const w = walls[0];
-            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.dimensions.length, w.dimensions.unit);
-            const h = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.dimensions.height, w.dimensions.unit);
+            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.dimensions.length, w.dimensions.unit);
+            const h = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.dimensions.height, w.dimensions.unit);
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SharedBrickWall"], {
@@ -4775,9 +5205,9 @@ function StructurePreview3D() {
                         }).map((_, i)=>{
                             const spacing = l / (pillars[0].count - 1 || 1);
                             const x = -l / 2 + i * spacing;
-                            const pW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pillars[0].width, pillars[0].unit);
-                            const pD = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pillars[0].depth, pillars[0].unit);
-                            const pH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pillars[0].height, pillars[0].unit);
+                            const pW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pillars[0].width, pillars[0].unit);
+                            const pD = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pillars[0].depth, pillars[0].unit);
+                            const pH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pillars[0].height, pillars[0].unit);
                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                                 position: [
                                     x,
@@ -4829,8 +5259,8 @@ function StructurePreview3D() {
             // Simplified small building layout (outer box + simple partition)
             const wN = walls[0];
             const wE = walls[1] || walls[0];
-            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wN.dimensions.length, wN.dimensions.unit);
-            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wE.dimensions.length, wE.dimensions.unit);
+            const lN = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wN.dimensions.length, wN.dimensions.unit);
+            const lE = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wE.dimensions.length, wE.dimensions.unit);
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SharedBrickWall"], {
@@ -4978,7 +5408,7 @@ function StructurePreview3D() {
         // Multiple mode (side by side)
         let currentX = 0;
         return walls.map((wall, index)=>{
-            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
+            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
             const posX = currentX + l / 2;
             currentX += l + 1; // 1m gap
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SharedBrickWall"], {
@@ -5530,15 +5960,15 @@ function VisualEstimator() {
         setStep(2);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "w-full max-w-7xl mx-auto py-6 sm:py-8",
+        className: "w-full max-w-none px-0 sm:px-1 py-1",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex bg-gray-100 rounded-lg p-1 mb-6 shadow-sm border border-gray-200",
+                className: "flex bg-slate-100 rounded-lg p-1 mb-2.5 shadow-2xs border border-slate-200",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>setStep(1),
-                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex-1 py-2.5 text-sm font-bold rounded-md text-center transition-all", step === 1 ? "bg-white text-orange-600 shadow" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"),
-                        children: "Step 1: Interactive Wall Editor"
+                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex-1 py-2 text-xs sm:text-sm font-bold rounded-md text-center transition-all cursor-pointer", step === 1 ? "bg-white text-orange-600 shadow-xs" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"),
+                        children: "Step 1: Interactive 2D Plan & Structural Editor"
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/VisualEstimator.tsx",
                         lineNumber: 30,
@@ -5546,8 +5976,8 @@ function VisualEstimator() {
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>setStep(2),
-                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex-1 py-2.5 text-sm font-bold rounded-md text-center transition-all", step === 2 ? "bg-white text-orange-600 shadow" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"),
-                        children: "Step 2: Comprehensive AI Estimate"
+                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex-1 py-2 text-xs sm:text-sm font-bold rounded-md text-center transition-all cursor-pointer", step === 2 ? "bg-white text-orange-600 shadow-xs" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"),
+                        children: "Step 2: 3D Visualization & Comprehensive AI Estimate"
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/VisualEstimator.tsx",
                         lineNumber: 39,
@@ -5560,7 +5990,7 @@ function VisualEstimator() {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "w-full bg-white shadow rounded-lg p-4 sm:p-6 border border-gray-200",
+                className: "w-full bg-white shadow-xs rounded-lg sm:rounded-xl p-1.5 sm:p-2.5 lg:p-3 border border-slate-200/90",
                 children: [
                     step === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$BuildingEditor$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BuildingEditor"], {
                         initialDetails: aiDetails,

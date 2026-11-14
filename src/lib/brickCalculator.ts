@@ -149,6 +149,7 @@ export interface Pillar {
   };
   calculatedLoadKn?: number;
   isCustomSize?: boolean;
+  isStoreyOverride?: boolean;
   structuralWarning?: string;
 }
 
@@ -827,42 +828,89 @@ export interface StructuralBeam {
   start: Coordinate;
   end: Coordinate;
   length: number;
+  width?: number;
+  depth?: number;
+  unit?: Unit;
 }
 
 /**
- * Detect all adjacent pillar-to-pillar structural beams along rows and columns of pillars.
+ * Detect all adjacent pillar-to-pillar structural frame beams along rows and columns of pillars.
+ * Uses effective pillar coordinates to ensure endpoints align with shifted pillar placements
+ * (e.g. outside-corner, flush-exterior, custom-offset) while strictly preserving orthogonal alignment.
  */
 export const detectPillarToPillarBeams = (
   pillars: Pillar[] = [],
-  buildingUnit: Unit = 'ft',
-  walls: Wall[] = []
+  unitOrWalls: Unit | Wall[] = 'ft',
+  wallsOrUnit: Wall[] | Unit = []
 ): StructuralBeam[] => {
-  const validPillars = pillars.filter(p => p.position && p.showIn3D !== false);
+  let buildingUnit: Unit = 'ft';
+  let walls: Wall[] = [];
+
+  if (typeof unitOrWalls === 'string') {
+    buildingUnit = unitOrWalls as Unit;
+    if (Array.isArray(wallsOrUnit)) {
+      walls = wallsOrUnit;
+    }
+  } else if (Array.isArray(unitOrWalls)) {
+    walls = unitOrWalls;
+    if (typeof wallsOrUnit === 'string') {
+      buildingUnit = wallsOrUnit as Unit;
+    }
+  }
+
+  const getPillarPos = (p: Pillar): Coordinate => {
+    const rawPos = p.position ? { x: p.position.x, y: p.position.y } : { x: p.x ?? 0, y: p.y ?? 0 };
+    // If pillar has explicit alignment or custom offset, compute effective position based on alignment & connected walls
+    if ((p.alignment && p.alignment !== 'centre') || p.customOffsetX !== undefined || p.customOffsetY !== undefined) {
+      return getEffectivePillarPosition(p, walls, buildingUnit);
+    }
+    return rawPos;
+  };
+
+  const validPillars = pillars.filter(p => (p.position || p.x !== undefined) && p.showIn3D !== false);
   if (validPillars.length < 2) return [];
 
   const tol = 1.0; // 1 ft clustering tolerance
   const beams: StructuralBeam[] = [];
   const beamKeys = new Set<string>();
 
-  const addBeam = (p1: Pillar, p2: Pillar) => {
-    if (!p1.position || !p2.position || p1.id === p2.id) return;
+  const addBeam = (p1: Pillar, p2: Pillar, isHorizontal?: boolean, fixedCoord?: number) => {
+    if (p1.id === p2.id) return;
     const key = [p1.id, p2.id].sort().join('--');
     if (beamKeys.has(key)) return;
     beamKeys.add(key);
 
-    const eff1 = getEffectivePillarPosition(p1, walls, buildingUnit);
-    const eff2 = getEffectivePillarPosition(p2, walls, buildingUnit);
+    const pos1 = getPillarPos(p1);
+    const pos2 = getPillarPos(p2);
 
-    const len = Math.hypot(eff2.x - eff1.x, eff2.y - eff1.y);
+    let sX = pos1.x;
+    let sY = pos1.y;
+    let eX = pos2.x;
+    let eY = pos2.y;
+
+    // Enforce perfectly straight beams along the primary orthogonal axes
+    // Prevents any bending or slanted jogs caused by corner pillar alignments or size differences
+    if (isHorizontal !== undefined && fixedCoord !== undefined) {
+      if (isHorizontal) {
+        sY = fixedCoord;
+        eY = fixedCoord;
+      } else {
+        sX = fixedCoord;
+        eX = fixedCoord;
+      }
+    }
+
+    const len = Math.hypot(eX - sX, eY - sY);
     if (len <= 0.1) return;
 
     beams.push({
       id: `beam-${p1.id}-${p2.id}`,
       startPillarId: p1.id,
       endPillarId: p2.id,
-      start: { x: eff1.x, y: eff1.y },
-      end: { x: eff2.x, y: eff2.y },
-      length: len
+      start: { x: sX, y: sY },
+      end: { x: eX, y: eY },
+      length: len,
+      unit: buildingUnit
     });
   };
 
@@ -882,24 +930,117 @@ export const detectPillarToPillarBeams = (
   };
 
   // Horizontal structural lines (same Y, connect consecutive sorted by X)
-  const yGroups = clusterByCoord(validPillars, p => getEffectivePillarPosition(p, walls, buildingUnit).y);
+  const yGroups = clusterByCoord(validPillars, p => getPillarPos(p).y);
   for (const group of yGroups) {
-    group.sort((a, b) => getEffectivePillarPosition(a, walls, buildingUnit).x - getEffectivePillarPosition(b, walls, buildingUnit).x);
+    // Canonical reference Y coordinate across the entire horizontal frame line
+    const avgY = group.reduce((sum, p) => sum + getPillarPos(p).y, 0) / group.length;
+    const refY = Math.round(avgY * 1000) / 1000;
+    group.sort((a, b) => getPillarPos(a).x - getPillarPos(b).x);
     for (let i = 0; i < group.length - 1; i++) {
-      addBeam(group[i], group[i + 1]);
+      addBeam(group[i], group[i + 1], true, refY);
     }
   }
 
   // Vertical structural lines (same X, connect consecutive sorted by Y)
-  const xGroups = clusterByCoord(validPillars, p => getEffectivePillarPosition(p, walls, buildingUnit).x);
+  const xGroups = clusterByCoord(validPillars, p => getPillarPos(p).x);
   for (const group of xGroups) {
-    group.sort((a, b) => getEffectivePillarPosition(a, walls, buildingUnit).y - getEffectivePillarPosition(b, walls, buildingUnit).y);
+    // Canonical reference X coordinate across the entire vertical frame line
+    const avgX = group.reduce((sum, p) => sum + getPillarPos(p).x, 0) / group.length;
+    const refX = Math.round(avgX * 1000) / 1000;
+    group.sort((a, b) => getPillarPos(a).y - getPillarPos(b).y);
     for (let i = 0; i < group.length - 1; i++) {
-      addBeam(group[i], group[i + 1]);
+      addBeam(group[i], group[i + 1], false, refX);
     }
   }
 
   return beams;
+};
+
+/**
+ * Reusable single source of truth for floor beam geometry.
+ * Detects structural pillar-to-pillar frame beams using effective pillar coordinates,
+ * and falls back to perimeter walls only when no structural pillar frame exists.
+ * Filters out internal non-structural partition walls.
+ */
+export const getEffectiveFloorBeams = (
+  pillars: Pillar[] = [],
+  walls: Wall[] = [],
+  buildingUnit: Unit = 'ft',
+  options?: {
+    fallbackToWalls?: boolean;
+    externalWallsOnly?: boolean;
+    beamWidth?: number;
+    beamDepth?: number;
+  }
+): StructuralBeam[] => {
+  // 1. Detect structural frame beams between pillars
+  const frameBeams = detectPillarToPillarBeams(pillars, buildingUnit, walls);
+
+  // If frame beams exist, they represent the primary structural frame for this floor
+  if (frameBeams.length > 0) {
+    if (options?.beamWidth || options?.beamDepth) {
+      return frameBeams.map(b => ({
+        ...b,
+        width: options.beamWidth,
+        depth: options.beamDepth,
+        unit: buildingUnit
+      }));
+    }
+    return frameBeams;
+  }
+
+  // 2. If no frame beams exist and fallbackToWalls is enabled (default true)
+  const shouldFallback = options?.fallbackToWalls !== false;
+  if (!shouldFallback || walls.length === 0) {
+    return [];
+  }
+
+  // Filter out internal non-structural partition walls
+  const isInternalPartition = (w: Wall): boolean => {
+    if ((w as any).isInternal === true) return true;
+    if (w.name && /internal|partition/i.test(w.name)) return true;
+    const thickM = toMeters(w.dimensions?.thickness || 9, w.dimensions?.thicknessUnit || 'in');
+    if (thickM <= 0.13) return true; // <= ~5 inches is non-structural partition
+    return false;
+  };
+
+  const candidateWalls = options?.externalWallsOnly 
+    ? walls.filter(w => !isInternalPartition(w) && !(w as any).floorInternal)
+    : walls.filter(w => !isInternalPartition(w));
+
+  const fallbackBeams: StructuralBeam[] = [];
+  candidateWalls.forEach(w => {
+    if (w.start && w.end) {
+      const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
+      if (len > 0.1) {
+        fallbackBeams.push({
+          id: `wall-beam-${w.id}`,
+          startPillarId: `wall-start-${w.id}`,
+          endPillarId: `wall-end-${w.id}`,
+          start: { x: w.start.x, y: w.start.y },
+          end: { x: w.end.x, y: w.end.y },
+          length: len,
+          width: options?.beamWidth,
+          depth: options?.beamDepth,
+          unit: buildingUnit
+        });
+      }
+    } else if (w.dimensions?.length && w.dimensions.length > 0.1) {
+      fallbackBeams.push({
+        id: `wall-beam-${w.id}`,
+        startPillarId: `wall-start-${w.id}`,
+        endPillarId: `wall-end-${w.id}`,
+        start: { x: 0, y: 0 },
+        end: { x: w.dimensions.length, y: 0 },
+        length: w.dimensions.length,
+        width: options?.beamWidth,
+        depth: options?.beamDepth,
+        unit: buildingUnit
+      });
+    }
+  });
+
+  return fallbackBeams;
 };
 
 
@@ -1082,9 +1223,14 @@ export const trimWallByPillars = (
   pillars: Pillar[] = [],
   buildingUnit: Unit = 'ft'
 ): { start: Coordinate; end: Coordinate; length: number; trimStart: number; trimEnd: number } => {
+  if (!wall.start || !wall.end) {
+    const len = wall.dimensions?.length || 0;
+    return { start: { x: 0, y: 0 }, end: { x: len, y: 0 }, length: len, trimStart: 0, trimEnd: 0 };
+  }
   const segments = splitWallByPillars(wall, pillars, buildingUnit);
   if (segments.length === 0) {
-    return { start: wall.start || { x: 0, y: 0 }, end: wall.end || { x: 0, y: 0 }, length: 0, trimStart: 0, trimEnd: 0 };
+    const origLen = Math.hypot((wall.end?.x || 0) - (wall.start?.x || 0), (wall.end?.y || 0) - (wall.start?.y || 0)) || (wall.dimensions?.length || 0);
+    return { start: wall.start, end: wall.end, length: origLen, trimStart: 0, trimEnd: 0 };
   }
   const firstSeg = segments[0];
   const lastSeg = segments[segments.length - 1];
@@ -1576,6 +1722,9 @@ export interface FootingItemEstimate {
   cementBagsPcc?: number;
   cementBagsRcc?: number;
   cementBagsStub?: number;
+  rccStubVolumeM3?: number;
+  costRccStub?: number;
+  costRccFooting?: number;
 
   mainSteelKg: number;
   distSteelKg: number;
@@ -2157,7 +2306,8 @@ export const calculateRingBeamsRcc = (
   walls: Wall[] = [],
   ringBeamConfig?: RCCRingBeamConfig,
   buildingUnit: Unit = 'ft',
-  reinf: RCCReinforcementConfig = DEFAULT_RCC_REINFORCEMENT
+  reinf: RCCReinforcementConfig = DEFAULT_RCC_REINFORCEMENT,
+  structuralBeams?: StructuralBeam[]
 ): {
   concreteVolumeM3: number;
   concreteVolumeCft: number;
@@ -2165,7 +2315,7 @@ export const calculateRingBeamsRcc = (
   coverBlocks: number;
   lengthM: number;
 } => {
-  if (!ringBeamConfig || ringBeamConfig.enabled === false || walls.length === 0) {
+  if (!ringBeamConfig || ringBeamConfig.enabled === false) {
     return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, lengthM: 0 };
   }
 
@@ -2176,20 +2326,46 @@ export const calculateRingBeamsRcc = (
   }
 
   let totalLengthM = 0;
-  walls.forEach(w => {
-    if (w.start && w.end) {
-      const sX = toMeters(w.start.x, w.dimensions.unit);
-      const sY = toMeters(w.start.y, w.dimensions.unit);
-      const eX = toMeters(w.end.x, w.dimensions.unit);
-      const eY = toMeters(w.end.y, w.dimensions.unit);
-      const len = Math.hypot(eX - sX, eY - sY);
-      if (len > 0.05) {
-        totalLengthM += len;
+
+  // 1. Calculate beam volume from actual structural frame spans when provided
+  if (structuralBeams && structuralBeams.length > 0) {
+    structuralBeams.forEach(b => {
+      const lenM = toMeters(b.length, b.unit || buildingUnit);
+      if (lenM > 0.05) {
+        totalLengthM += lenM;
       }
-    } else if (w.dimensions?.length) {
-      totalLengthM += toMeters(w.dimensions.length, w.dimensions.unit);
-    }
-  });
+    });
+  } else if (walls.length > 0) {
+    // 2. Safe backward-compatible wall-based fallback (when no structural frame beams exist)
+    const isInternalPartition = (w: Wall): boolean => {
+      if ((w as any).isInternal === true) return true;
+      if (w.name && /internal|partition/i.test(w.name)) return true;
+      const thickM = toMeters(w.dimensions?.thickness || 9, w.dimensions?.thicknessUnit || 'in');
+      if (thickM <= 0.13) return true; // <= ~5 inches is a non-structural partition wall
+      return false;
+    };
+
+    walls.forEach(w => {
+      if (isInternalPartition(w)) return; // Exclude non-structural partitions
+
+      if (w.start && w.end) {
+        const sX = toMeters(w.start.x, w.dimensions?.unit || buildingUnit);
+        const sY = toMeters(w.start.y, w.dimensions?.unit || buildingUnit);
+        const eX = toMeters(w.end.x, w.dimensions?.unit || buildingUnit);
+        const eY = toMeters(w.end.y, w.dimensions?.unit || buildingUnit);
+        const len = Math.hypot(eX - sX, eY - sY);
+        if (len > 0.05) {
+          totalLengthM += len;
+        }
+      } else if (w.dimensions?.length) {
+        totalLengthM += toMeters(w.dimensions.length, w.dimensions.unit || buildingUnit);
+      }
+    });
+  }
+
+  if (totalLengthM <= 0.05) {
+    return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, lengthM: 0 };
+  }
 
   const concreteVolumeM3 = totalLengthM * beamW_M * beamH_M;
 
@@ -2410,59 +2586,84 @@ export const calculateFloorRccEstimate = (
   // Structural element activation
   const isFullBeamOn = (floor.fullRingBeam?.enabled !== false);
   const isRingBeamOn = (floor.ringBeam?.enabled === true);
+  const isAnyBeamOn = isFullBeamOn || isRingBeamOn;
 
   // A. Pillars
   const pillarRes = calculatePillarsRcc(floorPillars, floor.height, buildingUnit, reinf);
   const pillarMats = calculateRccMaterialsFromVolume(pillarRes.concreteVolumeM3, pillarRes.steelKg, pillarRes.coverBlocks, settings, reinf);
 
-  // B. Ring Beams (only if ring beam is ON and full beam is OFF)
-  const ringBeamRes = isRingBeamOn 
-    ? calculateRingBeamsRcc(allWalls, floor.ringBeam, buildingUnit, reinf)
+  // B. Structural Frame Beams (Linear Frame Spans)
+  const effectiveBeamConfig: RCCRingBeamConfig = {
+    enabled: isAnyBeamOn,
+    height: isFullBeamOn ? (floor.fullRingBeam?.thicknessFt ?? 1) : (floor.ringBeam?.height ?? 2),
+    heightUnit: 'ft',
+    width: isFullBeamOn ? (floor.fullRingBeam?.width ?? 9) : (floor.ringBeam?.width ?? 9),
+    widthUnit: 'in',
+    depth: isFullBeamOn ? (floor.fullRingBeam?.width ?? 9) : (floor.ringBeam?.depth ?? 9),
+    depthUnit: 'in'
+  };
+
+  const floorBeams = getEffectiveFloorBeams(floorPillars, allWalls, buildingUnit);
+
+  const ringBeamRes = isAnyBeamOn
+    ? calculateRingBeamsRcc(allWalls, effectiveBeamConfig, buildingUnit, reinf, floorBeams)
     : { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, lengthM: 0 };
   const ringBeamMats = calculateRccMaterialsFromVolume(ringBeamRes.concreteVolumeM3, ringBeamRes.steelKg, ringBeamRes.coverBlocks, settings, reinf);
 
-  // C. Full RCC Top (only if full beam is ON)
-  const fullRccRes = isFullBeamOn
-    ? calculateFullRccTopRcc(floorPillars, floor.fullRingBeam, buildingUnit, reinf)
-    : { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, areaM2: 0, bayCount: 0 };
-  const fullRccMats = calculateRccMaterialsFromVolume(fullRccRes.concreteVolumeM3, fullRccRes.steelKg, fullRccRes.coverBlocks, settings, reinf);
+  // C. Closed Structural Bays Detection
+  const closedBays = detectClosedStructuralBays(floorPillars, buildingUnit, allWalls);
 
-  // D. Floor RCC Slab (Independent per-floor slab)
+  // D. Floor RCC Slab (Planar Volume)
   const isFloorSlabOn = (floor.slab?.enabled !== false);
   const slabRes = (() => {
-    if (!isFloorSlabOn) return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, areaM2: 0 };
-    const slabThickM = floor.slab?.thickness !== undefined
-      ? toMeters(floor.slab.thickness, floor.slab.thicknessUnit || 'in')
-      : (floor.slab?.height !== undefined ? toMeters(floor.slab.height, floor.slab.heightUnit || 'ft') : toMeters(5, 'in'));
+    if (isFloorSlabOn) {
+      const slabThickM = floor.slab?.thickness !== undefined
+        ? toMeters(floor.slab.thickness, floor.slab.thicknessUnit || 'in')
+        : (floor.slab?.height !== undefined ? toMeters(floor.slab.height, floor.slab.heightUnit || 'ft') : toMeters(5, 'in'));
 
-    let areaM2 = 0;
-    if (floor.slab?.customDimensions && floor.slab.length && floor.slab.width) {
-      areaM2 = toMeters(floor.slab.length, floor.slab.lengthUnit || buildingUnit) * toMeters(floor.slab.width, floor.slab.widthUnit || buildingUnit);
-    } else {
-      const overhangM = floor.slab?.overhang ? toMeters(floor.slab.overhang, floor.slab.overhangUnit || buildingUnit) : 0;
-      const bL = buildingDimensions?.buildingLength || 40;
-      const bW = buildingDimensions?.buildingWidth || 30;
-      const fp = getStructuralRoofFootprint(floor, { buildingLength: bL, buildingWidth: bW, buildingUnit }, floorPillars);
-      areaM2 = (fp.widthM + 2 * overhangM) * (fp.depthM + 2 * overhangM);
+      let areaM2 = 0;
+      if (floor.slab?.customDimensions && floor.slab.length && floor.slab.width) {
+        areaM2 = toMeters(floor.slab.length, floor.slab.lengthUnit || buildingUnit) * toMeters(floor.slab.width, floor.slab.widthUnit || buildingUnit);
+      } else {
+        const overhangM = floor.slab?.overhang ? toMeters(floor.slab.overhang, floor.slab.overhangUnit || buildingUnit) : 0;
+        const bL = buildingDimensions?.buildingLength || 40;
+        const bW = buildingDimensions?.buildingWidth || 30;
+        const fp = getStructuralRoofFootprint(floor, { buildingLength: bL, buildingWidth: bW, buildingUnit }, floorPillars);
+        areaM2 = (fp.widthM + 2 * overhangM) * (fp.depthM + 2 * overhangM);
+      }
+
+      const volM3 = areaM2 * slabThickM;
+      const steelKg = volM3 * 75; // standard RCC slab steel 75 kg/m3
+      const coverBlocks = Math.ceil(areaM2 * 4);
+      return {
+        concreteVolumeM3: volM3,
+        concreteVolumeCft: volM3 * 35.3147,
+        steelKg,
+        coverBlocks,
+        areaM2
+      };
     }
 
-    const volM3 = areaM2 * slabThickM;
-    const steelKg = volM3 * 75; // standard RCC slab steel 75 kg/m3
-    const coverBlocks = Math.ceil(areaM2 * 4);
-    return {
-      concreteVolumeM3: volM3,
-      concreteVolumeCft: volM3 * 35.3147,
-      steelKg,
-      coverBlocks,
-      areaM2
-    };
+    // If floor slab is explicitly disabled, check if Full RCC Top provides bay roof slab
+    if (isFullBeamOn && closedBays.length > 0) {
+      const bayRes = calculateFullRccTopRcc(floorPillars, floor.fullRingBeam, buildingUnit, reinf);
+      return {
+        concreteVolumeM3: bayRes.concreteVolumeM3,
+        concreteVolumeCft: bayRes.concreteVolumeCft,
+        steelKg: bayRes.steelKg,
+        coverBlocks: bayRes.coverBlocks,
+        areaM2: bayRes.areaM2
+      };
+    }
+
+    return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, areaM2: 0 };
   })();
   const slabMats = calculateRccMaterialsFromVolume(slabRes.concreteVolumeM3, slabRes.steelKg, slabRes.coverBlocks, settings, reinf);
 
-  // Floor Cumulative Total
-  const totalFloorConcreteM3 = pillarRes.concreteVolumeM3 + ringBeamRes.concreteVolumeM3 + fullRccRes.concreteVolumeM3 + slabRes.concreteVolumeM3;
-  const totalFloorSteelKg = pillarRes.steelKg + ringBeamRes.steelKg + fullRccRes.steelKg + slabRes.steelKg;
-  const totalFloorCoverBlocks = pillarRes.coverBlocks + ringBeamRes.coverBlocks + fullRccRes.coverBlocks + slabRes.coverBlocks;
+  // De-duplicated Floor Cumulative Total: Pillars + Linear Beams + Planar Slab (No Double Counting!)
+  const totalFloorConcreteM3 = pillarRes.concreteVolumeM3 + ringBeamRes.concreteVolumeM3 + slabRes.concreteVolumeM3;
+  const totalFloorSteelKg = pillarRes.steelKg + ringBeamRes.steelKg + slabRes.steelKg;
+  const totalFloorCoverBlocks = pillarRes.coverBlocks + ringBeamRes.coverBlocks + slabRes.coverBlocks;
 
   const floorMats = calculateRccMaterialsFromVolume(totalFloorConcreteM3, totalFloorSteelKg, totalFloorCoverBlocks, settings, reinf);
 
@@ -2490,7 +2691,7 @@ export const calculateFloorRccEstimate = (
       ringBeams: {
         elementType: 'ringBeam',
         elementName: 'RCC Ring Beams',
-        count: allWalls.length,
+        count: floorBeams.length > 0 ? floorBeams.length : allWalls.length,
         concreteVolumeM3: ringBeamRes.concreteVolumeM3,
         concreteVolumeCft: ringBeamRes.concreteVolumeCft,
         steelKg: ringBeamRes.steelKg,
@@ -2505,17 +2706,17 @@ export const calculateFloorRccEstimate = (
       fullRccTop: {
         elementType: 'fullRccTop',
         elementName: 'Full RCC Top / Roof',
-        count: fullRccRes.bayCount,
-        concreteVolumeM3: fullRccRes.concreteVolumeM3,
-        concreteVolumeCft: fullRccRes.concreteVolumeCft,
-        steelKg: fullRccRes.steelKg,
-        cementBags: fullRccMats.cementBags,
-        sandCft: fullRccMats.sandCft,
-        aggregateCft: fullRccMats.aggregateCft,
-        waterLitres: fullRccMats.waterLitres,
-        bindingWireKg: fullRccMats.bindingWireKg,
-        coverBlocks: fullRccRes.coverBlocks,
-        cost: fullRccMats.costs.total
+        count: closedBays.length,
+        concreteVolumeM3: isFullBeamOn ? slabRes.concreteVolumeM3 : 0,
+        concreteVolumeCft: isFullBeamOn ? slabRes.concreteVolumeCft : 0,
+        steelKg: isFullBeamOn ? slabRes.steelKg : 0,
+        cementBags: isFullBeamOn ? slabMats.cementBags : 0,
+        sandCft: isFullBeamOn ? slabMats.sandCft : 0,
+        aggregateCft: isFullBeamOn ? slabMats.aggregateCft : 0,
+        waterLitres: isFullBeamOn ? slabMats.waterLitres : 0,
+        bindingWireKg: isFullBeamOn ? slabMats.bindingWireKg : 0,
+        coverBlocks: isFullBeamOn ? slabRes.coverBlocks : 0,
+        cost: isFullBeamOn ? slabMats.costs.total : 0
       },
       slab: {
         elementType: 'slab',
@@ -2545,10 +2746,17 @@ export const calculateProjectRccEstimate = (
   roofSlab?: RCCSlabConfig,
   buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit }
 ): RCCProjectEstimate => {
-  const floorEstimates = floors.map(floor => calculateFloorRccEstimate(floor, modelPillars, buildingUnit, settings, buildingDimensions));
-
   // Independent Roof Slab calculation
   const isRoofSlabOn = Boolean(roofSlab && roofSlab.enabled !== false);
+  const floorEstimates = floors.map((floor, fIdx) => {
+    const isTopFloor = fIdx === floors.length - 1;
+    // When an independent top Roof Slab is active, the top floor's overhead slab is estimated as the Roof Slab.
+    // De-duplicate to prevent calculating an intermediate floor slab + roof slab on the same topmost storey.
+    const effectiveFloor = (isTopFloor && isRoofSlabOn && floor.slab?.enabled !== false)
+      ? { ...floor, slab: { ...(floor.slab || DEFAULT_RCC_SLAB), enabled: false } }
+      : floor;
+    return calculateFloorRccEstimate(effectiveFloor, modelPillars, buildingUnit, settings, buildingDimensions);
+  });
   const reinf: RCCReinforcementConfig = {
     ...DEFAULT_RCC_REINFORCEMENT,
     ...(settings.rccReinforcement || {})
@@ -2805,7 +3013,7 @@ export const calculateFootingRcc = (
 
   const totalSteelKg = mainSteelKg + distSteelKg + stubSteelKg;
   const bindingWireKg = (totalSteelKg / 1000) * (reinf.bindingWireKgPerTonneSteel || 10);
-  const coverBlocks = Math.max(4, Math.ceil(fL_M * fW_M * 4)) + Math.max(2, Math.ceil(stubH_M * 2));
+  const coverBlocks = Math.max(4, Math.ceil(fL_M * fW_M * 4)) + (hasStub ? Math.max(2, Math.ceil(stubH_M * 2)) : 0);
 
   // Backfill Volume (Excavation Volume minus Substructure Solid Volume)
   const occupiedM3 = pccVolumeM3 + rccFootingVolumeM3 + stubVolumeM3 + (sandL_M * sandW_M * sandD_M);
@@ -2836,20 +3044,24 @@ export const calculateFootingRcc = (
                       costFootingLabour;
 
   const costStubLabour = stubVolumeM3 * stubLabourRate;
-  const costStub = (stubCementExact * cementPrice) + (stubSandCft * sandRate) + (stubAggregateCft * aggPrice) +
-                   (stubSteelKg * steelRate) + 
-                   ((stubSteelKg / 1000) * (reinf.bindingWireKgPerTonneSteel || 10) * wireRate) + 
-                   (Math.max(2, Math.ceil(stubH_M * 2)) * coverPrice) + 
-                   costStubLabour;
+  const costStub = hasStub ? (
+    (stubCementExact * cementPrice) + (stubSandCft * sandRate) + (stubAggregateCft * aggPrice) +
+    (stubSteelKg * steelRate) + 
+    ((stubSteelKg / 1000) * (reinf.bindingWireKgPerTonneSteel || 10) * wireRate) + 
+    (Math.max(2, Math.ceil(stubH_M * 2)) * coverPrice) + 
+    costStubLabour
+  ) : 0;
 
-  const totalCost = costExc + costSandFill + costPcc + costFooting + costStub;
-
-  const footingCementCost = (rccCementExact + stubCementExact) * cementPrice;
-  const footingSandCost = (rccSandCft + stubSandCft) * sandRate;
-  const footingAggCost = (rccAggregateCft + stubAggregateCft) * aggPrice;
+  const footingCementCost = (pccCementExact + rccCementExact + stubCementExact) * cementPrice;
+  const footingSandCost = (pccSandCft + rccSandCft + stubSandCft) * sandRate;
+  const footingAggCost = (pccAggregateCft + rccAggregateCft + stubAggregateCft) * aggPrice;
   const footingSteelCost = totalSteelKg * steelRate;
   const footingWireCost = bindingWireKg * wireRate;
   const footingCoverCost = coverBlocks * coverPrice;
+
+  const totalCost = costExc + costSandFill + costPccLabour + costFootingLabour + (costStubLabour || 0) +
+                    footingCementCost + footingSandCost + footingAggCost +
+                    footingSteelCost + footingWireCost + footingCoverCost;
 
   return {
     footingId: footing.id,
@@ -2898,6 +3110,9 @@ export const calculateFootingRcc = (
     cementBagsPcc: pccCementBags,
     cementBagsRcc: rccCementBags,
     cementBagsStub: stubCementBags,
+    rccStubVolumeM3: stubVolumeM3,
+    costRccStub: costStub,
+    costRccFooting: costFooting,
 
     mainSteelKg,
     distSteelKg,
@@ -3192,7 +3407,7 @@ export const calculateFoundationEstimate = (
 
   const activeFootings = (foundationConfig?.footings && foundationConfig.footings.length > 0)
     ? foundationConfig.footings.filter(f => f.enabled !== false)
-    : (foundationConfig?.enabled === true && foundationConfig?.autoGenerateMode && groundPillars.length > 0
+    : (foundationConfig?.enabled !== false && groundPillars.length > 0
         ? generateFootingsForPillars(groundPillars, foundationConfig, buildingUnit)
         : []);
 
@@ -3442,7 +3657,7 @@ export const calculatePlasterSurfaceMaterials = (
   }
 
   const thicknessM = toMetersPlaster(config.thickness, config.unit);
-  const thicknessMm = thicknessM * 1000;
+  const thicknessMm = config.unit === 'mm' ? config.thickness : Number((thicknessM * 1000).toFixed(4));
   const wetVolumeM3 = netAreaSqM * thicknessM;
   const wetVolumeCft = wetVolumeM3 * 35.3147;
 
@@ -3964,8 +4179,8 @@ export const calculatePlasterEstimate = (
 
 export const calculateProject = (
   project: { walls: Wall[]; pillars?: Pillar[]; buildingModel?: BuildingModel },
-  brick: BrickSpecification,
-  settings: CalculatorSettings
+  brick: BrickSpecification = DEFAULT_TN_RED_BRICK,
+  settings: CalculatorSettings = {} as CalculatorSettings
 ): CalculationResult => {
   let totalGrossArea = 0;
   let totalOpeningArea = 0;
@@ -3985,11 +4200,14 @@ export const calculateProject = (
   let totalPillarVolume = 0;
   let deductedMasonryVolume = 0;
   const bUnit = project.buildingModel?.buildingUnit || 'ft';
-  const effectivePillars = project.pillars && project.pillars.length > 0 
-    ? project.pillars 
-    : (project.buildingModel?.pillars && project.buildingModel.pillars.length > 0
-        ? project.buildingModel.pillars
-        : project.buildingModel?.floors.flatMap(f => f.pillars || []) || []);
+  const floorPillarsFlat = project.buildingModel?.floors?.flatMap(f => f.pillars || []) || [];
+  const effectivePillars = floorPillarsFlat.length > 0
+    ? floorPillarsFlat
+    : (project.pillars && project.pillars.length > 0 
+        ? project.pillars 
+        : (project.buildingModel?.pillars && project.buildingModel.pillars.length > 0
+            ? project.buildingModel.pillars
+            : []));
 
   // Visual Estimator Building Model (Single Source of Truth synchronization)
   let allModelWalls: Wall[] = [];
@@ -4242,6 +4460,16 @@ export const calculateProject = (
     });
   }
 
+  const effectivePurchaseBricks = floorMasonryEstimates.length > 0
+    ? floorMasonryEstimates.reduce((sum, f) => sum + f.purchaseBrickQuantity, 0)
+    : purchaseBrickQuantity;
+  const effectiveBrickCost = floorMasonryEstimates.length > 0
+    ? floorMasonryEstimates.reduce((sum, f) => sum + f.brickCost, 0)
+    : brickCost;
+  const finalTotalCost = floorMasonryEstimates.length > 0
+    ? effectiveBrickCost + cementCost + sandCost + (settings.labourCost || 0) + (settings.transportCost || 0)
+    : totalCost;
+
   // RCC Pillar Calculation (Backwards compatibility)
   let rccPillarEstimate;
   if (totalPillarVolume > 0) {
@@ -4351,6 +4579,17 @@ export const calculateProject = (
     const bWidthM = toMeters(bModel.buildingWidth, bModel.buildingUnit);
     const allWallsForStructural = bModel.floors.flatMap(f => [...f.externalWalls, ...f.internalWalls]);
 
+    // Attach detected beams to each floor for accurate structural calculation
+    const floorsWithBeams = bModel.floors.map(fl => {
+      const flPillars = fl.pillars || [];
+      const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+      const flBeams = getEffectiveFloorBeams(flPillars, flWalls, bModel.buildingUnit || 'ft');
+      return {
+        ...fl,
+        detectedBeams: flBeams
+      };
+    });
+
     structuralSummary = calculateBuildingStructuralSummary(
       effectivePillars,
       allWallsForStructural,
@@ -4358,7 +4597,7 @@ export const calculateProject = (
       bWidthM,
       bConfig,
       structuralRates,
-      bModel.floors,
+      floorsWithBeams,
       bModel.roofSlab
     );
 
@@ -4366,14 +4605,49 @@ export const calculateProject = (
 
     // Mutate/enrich pillars with calculated structural data for 3D visualization and inspector
     const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
+
+    // Find the bottom / maximum calculated column section for each vertical column shaft
+    const shaftColumnSizes = new Map<string, { width: number; depth: number }>();
+    effectivePillars.forEach(p => {
+      if (p.isStoreyOverride) return; // Independent storey override does not alter continuous shaft master
+      const calc = calcMap.get(p.id);
+      const autoW = calc ? Math.round(calc.providedWidthMm * (1 / 25.4)) : (p.width || 9);
+      const autoD = calc ? Math.round(calc.providedDepthMm * (1 / 25.4)) : (p.depth || 9);
+      const userW = (p.width && p.width > 0) ? p.width : autoW;
+      const userD = (p.depth && p.depth > 0) ? (p.shape === 'circular' ? userW : p.depth) : autoD;
+      const w = p.isCustomSize ? p.width : Math.max(userW, autoW);
+      const d = p.isCustomSize ? p.depth : Math.max(userD, autoD);
+
+      const px = p.position?.x ?? p.x ?? 0;
+      const py = p.position?.y ?? p.y ?? 0;
+      const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+
+      const current = shaftColumnSizes.get(key);
+      if (!current) {
+        shaftColumnSizes.set(key, { width: w, depth: d });
+      } else {
+        shaftColumnSizes.set(key, {
+          width: Math.max(current.width, w),
+          depth: Math.max(current.depth, d)
+        });
+      }
+    });
+
     effectivePillars.forEach(p => {
       const calc = calcMap.get(p.id);
+      const px = p.position?.x ?? p.x ?? 0;
+      const py = p.position?.y ?? p.y ?? 0;
+      const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+      const shaft = shaftColumnSizes.get(key);
+
       if (calc) {
         p.structuralRole = calc.role;
-        // Never overwrite manually customized width or depth
-        if (!p.isCustomSize) {
-          p.width = Math.round(calc.providedWidthMm * (1 / 25.4));
-          p.depth = Math.round(calc.providedDepthMm * (1 / 25.4));
+        // Keep continuous shaft dimensions synchronized unless user explicitly decoupled this storey
+        if (!p.isStoreyOverride) {
+          const autoW = shaft ? shaft.width : Math.round(calc.providedWidthMm * (1 / 25.4));
+          const autoD = shaft ? shaft.depth : Math.round(calc.providedDepthMm * (1 / 25.4));
+          p.width = autoW;
+          p.depth = autoD;
           p.unit = 'in';
         }
 
@@ -4428,8 +4702,9 @@ export const calculateProject = (
     });
 
     // Keep individual floor pillars synchronized with structural dimensions
-    bModel.floors.forEach(fl => {
-      fl.pillars = effectivePillars.filter(p => p.floorId === fl.id);
+    bModel.floors.forEach((fl, fIdx) => {
+      const isGround = fIdx === 0 || fl.level === 0 || fl.id === 'floor-0';
+      fl.pillars = effectivePillars.filter(p => p.floorId === fl.id || (isGround && (!p.floorId || p.floorId === 'ground')));
     });
   }
 
@@ -4464,7 +4739,12 @@ export const calculateProject = (
   // Foundation Estimate (Strictly Ground Floor / Sub-grade level)
   let foundationEstimate: FoundationEstimate | undefined;
   const fConfig = project.buildingModel?.foundation;
-  if (fConfig && fConfig.enabled !== false && ((fConfig.footings && fConfig.footings.length > 0) || (fConfig.autoGenerateMode && effectivePillars.length > 0))) {
+  const isFoundationActive = fConfig && (
+    fConfig.enabled === true ||
+    (fConfig.footings && fConfig.footings.length > 0) ||
+    (fConfig.enabled !== false && effectivePillars.length > 0)
+  );
+  if (isFoundationActive && fConfig) {
     const gfPillars = effectivePillars.filter(p => !p.floorId || p.floorId === 'floor-0' || p.floorId === 'ground');
     if ((fConfig.footings && fConfig.footings.length > 0) || gfPillars.length > 0) {
       foundationEstimate = calculateFoundationEstimate(
@@ -4492,22 +4772,22 @@ export const calculateProject = (
     wastagePercentage,
     wastageBricks,
     finalBrickQuantityExact,
-    purchaseBrickQuantity,
-    totalBricks,
+    purchaseBrickQuantity: effectivePurchaseBricks,
+    totalBricks: effectivePurchaseBricks,
     brickPrice,
     wetMortarVolume,
     dryMortarVolume,
     cementBags,
     sandVolume,
     costs: {
-      bricks: brickCost,
+      bricks: effectiveBrickCost,
       cement: cementCost,
       sand: sandCost,
       labour: settings.labourCost || 0,
       transport: settings.transportCost || 0,
-      total: totalCost
+      total: finalTotalCost
     },
-    totalCost,
+    totalCost: finalTotalCost,
     sandVolumeCft: sandVolume * 35.3147,
     floorMasonryEstimates,
     rccPillarEstimate,
@@ -4765,17 +5045,26 @@ export function getRingBeamJunction(
   const totalBeamHeight = fullRingBeamHeight;
   const beamTopY = fullRingBeamTop;
 
-  // Slab dimensions: derived strictly from the active floor's independent slab configuration
-  const floorSlab = floor.slab ?? model.slab;
+  // Slab dimensions: derived strictly from the active floor's independent slab configuration or full roof
+  const floorSlab: RCCSlabConfig | undefined = (floor.fullRoof && floor.fullRoof.enabled !== false && floor.fullRoof.thickness !== undefined)
+    ? { 
+        enabled: true, 
+        thickness: floor.fullRoof.thickness, 
+        thicknessUnit: floor.fullRoof.thicknessUnit,
+        height: toMeters(floor.fullRoof.thickness, floor.fullRoof.thicknessUnit || 'in') / 0.3048,
+        heightUnit: 'ft'
+      }
+    : (floor.slab ?? model.slab);
   const slabH = floorSlab?.thickness !== undefined
     ? toMeters(floorSlab.thickness, floorSlab.thicknessUnit || 'in')
     : (floorSlab?.height !== undefined ? toMeters(floorSlab.height, floorSlab.heightUnit || 'ft') : toMeters(5, 'in'));
   const slabThickness = slabH;
 
-  const slabTopY = topStructuralLineY;
-  const slabBottomY = topStructuralLineY - slabThickness;
-  const slabCenterY = topStructuralLineY - slabThickness / 2;
-  const slabGap = Math.abs(beamTopY - slabTopY);
+  // Center both the concrete floor slab / roof slab and its steel rebar mesh vertically to the RCC ring beam layer
+  const slabCenterY = fullRingBeamCenterY;
+  const slabTopY = fullRingBeamCenterY + slabThickness / 2;
+  const slabBottomY = fullRingBeamCenterY - slabThickness / 2;
+  const slabGap = Math.abs(fullRingBeamCenterY - slabCenterY);
   const isSlabConnected = slabGap <= 0.0001;
 
   // Column joint and next floor base:
@@ -4855,11 +5144,11 @@ export function getFullRoofJunction(
   const roofThickness = model.roofSlab?.thickness !== undefined
     ? toMeters(model.roofSlab.thickness, model.roofSlab.thicknessUnit || 'in')
     : ringJunc.slabThickness;
-  const roofBottomY = topStructuralLineY - roofThickness;
-  const roofCenterY = topStructuralLineY - roofThickness / 2;
-  const roofTopY = topStructuralLineY;
-  const junctionY = topStructuralLineY;
-  const junctionGap = Math.abs(roofTopY - beamTopY);
+  const roofCenterY = ringJunc.fullRingBeamCenterY;
+  const roofTopY = ringJunc.fullRingBeamCenterY + roofThickness / 2;
+  const roofBottomY = ringJunc.fullRingBeamCenterY - roofThickness / 2;
+  const junctionY = ringJunc.fullRingBeamCenterY;
+  const junctionGap = Math.abs(roofCenterY - ringJunc.fullRingBeamCenterY);
   const isJunctionConnected = junctionGap <= 0.0001;
 
   return {
@@ -4919,12 +5208,12 @@ export function getTopRccStructuralJunction(
   const beamHeight = ringJunc.fullRingBeamHeight;
   const beamWidth = ringJunc.fullRingBeamWidth;
 
-  const roofReferenceY = ringJunc.slabCenterY;
+  const roofReferenceY = ringJunc.fullRingBeamCenterY;
   const roofTopY = ringJunc.slabTopY;
   const roofBottomY = ringJunc.slabBottomY;
   const roofThickness = ringJunc.slabThickness;
 
-  const verticalSeparation = Math.abs(beamTopY - roofTopY);
+  const verticalSeparation = Math.abs(beamReferenceY - roofReferenceY);
   const isIntegrated = verticalSeparation <= 0.0001;
 
   return {
@@ -5131,7 +5420,9 @@ export function applyPillarConfigToAll(
 
   const updatePillarProps = (p: Pillar): Pillar => {
     if (!isTargetPillar(p)) return p;
-    affectedPillarIds.push(p.id);
+    if (!affectedPillarIds.includes(p.id)) {
+      affectedPillarIds.push(p.id);
+    }
 
     const targetDepth = config.shape === 'circular' ? config.width : config.depth;
 

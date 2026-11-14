@@ -28,7 +28,8 @@ import {
   calculateFootingRcc,
   trimWallByPillars, 
   splitWallByPillars,
-  getEffectivePillarPosition, 
+  getEffectivePillarPosition,
+  getEffectiveFloorBeams,
   getPillarWorldPosition,
   worldPositionTo2D,
   validatePillarPlacement,
@@ -1378,7 +1379,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       } : fl);
       return {
         ...prev,
-        ringBeam: updatedBeam,
         floors: updatedFloors
       };
     });
@@ -1408,7 +1408,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       } : fl);
       return {
         ...prev,
-        ringBeam: updatedBeam,
         floors: updatedFloors
       };
     });
@@ -1427,7 +1426,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       } : fl);
       return {
         ...prev,
-        fullRingBeam: updatedFullBeam,
         floors: updatedFloors
       };
     });
@@ -1448,7 +1446,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       } : fl);
       return {
         ...prev,
-        fullRingBeam: updatedFullBeam,
         floors: updatedFloors
       };
     });
@@ -1502,6 +1499,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const [selectedPillarId, setSelectedPillarId] = useState<string | null>(null);
   const [drawingStart, setDrawingStart] = useState<Coordinate | null>(null);
   const [currentMouse, setCurrentMouse] = useState<Coordinate | null>(null);
+  const [canvasCursor, setCanvasCursor] = useState<Coordinate | null>(null);
   const [pillarPreview, setPillarPreview] = useState<{valid: boolean; coord: Coordinate | null; message?: string}>({ valid: true, coord: null });
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -2522,8 +2520,18 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     if (!selectedPillarId) return;
     setModel(prev => {
       const isSizeChange = changes.width !== undefined || changes.depth !== undefined;
+      const isGround = (activeFloor?.level === 0) || (activeFloorId === 'floor-0') || (prev.floors[0]?.id === activeFloorId);
+
+      // Locate raw target pillar and its column continuity key & coordinates
+      const rawTarget = (prev.pillars || []).find(p => p.id === selectedPillarId)
+        || prev.floors.flatMap(f => f.pillars || []).find(p => p.id === selectedPillarId);
+      const targetColId = rawTarget?.verticalColumnId;
+      const targetX = rawTarget?.position?.x ?? rawTarget?.x ?? 0;
+      const targetY = rawTarget?.position?.y ?? rawTarget?.y ?? 0;
+
+      // Update ground floor master pillars array
       const updatedPillars = (prev.pillars || []).map(p => {
-        const matches = (p.id === selectedPillarId) && (!p.floorId || p.floorId === activeFloorId);
+        const matches = (p.id === selectedPillarId) && (!p.floorId || p.floorId === activeFloorId || isGround);
         if (!matches) return p;
         const newWidth = changes.width !== undefined ? changes.width : p.width;
         const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
@@ -2552,42 +2560,129 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         };
       });
 
+      // Update floors: synchronize multi-storey shaft when ground-floor changes, or set override on upper floors
       const updatedFloors = prev.floors.map(fl => {
-        if (fl.id !== activeFloorId) return fl;
-        return {
-          ...fl,
-          pillars: (fl.pillars || []).map(p => {
-            if (p.id !== selectedPillarId) return p;
-            const newWidth = changes.width !== undefined ? changes.width : p.width;
-            const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
-            const newUnit = changes.unit || p.unit || 'in';
-            return {
-              ...p,
-              ...changes,
-              unit: newUnit,
-              isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
-            };
-          })
-        };
+        const isThisActiveFloor = fl.id === activeFloorId;
+
+        if (isGround) {
+          // Ground floor edit: update active floor pillar and propagate to upper floors along vertical shaft
+          return {
+            ...fl,
+            pillars: (fl.pillars || []).map(p => {
+              if (isThisActiveFloor && p.id === selectedPillarId) {
+                const newWidth = changes.width !== undefined ? changes.width : p.width;
+                const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
+                const newUnit = changes.unit || p.unit || 'in';
+                return {
+                  ...p,
+                  ...changes,
+                  unit: newUnit,
+                  isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
+                };
+              }
+
+              if (!isThisActiveFloor) {
+                const isCollinear = (targetColId && p.verticalColumnId && p.verticalColumnId === targetColId)
+                  || (Math.hypot((p.position?.x ?? p.x ?? 0) - targetX, (p.position?.y ?? p.y ?? 0) - targetY) < 0.2);
+
+                if (isCollinear) {
+                  // Independent per-floor overrides must remain unchanged
+                  if (p.isStoreyOverride) return p;
+
+                  // Propagate ground-floor shaft dimensions to upper floor
+                  const newWidth = changes.width !== undefined ? changes.width : p.width;
+                  const newDepth = changes.depth !== undefined ? (changes.shape === 'circular' ? newWidth : changes.depth) : p.depth;
+                  const newUnit = changes.unit || p.unit || 'in';
+                  return {
+                    ...p,
+                    width: newWidth,
+                    depth: newDepth,
+                    unit: newUnit,
+                    shape: changes.shape || p.shape,
+                    isCustomSize: isSizeChange ? true : p.isCustomSize
+                  };
+                }
+              }
+
+              return p;
+            })
+          };
+        } else {
+          // Upper floor edit: only update active floor, setting isStoreyOverride: true to decouple from shaft
+          if (!isThisActiveFloor) return fl;
+          return {
+            ...fl,
+            pillars: (fl.pillars || []).map(p => {
+              if (p.id !== selectedPillarId) return p;
+              const newWidth = changes.width !== undefined ? changes.width : p.width;
+              const newDepth = changes.depth !== undefined ? changes.depth : p.depth;
+              const newUnit = changes.unit || p.unit || 'in';
+              return {
+                ...p,
+                ...changes,
+                unit: newUnit,
+                isStoreyOverride: changes.isStoreyOverride !== undefined ? changes.isStoreyOverride : true,
+                isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
+              };
+            })
+          };
+        }
       });
 
-      let updatedFoundation = prev.foundation;
-      const targetPillar = updatedPillars.find(p => p.id === selectedPillarId) || (prev.pillars || []).find(p => p.id === selectedPillarId);
-      if (targetPillar && updatedFoundation && updatedFoundation.footings) {
-        const linkedFootingIndex = updatedFoundation.footings.findIndex(f => f.pillarId === selectedPillarId || (isGroundFloor && f.position && Math.hypot((f.position.x || 0) - (targetPillar.position?.x || 0), (f.position.y || 0) - (targetPillar.position?.y || 0)) < 0.2));
-        if (linkedFootingIndex >= 0) {
-          const curFooting = updatedFoundation.footings[linkedFootingIndex];
-          const dynamicSizing = calculateDynamicPillarFooting(
-            targetPillar,
-            prev.buildingUnit,
-            updatedFoundation,
-            prev.buildingConfig,
-            prev.floors.length
-          );
+      // Dynamic footing update & synthesis on ground-floor pillar changes
+      let updatedFoundation: FoundationConfig = prev.foundation
+        ? { ...prev.foundation }
+        : { ...DEFAULT_FOUNDATION_CONFIG, enabled: false, footings: [] };
+      const targetPillar = updatedPillars.find(p => p.id === selectedPillarId)
+        || updatedFloors.flatMap(f => f.pillars || []).find(p => p.id === selectedPillarId)
+        || rawTarget;
 
-          const updatedFootings = [...updatedFoundation.footings];
+      if (isGround && targetPillar) {
+        const dynamicSizing = calculateDynamicPillarFooting(
+          targetPillar,
+          prev.buildingUnit,
+          updatedFoundation,
+          prev.buildingConfig,
+          prev.floors.length
+        );
+
+        const fLenM = toMeters(dynamicSizing.footingLength, prev.buildingUnit);
+        const fWidM = toMeters(dynamicSizing.footingWidth, prev.buildingUnit);
+        const fDepM = toMeters(dynamicSizing.footingDepth, prev.buildingUnit);
+        const pccLenM = toMeters(dynamicSizing.pccLength, prev.buildingUnit);
+        const pccWidM = toMeters(dynamicSizing.pccWidth, prev.buildingUnit);
+        const pccThickM = toMeters(dynamicSizing.pccThickness, prev.buildingUnit);
+        const excLenM = toMeters(dynamicSizing.excavationLength, prev.buildingUnit);
+        const excWidM = toMeters(dynamicSizing.excavationWidth, prev.buildingUnit);
+        const excDepM = toMeters(dynamicSizing.excavationDepth, prev.buildingUnit);
+
+        targetPillar.calculatedFooting = {
+          lengthM: fLenM,
+          widthM: fWidM,
+          depthM: fDepM,
+          areaM2: fLenM * fWidM,
+          serviceLoadKn: dynamicSizing.serviceLoadKn,
+          excavationM3: excLenM * excWidM * excDepM,
+          pccM3: pccLenM * pccWidM * pccThickM,
+          rccM3: fLenM * fWidM * fDepM,
+          steelKg: targetPillar.calculatedFooting?.steelKg || 0
+        };
+
+        const currentFootings = updatedFoundation.footings || [];
+        const linkedFootingIndex = currentFootings.findIndex(f =>
+          f.pillarId === selectedPillarId ||
+          f.linkedPillarId === selectedPillarId ||
+          f.id === `footing-${selectedPillarId}` ||
+          (f.position && Math.hypot((f.position.x || 0) - targetX, (f.position.y || 0) - targetY) < 0.2)
+        );
+
+        if (linkedFootingIndex >= 0) {
+          const curFooting = currentFootings[linkedFootingIndex];
+          const updatedFootings = [...currentFootings];
           updatedFootings[linkedFootingIndex] = {
             ...curFooting,
+            pillarId: targetPillar.id,
+            pillarName: targetPillar.name || curFooting.pillarName,
             columnStubWidth: targetPillar.width,
             columnStubDepth: targetPillar.depth,
             columnStubUnit: targetPillar.unit || curFooting.columnStubUnit || 'in',
@@ -2602,11 +2697,46 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             excavationWidth: dynamicSizing.excavationWidth,
             excavationDepth: dynamicSizing.excavationDepth,
             foundationBedLevel: dynamicSizing.foundationBedLevel,
-            position: changes.position || curFooting.position
+            position: changes.position || curFooting.position || { x: targetX, y: targetY }
           };
           updatedFoundation = {
             ...updatedFoundation,
             footings: updatedFootings
+          };
+        } else {
+          // When footings is initially empty, synthesize a new footing record
+          const newFooting: FoundationFooting = {
+            id: `footing-${targetPillar.id}`,
+            floorId: 'floor-0',
+            pillarId: targetPillar.id,
+            pillarName: targetPillar.name,
+            position: { ...(targetPillar.position || { x: targetX, y: targetY }) },
+            footingLength: dynamicSizing.footingLength,
+            footingWidth: dynamicSizing.footingWidth,
+            footingDepth: dynamicSizing.footingDepth,
+            footingUnit: prev.buildingUnit,
+            columnStubWidth: targetPillar.width,
+            columnStubDepth: targetPillar.depth,
+            columnStubUnit: targetPillar.unit || 'in',
+            columnStubHeight: updatedFoundation.defaultColumnStubHeight || 2,
+            pccLength: dynamicSizing.pccLength,
+            pccWidth: dynamicSizing.pccWidth,
+            pccThickness: dynamicSizing.pccThickness,
+            pccUnit: prev.buildingUnit,
+            sandFillLength: dynamicSizing.sandFillLength,
+            sandFillWidth: dynamicSizing.sandFillWidth,
+            sandFillDepth: dynamicSizing.sandFillDepth,
+            sandFillUnit: prev.buildingUnit,
+            excavationLength: dynamicSizing.excavationLength,
+            excavationWidth: dynamicSizing.excavationWidth,
+            excavationDepth: dynamicSizing.excavationDepth,
+            excavationUnit: prev.buildingUnit,
+            foundationBedLevel: dynamicSizing.foundationBedLevel,
+            enabled: true
+          };
+          updatedFoundation = {
+            ...updatedFoundation,
+            footings: [...currentFootings, newFooting]
           };
         }
       }
@@ -2905,11 +3035,46 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
     // Mutate pillar dimensions and rebar according to calculated loads
     const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
+
+    // Find the bottom / maximum calculated column section for each vertical column shaft
+    const shaftColumnSizes = new Map<string, { width: number; depth: number }>();
+    allPillars.forEach(p => {
+      const calc = calcMap.get(p.id);
+      const autoW = calc ? Math.round(calc.providedWidthMm * (1 / 25.4)) : (p.width || 9);
+      const autoD = calc ? Math.round(calc.providedDepthMm * (1 / 25.4)) : (p.depth || 9);
+      const w = p.isCustomSize ? p.width : autoW;
+      const d = p.isCustomSize ? p.depth : autoD;
+
+      const px = p.position?.x ?? p.x ?? 0;
+      const py = p.position?.y ?? p.y ?? 0;
+      const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+
+      const current = shaftColumnSizes.get(key);
+      if (!current) {
+        shaftColumnSizes.set(key, { width: w, depth: d });
+      } else {
+        shaftColumnSizes.set(key, {
+          width: Math.max(current.width, w),
+          depth: Math.max(current.depth, d)
+        });
+      }
+    });
+
     allPillars = allPillars.map(p => {
       const calc = calcMap.get(p.id);
       if (calc) {
-        const autoW = Math.round(calc.providedWidthMm * (1 / 25.4));
-        const autoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+        const px = p.position?.x ?? p.x ?? 0;
+        const py = p.position?.y ?? p.y ?? 0;
+        const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+        const shaft = shaftColumnSizes.get(key);
+
+        const baseAutoW = Math.round(calc.providedWidthMm * (1 / 25.4));
+        const baseAutoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+
+        // Uniform cross-section: Upper floors maintain the exact bottom/ground floor pillar size
+        const autoW = shaft ? shaft.width : baseAutoW;
+        const autoD = shaft ? shaft.depth : baseAutoD;
+
         const widthIn = p.isCustomSize ? p.width : autoW;
         const depthIn = p.isCustomSize ? p.depth : autoD;
 
@@ -3088,6 +3253,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const handleSvgMouseMove = (e: React.MouseEvent) => {
     if (activeMode === 'foundation') {
       const fCoords = getFoundationCoords(e, foundationSnapMode);
+      if (fCoords) setCanvasCursor(fCoords);
       if (isPlacingFooting) {
         setFoundationMouse(fCoords);
       }
@@ -3119,6 +3285,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     }
     const coords = getMouseCoords(e);
     if (!coords) return;
+    setCanvasCursor(coords);
     
     if (draggingPillarId && dragStartPillarMouse && dragStartPillarPos) {
       const dx = coords.x - dragStartPillarMouse.x;
@@ -3421,117 +3588,92 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const allWalls = activeFloor ? [...activeFloor.externalWalls, ...activeFloor.internalWalls] : [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Interactive Wall & Pillar Editor</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Draw walls and place RCC columns with precise corner alignment to build a 100% physically accurate 3D model.
-          </p>
+    <div className="space-y-2 sm:space-y-2.5">
+      {/* 1. COMPACT ACTION HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1.5 border-b border-slate-200">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+            Interactive 2D Plan & Structural Editor
+          </h2>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-200">
+              {activeFloor?.name || 'Floor'}
+            </span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono">
+              {model.buildingLength}' × {model.buildingWidth}' {model.buildingUnit} ({Math.round(model.buildingLength * model.buildingWidth)} sq.{model.buildingUnit})
+            </span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-mono">
+              {(model.pillars || []).length} RCC Pillars
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+
+        <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
           <button
             type="button"
             onClick={() => setIsClearModalOpen(true)}
-            className="inline-flex items-center px-3.5 py-2 border border-rose-300 bg-rose-50 hover:bg-rose-100 rounded-lg shadow-sm text-xs font-bold text-rose-800 transition-colors cursor-pointer active:scale-95"
+            className="inline-flex items-center px-2.5 py-1.5 border border-rose-300 bg-rose-50 hover:bg-rose-100 rounded-lg shadow-2xs text-xs font-bold text-rose-800 transition-all cursor-pointer active:scale-95"
             title="Clean/Remove elements from graph (Pillars, Walls/Bricks, Foundation, Slabs, or Reset Canvas)"
           >
-            <Eraser className="w-4 h-4 mr-1.5 text-rose-600" />
+            <Eraser className="w-3.5 h-3.5 mr-1 text-rose-600" />
             <span>Clean Graph</span>
           </button>
           <button
+            type="button"
             onClick={() => setIsSaveModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg shadow-sm hover:shadow-md text-xs font-bold transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center px-2.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 rounded-lg shadow-2xs text-xs font-semibold transition-all cursor-pointer active:scale-95"
           >
-            <Save className="w-4 h-4 mr-1.5" />
+            <Save className="w-3.5 h-3.5 mr-1 text-slate-600" />
             <span>Save Plan</span>
           </button>
           <button
+            type="button"
             onClick={() => setIsHistoryModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 border border-slate-300 rounded-lg shadow-sm text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+            className="inline-flex items-center px-2.5 py-1.5 border border-slate-300 rounded-lg shadow-2xs text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
           >
-            <FolderClock className="w-4 h-4 mr-1.5 text-orange-600" />
-            <span>Saved History</span>
+            <FolderClock className="w-3.5 h-3.5 mr-1 text-orange-600" />
+            <span>Saved Plans</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            className="inline-flex items-center px-3.5 py-1.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-lg shadow-xs hover:shadow text-xs font-bold transition-all cursor-pointer active:scale-95 ml-1"
+            title="Generate physically accurate 3D model with concrete and reinforcement"
+          >
+            <span>Generate 3D Preview</span>
+            <span className="ml-1 text-xs font-bold">→</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-md font-medium text-gray-900 mb-3">Building Details</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-start">
-          <div>
-            <label className="block text-xs font-medium text-gray-700">Length ({model.buildingUnit})</label>
+      {/* 2. COMPACT INTEGRATED CONTROL BAR: GEOMETRY + MODES & FLOORS */}
+      <div className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-2.5 space-y-2 shadow-2xs">
+        {/* Row A: Building Dimensions Strip */}
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-xs">
+          <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-600">Length:</span>
             <input 
               type="number" 
               value={model.buildingLength} 
               onChange={e => handleDimensionChange(Number(e.target.value), model.buildingWidth)} 
-              className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
+              className="w-16 px-1.5 py-0.5 text-xs font-mono font-bold border border-slate-300 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-orange-500 text-slate-900" 
             />
-            {isManualMode && <span className="text-[10px] text-gray-400">Workspace reference</span>}
+            <span className="text-[10px] text-slate-500 font-mono">{model.buildingUnit}</span>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700">Width ({model.buildingUnit})</label>
+
+          <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-600">Width:</span>
             <input 
               type="number" 
               value={model.buildingWidth} 
               onChange={e => handleDimensionChange(model.buildingLength, Number(e.target.value))} 
-              className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
+              className="w-16 px-1.5 py-0.5 text-xs font-mono font-bold border border-slate-300 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-orange-500 text-slate-900" 
             />
-            {isManualMode && <span className="text-[10px] text-gray-400">Workspace reference</span>}
+            <span className="text-[10px] text-slate-500 font-mono">{model.buildingUnit}</span>
           </div>
-          <div className="lg:col-span-2">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Layout Mode</label>
-            <div className="flex flex-col sm:flex-row gap-2 bg-gray-50 p-1.5 rounded border border-gray-200">
-              <label className="flex items-center space-x-1.5 text-xs text-gray-800 cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="layoutMode" 
-                  checked={!isManualMode} 
-                  onChange={() => {
-                    if (isManualMode) {
-                      setConfirmModal({ isOpen: true, targetMode: 'auto' });
-                    }
-                  }} 
-                  className="text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
-                />
-                <span className="font-medium">Auto Outer Layout</span>
-              </label>
-              <label className="flex items-center space-x-1.5 text-xs text-gray-800 cursor-pointer">
-                <input 
-                  type="radio" 
-                  name="layoutMode" 
-                  checked={isManualMode} 
-                  onChange={() => {
-                    if (!isManualMode) {
-                      setConfirmModal({ isOpen: true, targetMode: 'manual' });
-                    }
-                  }} 
-                  className="text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
-                />
-                <span className="font-medium">Manual Layout</span>
-              </label>
-            </div>
-            {isManualMode && (
-              <p className="mt-1 text-[11px] text-orange-600 font-medium">
-                Manual Layout: Draw your own outer building walls on the grid.
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700">Unit</label>
-            <select 
-              value={model.buildingUnit} 
-              onChange={e => setModel(p => ({...p, buildingUnit: e.target.value as Unit}))} 
-              className="mt-1 block w-full px-2 py-1.5 rounded border border-gray-300 bg-white text-sm focus:ring-orange-500 focus:border-orange-500"
-            >
-              <option value="ft">Foot (ft)</option>
-              <option value="m">Metre (m)</option>
-              <option value="in">Inch (in)</option>
-              <option value="cm">Centimetre (cm)</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700">Floor Height ({model.buildingUnit})</label>
+
+          <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-600">Floor Height:</span>
             <input 
               type="number" 
               value={activeFloor?.height || 10} 
@@ -3554,66 +3696,71 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   pillars: (p.pillars || []).map(pil => (pil.floorId === activeFloorId ? { ...pil, height: val } : pil))
                 }));
               }} 
-              className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
+              className="w-14 px-1.5 py-0.5 text-xs font-mono font-bold border border-slate-300 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-orange-500 text-slate-900" 
             />
+            <span className="text-[10px] text-slate-500 font-mono">{model.buildingUnit}</span>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700">Ext. Wall Thickness (in)</label>
+
+          <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-600">Ext. Wall:</span>
             <input 
               type="number" 
               value={model.externalWallThickness || 9} 
               onChange={e => setModel(p => ({...p, externalWallThickness: Number(e.target.value)}))} 
-              className="mt-1 block w-full px-2 py-1 rounded border border-gray-300 text-sm focus:ring-orange-500 focus:border-orange-500" 
+              className="w-14 px-1.5 py-0.5 text-xs font-mono font-bold border border-slate-300 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-orange-500 text-slate-900" 
             />
+            <span className="text-[10px] text-slate-500">in</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-2xs">
+            <span className="text-[11px] font-bold text-slate-600">Unit:</span>
+            <select 
+              value={model.buildingUnit} 
+              onChange={e => setModel(p => ({...p, buildingUnit: e.target.value as Unit}))} 
+              className="text-xs font-semibold py-0.5 px-1 rounded bg-transparent border-none focus:ring-0 text-slate-800 cursor-pointer"
+            >
+              <option value="ft">Foot (ft)</option>
+              <option value="m">Metre (m)</option>
+              <option value="in">Inch (in)</option>
+              <option value="cm">Centimetre (cm)</option>
+            </select>
+          </div>
+
+          <div className="flex items-center bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs text-[11px]">
+            <button
+              type="button"
+              onClick={() => {
+                if (isManualMode) setConfirmModal({ isOpen: true, targetMode: 'auto' });
+              }}
+              className={cn(
+                "px-2 py-0.5 rounded font-bold transition-all cursor-pointer",
+                !isManualMode ? "bg-orange-600 text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Auto Perimeter
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!isManualMode) setConfirmModal({ isOpen: true, targetMode: 'manual' });
+              }}
+              className={cn(
+                "px-2 py-0.5 rounded font-bold transition-all cursor-pointer",
+                isManualMode ? "bg-orange-600 text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"
+              )}
+            >
+              Manual Draw
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* TOP NAVIGATION: STRUCTURE MODE, BUILDING FLOORS & FINISH / MATERIAL */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-200 pb-2.5 gap-3 bg-white px-2 pt-2 rounded-t-lg">
-        {/* 1. STRUCTURE */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider bg-amber-100/80 px-2 py-0.5 rounded border border-amber-300">
-            Structure
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode('foundation');
-              setSelectedPillarId(null);
-              setDrawingStart(null);
-              setCurrentMouse(null);
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm border",
-              activeMode === 'foundation'
-                ? "bg-amber-600 text-white border-amber-700 shadow-md ring-2 ring-amber-400/50"
-                : "bg-amber-50/90 text-amber-900 border-amber-300 hover:bg-amber-100 hover:border-amber-400"
-            )}
-            title="Switch to Structural Foundation / Base Mode"
-          >
-            <LandPlot className={cn("w-4 h-4", activeMode === 'foundation' ? "text-white" : "text-amber-700")} />
-            <span>Base / Foundation</span>
-            {model.foundation?.enabled && (
-              <span className={cn(
-                "ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold",
-                activeMode === 'foundation' ? "bg-amber-800 text-amber-100" : "bg-amber-200 text-amber-900"
-              )}>
-                {model.foundation?.footings?.length || 0}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Separator Divider */}
-        <div className="hidden md:block h-7 w-px bg-gray-300"></div>
-
-        {/* 2. BUILDING FLOORS */}
-        <div className="flex-1 flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-          <span className="text-[10px] font-bold text-gray-600 uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded border border-gray-200 shrink-0">
-            Floors
-          </span>
-          <div className="flex items-center space-x-1.5 overflow-x-auto">
+        {/* Row B: Storeys, Structure, Material, Engineering Modes */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/80">
+          {/* Floor levels */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-0.5">
+              Storeys:
+            </span>
             {model.floors.map((f, idx) => {
               const isSelected = activeMode === 'floor' && activeFloorId === f.id;
 
@@ -3621,10 +3768,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 <div
                   key={f.id}
                   className={cn(
-                    "flex items-center px-3.5 py-2 rounded-lg transition-all text-sm font-semibold whitespace-nowrap border cursor-pointer",
+                    "flex items-center px-2.5 py-1 rounded-md transition-all text-xs font-semibold whitespace-nowrap border cursor-pointer",
                     isSelected
-                      ? "bg-orange-600 text-white border-orange-700 shadow-sm"
-                      : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300 hover:text-gray-900"
+                      ? "bg-orange-600 text-white border-orange-700 shadow-2xs"
+                      : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
                   )}
                   onClick={() => {
                     setActiveMode('floor');
@@ -3638,10 +3785,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                     }
                   }}
                 >
-                  <button
-                    type="button"
-                    className="focus:outline-none"
-                  >
+                  <button type="button" className="focus:outline-none cursor-pointer">
                     {f.name}
                   </button>
                   {idx > 0 && (
@@ -3652,12 +3796,12 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                         handleRemoveFloor(f.id); 
                       }}
                       className={cn(
-                        "ml-2 rounded-full p-0.5 hover:bg-black/15 transition-colors",
-                        isSelected ? "text-white" : "text-gray-400 hover:text-red-500"
+                        "ml-1.5 rounded-full p-0.5 hover:bg-black/15 transition-colors cursor-pointer",
+                        isSelected ? "text-white" : "text-slate-400 hover:text-rose-600"
                       )}
                       title="Remove Floor"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -3666,7 +3810,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             <button
               type="button"
               onClick={handleAddFloor}
-              className="px-3.5 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors flex items-center whitespace-nowrap shadow-sm"
+              className="px-2.5 py-1 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors flex items-center whitespace-nowrap shadow-2xs cursor-pointer"
               title="Add a new building floor level"
             >
               + Add Floor
@@ -3684,10 +3828,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 setCurrentMouse(null);
               }}
               className={cn(
-                "px-3 py-2 text-xs font-bold rounded-lg border transition-all flex items-center gap-1.5 whitespace-nowrap shadow-sm cursor-pointer",
+                "px-2.5 py-1 text-xs font-bold rounded-md border transition-all flex items-center gap-1.5 whitespace-nowrap shadow-2xs cursor-pointer",
                 activeTool === 'roof'
-                  ? "bg-amber-600 text-white border-amber-700 shadow-md ring-2 ring-amber-400/50"
-                  : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
+                  ? "bg-amber-600 text-white border-amber-700 shadow-xs"
+                  : "bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100"
               )}
               title="Configure independent Roof RCC Slab (thickness, overhang, elevation)"
             >
@@ -3701,70 +3845,83 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
               </span>
             </button>
           </div>
-        </div>
 
-        {/* Separator Divider */}
-        <div className="hidden md:block h-7 w-px bg-gray-300"></div>
+          {/* Mode Switchers: Base / Foundation, Plaster Finish, Structural Engineering */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode('foundation');
+                setSelectedPillarId(null);
+                setDrawingStart(null);
+                setCurrentMouse(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all shadow-2xs border cursor-pointer",
+                activeMode === 'foundation'
+                  ? "bg-amber-600 text-white border-amber-700 shadow-xs ring-1 ring-amber-400"
+                  : "bg-amber-50/80 text-amber-900 border-amber-200 hover:bg-amber-100"
+              )}
+              title="Switch to Structural Foundation / Base Mode"
+            >
+              <LandPlot className={cn("w-3.5 h-3.5", activeMode === 'foundation' ? "text-white" : "text-amber-700")} />
+              <span>Base / Foundation</span>
+              {model.foundation?.enabled && (
+                <span className={cn(
+                  "ml-0.5 text-[9px] px-1.5 py-0.2 rounded-full font-extrabold",
+                  activeMode === 'foundation' ? "bg-amber-800 text-amber-100" : "bg-amber-200 text-amber-900"
+                )}>
+                  {model.foundation?.footings?.length || 0}
+                </span>
+              )}
+            </button>
 
-        {/* 3. FINISH / MATERIAL MODE */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wider bg-teal-100/80 px-2 py-0.5 rounded border border-teal-300 shrink-0">
-            Finish / Material
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveMode('plaster');
-              setSelectedPillarId(null);
-              setSelectedFootingId(null);
-              setDrawingStart(null);
-              setCurrentMouse(null);
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm border whitespace-nowrap",
-              activeMode === 'plaster'
-                ? "bg-teal-700 text-white border-teal-800 shadow-md ring-2 ring-teal-400/50"
-                : "bg-teal-50/90 text-teal-900 border-teal-300 hover:bg-teal-100 hover:border-teal-400"
-            )}
-            title="Switch to Plaster / Cement Wall Finish Construction Tool"
-          >
-            <Paintbrush className={cn("w-4 h-4", activeMode === 'plaster' ? "text-white" : "text-teal-700")} />
-            <span>Plaster / Cement Finish</span>
-            {model.plaster?.enabled && (
-              <span className={cn(
-                "ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold",
-                activeMode === 'plaster' ? "bg-teal-900 text-teal-100" : "bg-teal-200 text-teal-900"
-              )}>
-                ON
+            <button
+              type="button"
+              onClick={() => {
+                setActiveMode('plaster');
+                setSelectedPillarId(null);
+                setSelectedFootingId(null);
+                setDrawingStart(null);
+                setCurrentMouse(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all shadow-2xs border whitespace-nowrap cursor-pointer",
+                activeMode === 'plaster'
+                  ? "bg-teal-700 text-white border-teal-800 shadow-xs ring-1 ring-teal-400"
+                  : "bg-teal-50/80 text-teal-900 border-teal-200 hover:bg-teal-100"
+              )}
+              title="Switch to Plaster / Cement Wall Finish Construction Tool"
+            >
+              <Paintbrush className={cn("w-3.5 h-3.5", activeMode === 'plaster' ? "text-white" : "text-teal-700")} />
+              <span>Plaster Finish</span>
+              {model.plaster?.enabled && (
+                <span className={cn(
+                  "ml-0.5 text-[9px] px-1.5 py-0.2 rounded-full font-extrabold",
+                  activeMode === 'plaster' ? "bg-teal-900 text-teal-100" : "bg-teal-200 text-teal-900"
+                )}>
+                  ON
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsStructuralModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all shadow-2xs border whitespace-nowrap bg-indigo-50/80 text-indigo-900 border-indigo-200 hover:bg-indigo-100 cursor-pointer"
+              title="Configure Storeys, Concrete Grade, Steel Grade, Soil Bearing Capacity, and Structural Loads"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-indigo-700" />
+              <span>Structural Config</span>
+              <span className="ml-0.5 text-[9px] px-1.5 py-0.2 rounded-full font-extrabold bg-indigo-200 text-indigo-900">
+                {model.buildingConfig?.floorCount || model.floors.length}F • {model.buildingConfig?.concreteGrade || 'M20'}
               </span>
-            )}
-          </button>
-        </div>
-
-        {/* Separator Divider */}
-        <div className="hidden md:block h-7 w-px bg-gray-300"></div>
-
-        {/* 4. STRUCTURAL & ENGINEERING CONFIG */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider bg-indigo-100/80 px-2 py-0.5 rounded border border-indigo-300 shrink-0">
-            Engineering
-          </span>
-          <button
-            type="button"
-            onClick={() => setIsStructuralModalOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm border whitespace-nowrap bg-indigo-50/90 text-indigo-900 border-indigo-300 hover:bg-indigo-100 hover:border-indigo-400 cursor-pointer"
-            title="Configure Storeys, Concrete Grade, Steel Grade, Soil Bearing Capacity, and Structural Loads"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-indigo-700" />
-            <span>Structural Config</span>
-            <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold bg-indigo-200 text-indigo-900">
-              {model.buildingConfig?.floorCount || model.floors.length}F • {model.buildingConfig?.concreteGrade || 'M20'}
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 min-h-[600px]">
+      <div className="flex flex-col lg:flex-row gap-2.5 sm:gap-3.5 min-h-[640px] h-[calc(100vh-210px)] max-h-[950px]">
         
         {/* TOOLBOX: Dedicated Foundation Editor vs Floor Tools */}
         {activeMode === 'foundation' ? (
@@ -5987,11 +6144,20 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             </div>
           </div>
         ) : (
-          <div className="w-full lg:w-64 flex flex-col space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-y-auto max-h-[700px]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Tools ({activeFloor?.name || 'Floor'})
+          <div className="w-full lg:w-80 flex flex-col space-y-2.5 bg-slate-50/90 p-3 sm:p-3.5 rounded-xl border border-slate-200/90 shadow-2xs overflow-y-auto max-h-[calc(100vh-210px)] min-h-[580px]">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-200">
+              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🛠️ Tools:</span>
+                <span className="text-orange-600 font-extrabold">{activeFloor?.name || 'Floor'}</span>
               </span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-700">
+                Level {activeFloor?.level ?? 0}
+              </span>
+            </div>
+
+            {/* SECTION 1: ARCHITECTURE & WALLS */}
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1 pt-0.5">
+              Architecture & Walls
             </div>
 
             <button 
@@ -6069,6 +6235,11 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 </div>
               </div>
             )}
+
+            {/* SECTION 2: STRUCTURAL COLUMNS */}
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1 pt-1.5 border-t border-slate-200">
+              Structural Columns
+            </div>
 
             <button 
               onClick={() => { setActiveTool('pillar'); setDrawingStart(null); }}
@@ -6386,6 +6557,43 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   </div>
                 </div>
 
+                {!isGroundFloor && (
+                  <div className="mt-2 p-2 bg-orange-50/70 rounded-md border border-orange-200/60 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] font-semibold text-orange-950">Storey Override</div>
+                      <div className="text-[9px] text-orange-700">Decouple from continuous shaft</div>
+                    </div>
+                    <input 
+                      type="checkbox"
+                      checked={(() => {
+                        const target = (activeFloor?.pillars || []).find(p => p.id === selectedPillarId);
+                        return !!target?.isStoreyOverride;
+                      })()}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        if (!checked) {
+                          const target = (activeFloor?.pillars || []).find(p => p.id === selectedPillarId);
+                          const targetColId = target?.verticalColumnId;
+                          const targetX = target?.position?.x ?? target?.x ?? 0;
+                          const targetY = target?.position?.y ?? target?.y ?? 0;
+                          const gfPillar = (model.floors[0]?.pillars || model.pillars || []).find(gp => 
+                            (targetColId && gp.verticalColumnId && gp.verticalColumnId === targetColId) ||
+                            Math.hypot((gp.position?.x ?? gp.x ?? 0) - targetX, (gp.position?.y ?? gp.y ?? 0) - targetY) < 0.2
+                          );
+                          if (gfPillar) {
+                            setPillarWidth(gfPillar.width);
+                            setPillarDepth(gfPillar.depth);
+                            updateActiveFloorPillar({ isStoreyOverride: false, width: gfPillar.width, depth: gfPillar.depth, unit: gfPillar.unit });
+                            return;
+                          }
+                        }
+                        updateActiveFloorPillar({ isStoreyOverride: checked });
+                      }}
+                      className="rounded text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
+                    />
+                  </div>
+                )}
+
                 {/* Structural Load Check & Warning */}
                 {selectedPillarId && (() => {
                   const targetPillar = (model.pillars || []).find(p => p.id === selectedPillarId) || (activeFloor?.pillars || []).find(p => p.id === selectedPillarId);
@@ -6619,6 +6827,11 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 </div>
               </div>
             )}
+
+            {/* SECTION 3: SLABS & BEAMS */}
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1 pt-1.5 border-t border-slate-200">
+              Slabs & Beams
+            </div>
 
             <button 
               onClick={() => { setActiveTool('beam'); setDrawingStart(null); }}
@@ -7013,6 +7226,11 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
               );
             })()}
 
+            {/* SECTION 4: MODIFY & CLEAN */}
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1 pt-1.5 border-t border-slate-200">
+              Modify & Clean
+            </div>
+
             <button 
               onClick={() => { 
                 setActiveTool('delete'); 
@@ -7284,13 +7502,53 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
         {/* INTERACTIVE CANVAS */}
         <div className={cn(
-          "flex-1 bg-gray-50 border border-gray-300 rounded-lg overflow-hidden relative shadow-inner",
+          "flex-1 bg-slate-50/80 border border-slate-300 rounded-xl overflow-hidden relative shadow-inner flex flex-col",
           activeMode === 'foundation' && isPlacingFooting ? "cursor-crosshair" :
           activeMode === 'foundation' && draggingFootingId ? "cursor-grabbing" :
           activeMode === 'foundation' ? "cursor-default" :
           activeTool === 'delete' ? "cursor-pointer" :
           activeTool === 'clear' ? "cursor-default" : "cursor-crosshair"
         )}>
+          {/* FLOATING CANVAS HUD: Live Coordinates & Active Tool Status */}
+          <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-2 pointer-events-none">
+            <div className="bg-slate-900/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-md flex items-center gap-1.5 border border-slate-700/60">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>
+                {activeMode === 'foundation' ? 'Base / Foundation View' :
+                 activeMode === 'plaster' ? 'Plaster Finish View' :
+                 `${activeFloor?.name || 'Floor'} 2D CAD`}
+              </span>
+              <span className="text-slate-400">|</span>
+              <span className="text-amber-300 font-mono text-[11px]">
+                {activeMode === 'foundation' ? (isPlacingFooting ? 'Click canvas to place footing' : 'Footing Editor') :
+                 activeMode === 'plaster' ? 'Surface Coatings' :
+                 activeTool === 'wall' ? 'Draw Wall (Click start & end)' :
+                 activeTool === 'pillar' ? 'Place RCC Pillar' :
+                 activeTool === 'door' ? 'Insert Door' :
+                 activeTool === 'window' ? 'Insert Window' :
+                 activeTool === 'slab' ? 'Floor Slab' :
+                 activeTool === 'roof' ? 'Roof Slab' :
+                 activeTool === 'delete' ? 'Delete Item' :
+                 activeTool === 'clear' ? 'Clean Graph' : 'Select Tool'}
+              </span>
+            </div>
+          </div>
+
+          <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-2 pointer-events-none">
+            <div className="bg-white/90 backdrop-blur-xs text-slate-800 px-2.5 py-1 rounded-lg text-xs font-mono font-bold shadow-xs border border-slate-300 flex items-center gap-2">
+              <span className="text-slate-500">📍 Pointer:</span>
+              <span>
+                X: {canvasCursor?.x !== undefined ? canvasCursor.x.toFixed(1) : '0.0'}'
+              </span>
+              <span>
+                Y: {canvasCursor?.y !== undefined ? canvasCursor.y.toFixed(1) : '0.0'}'
+              </span>
+              <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-sans font-bold border border-emerald-200">
+                1ft Snap
+              </span>
+            </div>
+          </div>
+
           <svg 
             ref={svgRef}
             viewBox={`-20 -20 ${model.buildingLength + 40} ${model.buildingWidth + 40}`} 
@@ -7298,6 +7556,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             preserveAspectRatio="xMidYMid meet"
             onClick={handleSvgClick}
             onMouseMove={handleSvgMouseMove}
+            onMouseLeave={() => setCanvasCursor(null)}
           >
             <g transform={`scale(1, -1) translate(0, -${model.buildingWidth})`}>
               {/* Plot Boundary (Light Green) */}
@@ -7819,6 +8078,76 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 );
               })()}
 
+              {/* 2D Structural RCC Beam Spans (Floor Mode Only) */}
+              {activeMode === 'floor' && (() => {
+                const floorPillars = (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId);
+                const floorWalls = [...(activeFloor?.externalWalls || []), ...(activeFloor?.internalWalls || [])];
+                const beams = getEffectiveFloorBeams(floorPillars, floorWalls, model.buildingUnit);
+                if (beams.length === 0) return null;
+
+                const ringCfg = activeFloor?.ringBeam;
+                const fullRingCfg = activeFloor?.fullRingBeam;
+                const isBeamTool = activeTool === 'beam' || activeTool === 'fullRingBeam';
+                const isRingOn = ringCfg?.enabled !== false && !fullRingCfg?.enabled;
+                const isFullOn = fullRingCfg?.enabled === true;
+
+                const beamWidthIn = ringCfg?.width ?? 9;
+                const beamWidthFt = convertUnit(beamWidthIn, 'in', model.buildingUnit);
+
+                return (
+                  <g className="pointer-events-none" opacity={isBeamTool ? 0.95 : (isRingOn || isFullOn ? 0.75 : 0.4)}>
+                    {beams.map(b => {
+                      const dx = b.end.x - b.start.x;
+                      const dy = b.end.y - b.start.y;
+                      const len = Math.hypot(dx, dy);
+                      if (len <= 0.1) return null;
+
+                      const midX = (b.start.x + b.end.x) / 2;
+                      const midY = (b.start.y + b.end.y) / 2;
+
+                      const strokeColor = isFullOn ? "#6366f1" : (isBeamTool ? "#2563eb" : "#3b82f6");
+
+                      return (
+                        <g key={`2d-beam-${b.id}`}>
+                          {/* Beam Width Band */}
+                          <line
+                            x1={b.start.x} y1={b.start.y}
+                            x2={b.end.x} y2={b.end.y}
+                            stroke={strokeColor}
+                            strokeWidth={beamWidthFt}
+                            strokeLinecap="square"
+                            opacity={isBeamTool ? "0.35" : "0.2"}
+                          />
+                          {/* Centerline */}
+                          <line
+                            x1={b.start.x} y1={b.start.y}
+                            x2={b.end.x} y2={b.end.y}
+                            stroke={strokeColor}
+                            strokeWidth="0.12"
+                            strokeDasharray={isBeamTool ? undefined : "0.6,0.3"}
+                          />
+                          {/* Beam dimension label when Beam Tool is active */}
+                          {isBeamTool && len > 3 && (
+                            <text
+                              x={midX} y={midY}
+                              transform={`scale(1, -1) translate(0, ${-midY * 2})`}
+                              textAnchor="middle"
+                              alignmentBaseline="middle"
+                              fontSize="0.4"
+                              fill="#1e40af"
+                              fontWeight="600"
+                              className="select-none bg-white"
+                            >
+                              {`${beamWidthIn}" beam (${b.length.toFixed(1)} ${model.buildingUnit})`}
+                            </text>
+                          )}
+                        </g>
+                      );
+                    })}
+                  </g>
+                );
+              })()}
+
               {/* Concrete Pillars Rendering: Structural Reference in Foundation Mode vs Interactive in Floor Mode */}
               {activeMode === 'foundation' ? (
                 /* Ground Floor Pillars as Structural Reference in Foundation Mode */
@@ -8077,12 +8406,16 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+        <div className="text-xs text-slate-500">
+          Step 1 of 2: Configure walls, columns, footings, and slabs. Click Generate to produce full 3D building.
+        </div>
         <button
           onClick={handleGenerate}
-          className="px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+          className="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-xl shadow-md hover:shadow-lg text-sm font-bold transition-all cursor-pointer active:scale-95 gap-2"
         >
-          Generate 3D Building Preview
+          <span>Generate 3D Building Preview</span>
+          <span className="text-base font-bold">→</span>
         </button>
       </div>
 

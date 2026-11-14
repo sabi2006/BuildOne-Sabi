@@ -16,7 +16,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/build/three.core.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@react-three/drei/web/Html.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript) <locals>");
 ;
 var _s = __turbopack_context__.k.signature();
 ;
@@ -54,10 +54,10 @@ function SharedBrickWall({ wall, brickType, settings, position = [
     // Memoize brick positions to avoid recalculating on every render
     const { matrices, colors, brickCount, geometryArgs, totalLength, totalHeight, totalThickness, processedOpenings } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "SharedBrickWall.useMemo": ()=>{
-            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
-            const h = Math.min(20, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.height, wall.dimensions.unit)); // Cap at 20m for sanity
+            const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
+            const h = Math.min(20, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.height, wall.dimensions.unit)); // Cap at 20m for sanity
             const tUnit = wall.dimensions.thicknessUnit || (wall.dimensions.unit === 'ft' ? 'in' : 'mm');
-            const rawT = Math.min(2, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.thickness, tUnit)); // Cap at 2m
+            const rawT = Math.min(2, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.thickness, tUnit)); // Cap at 2m
             // Infill Recess: Inset brick infill slightly (~16mm on each face) so the RCC columns & beams project proudly in front of the masonry
             const recess = infillRecess !== false ? 0.016 : 0;
             const t = Math.max(0.08, rawT - recess * 2);
@@ -106,17 +106,17 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                 "SharedBrickWall.useMemo.centerOpenings": (o)=>o.position === 'Center' || !o.position
             }["SharedBrickWall.useMemo.centerOpenings"]);
             const totalCenterWidth = centerOpenings.reduce({
-                "SharedBrickWall.useMemo": (sum, op)=>sum + (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.width, op.unit || wall.dimensions.unit) + 0.2
+                "SharedBrickWall.useMemo": (sum, op)=>sum + (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.width, op.unit || wall.dimensions.unit) + 0.2
             }["SharedBrickWall.useMemo"], 0) - 0.2;
             posOffsets['Center'] = l / 2 - Math.max(0, totalCenterWidth) / 2;
             const processedOpenings = flatOpenings.map({
                 "SharedBrickWall.useMemo.processedOpenings": (op, index)=>{
-                    const opW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.width, op.unit || wall.dimensions.unit);
-                    const opH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.height, op.unit || wall.dimensions.unit);
+                    const opW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.width, op.unit || wall.dimensions.unit);
+                    const opH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.height, op.unit || wall.dimensions.unit);
                     const pos = op.position || 'Center';
                     let cx = 0;
                     if (op.distanceFromStart !== undefined) {
-                        cx = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.distanceFromStart, op.unit || wall.dimensions.unit) + opW / 2;
+                        cx = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.distanceFromStart, op.unit || wall.dimensions.unit) + opW / 2;
                     } else if (pos === 'Left') {
                         cx = posOffsets['Left'] + opW / 2;
                         posOffsets['Left'] += opW + 0.2;
@@ -127,14 +127,14 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                         cx = posOffsets['Center'] + opW / 2;
                         posOffsets['Center'] += opW + 0.2;
                     } else if (pos === 'Custom Offset') {
-                        const customOffset = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.customOffset || 0, op.unit || wall.dimensions.unit);
+                        const customOffset = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.customOffset || 0, op.unit || wall.dimensions.unit);
                         if (posOffsets[`Custom_${customOffset}`] === undefined) posOffsets[`Custom_${customOffset}`] = 0;
                         cx = customOffset + opW / 2 + posOffsets[`Custom_${customOffset}`];
                         posOffsets[`Custom_${customOffset}`] += opW + 0.2;
                     }
                     let cy = 0;
                     if (op.sillHeight !== undefined) {
-                        cy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.sillHeight, op.unit || wall.dimensions.unit);
+                        cy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.sillHeight, op.unit || wall.dimensions.unit);
                     } else if (op.type === 'window' || op.type === 'ventilator') {
                         cy = Math.max(0.9, h / 2 - opH / 2);
                     }
@@ -287,7 +287,7 @@ function SharedBrickWall({ wall, brickType, settings, position = [
         position: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Vector3"](...position),
         rotation: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Euler"](...rotation),
         children: [
-            !wireframe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+            !wireframe && processedOpenings.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                 position: [
                     0,
                     totalHeight / 2,
@@ -360,6 +360,734 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                 lineNumber: 289,
                 columnNumber: 9
             }, this),
+            !wireframe && processedOpenings.map((op, i)=>{
+                const opW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.width, op.unit || wall.dimensions.unit);
+                const opH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.height, op.unit || wall.dimensions.unit);
+                const frameThick = Math.min(totalThickness, 0.15);
+                if (op.type === 'door') {
+                    const postW = 0.05; // 50mm frame post
+                    const leafW = Math.max(0.1, opW - postW * 2);
+                    const leafH = Math.max(0.1, opH - postW);
+                    const leafT = 0.038; // 38mm wooden door panel
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                        position: [
+                            op.renderX,
+                            op.renderY,
+                            0
+                        ],
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    -opW / 2 + postW / 2,
+                                    0,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            postW,
+                                            opH,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 318,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#451a03",
+                                        roughness: 0.7,
+                                        metalness: 0.1
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 319,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 317,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    opW / 2 - postW / 2,
+                                    0,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            postW,
+                                            opH,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 323,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#451a03",
+                                        roughness: 0.7,
+                                        metalness: 0.1
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 324,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 322,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    opH / 2 - postW / 2,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            opW,
+                                            postW,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 328,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#451a03",
+                                        roughness: 0.7,
+                                        metalness: 0.1
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 329,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 327,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    -postW / 2,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            leafW,
+                                            leafH,
+                                            leafT
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 334,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#78350f",
+                                        roughness: 0.65,
+                                        metalness: 0.08
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 335,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 333,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    leafH * 0.22 - postW / 2,
+                                    leafT / 2 + 0.002
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            leafW * 0.75,
+                                            leafH * 0.35,
+                                            0.006
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 340,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#92400e",
+                                        roughness: 0.6,
+                                        metalness: 0.05
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 341,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 339,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    -leafH * 0.25 - postW / 2,
+                                    leafT / 2 + 0.002
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            leafW * 0.75,
+                                            leafH * 0.42,
+                                            0.006
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 345,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#92400e",
+                                        roughness: 0.6,
+                                        metalness: 0.05
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 346,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 344,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    leafW / 2 - 0.06,
+                                    -0.05,
+                                    leafT / 2 + 0.015
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                        args: [
+                                            0.012,
+                                            0.012,
+                                            0.12,
+                                            16
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 351,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#f59e0b",
+                                        metalness: 0.9,
+                                        roughness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 352,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 350,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    leafW / 2 - 0.06,
+                                    -0.05,
+                                    -leafT / 2 - 0.015
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                        args: [
+                                            0.012,
+                                            0.012,
+                                            0.12,
+                                            16
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 355,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#f59e0b",
+                                        metalness: 0.9,
+                                        roughness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 356,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 354,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, `3d-door-${i}`, true, {
+                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                        lineNumber: 314,
+                        columnNumber: 13
+                    }, this);
+                }
+                if (op.type === 'window') {
+                    const frameBar = 0.045; // 45mm frame profile
+                    const glassW = Math.max(0.1, opW - frameBar * 2);
+                    const glassH = Math.max(0.1, opH - frameBar * 2);
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                        position: [
+                            op.renderX,
+                            op.renderY,
+                            0
+                        ],
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    -opW / 2 + frameBar / 2,
+                                    0,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            frameBar,
+                                            opH,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 372,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 373,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 371,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    opW / 2 - frameBar / 2,
+                                    0,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            frameBar,
+                                            opH,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 377,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 378,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 376,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    opH / 2 - frameBar / 2,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            opW,
+                                            frameBar,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 382,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 383,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 381,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    -opH / 2 + frameBar / 2,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            opW,
+                                            frameBar,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 387,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 388,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 386,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    -opH / 2 - 0.015,
+                                    frameThick / 2 + 0.02
+                                ],
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            opW + 0.08,
+                                            0.03,
+                                            frameThick + 0.06
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 393,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#94a3b8",
+                                        roughness: 0.9,
+                                        metalness: 0.05
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 394,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 392,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            glassW,
+                                            glassH,
+                                            0.008
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 399,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#38bdf8",
+                                        transparent: true,
+                                        opacity: 0.45,
+                                        roughness: 0.08,
+                                        metalness: 0.9,
+                                        depthWrite: false
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 400,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 398,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    0,
+                                    0.002
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            0.025,
+                                            glassH,
+                                            frameThick * 0.7
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 412,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 413,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 411,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    0,
+                                    0.002
+                                ],
+                                castShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            glassW,
+                                            0.025,
+                                            frameThick * 0.7
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 418,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#334155",
+                                        roughness: 0.5,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 419,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 417,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, `3d-window-${i}`, true, {
+                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                        lineNumber: 368,
+                        columnNumber: 13
+                    }, this);
+                }
+                if (op.type === 'ventilator') {
+                    const frameBar = 0.035;
+                    const innerW = Math.max(0.1, opW - frameBar * 2);
+                    const innerH = Math.max(0.1, opH - frameBar * 2);
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                        position: [
+                            op.renderX,
+                            op.renderY,
+                            0
+                        ],
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            opW,
+                                            opH,
+                                            frameThick
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 434,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#1e293b",
+                                        roughness: 0.6,
+                                        metalness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 435,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 433,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    0,
+                                    0
+                                ],
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            innerW,
+                                            innerH,
+                                            0.006
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 439,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#bae6fd",
+                                        transparent: true,
+                                        opacity: 0.6,
+                                        roughness: 0.3
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                        lineNumber: 440,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                lineNumber: 438,
+                                columnNumber: 15
+                            }, this),
+                            [
+                                -innerH * 0.25,
+                                0,
+                                innerH * 0.25
+                            ].map((sY, sIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                    position: [
+                                        0,
+                                        sY,
+                                        0.01
+                                    ],
+                                    rotation: [
+                                        0.4,
+                                        0,
+                                        0
+                                    ],
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                            args: [
+                                                innerW,
+                                                0.02,
+                                                0.04
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                            lineNumber: 445,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                            color: "#64748b",
+                                            roughness: 0.5,
+                                            metalness: 0.3
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                            lineNumber: 446,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, `slat-${sIdx}`, true, {
+                                    fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                                    lineNumber: 444,
+                                    columnNumber: 17
+                                }, this))
+                        ]
+                    }, `3d-vent-${i}`, true, {
+                        fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
+                        lineNumber: 431,
+                        columnNumber: 13
+                    }, this);
+                }
+                return null;
+            }),
             wireframe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                 position: [
                     0,
@@ -375,7 +1103,7 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                         ]
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                        lineNumber: 304,
+                        lineNumber: 459,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshBasicMaterial", {
@@ -385,13 +1113,13 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                         opacity: 0.1
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                        lineNumber: 305,
+                        lineNumber: 460,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                lineNumber: 303,
+                lineNumber: 458,
                 columnNumber: 9
             }, this),
             wireframe && processedOpenings.map((op, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Html"], {
@@ -413,7 +1141,7 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                                 children: op.type
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                                lineNumber: 313,
+                                lineNumber: 468,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -425,7 +1153,7 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                                lineNumber: 314,
+                                lineNumber: 469,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -439,18 +1167,18 @@ function SharedBrickWall({ wall, brickType, settings, position = [
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                                lineNumber: 315,
+                                lineNumber: 470,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                        lineNumber: 312,
+                        lineNumber: 467,
                         columnNumber: 11
                     }, this)
                 }, `op-lbl-${i}`, false, {
                     fileName: "[project]/src/components/3d/SharedBrickWall.tsx",
-                    lineNumber: 311,
+                    lineNumber: 466,
                     columnNumber: 9
                 }, this))
         ]
@@ -474,6 +1202,14 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 __turbopack_context__.s([
     "RCC_CONCRETE_MATERIAL_CONFIG",
     ()=>RCC_CONCRETE_MATERIAL_CONFIG,
+    "SHARED_FOOTING_REBAR_MAT",
+    ()=>SHARED_FOOTING_REBAR_MAT,
+    "SHARED_MAIN_REBAR_MAT",
+    ()=>SHARED_MAIN_REBAR_MAT,
+    "SHARED_SLAB_REBAR_MAT",
+    ()=>SHARED_SLAB_REBAR_MAT,
+    "SHARED_TIE_REBAR_MAT",
+    ()=>SHARED_TIE_REBAR_MAT,
     "VisualEstimator3D",
     ()=>VisualEstimator3D,
     "validatePlasterSurface",
@@ -485,7 +1221,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$t
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$fiber$2f$dist$2f$events$2d$156d8d12$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__C__as__useThree$3e$__ = __turbopack_context__.i("[project]/node_modules/@react-three/fiber/dist/events-156d8d12.esm.js [app-client] (ecmascript) <export C as useThree>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$core$2f$OrbitControls$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@react-three/drei/core/OrbitControls.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@react-three/drei/web/Html.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/three/build/three.core.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/utils.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs [app-client] (ecmascript) <export default as AlertTriangle>");
@@ -502,12 +1238,15 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check.mjs [app-client] (ecmascript) <export default as CheckCircle2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/layers.mjs [app-client] (ecmascript) <export default as Layers>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$paintbrush$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paintbrush$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/paintbrush.mjs [app-client] (ecmascript) <export default as Paintbrush>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/eye.mjs [app-client] (ecmascript) <export default as Eye>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Building2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/building-2.mjs [app-client] (ecmascript) <export default as Building2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layout$2d$grid$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LayoutGrid$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/layout-grid.mjs [app-client] (ecmascript) <export default as LayoutGrid>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$CalculatorContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/calculator/CalculatorContext.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$3d$2f$SharedBrickWall$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/3d/SharedBrickWall.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$SaveProjectModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/calculator/SaveProjectModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$ProjectHistoryModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/calculator/ProjectHistoryModal.tsx [app-client] (ecmascript)");
 ;
-var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature(), _s3 = __turbopack_context__.k.signature();
+var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature(), _s3 = __turbopack_context__.k.signature(), _s4 = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
@@ -525,6 +1264,42 @@ const RCC_CONCRETE_MATERIAL_CONFIG = {
     roughness: 0.85,
     metalness: 0.05
 };
+const SHARED_MAIN_REBAR_MAT = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+    color: '#00f0ff',
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Color"]('#0284c7'),
+    emissiveIntensity: 0.45,
+    depthTest: true,
+    depthWrite: true
+});
+const SHARED_TIE_REBAR_MAT = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+    color: '#ffb703',
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Color"]('#d97706'),
+    emissiveIntensity: 0.45,
+    depthTest: true,
+    depthWrite: true
+});
+const SHARED_SLAB_REBAR_MAT = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+    color: '#38bdf8',
+    metalness: 0.85,
+    roughness: 0.25,
+    emissive: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Color"]('#0369a1'),
+    emissiveIntensity: 0.35,
+    depthTest: true,
+    depthWrite: true
+});
+const SHARED_FOOTING_REBAR_MAT = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MeshStandardMaterial"]({
+    color: '#f59e0b',
+    metalness: 0.85,
+    roughness: 0.25,
+    emissive: new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Color"]('#b45309'),
+    emissiveIntensity: 0.35,
+    depthTest: true,
+    depthWrite: true
+});
 class WebGLErrorBoundary extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].Component {
     constructor(props){
         super(props);
@@ -551,7 +1326,7 @@ class WebGLErrorBoundary extends __TURBOPACK__imported__module__$5b$project$5d2f
                         className: "w-10 h-10 text-amber-500 mb-3"
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 83,
+                        lineNumber: 124,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -559,7 +1334,7 @@ class WebGLErrorBoundary extends __TURBOPACK__imported__module__$5b$project$5d2f
                         children: "3D Viewer Suspended"
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 84,
+                        lineNumber: 125,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -567,7 +1342,7 @@ class WebGLErrorBoundary extends __TURBOPACK__imported__module__$5b$project$5d2f
                         children: "The 3D graphics context was reset or temporarily unavailable. Click below to reload the 3D model."
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 85,
+                        lineNumber: 126,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -579,13 +1354,13 @@ class WebGLErrorBoundary extends __TURBOPACK__imported__module__$5b$project$5d2f
                         children: "Reload 3D Preview"
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 88,
+                        lineNumber: 129,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 82,
+                lineNumber: 123,
                 columnNumber: 9
             }, this);
         }
@@ -621,10 +1396,10 @@ function getColumnExposedFaces(pX, pY, pW_M, pD_M, walls, unit) {
     const tol = Math.max(halfW, halfD) + 0.15; // Search radius around column
     for (const w of walls){
         if (!w.start || !w.end) continue;
-        const wsX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.start.x, w.dimensions.unit || unit);
-        const wsY = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.start.y, w.dimensions.unit || unit);
-        const weX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.end.x, w.dimensions.unit || unit);
-        const weY = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.end.y, w.dimensions.unit || unit);
+        const wsX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.start.x, w.dimensions.unit || unit);
+        const wsY = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.start.y, w.dimensions.unit || unit);
+        const weX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.end.x, w.dimensions.unit || unit);
+        const weY = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.end.y, w.dimensions.unit || unit);
         const minWX = Math.min(wsX, weX);
         const maxWX = Math.max(wsX, weX);
         const minWY = Math.min(wsY, weY);
@@ -661,18 +1436,18 @@ function getColumnExposedFaces(pX, pY, pW_M, pD_M, walls, unit) {
 // 3D Real Cement Plaster Layer Component with opening voids cut out and physical thickness
 function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, showOuter, isXRay, plasterConfig }) {
     _s();
-    const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
-    const h = Math.min(20, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.height, wall.dimensions.unit));
+    const l = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.length, wall.dimensions.unit);
+    const h = Math.min(20, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.height, wall.dimensions.unit));
     const tUnit = wall.dimensions.thicknessUnit || (wall.dimensions.unit === 'ft' ? 'in' : 'mm');
-    const t = Math.min(2, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(wall.dimensions.thickness, tUnit));
+    const t = Math.min(2, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.thickness, tUnit));
     // Determine plaster thicknesses (in meters) from overrides or config
     const overrides = wall.plasterOverrides || {};
     const innerThickMm = overrides.inner?.thicknessMm ?? overrides.inner?.thickness ?? plasterConfig?.inner?.thicknessMm ?? plasterConfig?.inner?.thickness ?? plasterConfig?.innerMasonry?.thickness ?? 12;
     const outerThickMm = overrides.outer?.thicknessMm ?? overrides.outer?.thickness ?? plasterConfig?.outer?.thicknessMm ?? plasterConfig?.outer?.thickness ?? plasterConfig?.outerMasonry?.thickness ?? 15;
     const innerUnit = overrides.inner?.unit || plasterConfig?.inner?.unit || 'mm';
     const outerUnit = overrides.outer?.unit || plasterConfig?.outer?.unit || 'mm';
-    const innerThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMetersPlaster"])(innerThickMm, innerUnit));
-    const outerThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMetersPlaster"])(outerThickMm, outerUnit));
+    const innerThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMetersPlaster"])(innerThickMm, innerUnit));
+    const outerThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMetersPlaster"])(outerThickMm, outerUnit));
     // Active visibility:
     // showInner / showOuter from 3D Scene Elements controls visibility unless a wall explicitly disabled it
     const isInnerVisible = showInner && overrides.inner?.enabled !== false;
@@ -706,17 +1481,17 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                 "WallPlasterSkin.useMemo.centerOpenings": (o)=>o.position === 'Center' || !o.position
             }["WallPlasterSkin.useMemo.centerOpenings"]);
             const totalCenterWidth = centerOpenings.reduce({
-                "WallPlasterSkin.useMemo": (sum, op)=>sum + (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.width, op.unit || wall.dimensions.unit) + 0.2
+                "WallPlasterSkin.useMemo": (sum, op)=>sum + (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.width, op.unit || wall.dimensions.unit) + 0.2
             }["WallPlasterSkin.useMemo"], 0) - 0.2;
             posOffsets['Center'] = l / 2 - Math.max(0, totalCenterWidth) / 2;
             flatOpenings.forEach({
                 "WallPlasterSkin.useMemo": (op)=>{
-                    const opW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.width, op.unit || wall.dimensions.unit);
-                    const opH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.height, op.unit || wall.dimensions.unit);
+                    const opW = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.width, op.unit || wall.dimensions.unit);
+                    const opH = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.height, op.unit || wall.dimensions.unit);
                     const pos = op.position || 'Center';
                     let cx = 0;
                     if (op.distanceFromStart !== undefined) {
-                        cx = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.distanceFromStart, op.unit || wall.dimensions.unit) + opW / 2;
+                        cx = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.distanceFromStart, op.unit || wall.dimensions.unit) + opW / 2;
                     } else if (pos === 'Left') {
                         cx = posOffsets['Left'] + opW / 2;
                         posOffsets['Left'] += opW + 0.2;
@@ -727,14 +1502,14 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                         cx = posOffsets['Center'] + opW / 2;
                         posOffsets['Center'] += opW + 0.2;
                     } else if (pos === 'Custom Offset') {
-                        const customOffset = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.customOffset || 0, op.unit || wall.dimensions.unit);
+                        const customOffset = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.customOffset || 0, op.unit || wall.dimensions.unit);
                         if (posOffsets[`Custom_${customOffset}`] === undefined) posOffsets[`Custom_${customOffset}`] = 0;
                         cx = customOffset + opW / 2 + posOffsets[`Custom_${customOffset}`];
                         posOffsets[`Custom_${customOffset}`] += opW + 0.2;
                     }
                     let cy = 0;
                     if (op.sillHeight !== undefined) {
-                        cy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(op.sillHeight, op.unit || wall.dimensions.unit);
+                        cy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(op.sillHeight, op.unit || wall.dimensions.unit);
                     } else if (op.type === 'window' || op.type === 'ventilator') {
                         cy = Math.max(0.9, h / 2 - opH / 2);
                     }
@@ -804,7 +1579,7 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
         side: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DoubleSide"]
     }, void 0, false, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 341,
+        lineNumber: 382,
         columnNumber: 5
     }, this);
     const innerPlasterMat = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -817,7 +1592,7 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
         side: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$three$2f$build$2f$three$2e$core$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DoubleSide"]
     }, void 0, false, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 353,
+        lineNumber: 394,
         columnNumber: 5
     }, this);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -836,7 +1611,7 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                     children: innerPlasterMat
                 }, void 0, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 372,
+                    lineNumber: 413,
                     columnNumber: 13
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -850,13 +1625,13 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                     children: innerPlasterMat
                 }, void 0, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 379,
+                    lineNumber: 420,
                     columnNumber: 13
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-            lineNumber: 371,
+            lineNumber: 412,
             columnNumber: 11
         }, this) : /* EXTERNAL WALL:
            Exterior face receives 15mm Outer Plaster skin strictly on the outside.
@@ -877,12 +1652,12 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                             children: outerPlasterMat
                         }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 398,
+                            lineNumber: 439,
                             columnNumber: 19
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 397,
+                        lineNumber: 438,
                         columnNumber: 17
                     }, this),
                     isInnerVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -898,18 +1673,18 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                             children: innerPlasterMat
                         }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 409,
+                            lineNumber: 450,
                             columnNumber: 19
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 408,
+                        lineNumber: 449,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 395,
+                lineNumber: 436,
                 columnNumber: 13
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                 children: [
@@ -926,12 +1701,12 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                             children: outerPlasterMat
                         }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 423,
+                            lineNumber: 464,
                             columnNumber: 19
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 422,
+                        lineNumber: 463,
                         columnNumber: 17
                     }, this),
                     isInnerVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -947,28 +1722,28 @@ function WallPlasterSkin({ wall, isInternal, isExteriorZPlus = true, showInner, 
                             children: innerPlasterMat
                         }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 434,
+                            lineNumber: 475,
                             columnNumber: 19
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 433,
+                        lineNumber: 474,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 420,
+                lineNumber: 461,
                 columnNumber: 13
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-            lineNumber: 393,
+            lineNumber: 434,
             columnNumber: 9
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 365,
+        lineNumber: 406,
         columnNumber: 5
     }, this);
 }
@@ -978,10 +1753,10 @@ function CustomWallMeshWrapper({ wall, yOffset, isInternal, debugMode, fadeFront
     _s1();
     const { brickType, settings } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$CalculatorContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCalculator"])();
     if (!wall.start || !wall.end) return null;
-    const toM = (val)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(val, wall.dimensions.unit);
+    const toM = (val)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(val, wall.dimensions.unit);
     const origLen = Math.hypot(wall.end.x - wall.start.x, wall.end.y - wall.start.y);
     // Split wall into clean brick sub-segments around all intersecting RCC pillars
-    let segments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["splitWallByPillars"])(wall, pillars || [], wall.dimensions.unit, allFloorWalls);
+    let segments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["splitWallByPillars"])(wall, pillars || [], wall.dimensions.unit, allFloorWalls);
     if (!segments || segments.length === 0) {
         segments = [
             {
@@ -998,7 +1773,7 @@ function CustomWallMeshWrapper({ wall, yOffset, isInternal, debugMode, fadeFront
     }
     const isWireframe = debugMode;
     const fullWallHeightM = targetHeightM !== undefined ? targetHeightM : toM(wall.dimensions.height);
-    const fullWallHeightInUnits = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["convertUnit"])(fullWallHeightM, 'm', wall.dimensions.unit);
+    const fullWallHeightInUnits = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["convertUnit"])(fullWallHeightM, 'm', wall.dimensions.unit);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
         children: segments.map((seg)=>{
             const startX = toM(seg.start.x);
@@ -1052,7 +1827,7 @@ function CustomWallMeshWrapper({ wall, yOffset, isInternal, debugMode, fadeFront
                         infillRecess: true
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 525,
+                        lineNumber: 566,
                         columnNumber: 13
                     }, this),
                     (showInnerPlaster || showOuterPlaster) && !isWireframe && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(WallPlasterSkin, {
@@ -1065,19 +1840,19 @@ function CustomWallMeshWrapper({ wall, yOffset, isInternal, debugMode, fadeFront
                         plasterConfig: plasterConfig
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 534,
+                        lineNumber: 575,
                         columnNumber: 15
                     }, this)
                 ]
             }, seg.id, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 524,
+                lineNumber: 565,
                 columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 485,
+        lineNumber: 526,
         columnNumber: 5
     }, this);
 }
@@ -1090,12 +1865,13 @@ _c1 = CustomWallMeshWrapper;
 // Normalize RCC pillar data ensuring safe defaults for all dimensions and rebar configurations
 function normalizePillarRebarConfig(p, customReinf) {
     const reinf = {
-        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_RCC_REINFORCEMENT"],
-        ...customReinf || {}
+        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_REINFORCEMENT"],
+        ...customReinf || {},
+        ...p.rebarConfig || {}
     };
-    const toUnitM = (val, unit)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(val || 9, unit || 'in');
-    const wM = Math.max(0.15, toUnitM(p.width, p.unit));
-    const dM = p.shape === 'circular' ? wM : Math.max(0.15, toUnitM(p.depth, p.unit));
+    const toUnitM = (val, unit)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(val || 9, unit || 'in');
+    const wM = Math.max(0.10, toUnitM(p.width, p.unit || 'in'));
+    const dM = p.shape === 'circular' ? wM : Math.max(0.10, toUnitM(p.depth, p.unit || 'in'));
     return {
         wM,
         dM,
@@ -1105,7 +1881,7 @@ function normalizePillarRebarConfig(p, customReinf) {
 // Rebar cage component for RCC column with structural joint continuity
 function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf: customReinf }) {
     const reinf = {
-        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_RCC_REINFORCEMENT"],
+        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_REINFORCEMENT"],
         ...customReinf || {}
     };
     // Physical rebar diameter with pixel-safe visual radius for Three.js 3D viewport
@@ -1237,39 +2013,25 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                         barCenterY,
                         oz
                     ],
+                    material: SHARED_MAIN_REBAR_MAT,
                     castShadow: true,
                     renderOrder: 1,
                     frustumCulled: false,
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                            args: [
-                                barRadius,
-                                barRadius,
-                                totalVerticalH,
-                                16
-                            ]
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 686,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                            color: "#00f0ff",
-                            metalness: 0.9,
-                            roughness: 0.2,
-                            emissive: "#0284c7",
-                            emissiveIntensity: 0.5,
-                            depthTest: true,
-                            depthWrite: true
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 687,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, `rebar-main-${idx}`, true, {
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                        args: [
+                            barRadius,
+                            barRadius,
+                            totalVerticalH,
+                            8
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 735,
+                        columnNumber: 11
+                    }, this)
+                }, `rebar-main-${idx}`, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 685,
+                    lineNumber: 727,
                     columnNumber: 9
                 }, this)),
             stirrupYPositions.map((y, idx)=>{
@@ -1285,39 +2047,25 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                             0,
                             0
                         ],
+                        material: SHARED_TIE_REBAR_MAT,
                         castShadow: true,
                         renderOrder: 1,
                         frustumCulled: false,
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("torusGeometry", {
-                                args: [
-                                    cageRadius,
-                                    stirrupRadius,
-                                    8,
-                                    24
-                                ]
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 704,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                color: "#ffb703",
-                                metalness: 0.9,
-                                roughness: 0.2,
-                                emissive: "#d97706",
-                                emissiveIntensity: 0.5,
-                                depthTest: true,
-                                depthWrite: true
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 705,
-                                columnNumber: 15
-                            }, this)
-                        ]
-                    }, `stirrup-circ-${idx}`, true, {
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("torusGeometry", {
+                            args: [
+                                cageRadius,
+                                stirrupRadius,
+                                6,
+                                16
+                            ]
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 752,
+                            columnNumber: 15
+                        }, this)
+                    }, `stirrup-circ-${idx}`, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 703,
+                        lineNumber: 743,
                         columnNumber: 13
                     }, this);
                 }
@@ -1339,38 +2087,24 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                                 0,
                                 Math.PI / 2
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             renderOrder: 1,
                             frustumCulled: false,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        stirrupRadius,
-                                        stirrupRadius,
-                                        innerW,
-                                        8
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 722,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5,
-                                    depthTest: true,
-                                    depthWrite: true
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 723,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerW,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 767,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 721,
+                            lineNumber: 760,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1384,38 +2118,24 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                                 0,
                                 Math.PI / 2
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             renderOrder: 1,
                             frustumCulled: false,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        stirrupRadius,
-                                        stirrupRadius,
-                                        innerW,
-                                        8
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 734,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5,
-                                    depthTest: true,
-                                    depthWrite: true
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 735,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerW,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 776,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 733,
+                            lineNumber: 769,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1429,38 +2149,24 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                                 0,
                                 0
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             renderOrder: 1,
                             frustumCulled: false,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        stirrupRadius,
-                                        stirrupRadius,
-                                        innerD,
-                                        8
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 746,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5,
-                                    depthTest: true,
-                                    depthWrite: true
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 747,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerD,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 785,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 745,
+                            lineNumber: 778,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1474,51 +2180,37 @@ function PillarRebarCage({ wM, dM, hM, jointM = 0, starterM = 0.35, shape, reinf
                                 0,
                                 0
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             renderOrder: 1,
                             frustumCulled: false,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        stirrupRadius,
-                                        stirrupRadius,
-                                        innerD,
-                                        8
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 758,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5,
-                                    depthTest: true,
-                                    depthWrite: true
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 759,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerD,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 794,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 757,
+                            lineNumber: 787,
                             columnNumber: 13
                         }, this)
                     ]
                 }, `stirrup-rect-${idx}`, true, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 719,
+                    lineNumber: 758,
                     columnNumber: 11
                 }, this);
             })
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 682,
+        lineNumber: 724,
         columnNumber: 5
     }, this);
 }
@@ -1526,7 +2218,7 @@ _c2 = PillarRebarCage;
 // 2-Direction RCC Floor/Roof Slab Reinforcement Mesh
 function SlabRebarMesh({ bayWidthM, bayDepthM, thicknessM, reinf: customReinf }) {
     const reinf = {
-        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_RCC_REINFORCEMENT"],
+        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_REINFORCEMENT"],
         ...customReinf || {}
     };
     // Engineering reinforcement diameters in meters with pixel-safe visual radius
@@ -1564,38 +2256,24 @@ function SlabRebarMesh({ bayWidthM, bayDepthM, thicknessM, reinf: customReinf })
                         0,
                         Math.PI / 2
                     ],
+                    material: SHARED_SLAB_REBAR_MAT,
                     renderOrder: 1,
                     frustumCulled: false,
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                            args: [
-                                mainRadius,
-                                mainRadius,
-                                usableWidthM,
-                                8
-                            ]
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 823,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                            color: "#00f0ff",
-                            metalness: 0.9,
-                            roughness: 0.2,
-                            emissive: "#0284c7",
-                            emissiveIntensity: 0.45,
-                            depthTest: true,
-                            depthWrite: true
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 824,
-                            columnNumber: 13
-                        }, this)
-                    ]
-                }, `slab-main-${idx}`, true, {
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                        args: [
+                            mainRadius,
+                            mainRadius,
+                            usableWidthM,
+                            6
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 857,
+                        columnNumber: 13
+                    }, this)
+                }, `slab-main-${idx}`, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 822,
+                    lineNumber: 849,
                     columnNumber: 11
                 }, this);
             }),
@@ -1614,49 +2292,282 @@ function SlabRebarMesh({ bayWidthM, bayDepthM, thicknessM, reinf: customReinf })
                         0,
                         0
                     ],
+                    material: SHARED_TIE_REBAR_MAT,
                     renderOrder: 1,
                     frustumCulled: false,
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                            args: [
-                                distRadius,
-                                distRadius,
-                                usableDepthM,
-                                8
-                            ]
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 842,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                            color: "#ffb703",
-                            metalness: 0.9,
-                            roughness: 0.2,
-                            emissive: "#d97706",
-                            emissiveIntensity: 0.45,
-                            depthTest: true,
-                            depthWrite: true
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 843,
-                            columnNumber: 13
-                        }, this)
-                    ]
-                }, `slab-dist-${idx}`, true, {
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                        args: [
+                            distRadius,
+                            distRadius,
+                            usableDepthM,
+                            6
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 874,
+                        columnNumber: 13
+                    }, this)
+                }, `slab-dist-${idx}`, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 841,
+                    lineNumber: 866,
                     columnNumber: 11
                 }, this);
             })
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 817,
+        lineNumber: 844,
         columnNumber: 5
     }, this);
 }
 _c3 = SlabRebarMesh;
+// 3D RCC Ring Beam Rebar Cage (Main Longitudinal Top & Bottom Bars + Rectangular Confining Stirrup Ties)
+function RingBeamRebarCage({ lenM, heightM, widthM, reinf: customReinf }) {
+    const reinf = {
+        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_REINFORCEMENT"],
+        ...customReinf || {}
+    };
+    // Physical reinforcement diameters with pixel-safe visual radius for Three.js 3D viewport
+    const topDiaM = Math.max(0.008, (reinf.beamTopBarDiaMm || 12) * 0.001);
+    const topRadius = Math.max(0.009, topDiaM / 2);
+    const bottomDiaM = Math.max(0.008, (reinf.beamBottomBarDiaMm || 12) * 0.001);
+    const bottomRadius = Math.max(0.009, bottomDiaM / 2);
+    const stirrupDiaM = Math.max(0.004, (reinf.beamStirrupDiaMm || 8) * 0.001);
+    const stirrupRadius = Math.max(0.006, stirrupDiaM / 2);
+    const coverM = Math.max(0.02, (reinf.beamCoverMm || 25) * 0.001);
+    const stirrupSpacingM = Math.max(0.08, (reinf.beamStirrupSpacingMm || 150) * 0.001);
+    const topCount = Math.max(2, reinf.beamTopBarCount || 2);
+    const bottomCount = Math.max(2, reinf.beamBottomBarCount || 2);
+    // Cage bounds strictly inside perimeter concrete cover
+    const innerH = Math.max(0.05, heightM - 2 * coverM);
+    const innerW = Math.max(0.05, widthM - 2 * coverM);
+    // Longitudinal bars run along local X axis (from -lenM/2 to +lenM/2)
+    const yTop = innerH / 2 - stirrupDiaM - topRadius;
+    const yBottom = -innerH / 2 + stirrupDiaM + bottomRadius;
+    const usableW_top = Math.max(0.02, innerW - 2 * (stirrupDiaM + topRadius));
+    const topBarZPositions = [];
+    if (topCount === 1) {
+        topBarZPositions.push(0);
+    } else {
+        for(let idx = 0; idx < topCount; idx++){
+            topBarZPositions.push(-usableW_top / 2 + idx * (usableW_top / (topCount - 1)));
+        }
+    }
+    const usableW_bot = Math.max(0.02, innerW - 2 * (stirrupDiaM + bottomRadius));
+    const bottomBarZPositions = [];
+    if (bottomCount === 1) {
+        bottomBarZPositions.push(0);
+    } else {
+        for(let idx = 0; idx < bottomCount; idx++){
+            bottomBarZPositions.push(-usableW_bot / 2 + idx * (usableW_bot / (bottomCount - 1)));
+        }
+    }
+    // Stirrup ring positions along local X axis
+    const numStirrups = Math.max(2, Math.floor(lenM / stirrupSpacingM));
+    const stirrupXPositions = [];
+    for(let idx = 0; idx < numStirrups; idx++){
+        stirrupXPositions.push(-lenM / 2 + stirrupSpacingM * 0.5 + idx * ((lenM - stirrupSpacingM) / Math.max(1, numStirrups - 1)));
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+        renderOrder: 1,
+        children: [
+            topBarZPositions.map((z, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                    position: [
+                        0,
+                        yTop,
+                        z
+                    ],
+                    rotation: [
+                        0,
+                        0,
+                        Math.PI / 2
+                    ],
+                    material: SHARED_MAIN_REBAR_MAT,
+                    renderOrder: 1,
+                    frustumCulled: false,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                        args: [
+                            topRadius,
+                            topRadius,
+                            lenM,
+                            8
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 960,
+                        columnNumber: 11
+                    }, this)
+                }, `beam-top-bar-${idx}`, false, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 952,
+                    columnNumber: 9
+                }, this)),
+            bottomBarZPositions.map((z, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                    position: [
+                        0,
+                        yBottom,
+                        z
+                    ],
+                    rotation: [
+                        0,
+                        0,
+                        Math.PI / 2
+                    ],
+                    material: SHARED_MAIN_REBAR_MAT,
+                    renderOrder: 1,
+                    frustumCulled: false,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                        args: [
+                            bottomRadius,
+                            bottomRadius,
+                            lenM,
+                            8
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 974,
+                        columnNumber: 11
+                    }, this)
+                }, `beam-bottom-bar-${idx}`, false, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 966,
+                    columnNumber: 9
+                }, this)),
+            stirrupXPositions.map((x, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    position: [
+                        x,
+                        0,
+                        0
+                    ],
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                innerH / 2,
+                                0
+                            ],
+                            rotation: [
+                                Math.PI / 2,
+                                0,
+                                0
+                            ],
+                            material: SHARED_TIE_REBAR_MAT,
+                            renderOrder: 1,
+                            frustumCulled: false,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerW,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 989,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 982,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                -innerH / 2,
+                                0
+                            ],
+                            rotation: [
+                                Math.PI / 2,
+                                0,
+                                0
+                            ],
+                            material: SHARED_TIE_REBAR_MAT,
+                            renderOrder: 1,
+                            frustumCulled: false,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerW,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 999,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 992,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                0,
+                                -innerW / 2
+                            ],
+                            material: SHARED_TIE_REBAR_MAT,
+                            renderOrder: 1,
+                            frustumCulled: false,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerH,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1008,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1002,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                0,
+                                innerW / 2
+                            ],
+                            material: SHARED_TIE_REBAR_MAT,
+                            renderOrder: 1,
+                            frustumCulled: false,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    stirrupRadius,
+                                    stirrupRadius,
+                                    innerH,
+                                    6
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1017,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1011,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, `beam-stirrup-${idx}`, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 980,
+                    columnNumber: 9
+                }, this))
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+        lineNumber: 949,
+        columnNumber: 5
+    }, this);
+}
+_c4 = RingBeamRebarCage;
 // 2-Way RCC Footing Reinforcement Mesh & Column Starter Anchor Bars
 function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_M = 0.6, stubW_M = 0.2286, stubD_M = 0.2286, hasStub = true, rebar, columnStubRebar, starterCount = 4, starterDiaMm = 16 }) {
     const coverM = Math.max(0.03, (rebar?.coverMm || 50) * 0.001);
@@ -1693,36 +2604,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 0,
                                 Math.PI / 2
                             ],
+                            material: SHARED_FOOTING_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        mainRadius,
-                                        mainRadius,
-                                        usableLenM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 914,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#00f0ff",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#0284c7",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 915,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    mainRadius,
+                                    mainRadius,
+                                    usableLenM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1080,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 913,
+                            lineNumber: 1079,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1731,36 +2630,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 hookM / 2,
                                 0
                             ],
+                            material: SHARED_FOOTING_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        mainRadius,
-                                        mainRadius,
-                                        hookM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 918,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#00f0ff",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#0284c7",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 919,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    mainRadius,
+                                    mainRadius,
+                                    hookM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1083,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 917,
+                            lineNumber: 1082,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1769,42 +2656,30 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 hookM / 2,
                                 0
                             ],
+                            material: SHARED_FOOTING_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        mainRadius,
-                                        mainRadius,
-                                        hookM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 922,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#00f0ff",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#0284c7",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 923,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    mainRadius,
+                                    mainRadius,
+                                    hookM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1086,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 921,
+                            lineNumber: 1085,
                             columnNumber: 13
                         }, this)
                     ]
                 }, `footing-main-${idx}`, true, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 912,
+                    lineNumber: 1078,
                     columnNumber: 11
                 }, this);
             }),
@@ -1825,36 +2700,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 0,
                                 0
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        distRadius,
-                                        distRadius,
-                                        usableWidM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 935,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 936,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    distRadius,
+                                    distRadius,
+                                    usableWidM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1098,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 934,
+                            lineNumber: 1097,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1863,36 +2726,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 hookM / 2,
                                 -usableWidM / 2
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        distRadius,
-                                        distRadius,
-                                        hookM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 939,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 940,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    distRadius,
+                                    distRadius,
+                                    hookM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1101,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 938,
+                            lineNumber: 1100,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -1901,42 +2752,30 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                 hookM / 2,
                                 usableWidM / 2
                             ],
+                            material: SHARED_TIE_REBAR_MAT,
                             castShadow: true,
                             renderOrder: 1,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                    args: [
-                                        distRadius,
-                                        distRadius,
-                                        hookM,
-                                        12
-                                    ]
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 943,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                    color: "#ffb703",
-                                    metalness: 0.9,
-                                    roughness: 0.2,
-                                    emissive: "#d97706",
-                                    emissiveIntensity: 0.5
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 944,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    distRadius,
+                                    distRadius,
+                                    hookM,
+                                    8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1104,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 942,
+                            lineNumber: 1103,
                             columnNumber: 13
                         }, this)
                     ]
                 }, `footing-dist-${idx}`, true, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 933,
+                    lineNumber: 1096,
                     columnNumber: 11
                 }, this);
             }),
@@ -1997,36 +2836,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             startY + starterVerticalH / 2,
                                             0
                                         ],
+                                        material: SHARED_MAIN_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    starterRadius,
-                                                    starterRadius,
-                                                    starterVerticalH,
-                                                    12
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 982,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#38bdf8",
-                                                metalness: 0.9,
-                                                roughness: 0.2,
-                                                emissive: "#0284c7",
-                                                emissiveIntensity: 0.6
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 983,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                starterRadius,
+                                                starterRadius,
+                                                starterVerticalH,
+                                                8
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1142,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 981,
+                                        lineNumber: 1141,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2040,42 +2867,30 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             0,
                                             Math.PI / 2
                                         ],
+                                        material: SHARED_MAIN_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    starterRadius,
-                                                    starterRadius,
-                                                    starterBendM,
-                                                    12
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 986,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#38bdf8",
-                                                metalness: 0.9,
-                                                roughness: 0.2,
-                                                emissive: "#0284c7",
-                                                emissiveIntensity: 0.6
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 987,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                starterRadius,
+                                                starterRadius,
+                                                starterBendM,
+                                                8
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1145,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 985,
+                                        lineNumber: 1144,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, `col-starter-${sIdx}`, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 980,
+                                lineNumber: 1140,
                                 columnNumber: 15
                             }, this)),
                         Array.from({
@@ -2100,36 +2915,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             0,
                                             Math.PI / 2
                                         ],
+                                        material: SHARED_TIE_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    stirrupRadius,
-                                                    stirrupRadius,
-                                                    tieW,
-                                                    8
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 998,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#f59e0b",
-                                                metalness: 0.8,
-                                                roughness: 0.25,
-                                                emissive: "#d97706",
-                                                emissiveIntensity: 0.4
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 999,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                stirrupRadius,
+                                                stirrupRadius,
+                                                tieW,
+                                                6
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1156,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 997,
+                                        lineNumber: 1155,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2143,36 +2946,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             0,
                                             Math.PI / 2
                                         ],
+                                        material: SHARED_TIE_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    stirrupRadius,
-                                                    stirrupRadius,
-                                                    tieW,
-                                                    8
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1002,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#f59e0b",
-                                                metalness: 0.8,
-                                                roughness: 0.25,
-                                                emissive: "#d97706",
-                                                emissiveIntensity: 0.4
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1003,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                stirrupRadius,
+                                                stirrupRadius,
+                                                tieW,
+                                                6
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1159,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1001,
+                                        lineNumber: 1158,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2186,36 +2977,24 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             0,
                                             0
                                         ],
+                                        material: SHARED_TIE_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    stirrupRadius,
-                                                    stirrupRadius,
-                                                    tieD,
-                                                    8
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1006,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#f59e0b",
-                                                metalness: 0.8,
-                                                roughness: 0.25,
-                                                emissive: "#d97706",
-                                                emissiveIntensity: 0.4
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1007,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                stirrupRadius,
+                                                stirrupRadius,
+                                                tieD,
+                                                6
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1162,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1005,
+                                        lineNumber: 1161,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2229,78 +3008,66 @@ function FootingRebarMesh({ footingLengthM, footingWidthM, footingDepthM, stubH_
                                             0,
                                             0
                                         ],
+                                        material: SHARED_TIE_REBAR_MAT,
                                         castShadow: true,
                                         renderOrder: 1,
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
-                                                args: [
-                                                    stirrupRadius,
-                                                    stirrupRadius,
-                                                    tieD,
-                                                    8
-                                                ]
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1010,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                color: "#f59e0b",
-                                                metalness: 0.8,
-                                                roughness: 0.25,
-                                                emissive: "#d97706",
-                                                emissiveIntensity: 0.4
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1011,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                stirrupRadius,
+                                                stirrupRadius,
+                                                tieD,
+                                                6
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1165,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1009,
+                                        lineNumber: 1164,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, `stub-tie-${tIdx}`, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 996,
+                                lineNumber: 1154,
                                 columnNumber: 17
                             }, this);
                         })
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 977,
+                    lineNumber: 1137,
                     columnNumber: 11
                 }, this);
             })()
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 907,
+        lineNumber: 1073,
         columnNumber: 5
     }, this);
 }
-_c4 = FootingRebarMesh;
+_c5 = FootingRebarMesh;
 // 3D Foundation Footing Group with layer-by-layer representation below Ground Floor (Y < 0)
 function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundation, showFootingRebar, showLabels, isSelected, onSelect, reinf }) {
-    const effSize = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getEffectiveFootingSize"])(footing, foundationConfig);
-    const fL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(effSize.length, effSize.unit);
-    const fW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(effSize.width, effSize.unit);
-    const fD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(effSize.depth, effSize.unit);
+    const effSize = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectiveFootingSize"])(footing, foundationConfig);
+    const fL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(effSize.length, effSize.unit);
+    const fW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(effSize.width, effSize.unit);
+    const fD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(effSize.depth, effSize.unit);
     const stubHeightFt = footing.columnStubHeight !== undefined ? footing.columnStubHeight : 2.0;
-    const stubH_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(stubHeightFt, footing.columnStubUnit || effSize.unit);
-    const stubW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.columnStubWidth || 9, 'in');
-    const stubD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.columnStubDepth || 9, 'in');
-    const pccL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.pccLength || effSize.length + 1, footing.pccUnit || effSize.unit);
-    const pccW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.pccWidth || effSize.width + 1, footing.pccUnit || effSize.unit);
-    const pccT_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.pccThickness || 0.33, footing.pccUnit || effSize.unit);
-    const sandL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.sandFillLength || footing.pccLength || effSize.length + 1, footing.sandFillUnit || effSize.unit);
-    const sandW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.sandFillWidth || footing.pccWidth || effSize.width + 1, footing.sandFillUnit || effSize.unit);
-    const sandD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.sandFillDepth || 0.5, footing.sandFillUnit || effSize.unit);
-    const posX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.position?.x || 0, buildingUnit);
-    const posZ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(footing.position?.y || 0, buildingUnit);
+    const stubH_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(stubHeightFt, footing.columnStubUnit || effSize.unit);
+    const stubW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.columnStubWidth || 9, 'in');
+    const stubD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.columnStubDepth || 9, 'in');
+    const pccL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.pccLength || effSize.length + 1, footing.pccUnit || effSize.unit);
+    const pccW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.pccWidth || effSize.width + 1, footing.pccUnit || effSize.unit);
+    const pccT_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.pccThickness || 0.33, footing.pccUnit || effSize.unit);
+    const sandL_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.sandFillLength || footing.pccLength || effSize.length + 1, footing.sandFillUnit || effSize.unit);
+    const sandW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.sandFillWidth || footing.pccWidth || effSize.width + 1, footing.sandFillUnit || effSize.unit);
+    const sandD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.sandFillDepth || 0.5, footing.sandFillUnit || effSize.unit);
+    const posX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.position?.x || 0, buildingUnit);
+    const posZ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(footing.position?.y || 0, buildingUnit);
     // Check if foundation pillar / column stub exists
     const hasStub = footing.hasFoundationPillar !== false && stubHeightFt > 0;
     const actualStubH_M = hasStub ? stubH_M : 0;
@@ -2343,7 +3110,7 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         ]
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1087,
+                        lineNumber: 1241,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -2355,13 +3122,13 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         depthWrite: !isXRay
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1088,
+                        lineNumber: 1242,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1086,
+                lineNumber: 1240,
                 columnNumber: 9
             }, this),
             showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2382,7 +3149,7 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         ]
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1102,
+                        lineNumber: 1256,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -2394,13 +3161,13 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         depthWrite: !isXRay
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1103,
+                        lineNumber: 1257,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1101,
+                lineNumber: 1255,
                 columnNumber: 9
             }, this),
             showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2420,7 +3187,7 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         ]
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1117,
+                        lineNumber: 1271,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -2432,13 +3199,13 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         depthWrite: !isXRay
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1118,
+                        lineNumber: 1272,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1116,
+                lineNumber: 1270,
                 columnNumber: 9
             }, this),
             showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -2458,7 +3225,7 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         ]
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1132,
+                        lineNumber: 1286,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -2470,13 +3237,13 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                         depthWrite: !isXRay
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1133,
+                        lineNumber: 1287,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1131,
+                lineNumber: 1285,
                 columnNumber: 9
             }, this),
             showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -2499,12 +3266,12 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                     starterDiaMm: reinf?.pillarMainBarDiaMm || 16
                 }, void 0, false, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 1147,
+                    lineNumber: 1301,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1146,
+                lineNumber: 1300,
                 columnNumber: 9
             }, this),
             showLabels && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Html"], {
@@ -2529,7 +3296,7 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 1173,
+                            lineNumber: 1327,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2543,30 +3310,1928 @@ function Footing3DGroup({ footing, foundationConfig, buildingUnit, showFoundatio
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 1174,
+                            lineNumber: 1328,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                    lineNumber: 1166,
+                    lineNumber: 1320,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1165,
+                lineNumber: 1319,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 1083,
+        lineNumber: 1237,
         columnNumber: 5
     }, this);
 }
-_c5 = Footing3DGroup;
-function CameraController({ viewMode, viewPreset, controlsRef }) {
+_c6 = Footing3DGroup;
+// 3D RCC Dog-Legged Staircase connecting storeys in multi-storey buildings
+function Staircase3D({ baseY, topY, startX = 2.0, startZ = 2.0, widthM = 1.05, isConcreteSolid = false, isRebarActive = false, isGhosted = false }) {
+    const totalH = topY - baseY;
+    const numStepsFlight = 8;
+    const stepRise = totalH / 2 / numStepsFlight;
+    const stepTread = 0.28;
+    const waistThick = 0.14;
+    const landingH = baseY + totalH / 2;
+    const flight1Len = numStepsFlight * stepTread;
+    const matColor = "#94a3b8";
+    const opacity = isGhosted ? 0.05 : isConcreteSolid ? 1.0 : 0.35;
+    const transparent = !isConcreteSolid;
+    const depthWrite = isConcreteSolid;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+        position: [
+            startX,
+            0,
+            -startZ
+        ],
+        children: [
+            Array.from({
+                length: numStepsFlight
+            }).map((_, stepIdx)=>{
+                const stepY = baseY + (stepIdx + 0.5) * stepRise;
+                const stepX = (stepIdx + 0.5) * stepTread;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    children: !isGhosted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                        position: [
+                            stepX,
+                            stepY,
+                            0
+                        ],
+                        castShadow: true,
+                        receiveShadow: true,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                args: [
+                                    stepTread,
+                                    stepRise,
+                                    widthM
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1382,
+                                columnNumber: 17
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                color: matColor,
+                                roughness: 0.8,
+                                transparent: transparent,
+                                opacity: opacity,
+                                depthWrite: depthWrite
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1383,
+                                columnNumber: 17
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1381,
+                        columnNumber: 15
+                    }, this)
+                }, `stair-f1-${stepIdx}`, false, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1379,
+                    columnNumber: 11
+                }, this);
+            }),
+            (()=>{
+                const angle = Math.atan2(totalH / 2, flight1Len);
+                const hypoLen = Math.hypot(totalH / 2, flight1Len);
+                const midHypoX = flight1Len / 2;
+                const midHypoY = baseY + totalH / 4 - 0.06;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                    position: [
+                        midHypoX,
+                        midHypoY,
+                        0
+                    ],
+                    rotation: [
+                        0,
+                        0,
+                        angle
+                    ],
+                    castShadow: true,
+                    receiveShadow: true,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                            args: [
+                                hypoLen,
+                                waistThick,
+                                widthM
+                            ]
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1404,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                            color: "#64748b",
+                            roughness: 0.7,
+                            transparent: transparent,
+                            opacity: opacity,
+                            depthWrite: depthWrite
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1405,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1403,
+                    columnNumber: 11
+                }, this);
+            })(),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                position: [
+                    flight1Len + 0.6,
+                    landingH - 0.07,
+                    widthM / 2
+                ],
+                castShadow: true,
+                receiveShadow: true,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                        args: [
+                            1.2,
+                            0.14,
+                            widthM * 2 + 0.1
+                        ]
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1418,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                        color: "#64748b",
+                        roughness: 0.7,
+                        transparent: transparent,
+                        opacity: opacity,
+                        depthWrite: depthWrite
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1419,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1417,
+                columnNumber: 7
+            }, this),
+            Array.from({
+                length: numStepsFlight
+            }).map((_, stepIdx)=>{
+                const stepY = landingH + (stepIdx + 0.5) * stepRise;
+                const stepX = flight1Len - (stepIdx + 0.5) * stepTread;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    children: !isGhosted && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                        position: [
+                            stepX,
+                            stepY,
+                            widthM + 0.08
+                        ],
+                        castShadow: true,
+                        receiveShadow: true,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                args: [
+                                    stepTread,
+                                    stepRise,
+                                    widthM
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1436,
+                                columnNumber: 17
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                color: matColor,
+                                roughness: 0.8,
+                                transparent: transparent,
+                                opacity: opacity,
+                                depthWrite: depthWrite
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1437,
+                                columnNumber: 17
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1435,
+                        columnNumber: 15
+                    }, this)
+                }, `stair-f2-${stepIdx}`, false, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1433,
+                    columnNumber: 11
+                }, this);
+            }),
+            (()=>{
+                const angle = Math.atan2(totalH / 2, flight1Len);
+                const hypoLen = Math.hypot(totalH / 2, flight1Len);
+                const midHypoX = flight1Len / 2;
+                const midHypoY = landingH + totalH / 4 - 0.06;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                    position: [
+                        midHypoX,
+                        midHypoY,
+                        widthM + 0.08
+                    ],
+                    rotation: [
+                        0,
+                        0,
+                        -angle
+                    ],
+                    castShadow: true,
+                    receiveShadow: true,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                            args: [
+                                hypoLen,
+                                waistThick,
+                                widthM
+                            ]
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1458,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                            color: "#64748b",
+                            roughness: 0.7,
+                            transparent: transparent,
+                            opacity: opacity,
+                            depthWrite: depthWrite
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1459,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1457,
+                    columnNumber: 11
+                }, this);
+            })(),
+            [
+                -widthM / 2 - 0.02,
+                widthM * 1.5 + 0.1
+            ].map((rz, rIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    position: [
+                        0,
+                        0,
+                        rz
+                    ],
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                flight1Len / 2,
+                                baseY + totalH / 4 + 0.85,
+                                0
+                            ],
+                            rotation: [
+                                0,
+                                0,
+                                Math.atan2(totalH / 2, flight1Len)
+                            ],
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                    args: [
+                                        0.02,
+                                        0.02,
+                                        Math.hypot(totalH / 2, flight1Len),
+                                        12
+                                    ]
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1474,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                    color: "#0284c7",
+                                    metalness: 0.8,
+                                    roughness: 0.2
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1475,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1473,
+                            columnNumber: 11
+                        }, this),
+                        [
+                            0,
+                            flight1Len * 0.33,
+                            flight1Len * 0.66,
+                            flight1Len
+                        ].map((px, pIdx)=>{
+                            const py = baseY + px / flight1Len * (totalH / 2) + 0.42;
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    px,
+                                    py,
+                                    0
+                                ],
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                        args: [
+                                            0.015,
+                                            0.015,
+                                            0.85,
+                                            12
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1481,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#0284c7",
+                                        metalness: 0.8,
+                                        roughness: 0.2
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1482,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, `post-${pIdx}`, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1480,
+                                columnNumber: 15
+                            }, this);
+                        })
+                    ]
+                }, `railing-${rIdx}`, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1472,
+                    columnNumber: 9
+                }, this)),
+            isRebarActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                renderOrder: 10,
+                children: [
+                    -widthM / 3,
+                    0,
+                    widthM / 3
+                ].map((barZ, bIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                        position: [
+                            flight1Len / 2,
+                            baseY + totalH / 4 - 0.06,
+                            barZ
+                        ],
+                        rotation: [
+                            0,
+                            0,
+                            Math.atan2(totalH / 2, flight1Len)
+                        ],
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                args: [
+                                    0.008,
+                                    0.008,
+                                    Math.hypot(totalH / 2, flight1Len),
+                                    12
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1494,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                color: "#00f0ff",
+                                emissive: "#0284c7",
+                                emissiveIntensity: 0.6,
+                                metalness: 0.9,
+                                roughness: 0.2
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1495,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, `stair-rebar-${bIdx}`, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1493,
+                        columnNumber: 13
+                    }, this))
+            }, void 0, false, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1491,
+                columnNumber: 9
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+        lineNumber: 1373,
+        columnNumber: 5
+    }, this);
+}
+_c7 = Staircase3D;
+// 3D Comprehensive Foundation System supporting all 6 foundation types:
+// 1. Isolated Footing (individual pads under every column)
+// 2. Combined Footing (common footing slab for adjacent column pairs)
+// 3. Strip Footing (continuous trench footing under walls & column lines)
+// 4. Strap Footing (isolated footings linked by continuous RCC strap beams)
+// 5. Raft / Mat Foundation (monolithic continuous thick slab under entire building footprint)
+// 6. Pile Foundation (heavy pile caps with vertical cylindrical concrete piles driven deep into stratum)
+function Foundation3DSystem({ model, groundPillars, floorAllWalls, showFoundation, showFootingRebar, showSoilBed, showLabels, isConcreteSolid = false, isGhosted = false, selectedFooting, onSelectFooting, reinf }) {
     _s2();
+    const bUnit = model.buildingUnit || 'ft';
+    const toM = (v)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(v, bUnit);
+    const bLenM = toM(model.buildingLength || 40);
+    const bWidM = toM(model.buildingWidth || 30);
+    const bConfig = model.buildingConfig;
+    const foundationType = bConfig?.foundationType || model.foundation?.foundationType || 'isolated';
+    const soilType = bConfig?.soilClassification || 'dense_sand_gravel';
+    const groundwater = bConfig?.groundwaterCondition || 'normal';
+    const foundDepthM = Math.max(1.0, bConfig?.foundationDepthM || 1.5);
+    const stubH_M = Math.max(0.4, foundDepthM - 0.45);
+    const pccT_M = 0.10;
+    const sandT_M = 0.10;
+    // Soil colors based on geological classification
+    const soilColorMap = {
+        dense_sand_gravel: '#b45309',
+        loose_sand: '#eab308',
+        stiff_clay: '#9a3412',
+        soft_clay: '#78716c',
+        black_cotton: '#1c1917',
+        filled_soil: '#57534e',
+        rock: '#334155' // Solid bedrock
+    };
+    const soilColor = soilColorMap[soilType] || '#b45309';
+    const concreteMatOpacity = isGhosted ? 0.05 : isConcreteSolid ? 1.0 : 0.35;
+    const isTransparent = !isConcreteSolid;
+    const depthWrite = isConcreteSolid;
+    // Prepare list of footings (from model.foundation or auto-derived from groundPillars)
+    const effectiveFootings = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "Foundation3DSystem.useMemo[effectiveFootings]": ()=>{
+            if (model.foundation?.footings && model.foundation.footings.length > 0) {
+                return model.foundation.footings;
+            }
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateFootingsForPillars"])(groundPillars, model.foundation, bUnit);
+        }
+    }["Foundation3DSystem.useMemo[effectiveFootings]"], [
+        model.foundation,
+        groundPillars,
+        bUnit
+    ]);
+    // Pillar coordinate helper in meters
+    const pillarCoords = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "Foundation3DSystem.useMemo[pillarCoords]": ()=>{
+            return groundPillars.map({
+                "Foundation3DSystem.useMemo[pillarCoords]": (p)=>{
+                    const effPos = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectivePillarPosition"])(p, floorAllWalls, bUnit);
+                    const pW_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(p.width || 9, p.unit || 'in');
+                    const pD_M = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(p.depth || 9, p.unit || 'in');
+                    const fData = p.calculatedFooting;
+                    const fL_M = fData ? fData.lengthM : Math.max(1.2, pW_M * 4.5);
+                    const fW_M = fData ? fData.widthM : Math.max(1.2, pD_M * 4.5);
+                    const fD_M = fData ? fData.depthM : 0.40;
+                    return {
+                        pillar: p,
+                        posX: toM(effPos.x),
+                        posZ: toM(effPos.y),
+                        pW_M,
+                        pD_M,
+                        fL_M,
+                        fW_M,
+                        fD_M
+                    };
+                }
+            }["Foundation3DSystem.useMemo[pillarCoords]"]);
+        }
+    }["Foundation3DSystem.useMemo[pillarCoords]"], [
+        groundPillars,
+        floorAllWalls,
+        bUnit
+    ]);
+    if (!showFoundation && !showFootingRebar) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+        children: [
+            showSoilBed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                position: [
+                    bLenM / 2,
+                    -(foundDepthM + pccT_M + sandT_M),
+                    -bWidM / 2
+                ],
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                        receiveShadow: true,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                args: [
+                                    bLenM + 4,
+                                    0.08,
+                                    bWidM + 4
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1610,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                color: soilColor,
+                                roughness: 0.95,
+                                metalness: 0.0
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1611,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1609,
+                        columnNumber: 11
+                    }, this),
+                    showLabels && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Html"], {
+                        position: [
+                            0,
+                            -0.2,
+                            (bWidM + 4) / 2 + 0.3
+                        ],
+                        center: true,
+                        zIndexRange: [
+                            30,
+                            0
+                        ],
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-slate-900/90 text-amber-400 border border-amber-500/50 px-2 py-0.5 rounded text-[9px] font-bold font-mono whitespace-nowrap shadow-lg",
+                            children: [
+                                "🌍 Soil Stratum: ",
+                                soilType.replace(/_/g, ' ').toUpperCase(),
+                                " • SBC: ",
+                                bConfig?.allowableSoilBearingPressureKnM2 || 200,
+                                " kN/m²"
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1617,
+                            columnNumber: 15
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1616,
+                        columnNumber: 13
+                    }, this),
+                    (groundwater === 'high' || groundwater === 'high_water_table') && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                        position: [
+                            0,
+                            foundDepthM * 0.45,
+                            0
+                        ],
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                args: [
+                                    bLenM + 3.8,
+                                    0.02,
+                                    bWidM + 3.8
+                                ]
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1626,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                color: "#0284c7",
+                                transparent: true,
+                                opacity: 0.35,
+                                roughness: 0.1
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1627,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1625,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1607,
+                columnNumber: 9
+            }, this),
+            foundationType === 'isolated' && effectiveFootings.map((footing)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Footing3DGroup, {
+                    footing: footing,
+                    foundationConfig: model.foundation,
+                    buildingUnit: bUnit,
+                    showFoundation: showFoundation,
+                    showFootingRebar: showFootingRebar,
+                    showLabels: showLabels,
+                    isSelected: selectedFooting?.id === footing.id,
+                    onSelect: ()=>onSelectFooting(selectedFooting?.id === footing.id ? null : footing),
+                    reinf: reinf
+                }, `3d-footing-${footing.id}`, false, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1638,
+                    columnNumber: 11
+                }, this)),
+            foundationType === 'combined' && (()=>{
+                const pairedPillars = [];
+                const visited = new Set();
+                for(let i = 0; i < pillarCoords.length; i++){
+                    if (visited.has(pillarCoords[i].pillar.id)) continue;
+                    let bestNeighbor = null;
+                    let minD = 999;
+                    for(let j = i + 1; j < pillarCoords.length; j++){
+                        if (visited.has(pillarCoords[j].pillar.id)) continue;
+                        const dist = Math.hypot(pillarCoords[j].posX - pillarCoords[i].posX, pillarCoords[j].posZ - pillarCoords[i].posZ);
+                        if (dist <= 5.0 && dist < minD) {
+                            minD = dist;
+                            bestNeighbor = pillarCoords[j];
+                        }
+                    }
+                    if (bestNeighbor) {
+                        pairedPillars.push([
+                            pillarCoords[i],
+                            bestNeighbor
+                        ]);
+                        visited.add(pillarCoords[i].pillar.id);
+                        visited.add(bestNeighbor.pillar.id);
+                    }
+                }
+                const remainingPillars = pillarCoords.filter((p)=>!visited.has(p.pillar.id));
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    name: "combinedFootingsGroup",
+                    children: [
+                        pairedPillars.map(([p1, p2], pairIdx)=>{
+                            const mx = (p1.posX + p2.posX) / 2;
+                            const mz = (p1.posZ + p2.posZ) / 2;
+                            const spanDist = Math.hypot(p2.posX - p1.posX, p2.posZ - p1.posZ);
+                            const angle = Math.atan2(-(p2.posZ - p1.posZ), p2.posX - p1.posX);
+                            const padLenM = spanDist + Math.max(p1.fL_M, p2.fL_M) + 0.4;
+                            const padWidM = Math.max(p1.fW_M, p2.fW_M) + 0.3;
+                            const padDepM = 0.50;
+                            const padCenterY = -stubH_M - padDepM / 2;
+                            const pccCenterY = -stubH_M - padDepM - pccT_M / 2;
+                            const sandCenterY = -stubH_M - padDepM - pccT_M - sandT_M / 2;
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                position: [
+                                    mx,
+                                    0,
+                                    -mz
+                                ],
+                                rotation: [
+                                    0,
+                                    -angle,
+                                    0
+                                ],
+                                children: [
+                                    showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                        position: [
+                                            0,
+                                            padCenterY,
+                                            0
+                                        ],
+                                        castShadow: true,
+                                        receiveShadow: true,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                args: [
+                                                    padLenM,
+                                                    padDepM,
+                                                    padWidM
+                                                ]
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1700,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                color: "#3b82f6",
+                                                roughness: 0.4,
+                                                metalness: 0.1,
+                                                transparent: isTransparent,
+                                                opacity: concreteMatOpacity,
+                                                depthWrite: depthWrite
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1701,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1699,
+                                        columnNumber: 21
+                                    }, this),
+                                    showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                        position: [
+                                            0,
+                                            pccCenterY,
+                                            0
+                                        ],
+                                        receiveShadow: true,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                args: [
+                                                    padLenM + 0.3,
+                                                    pccT_M,
+                                                    padWidM + 0.3
+                                                ]
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1708,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                color: "#94a3b8",
+                                                roughness: 0.9,
+                                                metalness: 0.0,
+                                                transparent: isTransparent,
+                                                opacity: concreteMatOpacity,
+                                                depthWrite: depthWrite
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1709,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1707,
+                                        columnNumber: 21
+                                    }, this),
+                                    showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                        position: [
+                                            0,
+                                            sandCenterY,
+                                            0
+                                        ],
+                                        receiveShadow: true,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                args: [
+                                                    padLenM + 0.3,
+                                                    sandT_M,
+                                                    padWidM + 0.3
+                                                ]
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1716,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                color: "#d97706",
+                                                roughness: 0.95,
+                                                metalness: 0.0,
+                                                transparent: isTransparent,
+                                                opacity: concreteMatOpacity,
+                                                depthWrite: depthWrite
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1717,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1715,
+                                        columnNumber: 21
+                                    }, this),
+                                    showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                position: [
+                                                    -spanDist / 2,
+                                                    -stubH_M / 2,
+                                                    0
+                                                ],
+                                                castShadow: true,
+                                                receiveShadow: true,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                        args: [
+                                                            p1.pW_M + 0.05,
+                                                            stubH_M,
+                                                            p1.pD_M + 0.05
+                                                        ]
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1725,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                        color: "#64748b",
+                                                        roughness: 0.5,
+                                                        transparent: isTransparent,
+                                                        opacity: concreteMatOpacity,
+                                                        depthWrite: depthWrite
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1726,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1724,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                position: [
+                                                    spanDist / 2,
+                                                    -stubH_M / 2,
+                                                    0
+                                                ],
+                                                castShadow: true,
+                                                receiveShadow: true,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                        args: [
+                                                            p2.pW_M + 0.05,
+                                                            stubH_M,
+                                                            p2.pD_M + 0.05
+                                                        ]
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1729,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                        color: "#64748b",
+                                                        roughness: 0.5,
+                                                        transparent: isTransparent,
+                                                        opacity: concreteMatOpacity,
+                                                        depthWrite: depthWrite
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1730,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1728,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1723,
+                                        columnNumber: 21
+                                    }, this),
+                                    showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                        renderOrder: 10,
+                                        children: [
+                                            -padWidM * 0.35,
+                                            0,
+                                            padWidM * 0.35
+                                        ].map((rz, rIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].Fragment, {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                        position: [
+                                                            0,
+                                                            -stubH_M - padDepM + 0.05,
+                                                            rz
+                                                        ],
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                                args: [
+                                                                    0.008,
+                                                                    0.008,
+                                                                    padLenM - 0.1,
+                                                                    12
+                                                                ]
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 1741,
+                                                                columnNumber: 29
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                color: "#00f0ff",
+                                                                emissive: "#0284c7",
+                                                                emissiveIntensity: 0.6,
+                                                                metalness: 0.9,
+                                                                roughness: 0.2
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 1742,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1740,
+                                                        columnNumber: 27
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                        position: [
+                                                            0,
+                                                            -stubH_M - 0.05,
+                                                            rz
+                                                        ],
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                                args: [
+                                                                    0.008,
+                                                                    0.008,
+                                                                    padLenM - 0.1,
+                                                                    12
+                                                                ]
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 1745,
+                                                                columnNumber: 29
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                color: "#00f0ff",
+                                                                emissive: "#0284c7",
+                                                                emissiveIntensity: 0.6,
+                                                                metalness: 0.9,
+                                                                roughness: 0.2
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 1746,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1744,
+                                                        columnNumber: 27
+                                                    }, this)
+                                                ]
+                                            }, `comb-rebar-${rIdx}`, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1739,
+                                                columnNumber: 25
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1737,
+                                        columnNumber: 21
+                                    }, this)
+                                ]
+                            }, `comb-pad-${pairIdx}`, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1696,
+                                columnNumber: 17
+                            }, this);
+                        }),
+                        remainingPillars.map((p)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Footing3DGroup, {
+                                footing: {
+                                    id: `footing-${p.pillar.id}`,
+                                    floorId: 'ground',
+                                    pillarId: p.pillar.id,
+                                    pillarName: p.pillar.name,
+                                    position: {
+                                        x: p.pillar.position?.x || 0,
+                                        y: p.pillar.position?.y || 0
+                                    },
+                                    footingLength: p.fL_M * 3.28084,
+                                    footingWidth: p.fW_M * 3.28084,
+                                    footingDepth: p.fD_M * 3.28084,
+                                    footingUnit: 'ft',
+                                    excavationLength: (p.fL_M + 0.6) * 3.28084,
+                                    excavationWidth: (p.fW_M + 0.6) * 3.28084,
+                                    excavationDepth: 4,
+                                    excavationUnit: 'ft',
+                                    sandFillLength: (p.fL_M + 0.3) * 3.28084,
+                                    sandFillWidth: (p.fW_M + 0.3) * 3.28084,
+                                    sandFillDepth: 0.5,
+                                    sandFillUnit: 'ft',
+                                    pccLength: (p.fL_M + 0.3) * 3.28084,
+                                    pccWidth: (p.fW_M + 0.3) * 3.28084,
+                                    pccThickness: 0.33,
+                                    pccUnit: 'ft',
+                                    columnStubHeight: 2
+                                },
+                                foundationConfig: model.foundation,
+                                buildingUnit: bUnit,
+                                showFoundation: showFoundation,
+                                showFootingRebar: showFootingRebar,
+                                showLabels: showLabels,
+                                isSelected: false,
+                                onSelect: ()=>{},
+                                reinf: reinf
+                            }, `comb-rem-${p.pillar.id}`, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1758,
+                                columnNumber: 15
+                            }, this))
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1680,
+                    columnNumber: 11
+                }, this);
+            })(),
+            foundationType === 'strip' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                name: "stripFootingGroup",
+                children: [
+                    floorAllWalls.map((wall, wIdx)=>{
+                        if (!wall.start || !wall.end) return null;
+                        const sx = toM(wall.start.x);
+                        const sz = toM(wall.start.y);
+                        const ex = toM(wall.end.x);
+                        const ez = toM(wall.end.y);
+                        const len = Math.hypot(ex - sx, ez - sz);
+                        if (len <= 0.1) return null;
+                        const angle = Math.atan2(-(ez - sz), ex - sx);
+                        const mx = (sx + ex) / 2;
+                        const mz = (sz + ez) / 2;
+                        const stripWidM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(wall.dimensions.thickness, wall.dimensions.thicknessUnit || 'in') + 0.6;
+                        const stripDepM = 0.38;
+                        const stripCenterY = -stubH_M - stripDepM / 2;
+                        const pccCenterY = -stubH_M - stripDepM - pccT_M / 2;
+                        const sandCenterY = -stubH_M - stripDepM - pccT_M - sandT_M / 2;
+                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                            position: [
+                                mx,
+                                0,
+                                -mz
+                            ],
+                            rotation: [
+                                0,
+                                -angle,
+                                0
+                            ],
+                            children: [
+                                showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                    position: [
+                                        0,
+                                        stripCenterY,
+                                        0
+                                    ],
+                                    castShadow: true,
+                                    receiveShadow: true,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                            args: [
+                                                len + stripWidM,
+                                                stripDepM,
+                                                stripWidM
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1824,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                            color: "#2563eb",
+                                            roughness: 0.4,
+                                            metalness: 0.1,
+                                            transparent: isTransparent,
+                                            opacity: concreteMatOpacity,
+                                            depthWrite: depthWrite
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1825,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1823,
+                                    columnNumber: 19
+                                }, this),
+                                showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                    position: [
+                                        0,
+                                        pccCenterY,
+                                        0
+                                    ],
+                                    receiveShadow: true,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                            args: [
+                                                len + stripWidM + 0.3,
+                                                pccT_M,
+                                                stripWidM + 0.3
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1830,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                            color: "#94a3b8",
+                                            roughness: 0.9,
+                                            metalness: 0.0,
+                                            transparent: isTransparent,
+                                            opacity: concreteMatOpacity,
+                                            depthWrite: depthWrite
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1831,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1829,
+                                    columnNumber: 19
+                                }, this),
+                                showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                    position: [
+                                        0,
+                                        sandCenterY,
+                                        0
+                                    ],
+                                    receiveShadow: true,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                            args: [
+                                                len + stripWidM + 0.3,
+                                                sandT_M,
+                                                stripWidM + 0.3
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1836,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                            color: "#d97706",
+                                            roughness: 0.95,
+                                            metalness: 0.0,
+                                            transparent: isTransparent,
+                                            opacity: concreteMatOpacity,
+                                            depthWrite: depthWrite
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 1837,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1835,
+                                    columnNumber: 19
+                                }, this)
+                            ]
+                        }, `strip-wall-${wIdx}`, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1821,
+                            columnNumber: 15
+                        }, this);
+                    }),
+                    showFoundation && pillarCoords.map((p, pIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                p.posX,
+                                -stubH_M / 2,
+                                -p.posZ
+                            ],
+                            castShadow: true,
+                            receiveShadow: true,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                    args: [
+                                        p.pW_M + 0.05,
+                                        stubH_M,
+                                        p.pD_M + 0.05
+                                    ]
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1845,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                    color: "#64748b",
+                                    roughness: 0.5,
+                                    transparent: isTransparent,
+                                    opacity: concreteMatOpacity,
+                                    depthWrite: depthWrite
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1846,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, `strip-ped-${pIdx}`, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1844,
+                            columnNumber: 13
+                        }, this))
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1800,
+                columnNumber: 9
+            }, this),
+            foundationType === 'strap' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                name: "strapFootingsGroup",
+                children: [
+                    effectiveFootings.map((footing)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Footing3DGroup, {
+                            footing: footing,
+                            foundationConfig: model.foundation,
+                            buildingUnit: bUnit,
+                            showFoundation: showFoundation,
+                            showFootingRebar: showFootingRebar,
+                            showLabels: showLabels,
+                            isSelected: selectedFooting?.id === footing.id,
+                            onSelect: ()=>onSelectFooting(selectedFooting?.id === footing.id ? null : footing),
+                            reinf: reinf
+                        }, `strap-f-${footing.id}`, false, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1856,
+                            columnNumber: 13
+                        }, this)),
+                    showFoundation && (()=>{
+                        const strapBeams = [];
+                        for(let i = 0; i < pillarCoords.length; i++){
+                            for(let j = i + 1; j < pillarCoords.length; j++){
+                                const p1 = pillarCoords[i];
+                                const p2 = pillarCoords[j];
+                                const dist = Math.hypot(p2.posX - p1.posX, p2.posZ - p1.posZ);
+                                if (dist >= 1.0 && dist <= 5.0) {
+                                    const mx = (p1.posX + p2.posX) / 2;
+                                    const mz = (p1.posZ + p2.posZ) / 2;
+                                    const angle = Math.atan2(-(p2.posZ - p1.posZ), p2.posX - p1.posX);
+                                    const beamH = 0.45;
+                                    const beamW = 0.35;
+                                    const beamCenterY = -stubH_M - beamH / 2;
+                                    strapBeams.push(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                        position: [
+                                            mx,
+                                            beamCenterY,
+                                            -mz
+                                        ],
+                                        rotation: [
+                                            0,
+                                            -angle,
+                                            0
+                                        ],
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                castShadow: true,
+                                                receiveShadow: true,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                        args: [
+                                                            dist,
+                                                            beamH,
+                                                            beamW
+                                                        ]
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1888,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                        color: "#475569",
+                                                        roughness: 0.6,
+                                                        metalness: 0.1,
+                                                        transparent: isTransparent,
+                                                        opacity: concreteMatOpacity,
+                                                        depthWrite: depthWrite
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1889,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1887,
+                                                columnNumber: 23
+                                            }, this),
+                                            showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                position: [
+                                                    0,
+                                                    beamH / 2 - 0.04,
+                                                    0
+                                                ],
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                        args: [
+                                                            0.009,
+                                                            0.009,
+                                                            dist - 0.1,
+                                                            12
+                                                        ]
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1893,
+                                                        columnNumber: 27
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                        color: "#00f0ff",
+                                                        emissive: "#0284c7",
+                                                        emissiveIntensity: 0.6,
+                                                        metalness: 0.9,
+                                                        roughness: 0.2
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 1894,
+                                                        columnNumber: 27
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1892,
+                                                columnNumber: 25
+                                            }, this)
+                                        ]
+                                    }, `strap-beam-${i}-${j}`, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1886,
+                                        columnNumber: 21
+                                    }, this));
+                                }
+                            }
+                        }
+                        return strapBeams;
+                    })()
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1854,
+                columnNumber: 9
+            }, this),
+            foundationType === 'raft' && (()=>{
+                const raftWidthM = bLenM + 0.8;
+                const raftDepthM = bWidM + 0.8;
+                const raftThickM = 0.50;
+                const raftCenterY = -stubH_M - raftThickM / 2;
+                const pccCenterY = -stubH_M - raftThickM - pccT_M / 2;
+                const sandCenterY = -stubH_M - raftThickM - pccT_M - sandT_M / 2;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                    name: "raftFoundationGroup",
+                    position: [
+                        bLenM / 2,
+                        0,
+                        -bWidM / 2
+                    ],
+                    children: [
+                        showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                raftCenterY,
+                                0
+                            ],
+                            castShadow: true,
+                            receiveShadow: true,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                    args: [
+                                        raftWidthM,
+                                        raftThickM,
+                                        raftDepthM
+                                    ]
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1921,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                    color: "#1d4ed8",
+                                    roughness: 0.35,
+                                    metalness: 0.15,
+                                    transparent: isTransparent,
+                                    opacity: concreteMatOpacity,
+                                    depthWrite: depthWrite
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1922,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1920,
+                            columnNumber: 15
+                        }, this),
+                        showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                pccCenterY,
+                                0
+                            ],
+                            receiveShadow: true,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                    args: [
+                                        raftWidthM + 0.4,
+                                        pccT_M,
+                                        raftDepthM + 0.4
+                                    ]
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1928,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                    color: "#94a3b8",
+                                    roughness: 0.9,
+                                    metalness: 0.0,
+                                    transparent: isTransparent,
+                                    opacity: concreteMatOpacity,
+                                    depthWrite: depthWrite
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1929,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1927,
+                            columnNumber: 15
+                        }, this),
+                        showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                            position: [
+                                0,
+                                sandCenterY,
+                                0
+                            ],
+                            receiveShadow: true,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                    args: [
+                                        raftWidthM + 0.4,
+                                        sandT_M,
+                                        raftDepthM + 0.4
+                                    ]
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1935,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                    color: "#d97706",
+                                    roughness: 0.95,
+                                    metalness: 0.0,
+                                    transparent: isTransparent,
+                                    opacity: concreteMatOpacity,
+                                    depthWrite: depthWrite
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 1936,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1934,
+                            columnNumber: 15
+                        }, this),
+                        showFoundation && pillarCoords.map((p, pIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    p.posX - bLenM / 2,
+                                    -stubH_M / 2,
+                                    -(p.posZ - bWidM / 2)
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            p.pW_M + 0.05,
+                                            stubH_M,
+                                            p.pD_M + 0.05
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1942,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#64748b",
+                                        roughness: 0.5,
+                                        transparent: isTransparent,
+                                        opacity: concreteMatOpacity,
+                                        depthWrite: depthWrite
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1943,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, `raft-ped-${pIdx}`, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1941,
+                                columnNumber: 15
+                            }, this)),
+                        showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                            renderOrder: 10,
+                            children: [
+                                Array.from({
+                                    length: 9
+                                }).map((_, rIdx)=>{
+                                    const z = -raftDepthM / 2 + 0.2 + rIdx * (raftDepthM - 0.4) / 8;
+                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                        position: [
+                                            0,
+                                            -stubH_M - raftThickM + 0.06,
+                                            z
+                                        ],
+                                        rotation: [
+                                            0,
+                                            0,
+                                            Math.PI / 2
+                                        ],
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                args: [
+                                                    0.008,
+                                                    0.008,
+                                                    raftWidthM - 0.2,
+                                                    12
+                                                ]
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1953,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                color: "#00f0ff",
+                                                emissive: "#0284c7",
+                                                emissiveIntensity: 0.6,
+                                                metalness: 0.9,
+                                                roughness: 0.2
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1954,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, `raft-mesh-x-${rIdx}`, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1952,
+                                        columnNumber: 21
+                                    }, this);
+                                }),
+                                Array.from({
+                                    length: 9
+                                }).map((_, rIdx)=>{
+                                    const x = -raftWidthM / 2 + 0.2 + rIdx * (raftWidthM - 0.4) / 8;
+                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                        position: [
+                                            x,
+                                            -stubH_M - 0.06,
+                                            0
+                                        ],
+                                        rotation: [
+                                            Math.PI / 2,
+                                            0,
+                                            0
+                                        ],
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                args: [
+                                                    0.008,
+                                                    0.008,
+                                                    raftDepthM - 0.2,
+                                                    12
+                                                ]
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1962,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                color: "#00f0ff",
+                                                emissive: "#0284c7",
+                                                emissiveIntensity: 0.6,
+                                                metalness: 0.9,
+                                                roughness: 0.2
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 1963,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, `raft-mesh-z-${rIdx}`, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1961,
+                                        columnNumber: 21
+                                    }, this);
+                                })
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                            lineNumber: 1948,
+                            columnNumber: 15
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                    lineNumber: 1918,
+                    columnNumber: 11
+                }, this);
+            })(),
+            foundationType === 'pile' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                name: "pileFoundationGroup",
+                children: pillarCoords.map((p, pIdx)=>{
+                    const capW = 1.3;
+                    const capD = 1.3;
+                    const capH = 0.65;
+                    const pileRadius = 0.18;
+                    const pileLenM = 5.0;
+                    const capCenterY = -stubH_M - capH / 2;
+                    const pileCenterY = -stubH_M - capH - pileLenM / 2;
+                    const pileOffsets = [
+                        [
+                            -0.35,
+                            -0.35
+                        ],
+                        [
+                            0.35,
+                            -0.35
+                        ],
+                        [
+                            -0.35,
+                            0.35
+                        ],
+                        [
+                            0.35,
+                            0.35
+                        ]
+                    ];
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                        position: [
+                            p.posX,
+                            0,
+                            -p.posZ
+                        ],
+                        children: [
+                            showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    capCenterY,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            capW,
+                                            capH,
+                                            capD
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1997,
+                                        columnNumber: 21
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#1e3a8a",
+                                        roughness: 0.4,
+                                        metalness: 0.2,
+                                        transparent: isTransparent,
+                                        opacity: concreteMatOpacity,
+                                        depthWrite: depthWrite
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 1998,
+                                        columnNumber: 21
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 1996,
+                                columnNumber: 19
+                            }, this),
+                            showFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                position: [
+                                    0,
+                                    -stubH_M / 2,
+                                    0
+                                ],
+                                castShadow: true,
+                                receiveShadow: true,
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                        args: [
+                                            p.pW_M + 0.05,
+                                            stubH_M,
+                                            p.pD_M + 0.05
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2004,
+                                        columnNumber: 21
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                        color: "#64748b",
+                                        roughness: 0.5,
+                                        transparent: isTransparent,
+                                        opacity: concreteMatOpacity,
+                                        depthWrite: depthWrite
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2005,
+                                        columnNumber: 21
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 2003,
+                                columnNumber: 19
+                            }, this),
+                            showFoundation && pileOffsets.map(([px, pz], pileIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                    position: [
+                                        px,
+                                        pileCenterY,
+                                        pz
+                                    ],
+                                    castShadow: true,
+                                    receiveShadow: true,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                            args: [
+                                                pileRadius,
+                                                pileRadius,
+                                                pileLenM,
+                                                24
+                                            ]
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2011,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                            color: "#334155",
+                                            roughness: 0.7,
+                                            metalness: 0.1,
+                                            transparent: isTransparent,
+                                            opacity: concreteMatOpacity,
+                                            depthWrite: depthWrite
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2012,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, `cyl-pile-${pileIdx}`, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 2010,
+                                    columnNumber: 19
+                                }, this)),
+                            showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                renderOrder: 10,
+                                children: pileOffsets.map(([px, pz], pileIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                        position: [
+                                            px,
+                                            pileCenterY,
+                                            pz
+                                        ],
+                                        children: [
+                                            [
+                                                -0.10,
+                                                0.10
+                                            ].map((vx)=>[
+                                                    -0.10,
+                                                    0.10
+                                                ].map((vz)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                        position: [
+                                                            vx,
+                                                            0,
+                                                            vz
+                                                        ],
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("cylinderGeometry", {
+                                                                args: [
+                                                                    0.007,
+                                                                    0.007,
+                                                                    pileLenM + 0.4,
+                                                                    12
+                                                                ]
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 2023,
+                                                                columnNumber: 31
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                color: "#00f0ff",
+                                                                emissive: "#0284c7",
+                                                                emissiveIntensity: 0.6,
+                                                                metalness: 0.9,
+                                                                roughness: 0.2
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                lineNumber: 2024,
+                                                                columnNumber: 31
+                                                            }, this)
+                                                        ]
+                                                    }, `pbar-${vx}-${vz}`, true, {
+                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                        lineNumber: 2022,
+                                                        columnNumber: 29
+                                                    }, this))),
+                                            Array.from({
+                                                length: 6
+                                            }).map((_, loopIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                    position: [
+                                                        0,
+                                                        -pileLenM / 2 + 0.5 + loopIdx * (pileLenM - 1) / 5,
+                                                        0
+                                                    ],
+                                                    rotation: [
+                                                        Math.PI / 2,
+                                                        0,
+                                                        0
+                                                    ],
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("torusGeometry", {
+                                                            args: [
+                                                                0.13,
+                                                                0.006,
+                                                                8,
+                                                                24
+                                                            ]
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                            lineNumber: 2030,
+                                                            columnNumber: 29
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                            color: "#f59e0b",
+                                                            emissive: "#d97706",
+                                                            emissiveIntensity: 0.4,
+                                                            metalness: 0.8,
+                                                            roughness: 0.3
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                            lineNumber: 2031,
+                                                            columnNumber: 29
+                                                        }, this)
+                                                    ]
+                                                }, `loop-${loopIdx}`, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2029,
+                                                    columnNumber: 27
+                                                }, this))
+                                        ]
+                                    }, `pile-rebar-${pileIdx}`, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2019,
+                                        columnNumber: 23
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 2017,
+                                columnNumber: 19
+                            }, this),
+                            showLabels && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Html"], {
+                                position: [
+                                    0,
+                                    -stubH_M - capH - 0.2,
+                                    0
+                                ],
+                                center: true,
+                                zIndexRange: [
+                                    50,
+                                    0
+                                ],
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "bg-slate-900/90 text-cyan-300 border border-cyan-500/50 px-2 py-0.5 rounded text-[8px] font-bold font-mono whitespace-nowrap shadow-md",
+                                    children: [
+                                        p.pillar.name,
+                                        " Pile Cap (4×Ø350mm Piles • 5m)"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 2041,
+                                    columnNumber: 21
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 2040,
+                                columnNumber: 19
+                            }, this)
+                        ]
+                    }, `pile-group-${pIdx}`, true, {
+                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                        lineNumber: 1994,
+                        columnNumber: 15
+                    }, this);
+                })
+            }, void 0, false, {
+                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                lineNumber: 1975,
+                columnNumber: 9
+            }, this)
+        ]
+    }, `foundation-system-${foundationType}`, true, {
+        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+        lineNumber: 1604,
+        columnNumber: 5
+    }, this);
+}
+_s2(Foundation3DSystem, "E81Ob2xK9OvP2F5yj+QQ001axvY=");
+_c8 = Foundation3DSystem;
+function CameraController({ viewMode, viewPreset, controlsRef }) {
+    _s3();
     const { camera } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$fiber$2f$dist$2f$events$2d$156d8d12$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__C__as__useThree$3e$__["useThree"])();
     __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].useEffect({
         "CameraController.useEffect": ()=>{
@@ -2623,27 +5288,27 @@ function CameraController({ viewMode, viewPreset, controlsRef }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$core$2f$OrbitControls$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["OrbitControls"], {
         ref: controlsRef,
         makeDefault: true,
-        enableZoom: false,
+        enableZoom: true,
         enableRotate: true,
         enablePan: true,
-        minDistance: 10,
-        maxDistance: 150,
+        minDistance: 2,
+        maxDistance: 250,
         minPolarAngle: 0,
         maxPolarAngle: Math.PI / 2 + 0.1
     }, void 0, false, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 1240,
+        lineNumber: 2111,
         columnNumber: 5
     }, this);
 }
-_s2(CameraController, "LkD+P9L27FeQPcIha69ShQZNiyc=", false, function() {
+_s3(CameraController, "LkD+P9L27FeQPcIha69ShQZNiyc=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$fiber$2f$dist$2f$events$2d$156d8d12$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__C__as__useThree$3e$__["useThree"]
     ];
 });
-_c6 = CameraController;
+_c9 = CameraController;
 function VisualEstimator3D({ model }) {
-    _s3();
+    _s4();
     const { brickType, settings, setActiveTab, result, projectName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$CalculatorContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCalculator"])();
     const [isSaveModalOpen, setIsSaveModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -2662,21 +5327,46 @@ function VisualEstimator3D({ model }) {
     const [showInternal, setShowInternal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showLabels, setShowLabels] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [collisionDebug, setCollisionDebug] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [renderMode, setRenderMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('concrete');
+    const [showStairs, setShowStairs] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showPillars, setShowPillars] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showPillarLabels, setShowPillarLabels] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showFloorSlab, setShowFloorSlab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showFullRingBeam, setShowFullRingBeam] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showFullRoof, setShowFullRoof] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(model.fullRoof?.enabled ?? true);
-    const [showPillarRebar, setShowPillarRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [showRoofSlabRebar, setShowRoofSlabRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [showFoundation, setShowFoundation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [showFootingRebar, setShowFootingRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [showSoilBed, setShowSoilBed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showFoundation, setShowFoundation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [showSoilBed, setShowSoilBed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [selectedPillar, setSelectedPillar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [selectedFooting, setSelectedFooting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [structuralView, setStructuralView] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showHint, setShowHint] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [showSceneElements, setShowSceneElements] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showPillarRebar, setShowPillarRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showRoofSlabRebar, setShowRoofSlabRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showRingBeamRebar, setShowRingBeamRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [showFootingRebar, setShowFootingRebar] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const handleSetRenderMode = (mode)=>{
+        setRenderMode(mode);
+        if (mode === 'concrete' || mode === 'wireframe') {
+            setShowPillarRebar(false);
+            setShowRoofSlabRebar(false);
+            setShowRingBeamRebar(false);
+            setShowFootingRebar(false);
+        } else {
+            setShowPillarRebar(true);
+            setShowRoofSlabRebar(true);
+            setShowRingBeamRebar(true);
+            setShowFootingRebar(true);
+        }
+    };
+    // Derived reinforcement & concrete transparency states
+    const isConcreteSolid = renderMode === 'concrete';
+    const isWireframe = renderMode === 'wireframe';
+    const isGhosted = renderMode === 'rebar';
+    const isRebarActive = (renderMode === 'rebar' || renderMode === 'combined') && (showPillarRebar || showRoofSlabRebar || showRingBeamRebar || showFootingRebar);
+    const concreteOpacity = isGhosted ? 0.05 : isConcreteSolid || isWireframe ? 1.0 : 0.22;
+    const isConcreteTransparent = !isConcreteSolid && !isWireframe;
+    const isConcreteDepthWrite = isConcreteSolid || isWireframe;
     // Plaster 3D Visualization States
     const [showInnerPlaster, setShowInnerPlaster] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(model.plaster?.inner?.enabled ?? model.plaster?.innerMasonry?.enabled ?? false);
     const [showOuterPlaster, setShowOuterPlaster] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(model.plaster?.outer?.enabled ?? model.plaster?.outerMasonry?.enabled ?? false);
@@ -2711,6 +5401,36 @@ function VisualEstimator3D({ model }) {
         }
     }["VisualEstimator3D.useMemo[allWalls]"], [
         model
+    ]);
+    const groundFloor = model.floors[0];
+    const groundPillars = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "VisualEstimator3D.useMemo[groundPillars]": ()=>{
+            if (!groundFloor) return [];
+            if (model.pillars && model.pillars.length > 0) {
+                const gfPillars = model.pillars.filter({
+                    "VisualEstimator3D.useMemo[groundPillars].gfPillars": (p)=>!p.floorId || String(p.floorId) === String(groundFloor.id) || p.continueToFloors === 'all'
+                }["VisualEstimator3D.useMemo[groundPillars].gfPillars"]);
+                if (gfPillars.length > 0) return gfPillars;
+            }
+            if (groundFloor.pillars && groundFloor.pillars.length > 0) {
+                return groundFloor.pillars;
+            }
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["detectStructuralPillars"])(groundFloor, model.buildingLength, model.buildingWidth, model.buildingUnit, groundFloor.height);
+        }
+    }["VisualEstimator3D.useMemo[groundPillars]"], [
+        model,
+        groundFloor
+    ]);
+    const groundFloorWalls = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "VisualEstimator3D.useMemo[groundFloorWalls]": ()=>{
+            if (!groundFloor) return [];
+            return [
+                ...groundFloor.externalWalls,
+                ...groundFloor.internalWalls
+            ];
+        }
+    }["VisualEstimator3D.useMemo[groundFloorWalls]"], [
+        groundFloor
     ]);
     const debugInfo = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "VisualEstimator3D.useMemo[debugInfo]": ()=>{
@@ -2845,7 +5565,7 @@ function VisualEstimator3D({ model }) {
             let curY = 0;
             return model.floors.map({
                 "VisualEstimator3D.useMemo[floorJunctions]": (f)=>{
-                    const junc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getRingBeamJunction"])(f, model, curY);
+                    const junc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getRingBeamJunction"])(f, model, curY);
                     curY = junc.structuralTopY;
                     return junc;
                 }
@@ -2854,7 +5574,7 @@ function VisualEstimator3D({ model }) {
     }["VisualEstimator3D.useMemo[floorJunctions]"], [
         model
     ]);
-    const toM = (val)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(val, model.buildingUnit);
+    const toM = (val)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(val, model.buildingUnit);
     const centerX = -toM(model.buildingLength) / 2;
     const centerZ = toM(model.buildingWidth) / 2;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2870,14 +5590,14 @@ function VisualEstimator3D({ model }) {
                                 className: "w-4 h-4 mr-2 text-blue-500"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1425,
+                                lineNumber: 2342,
                                 columnNumber: 11
                             }, this),
                             "Structural Geometry Validation"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1424,
+                        lineNumber: 2341,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2890,7 +5610,7 @@ function VisualEstimator3D({ model }) {
                                         children: "External Walls"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1429,
+                                        lineNumber: 2346,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2898,13 +5618,13 @@ function VisualEstimator3D({ model }) {
                                         children: validation.extCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1429,
+                                        lineNumber: 2346,
                                         columnNumber: 83
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1429,
+                                lineNumber: 2346,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2914,7 +5634,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Internal Walls"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1430,
+                                        lineNumber: 2347,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2922,13 +5642,13 @@ function VisualEstimator3D({ model }) {
                                         children: validation.intCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1430,
+                                        lineNumber: 2347,
                                         columnNumber: 83
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1430,
+                                lineNumber: 2347,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2938,7 +5658,7 @@ function VisualEstimator3D({ model }) {
                                         children: "RCC Columns"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1431,
+                                        lineNumber: 2348,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2946,13 +5666,13 @@ function VisualEstimator3D({ model }) {
                                         children: model.pillars?.length || 0
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1431,
+                                        lineNumber: 2348,
                                         columnNumber: 80
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1431,
+                                lineNumber: 2348,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2962,7 +5682,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Doors"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1432,
+                                        lineNumber: 2349,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2970,13 +5690,13 @@ function VisualEstimator3D({ model }) {
                                         children: validation.doorsCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1432,
+                                        lineNumber: 2349,
                                         columnNumber: 74
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1432,
+                                lineNumber: 2349,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2986,7 +5706,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Windows"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1433,
+                                        lineNumber: 2350,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2994,13 +5714,13 @@ function VisualEstimator3D({ model }) {
                                         children: validation.winCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1433,
+                                        lineNumber: 2350,
                                         columnNumber: 76
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1433,
+                                lineNumber: 2350,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3010,7 +5730,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Junction Status"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1434,
+                                        lineNumber: 2351,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3018,25 +5738,25 @@ function VisualEstimator3D({ model }) {
                                         children: "Flush Trimmed"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1434,
+                                        lineNumber: 2351,
                                         columnNumber: 84
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1434,
+                                lineNumber: 2351,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1428,
+                        lineNumber: 2345,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1423,
+                lineNumber: 2340,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3053,7 +5773,7 @@ function VisualEstimator3D({ model }) {
                         children: debugText
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1446,
+                        lineNumber: 2363,
                         columnNumber: 9
                     }, this),
                     (debugMode || structuralView) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3066,7 +5786,7 @@ function VisualEstimator3D({ model }) {
                                         children: "📐 RCC Frame Junction Validation"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1454,
+                                        lineNumber: 2371,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3074,18 +5794,18 @@ function VisualEstimator3D({ model }) {
                                         children: "Zero Gap Verified"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1455,
+                                        lineNumber: 2372,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1453,
+                                lineNumber: 2370,
                                 columnNumber: 13
                             }, this),
                             floorJunctions.map((junc, fIdx)=>{
                                 const isTop = fIdx === floorJunctions.length - 1;
-                                const topRccJunc = isTop ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getTopRccStructuralJunction"])(model.floors[fIdx], model, junc.floorBaseY) : null;
+                                const topRccJunc = isTop ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getTopRccStructuralJunction"])(model.floors[fIdx], model, junc.floorBaseY) : null;
                                 const isMeshVisible = isTop ? showFullRoof : showFloorSlab;
                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "space-y-0.5 text-[10px] border-t border-slate-800 pt-1",
@@ -3103,7 +5823,7 @@ function VisualEstimator3D({ model }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1463,
+                                            lineNumber: 2380,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3117,7 +5837,7 @@ function VisualEstimator3D({ model }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1464,
+                                            lineNumber: 2381,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3125,7 +5845,7 @@ function VisualEstimator3D({ model }) {
                                             children: isTop ? `Roof ID: rcc-fullroof-${junc.floorId} | Type: fullRoof | GlobalFullRoof: ${showFullRoof} | Visible: ${isMeshVisible}` : `Slab ID: rcc-floorslab-${junc.floorId} | Type: floorSlab | GlobalFloorSlab: ${showFloorSlab} | Visible: ${isMeshVisible}`
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1465,
+                                            lineNumber: 2382,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3133,20 +5853,20 @@ function VisualEstimator3D({ model }) {
                                             children: isTop ? `Structural Junction Y = ${topRccJunc?.topStructuralLineY.toFixed(2)}m • Vertical Separation = ${topRccJunc?.verticalSeparation.toFixed(4)}m (${topRccJunc?.isIntegrated ? 'ONE CONTINUOUS STRUCTURAL LINE' : 'MISALIGNED'})` : `Wall-Beam Gap = ${junc.junctionGap.toFixed(4)}m • Beam-Slab Gap = ${junc.slabGap.toFixed(4)}m`
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1470,
+                                            lineNumber: 2387,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, junc.floorId, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1462,
+                                    lineNumber: 2379,
                                     columnNumber: 17
                                 }, this);
                             })
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1452,
+                        lineNumber: 2369,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3154,11 +5874,11 @@ function VisualEstimator3D({ model }) {
                         children: "Scroll to zoom • Drag to rotate"
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1482,
+                        lineNumber: 2399,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "absolute top-3 left-3 z-30 flex items-center gap-2",
+                        className: "absolute top-3 left-3 z-30 flex items-center gap-2 flex-wrap max-w-[calc(100%-140px)]",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: ()=>setIsSaveModalOpen(true),
@@ -3169,20 +5889,20 @@ function VisualEstimator3D({ model }) {
                                         className: "w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1497,
+                                        lineNumber: 2414,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Save Plan"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1498,
+                                        lineNumber: 2415,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1492,
+                                lineNumber: 2409,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3194,20 +5914,129 @@ function VisualEstimator3D({ model }) {
                                         className: "w-3.5 h-3.5 text-orange-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1507,
+                                        lineNumber: 2424,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "History"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1508,
+                                        lineNumber: 2425,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1502,
+                                lineNumber: 2419,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-700/80 shadow-lg backdrop-blur-md",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>handleSetRenderMode('concrete'),
+                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("px-2.5 py-1 rounded text-xs font-bold transition-all flex items-center gap-1 cursor-pointer", renderMode === 'concrete' ? "bg-slate-700 text-white shadow-xs ring-1 ring-slate-400" : "text-slate-400 hover:text-slate-200"),
+                                        title: "Concrete View (100% Solid Concrete, Steel Reinforcement Hidden)",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Building2$3e$__["Building2"], {
+                                                className: "w-3.5 h-3.5 text-slate-300"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2440,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Concrete View"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2441,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2430,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>handleSetRenderMode('combined'),
+                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("px-2.5 py-1 rounded text-xs font-bold transition-all flex items-center gap-1 cursor-pointer", renderMode === 'combined' ? "bg-blue-600 text-white shadow-xs ring-1 ring-blue-400" : "text-slate-400 hover:text-slate-200"),
+                                        title: "Combined View (Concrete Translucent X-Ray 22%, Steel Clearly Visible Inside)",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
+                                                className: "w-3.5 h-3.5 text-blue-200"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2453,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Combined X-Ray"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2454,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2443,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>handleSetRenderMode('rebar'),
+                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("px-2.5 py-1 rounded text-xs font-bold transition-all flex items-center gap-1 cursor-pointer", renderMode === 'rebar' ? "bg-cyan-600 text-white shadow-xs ring-1 ring-cyan-400" : "text-slate-400 hover:text-slate-200"),
+                                        title: "Reinforcement-Only View (Steel 100% Visible, Concrete Ghosted 5%)",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$hammer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Hammer$3e$__["Hammer"], {
+                                                className: "w-3.5 h-3.5 text-cyan-200"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2466,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Reinforcement"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2467,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2456,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>handleSetRenderMode('wireframe'),
+                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("px-2.5 py-1 rounded text-xs font-bold transition-all flex items-center gap-1 cursor-pointer", renderMode === 'wireframe' ? "bg-amber-600 text-white shadow-xs ring-1 ring-amber-400" : "text-slate-400 hover:text-slate-200"),
+                                        title: "Wireframe View (Structural Grid Outlines & Edges)",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layout$2d$grid$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LayoutGrid$3e$__["LayoutGrid"], {
+                                                className: "w-3.5 h-3.5 text-amber-200"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2479,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Wireframe"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2480,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2469,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 2429,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3219,7 +6048,7 @@ function VisualEstimator3D({ model }) {
                                         children: "🏷️ Column Labels:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1522,
+                                        lineNumber: 2495,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3227,19 +6056,19 @@ function VisualEstimator3D({ model }) {
                                         children: showPillarLabels ? 'ON' : 'OFF'
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1523,
+                                        lineNumber: 2496,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1512,
+                                lineNumber: 2485,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1490,
+                        lineNumber: 2407,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3256,12 +6085,12 @@ function VisualEstimator3D({ model }) {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1534,
+                                            lineNumber: 2507,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1533,
+                                        lineNumber: 2506,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3272,12 +6101,12 @@ function VisualEstimator3D({ model }) {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1537,
+                                            lineNumber: 2510,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1536,
+                                        lineNumber: 2509,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3288,18 +6117,18 @@ function VisualEstimator3D({ model }) {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1540,
+                                            lineNumber: 2513,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1539,
+                                        lineNumber: 2512,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1532,
+                                lineNumber: 2505,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3314,20 +6143,20 @@ function VisualEstimator3D({ model }) {
                                             className: "w-3.5 h-3.5 text-white"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1559,
+                                            lineNumber: 2532,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Close Elements"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1560,
+                                            lineNumber: 2533,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1558,
+                                    lineNumber: 2531,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                     children: [
@@ -3335,31 +6164,31 @@ function VisualEstimator3D({ model }) {
                                             className: "w-3.5 h-3.5 text-orange-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1564,
+                                            lineNumber: 2537,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Scene Elements"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1565,
+                                            lineNumber: 2538,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1563,
+                                    lineNumber: 2536,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1545,
+                                lineNumber: 2518,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1530,
+                        lineNumber: 2503,
                         columnNumber: 9
                     }, this),
                     showSceneElements && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3376,14 +6205,14 @@ function VisualEstimator3D({ model }) {
                                                 children: "📐"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1579,
+                                                lineNumber: 2552,
                                                 columnNumber: 17
                                             }, this),
                                             " Scene Elements"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1578,
+                                        lineNumber: 2551,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3391,43 +6220,35 @@ function VisualEstimator3D({ model }) {
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 onClick: ()=>{
-                                                    setShowPillars(false);
-                                                    setShowFullRingBeam(false);
-                                                    setShowFullRoof(false);
-                                                    setShowFloorSlab(false);
-                                                    setShowInternal(false);
-                                                    setShowFoundation(false);
-                                                    setShowPillarRebar(true);
-                                                    setShowRoofSlabRebar(true);
-                                                    setShowFootingRebar(true);
+                                                    handleSetRenderMode('rebar');
                                                 },
                                                 className: "px-2 py-0.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-[10px] font-bold shadow-xs transition-colors cursor-pointer",
                                                 title: "Isolate and inspect 3D rebar cages & meshes with zero concrete occlusion",
                                                 children: "Rebar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1582,
+                                                lineNumber: 2555,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 onClick: ()=>{
+                                                    handleSetRenderMode('combined');
                                                     setShowPillars(true);
                                                     setShowFullRingBeam(true);
                                                     setShowFullRoof(true);
                                                     setShowFloorSlab(true);
                                                     setShowInternal(true);
-                                                    setShowFoundation(false);
-                                                    setShowSoilBed(false);
-                                                    setShowPillarRebar(false);
-                                                    setShowRoofSlabRebar(false);
-                                                    setShowFootingRebar(false);
+                                                    setShowFoundation(true);
+                                                    setShowSoilBed(true);
+                                                    setShowStairs(true);
+                                                    setShowBrickInfill(true);
                                                 },
                                                 className: "px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded text-[10px] font-medium transition-colors cursor-pointer",
-                                                title: "Restore default concrete and wall view",
+                                                title: "Restore default view",
                                                 children: "Restore"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1599,
+                                                lineNumber: 2564,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3439,24 +6260,24 @@ function VisualEstimator3D({ model }) {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1624,
+                                                    lineNumber: 2589,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1618,
+                                                lineNumber: 2583,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1581,
+                                        lineNumber: 2554,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1577,
+                                lineNumber: 2550,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3472,20 +6293,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1632,
+                                                lineNumber: 2597,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Brick Infill Walls"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1633,
+                                                lineNumber: 2598,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1631,
+                                        lineNumber: 2596,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3498,20 +6319,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1636,
+                                                lineNumber: 2601,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Internal Walls"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1637,
+                                                lineNumber: 2602,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1635,
+                                        lineNumber: 2600,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3524,20 +6345,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1640,
+                                                lineNumber: 2605,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Solid RCC Columns"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1641,
+                                                lineNumber: 2606,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1639,
+                                        lineNumber: 2604,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3550,20 +6371,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-cyan-600 focus:ring-cyan-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1644,
+                                                lineNumber: 2609,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Pillar Rebar Cage"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1645,
+                                                lineNumber: 2610,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1643,
+                                        lineNumber: 2608,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3576,20 +6397,46 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-amber-600 focus:ring-amber-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1648,
+                                                lineNumber: 2613,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Roof/Slab Rebar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1649,
+                                                lineNumber: 2614,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1647,
+                                        lineNumber: 2612,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "flex items-center space-x-2 cursor-pointer text-indigo-900 font-semibold bg-indigo-50/90 px-1.5 py-0.5 rounded border border-indigo-200/70",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "checkbox",
+                                                checked: showRingBeamRebar,
+                                                onChange: (e)=>setShowRingBeamRebar(e.target.checked),
+                                                className: "rounded text-indigo-600 focus:ring-indigo-500"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2617,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Show RCC Full Ring Beam Rebar"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2618,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2616,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3602,20 +6449,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-indigo-600 focus:ring-indigo-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1652,
+                                                lineNumber: 2621,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show RCC Full Ring Beam"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1653,
+                                                lineNumber: 2622,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1651,
+                                        lineNumber: 2620,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3628,20 +6475,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-slate-700 focus:ring-slate-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1658,
+                                                lineNumber: 2627,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Full Roof"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1664,
+                                                lineNumber: 2633,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1657,
+                                        lineNumber: 2626,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3654,20 +6501,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-amber-600 focus:ring-amber-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1668,
+                                                lineNumber: 2637,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Foundation (Footing/PCC)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1669,
+                                                lineNumber: 2638,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1667,
+                                        lineNumber: 2636,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3680,20 +6527,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-amber-600 focus:ring-amber-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1672,
+                                                lineNumber: 2641,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Footing Rebar (2-Way)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1673,
+                                                lineNumber: 2642,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1671,
+                                        lineNumber: 2640,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3706,20 +6553,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-yellow-700 focus:ring-yellow-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1676,
+                                                lineNumber: 2645,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Soil Bed / Excavation Pit"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1677,
+                                                lineNumber: 2646,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1675,
+                                        lineNumber: 2644,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3732,20 +6579,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1680,
+                                                lineNumber: 2649,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Column Labels"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1681,
+                                                lineNumber: 2650,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1679,
+                                        lineNumber: 2648,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3758,20 +6605,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1684,
+                                                lineNumber: 2653,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Room Labels"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1685,
+                                                lineNumber: 2654,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1683,
+                                        lineNumber: 2652,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3784,20 +6631,46 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1690,
+                                                lineNumber: 2659,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Show Floor Slab"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1696,
+                                                lineNumber: 2665,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1689,
+                                        lineNumber: 2658,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        className: "flex items-center space-x-2 cursor-pointer text-indigo-900 font-semibold bg-indigo-50/90 px-1.5 py-0.5 rounded border border-indigo-200/70",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "checkbox",
+                                                checked: showStairs,
+                                                onChange: (e)=>setShowStairs(e.target.checked),
+                                                className: "rounded text-indigo-600 focus:ring-indigo-500"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2670,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: "Show Dog-Legged Staircase"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2676,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2669,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3810,20 +6683,20 @@ function VisualEstimator3D({ model }) {
                                                         className: "w-3 h-3 text-teal-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1702,
+                                                        lineNumber: 2682,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Plaster / Rendering"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1703,
+                                                        lineNumber: 2683,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1701,
+                                                lineNumber: 2681,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3836,7 +6709,7 @@ function VisualEstimator3D({ model }) {
                                                         className: "rounded text-teal-600 focus:ring-teal-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1706,
+                                                        lineNumber: 2686,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3847,13 +6720,13 @@ function VisualEstimator3D({ model }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1707,
+                                                        lineNumber: 2687,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1705,
+                                                lineNumber: 2685,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3866,7 +6739,7 @@ function VisualEstimator3D({ model }) {
                                                         className: "rounded text-sky-600 focus:ring-sky-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1710,
+                                                        lineNumber: 2690,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3877,13 +6750,13 @@ function VisualEstimator3D({ model }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1711,
+                                                        lineNumber: 2691,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1709,
+                                                lineNumber: 2689,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3896,7 +6769,7 @@ function VisualEstimator3D({ model }) {
                                                         className: "rounded text-slate-600 focus:ring-slate-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1714,
+                                                        lineNumber: 2694,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3907,13 +6780,13 @@ function VisualEstimator3D({ model }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1715,
+                                                        lineNumber: 2695,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1713,
+                                                lineNumber: 2693,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3926,7 +6799,7 @@ function VisualEstimator3D({ model }) {
                                                         className: "rounded text-emerald-600 focus:ring-emerald-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1718,
+                                                        lineNumber: 2698,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3937,13 +6810,13 @@ function VisualEstimator3D({ model }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1719,
+                                                        lineNumber: 2699,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1717,
+                                                lineNumber: 2697,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3956,26 +6829,26 @@ function VisualEstimator3D({ model }) {
                                                         className: "rounded text-emerald-600 focus:ring-emerald-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1722,
+                                                        lineNumber: 2702,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Plaster Semi-Transparent"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1723,
+                                                        lineNumber: 2703,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1721,
+                                                lineNumber: 2701,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1700,
+                                        lineNumber: 2680,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -3988,20 +6861,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-amber-600 focus:ring-amber-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1728,
+                                                lineNumber: 2708,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Brick/Pillar Collision Debug"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1729,
+                                                lineNumber: 2709,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1727,
+                                        lineNumber: 2707,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -4014,35 +6887,35 @@ function VisualEstimator3D({ model }) {
                                                 className: "rounded text-red-600 focus:ring-red-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1732,
+                                                lineNumber: 2712,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "3D Wireframe Debug"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1733,
+                                                lineNumber: 2713,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1731,
+                                        lineNumber: 2711,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1630,
+                                lineNumber: 2595,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1573,
+                        lineNumber: 2546,
                         columnNumber: 11
                     }, this),
-                    (showPillarRebar || showRoofSlabRebar || showFootingRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    (showPillarRebar || showRoofSlabRebar || showFootingRebar || showRingBeamRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "absolute top-14 left-3 z-20 bg-slate-900/95 text-white p-3 rounded-lg border border-cyan-500 shadow-2xl max-w-xs text-xs space-y-1.5 backdrop-blur-md",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4055,20 +6928,20 @@ function VisualEstimator3D({ model }) {
                                                 className: "w-4 h-4 text-cyan-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1744,
+                                                lineNumber: 2724,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "RCC Rebar Active"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1745,
+                                                lineNumber: 2725,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1743,
+                                        lineNumber: 2723,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4076,13 +6949,13 @@ function VisualEstimator3D({ model }) {
                                         children: "3D X-Ray"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1747,
+                                        lineNumber: 2727,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1742,
+                                lineNumber: 2722,
                                 columnNumber: 13
                             }, this),
                             showFootingRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4093,7 +6966,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Foundation Footing Rebar:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1751,
+                                        lineNumber: 2731,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4110,14 +6983,14 @@ function VisualEstimator3D({ model }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1753,
+                                                lineNumber: 2733,
                                                 columnNumber: 32
                                             }, this),
                                             " (2-Way Mesh + 90° Upward End Hooks)"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1752,
+                                        lineNumber: 2732,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4129,20 +7002,20 @@ function VisualEstimator3D({ model }) {
                                                 children: "4×16mm"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1756,
+                                                lineNumber: 2736,
                                                 columnNumber: 35
                                             }, this),
                                             " Anchored into Footing"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1755,
+                                        lineNumber: 2735,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1750,
+                                lineNumber: 2730,
                                 columnNumber: 15
                             }, this),
                             showPillarRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4153,7 +7026,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Pillar Rebar Cages:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1762,
+                                        lineNumber: 2742,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4170,14 +7043,14 @@ function VisualEstimator3D({ model }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1764,
+                                                lineNumber: 2744,
                                                 columnNumber: 32
                                             }, this),
                                             " (Full Height + Joint Zone)"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1763,
+                                        lineNumber: 2743,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4194,20 +7067,87 @@ function VisualEstimator3D({ model }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1767,
+                                                lineNumber: 2747,
                                                 columnNumber: 35
                                             }, this),
                                             " + 3 Joint Loops"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1766,
+                                        lineNumber: 2746,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1761,
+                                lineNumber: 2741,
+                                columnNumber: 15
+                            }, this),
+                            showRingBeamRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "space-y-0.5 border-t border-slate-800 pt-1",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-[11px] font-semibold text-indigo-300",
+                                        children: "Ring Beam Reinforcement:"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2753,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-[10px] text-slate-300",
+                                        children: [
+                                            "• Main Bars: ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-cyan-300 font-mono font-bold",
+                                                children: [
+                                                    settings.rccReinforcement?.beamTopBarCount || 2,
+                                                    "×",
+                                                    settings.rccReinforcement?.beamTopBarDiaMm || 12,
+                                                    "mm Top + ",
+                                                    settings.rccReinforcement?.beamBottomBarCount || 2,
+                                                    "×",
+                                                    settings.rccReinforcement?.beamBottomBarDiaMm || 12,
+                                                    "mm Bot"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2755,
+                                                columnNumber: 32
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2754,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-[10px] text-slate-300",
+                                        children: [
+                                            "• Stirrup Ties: ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-amber-300 font-mono font-bold",
+                                                children: [
+                                                    settings.rccReinforcement?.beamStirrupDiaMm || 8,
+                                                    "mm @ ",
+                                                    settings.rccReinforcement?.beamStirrupSpacingMm || 150,
+                                                    "mm"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                lineNumber: 2758,
+                                                columnNumber: 35
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                        lineNumber: 2757,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                lineNumber: 2752,
                                 columnNumber: 15
                             }, this),
                             showRoofSlabRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4218,7 +7158,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Slab Reinforcement:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1773,
+                                        lineNumber: 2764,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4235,13 +7175,13 @@ function VisualEstimator3D({ model }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1775,
+                                                lineNumber: 2766,
                                                 columnNumber: 32
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1774,
+                                        lineNumber: 2765,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4258,25 +7198,25 @@ function VisualEstimator3D({ model }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1778,
+                                                lineNumber: 2769,
                                                 columnNumber: 32
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1777,
+                                        lineNumber: 2768,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1772,
+                                lineNumber: 2763,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1741,
+                        lineNumber: 2721,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4288,7 +7228,7 @@ function VisualEstimator3D({ model }) {
                                 children: "Iso"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1787,
+                                lineNumber: 2778,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4297,7 +7237,7 @@ function VisualEstimator3D({ model }) {
                                 children: "Front"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1788,
+                                lineNumber: 2779,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4306,7 +7246,7 @@ function VisualEstimator3D({ model }) {
                                 children: "Back"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1789,
+                                lineNumber: 2780,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4315,7 +7255,7 @@ function VisualEstimator3D({ model }) {
                                 children: "Left"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1790,
+                                lineNumber: 2781,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4324,7 +7264,7 @@ function VisualEstimator3D({ model }) {
                                 children: "Right"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1791,
+                                lineNumber: 2782,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4333,13 +7273,13 @@ function VisualEstimator3D({ model }) {
                                 children: "Top"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1792,
+                                lineNumber: 2783,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1786,
+                        lineNumber: 2777,
                         columnNumber: 9
                     }, this),
                     collisionDebug && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4352,20 +7292,20 @@ function VisualEstimator3D({ model }) {
                                         className: "w-4 h-4 text-amber-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1799,
+                                        lineNumber: 2790,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Collision Exclusion Check"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1800,
+                                        lineNumber: 2791,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1798,
+                                lineNumber: 2789,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4376,7 +7316,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Pillar No-Brick Zone:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1803,
+                                        lineNumber: 2794,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4384,13 +7324,13 @@ function VisualEstimator3D({ model }) {
                                         children: "Active 3D Bounds"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1804,
+                                        lineNumber: 2795,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1802,
+                                lineNumber: 2793,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4401,7 +7341,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Colliding Bricks:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1807,
+                                        lineNumber: 2798,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4409,13 +7349,13 @@ function VisualEstimator3D({ model }) {
                                         children: "0 (0.00% overlap)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1808,
+                                        lineNumber: 2799,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1806,
+                                lineNumber: 2797,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4426,7 +7366,7 @@ function VisualEstimator3D({ model }) {
                                         children: "Masonry Termination:"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1811,
+                                        lineNumber: 2802,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4434,13 +7374,13 @@ function VisualEstimator3D({ model }) {
                                         children: "100% Flush Cut"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 1812,
+                                        lineNumber: 2803,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1810,
+                                lineNumber: 2801,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4448,13 +7388,13 @@ function VisualEstimator3D({ model }) {
                                 children: "Every brick is mathematically clamped strictly within column faces."
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 1814,
+                                lineNumber: 2805,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1797,
+                        lineNumber: 2788,
                         columnNumber: 11
                     }, this),
                     selectedPillar && (()=>{
@@ -4466,28 +7406,47 @@ function VisualEstimator3D({ model }) {
                             ...floorObj.externalWalls,
                             ...floorObj.internalWalls
                         ] : allWalls;
-                        const worldPos = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getPillarWorldPosition"])(selectedPillar, {
+                        const worldPos = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getPillarWorldPosition"])(selectedPillar, {
                             buildingUnit: model.buildingUnit,
                             buildingLength: model.buildingLength,
                             buildingWidth: model.buildingWidth,
                             floorElevation
                         }, floorAllWalls);
-                        const validation = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["validatePillarPlacement"])(selectedPillar, floorAllWalls, model);
+                        const validation = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["validatePillarPlacement"])(selectedPillar, floorAllWalls, model);
+                        const sData = selectedPillar.structuralData;
+                        const rConfig = selectedPillar.rebarConfig;
+                        const fData = selectedPillar.calculatedFooting;
                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-1.5 backdrop-blur-md",
+                            className: "absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex justify-between items-center border-b border-slate-700 pb-1.5",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "font-bold text-orange-400 text-sm",
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             children: [
-                                                selectedPillar.name || selectedPillar.id,
-                                                " RCC Column"
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-bold text-orange-400 text-sm",
+                                                    children: [
+                                                        selectedPillar.name || selectedPillar.id,
+                                                        " RCC Column"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2834,
+                                                    columnNumber: 19
+                                                }, this),
+                                                selectedPillar.structuralRole && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-blue-900/80 text-blue-200 border border-blue-700",
+                                                    children: selectedPillar.structuralRole
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2836,
+                                                    columnNumber: 21
+                                                }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1838,
+                                            lineNumber: 2833,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4497,18 +7456,18 @@ function VisualEstimator3D({ model }) {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1839,
+                                                lineNumber: 2841,
                                                 columnNumber: 115
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1839,
+                                            lineNumber: 2841,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1837,
+                                    lineNumber: 2832,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4521,7 +7480,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Pillar ID: "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1842,
+                                                    lineNumber: 2846,
                                                     columnNumber: 22
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4529,13 +7488,13 @@ function VisualEstimator3D({ model }) {
                                                     children: selectedPillar.id
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1842,
+                                                    lineNumber: 2846,
                                                     columnNumber: 73
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1842,
+                                            lineNumber: 2846,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4545,7 +7504,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Floor: "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1843,
+                                                    lineNumber: 2847,
                                                     columnNumber: 22
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4553,13 +7512,13 @@ function VisualEstimator3D({ model }) {
                                                     children: floorObj?.name || 'Ground Floor'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1843,
+                                                    lineNumber: 2847,
                                                     columnNumber: 69
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1843,
+                                            lineNumber: 2847,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4569,7 +7528,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Coordinates (2D): "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1844,
+                                                    lineNumber: 2848,
                                                     columnNumber: 22
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4586,81 +7545,46 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1844,
+                                                    lineNumber: 2848,
                                                     columnNumber: 80
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1844,
+                                            lineNumber: 2848,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     className: "text-slate-400",
-                                                    children: "3D World: "
+                                                    children: "Section Dimensions: "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1845,
+                                                    lineNumber: 2849,
                                                     columnNumber: 22
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "font-mono text-emerald-400 font-bold",
-                                                    children: [
-                                                        "X: ",
-                                                        worldPos.x.toFixed(2),
-                                                        "m, Z: ",
-                                                        worldPos.z.toFixed(2),
-                                                        "m (Y: ",
-                                                        worldPos.y.toFixed(2),
-                                                        "m)"
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1845,
-                                                    columnNumber: 72
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1845,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-slate-400",
-                                                    children: "Column Size: "
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1846,
-                                                    columnNumber: 22
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "font-mono text-white",
+                                                    className: "font-mono font-bold text-amber-300",
                                                     children: [
                                                         selectedPillar.width,
-                                                        " ",
-                                                        selectedPillar.unit,
-                                                        " × ",
+                                                        '" × ',
                                                         selectedPillar.depth,
-                                                        " ",
-                                                        selectedPillar.unit,
+                                                        '" (',
+                                                        Math.round((selectedPillar.width || 9) * 25.4),
                                                         " × ",
-                                                        selectedPillar.height,
-                                                        " ",
-                                                        model.buildingUnit
+                                                        Math.round((selectedPillar.depth || 9) * 25.4),
+                                                        " mm)"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1846,
-                                                    columnNumber: 75
+                                                    lineNumber: 2849,
+                                                    columnNumber: 82
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1846,
+                                            lineNumber: 2849,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4670,7 +7594,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Alignment: "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1847,
+                                                    lineNumber: 2850,
                                                     columnNumber: 22
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4678,92 +7602,435 @@ function VisualEstimator3D({ model }) {
                                                     children: selectedPillar.alignment?.replace('_', ' ') || 'Outside Corner'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1847,
+                                                    lineNumber: 2850,
                                                     columnNumber: 73
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1847,
+                                            lineNumber: 2850,
                                             columnNumber: 17
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        selectedPillar.structuralWarning && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "p-2 rounded bg-amber-950/80 border border-amber-600 text-amber-200 text-[10px] leading-relaxed flex items-start gap-1.5 mt-1",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-slate-400",
-                                                    children: "Structure: "
+                                                    className: "text-amber-400 font-bold",
+                                                    children: "⚠️"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1848,
-                                                    columnNumber: 22
+                                                    lineNumber: 2853,
+                                                    columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-emerald-400 font-medium",
-                                                    children: "Solid Reinforced Concrete"
+                                                    children: selectedPillar.structuralWarning
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1848,
-                                                    columnNumber: 73
+                                                    lineNumber: 2854,
+                                                    columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1848,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-slate-400",
-                                                    children: "Masonry Cut: "
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1849,
-                                                    columnNumber: 22
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-orange-300",
-                                                    children: "Clean Flush Junction (0 Overlap)"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1849,
-                                                    columnNumber: 75
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1849,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "text-slate-400",
-                                                    children: "Verification: "
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1850,
-                                                    columnNumber: 22
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: validation.isValid ? "text-emerald-400 font-mono font-semibold" : "text-amber-400 font-mono font-semibold",
-                                                    children: validation.isValid ? "100% Coords Aligned (Drift: 0.000)" : validation.errors[0] || "Checking"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1850,
-                                                    columnNumber: 76
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1850,
-                                            columnNumber: 17
+                                            lineNumber: 2852,
+                                            columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1841,
+                                    lineNumber: 2845,
                                     columnNumber: 15
+                                }, this),
+                                sData && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "pt-1.5 border-t border-slate-800 space-y-1 text-slate-300",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-[11px] font-bold text-orange-300 flex items-center justify-between",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    children: "Structural Analysis"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2863,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-[9px] font-mono text-slate-400",
+                                                    children: "IS 456 Preliminary"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2864,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2862,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Tributary Area: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2867,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-emerald-300 font-semibold",
+                                                    children: [
+                                                        sData.tributaryAreaSqFt.toFixed(1),
+                                                        " sq.ft (",
+                                                        sData.tributaryAreaM2.toFixed(2),
+                                                        " m²)"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2868,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2866,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Axial Service Load (P): "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2873,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-white font-bold",
+                                                    children: [
+                                                        Math.round(sData.serviceLoadKn),
+                                                        " kN"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2874,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2872,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Factored Ultimate (Pu): "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2877,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-amber-300 font-bold",
+                                                    children: [
+                                                        Math.round(sData.factoredLoadKn),
+                                                        " kN (1.5 × P)"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2878,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2876,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Axial Capacity (Puz): "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2881,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-cyan-300 font-semibold",
+                                                    children: [
+                                                        Math.round(sData.capacityKn),
+                                                        " kN"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2882,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2880,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center justify-between",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Capacity Utilization: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2885,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("font-mono font-bold px-1.5 py-0.2 rounded text-[10px]", sData.capacityUtilization <= 85 ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : sData.capacityUtilization <= 100 ? "bg-amber-950 text-amber-300 border border-amber-800" : "bg-red-950 text-red-300 border border-red-800"),
+                                                    children: [
+                                                        sData.capacityUtilization.toFixed(1),
+                                                        "%"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2886,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2884,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 2861,
+                                    columnNumber: 17
+                                }, this),
+                                rConfig && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "pt-1.5 border-t border-slate-800 space-y-1 text-slate-300",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-[11px] font-bold text-cyan-300",
+                                            children: "Reinforcement Details"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2901,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Longitudinal Steel: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2903,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-white font-bold",
+                                                    children: [
+                                                        rConfig.pillarMainBarCount,
+                                                        " Nos × ",
+                                                        rConfig.pillarMainBarDiaMm,
+                                                        "mm"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2904,
+                                                    columnNumber: 21
+                                                }, this),
+                                                sData && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400 text-[10px] ml-1",
+                                                    children: [
+                                                        "(",
+                                                        sData.steelPercentage.toFixed(2),
+                                                        "%)"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2908,
+                                                    columnNumber: 23
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2902,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Lateral Ties: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2912,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-white",
+                                                    children: [
+                                                        rConfig.pillarStirrupDiaMm || 8,
+                                                        "mm @ ",
+                                                        rConfig.pillarStirrupSpacingMm || 150,
+                                                        "mm c/c"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2913,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2911,
+                                            columnNumber: 19
+                                        }, this),
+                                        rConfig.mainSteelWeightKg !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Column Steel Weight: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2919,
+                                                    columnNumber: 23
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-emerald-300 font-semibold",
+                                                    children: [
+                                                        (rConfig.mainSteelWeightKg + (rConfig.stirrupSteelWeightKg || 0)).toFixed(1),
+                                                        " kg"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2920,
+                                                    columnNumber: 23
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2918,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 2900,
+                                    columnNumber: 17
+                                }, this),
+                                fData && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "pt-1.5 border-t border-slate-800 space-y-1 text-slate-300",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-[11px] font-bold text-amber-300",
+                                            children: "Soil-Sized Footing"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2931,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Footing Plan: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2933,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-white font-bold",
+                                                    children: [
+                                                        fData.lengthM.toFixed(2),
+                                                        "m × ",
+                                                        fData.widthM.toFixed(2),
+                                                        "m (",
+                                                        (fData.lengthM * 3.28084).toFixed(1),
+                                                        "' × ",
+                                                        (fData.widthM * 3.28084).toFixed(1),
+                                                        "')"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2934,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2932,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Footing Depth: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2939,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-white",
+                                                    children: [
+                                                        fData.depthM.toFixed(2),
+                                                        "m (",
+                                                        (fData.depthM * 3.28084).toFixed(1),
+                                                        "')"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2940,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2938,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-slate-400",
+                                                    children: "Footing Concrete: "
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2943,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-cyan-300",
+                                                    children: [
+                                                        fData.rccM3.toFixed(2),
+                                                        " m³"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                    lineNumber: 2944,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2942,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                    lineNumber: 2930,
+                                    columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-[10px] text-slate-400 pt-1.5 border-t border-slate-800 flex items-start space-x-1",
@@ -4772,26 +8039,26 @@ function VisualEstimator3D({ model }) {
                                             className: "w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1853,
+                                            lineNumber: 2950,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            children: "Pillar reinforcement & dimensions must be certified by a qualified structural engineer."
+                                            children: "Preliminary structural sizing. Final working design requires verified geotechnical report and engineer certification."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1854,
+                                            lineNumber: 2951,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1852,
+                                    lineNumber: 2949,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 1836,
+                            lineNumber: 2831,
                             columnNumber: 13
                         }, this);
                     })(),
@@ -4814,7 +8081,7 @@ function VisualEstimator3D({ model }) {
                                     controlsRef: controlsRef
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1866,
+                                    lineNumber: 2963,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("color", {
@@ -4824,14 +8091,14 @@ function VisualEstimator3D({ model }) {
                                     ]
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1867,
+                                    lineNumber: 2964,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ambientLight", {
                                     intensity: 0.65
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1868,
+                                    lineNumber: 2965,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("hemisphereLight", {
@@ -4842,7 +8109,7 @@ function VisualEstimator3D({ model }) {
                                     ]
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1869,
+                                    lineNumber: 2966,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("directionalLight", {
@@ -4859,7 +8126,7 @@ function VisualEstimator3D({ model }) {
                                     ]
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1870,
+                                    lineNumber: 2967,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("directionalLight", {
@@ -4871,7 +8138,7 @@ function VisualEstimator3D({ model }) {
                                     intensity: 0.5
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1871,
+                                    lineNumber: 2968,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -4888,7 +8155,7 @@ function VisualEstimator3D({ model }) {
                                                 -toM(model.buildingWidth) / 2
                                             ],
                                             receiveShadow: true,
-                                            renderOrder: showPillarRebar || showRoofSlabRebar ? 2 : 1,
+                                            renderOrder: isRebarActive ? 2 : 1,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
                                                     args: [
@@ -4898,115 +8165,71 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1877,
+                                                    lineNumber: 2974,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
                                                     color: "#1e293b",
-                                                    roughness: showPillarRebar || showRoofSlabRebar ? 0.4 : 0.9,
-                                                    transparent: showPillarRebar || showRoofSlabRebar,
-                                                    opacity: showPillarRebar || showRoofSlabRebar ? 0.35 : 1.0,
-                                                    depthWrite: !(showPillarRebar || showRoofSlabRebar),
+                                                    roughness: isRebarActive ? 0.4 : 0.9,
+                                                    transparent: isConcreteTransparent,
+                                                    opacity: isGhosted ? 0.05 : isConcreteSolid ? 1.0 : 0.35,
+                                                    depthWrite: isConcreteSolid,
                                                     depthTest: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 1878,
+                                                    lineNumber: 2975,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 1876,
+                                            lineNumber: 2973,
                                             columnNumber: 17
                                         }, this),
-                                        (showFoundation || showFootingRebar) && model.foundation?.enabled !== false && (()=>{
-                                            const footings = model.foundation?.footings && model.foundation.footings.length > 0 ? model.foundation.footings : [];
-                                            if (footings.length === 0) return null;
-                                            const sampleF = footings[0];
-                                            const excDepthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(sampleF.excavationDepth || 4, sampleF.excavationUnit || model.buildingUnit);
-                                            const bLenM = toM(model.buildingLength);
-                                            const bWidM = toM(model.buildingWidth);
-                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
-                                                children: [
-                                                    showSoilBed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
-                                                        position: [
-                                                            bLenM / 2,
-                                                            -excDepthM,
-                                                            -bWidM / 2
-                                                        ],
-                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
-                                                            receiveShadow: true,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
-                                                                    args: [
-                                                                        bLenM + 4,
-                                                                        0.05,
-                                                                        bWidM + 4
-                                                                    ]
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 1908,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                                    color: "#2d1d0f",
-                                                                    roughness: 0.95,
-                                                                    metalness: 0.0
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 1909,
-                                                                    columnNumber: 27
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 1907,
-                                                            columnNumber: 25
-                                                        }, this)
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                        lineNumber: 1906,
-                                                        columnNumber: 23
-                                                    }, this),
-                                                    footings.map((footing)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Footing3DGroup, {
-                                                            footing: footing,
-                                                            foundationConfig: model.foundation,
-                                                            buildingUnit: model.buildingUnit,
-                                                            showFoundation: showFoundation,
-                                                            showFootingRebar: showFootingRebar,
-                                                            showLabels: showPillarLabels,
-                                                            isSelected: selectedFooting?.id === footing.id,
-                                                            onSelect: ()=>setSelectedFooting(selectedFooting?.id === footing.id ? null : footing),
-                                                            reinf: settings.rccReinforcement
-                                                        }, `3d-footing-${footing.id}`, false, {
-                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 1916,
-                                                            columnNumber: 23
-                                                        }, this))
-                                                ]
-                                            }, "foundation-subgrade-system", true, {
-                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 1903,
-                                                columnNumber: 19
-                                            }, this);
-                                        })(),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Foundation3DSystem, {
+                                            model: model,
+                                            groundPillars: groundPillars,
+                                            floorAllWalls: groundFloorWalls,
+                                            showFoundation: showFoundation,
+                                            showFootingRebar: showFootingRebar,
+                                            showSoilBed: showSoilBed,
+                                            showLabels: showPillarLabels,
+                                            isConcreteSolid: isConcreteSolid,
+                                            isGhosted: isGhosted,
+                                            selectedFooting: selectedFooting,
+                                            onSelectFooting: setSelectedFooting,
+                                            reinf: settings.rccReinforcement
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                            lineNumber: 2987,
+                                            columnNumber: 15
+                                        }, this),
                                         model.floors.map((floor, i)=>{
-                                            const junction = floorJunctions[i] || (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getRingBeamJunction"])(floor, model, 0);
+                                            const junction = floorJunctions[i] || (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getRingBeamJunction"])(floor, model, 0);
                                             const yOffset = junction.floorBaseY;
                                             const floorWallHeightM = toM(floor.height);
                                             const actualBeamHeightM = junction.ringBeamHeight;
                                             const actualBeamThickM = junction.ringBeamWidth;
-                                            const isAnyBeamActiveIn3D = showFullRingBeam;
+                                            const isAnyBeamActiveIn3D = showFullRingBeam || showRingBeamRebar;
                                             const fullBeamThicknessM = junction.fullRingBeamHeight;
                                             // Slab dimensions from single source of truth junction
                                             const slabThickM = junction.slabThickness;
                                             const floorTotalHeightM = floorWallHeightM + junction.totalStructuralTopHeight;
-                                            const floorPillars = (()=>{
-                                                // 1. Direct floor pillars from model.pillars
+                                            const rawFloorPillars = (()=>{
+                                                // 1. Direct floor pillars explicitly stored on floor.pillars (highest priority - respects floor-wise sizing and removals)
+                                                if (floor.pillars && floor.pillars.length > 0) {
+                                                    return floor.pillars;
+                                                }
+                                                // 2. Direct floor pillars from model.pillars with matching floorId
                                                 if (model.pillars && model.pillars.length > 0) {
                                                     const direct = model.pillars.filter((p)=>p.floorId && String(p.floorId) === String(floor.id));
                                                     if (direct.length > 0) return direct;
-                                                    const global = model.pillars.filter((p)=>!p.floorId || p.continueToFloors === 'all');
+                                                    const isGroundFloor = i === 0;
+                                                    if (isGroundFloor) {
+                                                        const gf = model.pillars.filter((p)=>!p.floorId || String(p.floorId) === String(floor.id));
+                                                        if (gf.length > 0) return gf;
+                                                    }
+                                                    const global = model.pillars.filter((p)=>p.continueToFloors === 'all');
                                                     if (global.length > 0) {
                                                         return global.map((p)=>({
                                                                 ...p,
@@ -5014,42 +8237,60 @@ function VisualEstimator3D({ model }) {
                                                                 floorId: floor.id
                                                             }));
                                                     }
-                                                }
-                                                // 2. Direct floor pillars from floor.pillars
-                                                if (floor.pillars && floor.pillars.length > 0) {
-                                                    return floor.pillars;
-                                                }
-                                                // 3. Propagate pillars from Ground Floor along exact same X/Z axis
-                                                const groundFloor = model.floors[0];
-                                                if (groundFloor) {
-                                                    if (model.pillars && model.pillars.length > 0) {
-                                                        const gfPillars = model.pillars.filter((p)=>!p.floorId || String(p.floorId) === String(groundFloor.id) || p.continueToFloors === 'all');
-                                                        if (gfPillars.length > 0) {
-                                                            return gfPillars.map((p)=>({
-                                                                    ...p,
-                                                                    id: `pillar-${floor.id}-${p.id}`,
-                                                                    floorId: floor.id
-                                                                }));
-                                                        }
-                                                    }
-                                                    if (groundFloor.pillars && groundFloor.pillars.length > 0) {
-                                                        return groundFloor.pillars.map((p)=>({
+                                                    // For upper floors: continue columns vertically up from ground floor
+                                                    const gfPillars = model.pillars.filter((p)=>!p.floorId || String(p.floorId) === String(model.floors[0]?.id));
+                                                    if (gfPillars.length > 0) {
+                                                        return gfPillars.map((p)=>({
                                                                 ...p,
                                                                 id: `pillar-${floor.id}-${p.id}`,
                                                                 floorId: floor.id
                                                             }));
                                                     }
                                                 }
-                                                // 4. Fallback to structural pillar detection for all corners, side spans, and internal junctions
-                                                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["detectStructuralPillars"])(floor, model.buildingLength, model.buildingWidth, model.buildingUnit, floor.height);
-                                            })();
+                                                // 3. Fallback to structural pillar detection for all corners, side spans, and internal junctions
+                                                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["detectStructuralPillars"])(floor, model.buildingLength, model.buildingWidth, model.buildingUnit, floor.height);
+                                            })().map((p)=>({
+                                                    ...p,
+                                                    position: p.position ? p.position : {
+                                                        x: p.x ?? 0,
+                                                        y: p.y ?? 0
+                                                    }
+                                                }));
+                                            // Inherit bottom/ground floor pillar dimensions along the vertical column shaft
+                                            // Columns maintain uniform cross-section from bottom to top without shrinking
+                                            const gfPillarsList = model.floors[0]?.pillars || (model.pillars || []).filter((p)=>!p.floorId || String(p.floorId) === String(model.floors[0]?.id));
+                                            const gfDimMap = new Map();
+                                            gfPillarsList.forEach((gp)=>{
+                                                const gpx = gp.position?.x ?? gp.x ?? 0;
+                                                const gpy = gp.position?.y ?? gp.y ?? 0;
+                                                const key = gp.verticalColumnId || `${Math.round(gpx * 10)}_${Math.round(gpy * 10)}`;
+                                                gfDimMap.set(key, {
+                                                    width: gp.width || 9,
+                                                    depth: gp.depth || 9
+                                                });
+                                            });
+                                            const floorPillars = rawFloorPillars.map((p)=>{
+                                                if (p.isStoreyOverride) return p;
+                                                const px = p.position?.x ?? p.x ?? 0;
+                                                const py = p.position?.y ?? p.y ?? 0;
+                                                const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+                                                const gfDim = gfDimMap.get(key);
+                                                if (gfDim) {
+                                                    return {
+                                                        ...p,
+                                                        width: gfDim.width,
+                                                        depth: gfDim.depth
+                                                    };
+                                                }
+                                                return p;
+                                            });
                                             const floorAllWalls = [
                                                 ...floor.externalWalls,
                                                 ...floor.internalWalls
                                             ];
                                             // Effective pillar positions matching 3D rendering
                                             const effectivePillars = floorPillars.map((p)=>{
-                                                const eff = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getEffectivePillarPosition"])(p, floorAllWalls, model.buildingUnit);
+                                                const eff = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectivePillarPosition"])(p, floorAllWalls, model.buildingUnit);
                                                 return {
                                                     ...p,
                                                     position: {
@@ -5059,22 +8300,36 @@ function VisualEstimator3D({ model }) {
                                                 };
                                             });
                                             // Detect valid closed structural bays formed by connected RCC pillars
-                                            const closedBays = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["detectClosedStructuralBays"])(effectivePillars, model.buildingUnit, floorAllWalls);
+                                            const closedBays = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["detectClosedStructuralBays"])(effectivePillars, model.buildingUnit, floorAllWalls);
                                             const isTopFloor = i === model.floors.length - 1;
                                             // Structural footprint of this floor derived from outer RCC pillar and beam perimeter
-                                            const floorBounds = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getStructuralRoofFootprint"])(floor, model, effectivePillars);
-                                            // Full Closed RCC Roof Slab covering that floor's complete structural support envelope
+                                            const floorBounds = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getStructuralRoofFootprint"])(floor, model, effectivePillars);
+                                            // Full Closed RCC Roof / Floor Slab covering that floor's complete structural support envelope
+                                            const slabCfg = isTopFloor ? model.roofSlab || floor.slab : floor.slab;
+                                            const overhangM = slabCfg?.overhang ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(slabCfg.overhang, slabCfg.overhangUnit || model.buildingUnit) : 0;
+                                            let slabWidthM = floorBounds.widthM + 2 * overhangM;
+                                            let slabDepthM = floorBounds.depthM + 2 * overhangM;
+                                            let slabCenterX = floorBounds.centerX;
+                                            let slabCenterY = floorBounds.centerY;
+                                            if (slabCfg?.customDimensions && slabCfg.length && slabCfg.width) {
+                                                slabWidthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(slabCfg.width, slabCfg.widthUnit || model.buildingUnit);
+                                                slabDepthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(slabCfg.length, slabCfg.lengthUnit || model.buildingUnit);
+                                            }
+                                            const slabEffectiveThickM = slabCfg?.thickness !== undefined ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(slabCfg.thickness, slabCfg.thicknessUnit || 'in') : junction.slabThickness;
+                                            const slabElevationOffsetY = slabCfg?.elevationOffset ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(slabCfg.elevationOffset, slabCfg.elevationOffsetUnit || model.buildingUnit) : 0;
                                             const structuralSlabs = [
                                                 {
                                                     id: `roof-${floor.id}`,
-                                                    widthM: floorBounds.widthM,
-                                                    depthM: floorBounds.depthM,
-                                                    centerX: floorBounds.centerX,
-                                                    centerY: floorBounds.centerY
+                                                    widthM: slabWidthM,
+                                                    depthM: slabDepthM,
+                                                    thicknessM: slabEffectiveThickM,
+                                                    elevationOffsetY: slabElevationOffsetY,
+                                                    centerX: slabCenterX,
+                                                    centerY: slabCenterY
                                                 }
                                             ];
                                             // Structural pillar-to-pillar beams along all frame lines
-                                            const detectedBeams = isAnyBeamActiveIn3D ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["detectPillarToPillarBeams"])(effectivePillars, model.buildingUnit, floorAllWalls) : [];
+                                            const detectedBeams = isAnyBeamActiveIn3D ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["detectPillarToPillarBeams"])(floorPillars, model.buildingUnit, floorAllWalls) : [];
                                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                 children: [
                                                     showBrickInfill && floor.externalWalls.map((w)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CustomWallMeshWrapper, {
@@ -5096,7 +8351,7 @@ function VisualEstimator3D({ model }) {
                                                             targetHeightM: floorWallHeightM
                                                         }, w.id, false, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2011,
+                                                            lineNumber: 3134,
                                                             columnNumber: 25
                                                         }, this)),
                                                     showBrickInfill && showInternal && floor.internalWalls.map((w)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CustomWallMeshWrapper, {
@@ -5118,13 +8373,13 @@ function VisualEstimator3D({ model }) {
                                                             targetHeightM: floorWallHeightM
                                                         }, w.id, false, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2027,
+                                                            lineNumber: 3150,
                                                             columnNumber: 25
                                                         }, this)),
                                                     (()=>{
                                                         const beamPlasterThickMm = floor.plaster?.rccSideBeam?.thickness ?? model.plaster?.rccSideBeam?.thickness ?? 6;
                                                         const beamPlasterUnit = floor.plaster?.rccSideBeam?.unit ?? model.plaster?.rccSideBeam?.unit ?? 'mm';
-                                                        const beamPlasterThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMetersPlaster"])(beamPlasterThickMm, beamPlasterUnit));
+                                                        const beamPlasterThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMetersPlaster"])(beamPlasterThickMm, beamPlasterUnit));
                                                         const isSideBeamPlasterVisible = showRccSideBeamPlaster;
                                                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                             children: [
@@ -5139,19 +8394,19 @@ function VisualEstimator3D({ model }) {
                                                                     const mX = (sX + eX) / 2;
                                                                     const mY = (sY + eY) / 2;
                                                                     const pSample = floorPillars.find((p)=>p.id === beam.startPillarId || p.id === beam.endPillarId) || floorPillars[0];
-                                                                    const pW_M = pSample ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pSample.width || 9, pSample.unit || 'in') : (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(9, 'in');
-                                                                    const beamThickM = actualBeamThickM || pW_M;
-                                                                    const isBeamXRay = showPillarRebar || showRoofSlabRebar;
+                                                                    const pW_M = pSample ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pSample.width || 9, pSample.unit || 'in') : (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(9, 'in');
+                                                                    const beamThickM = actualBeamThickM || (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(9, 'in');
+                                                                    const isBeamXRay = isRebarActive;
                                                                     // Clear span between start and end pillars so beam plaster stops cleanly at pillar faces
                                                                     const startPillar = floorPillars.find((p)=>p.id === beam.startPillarId);
                                                                     const endPillar = floorPillars.find((p)=>p.id === beam.endPillarId);
-                                                                    const startPW = startPillar ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(startPillar.width || 9, startPillar.unit || 'in') : pW_M;
-                                                                    const endPW = endPillar ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(endPillar.width || 9, endPillar.unit || 'in') : pW_M;
+                                                                    const startPW = startPillar ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(startPillar.width || 9, startPillar.unit || 'in') : pW_M;
+                                                                    const endPW = endPillar ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(endPillar.width || 9, endPillar.unit || 'in') : pW_M;
                                                                     const clearSpanM = Math.max(0.05, len - (startPW / 2 + endPW / 2));
-                                                                    const extendedBeamLen = len + startPW / 2 + endPW / 2;
+                                                                    const beamLenM = len;
                                                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].Fragment, {
                                                                         children: [
-                                                                            i === 0 && showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                            i === 0 && (showFullRingBeam || showRingBeamRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                 position: [
                                                                                     mX,
                                                                                     yOffset - actualBeamHeightM / 2,
@@ -5162,48 +8417,61 @@ function VisualEstimator3D({ model }) {
                                                                                     -ang,
                                                                                     0
                                                                                 ],
-                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
-                                                                                    name: "rccPlinthBeamMesh",
-                                                                                    castShadow: !isBeamXRay,
-                                                                                    receiveShadow: !isBeamXRay,
-                                                                                    renderOrder: isBeamXRay ? 2 : 1,
-                                                                                    children: [
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
-                                                                                            args: [
-                                                                                                extendedBeamLen,
-                                                                                                actualBeamHeightM,
-                                                                                                beamThickM
-                                                                                            ]
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                            lineNumber: 2081,
-                                                                                            columnNumber: 41
-                                                                                        }, this),
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                                                            color: "#64748b",
-                                                                                            roughness: isBeamXRay ? 0.3 : 0.85,
-                                                                                            metalness: isBeamXRay ? 0.1 : 0.05,
-                                                                                            transparent: isBeamXRay,
-                                                                                            opacity: isBeamXRay ? 0.22 : 1.0,
-                                                                                            depthWrite: !isBeamXRay,
-                                                                                            depthTest: true
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                            lineNumber: 2082,
-                                                                                            columnNumber: 41
-                                                                                        }, this)
-                                                                                    ]
-                                                                                }, void 0, true, {
-                                                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                    lineNumber: 2080,
-                                                                                    columnNumber: 39
-                                                                                }, this)
-                                                                            }, void 0, false, {
+                                                                                children: [
+                                                                                    showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                                                        name: "rccPlinthBeamMesh",
+                                                                                        castShadow: isConcreteSolid,
+                                                                                        receiveShadow: isConcreteSolid,
+                                                                                        renderOrder: isBeamXRay ? 2 : 1,
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                                                                args: [
+                                                                                                    beamLenM,
+                                                                                                    actualBeamHeightM,
+                                                                                                    beamThickM
+                                                                                                ]
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                                lineNumber: 3204,
+                                                                                                columnNumber: 43
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                                                color: "#64748b",
+                                                                                                roughness: isBeamXRay ? 0.3 : 0.85,
+                                                                                                metalness: isBeamXRay ? 0.1 : 0.05,
+                                                                                                transparent: isConcreteTransparent,
+                                                                                                opacity: concreteOpacity,
+                                                                                                depthWrite: isConcreteDepthWrite,
+                                                                                                depthTest: true,
+                                                                                                wireframe: isWireframe
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                                lineNumber: 3205,
+                                                                                                columnNumber: 43
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3203,
+                                                                                        columnNumber: 41
+                                                                                    }, this),
+                                                                                    isRebarActive && showRingBeamRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(RingBeamRebarCage, {
+                                                                                        lenM: beamLenM,
+                                                                                        heightM: actualBeamHeightM,
+                                                                                        widthM: beamThickM,
+                                                                                        reinf: settings.rccReinforcement
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3218,
+                                                                                        columnNumber: 41
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2079,
+                                                                                lineNumber: 3201,
                                                                                 columnNumber: 37
                                                                             }, this),
-                                                                            showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                            (showFullRingBeam || isRebarActive && showRingBeamRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                 position: [
                                                                                     mX,
                                                                                     junction.fullRingBeamCenterY,
@@ -5215,39 +8483,54 @@ function VisualEstimator3D({ model }) {
                                                                                     0
                                                                                 ],
                                                                                 children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                                                    showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                                                                                         name: "rccFullRingBeamMesh",
-                                                                                        castShadow: !isBeamXRay,
-                                                                                        receiveShadow: !isBeamXRay,
-                                                                                        renderOrder: 1,
+                                                                                        castShadow: isConcreteSolid,
+                                                                                        receiveShadow: isConcreteSolid,
+                                                                                        renderOrder: isBeamXRay ? 2 : 1,
                                                                                         children: [
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
                                                                                                 args: [
-                                                                                                    extendedBeamLen,
+                                                                                                    beamLenM,
                                                                                                     junction.fullRingBeamHeight,
                                                                                                     beamThickM
                                                                                                 ]
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2099,
-                                                                                                columnNumber: 41
+                                                                                                lineNumber: 3233,
+                                                                                                columnNumber: 43
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
                                                                                                 color: "#64748b",
-                                                                                                roughness: 0.85,
-                                                                                                metalness: 0.05
+                                                                                                roughness: isBeamXRay ? 0.3 : 0.85,
+                                                                                                metalness: isBeamXRay ? 0.1 : 0.05,
+                                                                                                transparent: isConcreteTransparent,
+                                                                                                opacity: concreteOpacity,
+                                                                                                depthWrite: isConcreteDepthWrite,
+                                                                                                depthTest: true,
+                                                                                                wireframe: isWireframe
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2100,
-                                                                                                columnNumber: 41
+                                                                                                lineNumber: 3234,
+                                                                                                columnNumber: 43
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2098,
-                                                                                        columnNumber: 39
+                                                                                        lineNumber: 3232,
+                                                                                        columnNumber: 41
                                                                                     }, this),
-                                                                                    isSideBeamPlasterVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                                    isRebarActive && showRingBeamRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(RingBeamRebarCage, {
+                                                                                        lenM: beamLenM,
+                                                                                        heightM: junction.fullRingBeamHeight,
+                                                                                        widthM: beamThickM,
+                                                                                        reinf: settings.rccReinforcement
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3249,
+                                                                                        columnNumber: 41
+                                                                                    }, this),
+                                                                                    showFullRingBeam && isSideBeamPlasterVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                         name: "rccSideBeamPlasterGroup",
                                                                                         children: [
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5269,7 +8552,7 @@ function VisualEstimator3D({ model }) {
                                                                                                         ]
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2117,
+                                                                                                        lineNumber: 3267,
                                                                                                         columnNumber: 45
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5281,13 +8564,13 @@ function VisualEstimator3D({ model }) {
                                                                                                         depthWrite: !plasterXRay
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2118,
+                                                                                                        lineNumber: 3268,
                                                                                                         columnNumber: 45
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2110,
+                                                                                                lineNumber: 3260,
                                                                                                 columnNumber: 43
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5309,7 +8592,7 @@ function VisualEstimator3D({ model }) {
                                                                                                         ]
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2134,
+                                                                                                        lineNumber: 3284,
                                                                                                         columnNumber: 45
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5321,31 +8604,31 @@ function VisualEstimator3D({ model }) {
                                                                                                         depthWrite: !plasterXRay
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2135,
+                                                                                                        lineNumber: 3285,
                                                                                                         columnNumber: 45
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2127,
+                                                                                                lineNumber: 3277,
                                                                                                 columnNumber: 43
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2109,
+                                                                                        lineNumber: 3259,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2097,
+                                                                                lineNumber: 3230,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         ]
                                                                     }, `frame-beam-${floor.id}-${beam.id}`, true, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2076,
+                                                                        lineNumber: 3198,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 }),
@@ -5360,44 +8643,64 @@ function VisualEstimator3D({ model }) {
                                                                     const eY = toM(w.end.y);
                                                                     const len = Math.hypot(eX - sX, eY - sY);
                                                                     if (len <= 0.05) return null;
-                                                                    // Check if a line segment lies along any beam in detectedBeams
-                                                                    const isSegmentCovered = (p1X, p1Y, p2X, p2Y)=>{
-                                                                        const segLen = Math.hypot(p2X - p1X, p2Y - p1Y);
-                                                                        if (segLen <= 0.05) return true;
-                                                                        return detectedBeams.some((b)=>{
+                                                                    // Check if this wall is already covered by the frame beams
+                                                                    const isWallCoveredByFrame = ()=>{
+                                                                        // 1. If this floor has a structural frame (detectedBeams), ALL external perimeter walls are covered by frame beams
+                                                                        if (detectedBeams.length > 0 && floor.externalWalls.some((ew)=>ew.id === w.id)) {
+                                                                            return true;
+                                                                        }
+                                                                        // 2. Check if pillars exist at/near the ends of this wall segment
+                                                                        const pAtStart = floorPillars.some((p)=>Math.hypot(toM(p.position?.x ?? p.x ?? 0) - sX, toM(p.position?.y ?? p.y ?? 0) - sY) < 0.6);
+                                                                        const pAtEnd = floorPillars.some((p)=>Math.hypot(toM(p.position?.x ?? p.x ?? 0) - eX, toM(p.position?.y ?? p.y ?? 0) - eY) < 0.6);
+                                                                        if (pAtStart && pAtEnd && detectedBeams.length > 0) return true;
+                                                                        // 3. Check if 2 or more pillars lie along this wall
+                                                                        const pillarsOnWall = floorPillars.filter((p)=>{
+                                                                            const px = toM(p.position?.x ?? p.x ?? 0);
+                                                                            const py = toM(p.position?.y ?? p.y ?? 0);
+                                                                            const dist = Math.abs((eY - sY) * px - (eX - sX) * py + eX * sY - eY * sX) / len;
+                                                                            if (dist > 0.45) return false;
+                                                                            const dot = (px - sX) * (eX - sX) + (py - sY) * (eY - sY);
+                                                                            return dot >= -0.45 * len && dot <= len * len + 0.45 * len;
+                                                                        });
+                                                                        if (pillarsOnWall.length >= 2) return true;
+                                                                        // 4. Check if detectedBeams already contains beams collinear with this wall
+                                                                        const wallAng = Math.atan2(-(eY - sY), eX - sX);
+                                                                        const collinearBeams = detectedBeams.filter((b)=>{
                                                                             const bsX = toM(b.start.x);
                                                                             const bsY = toM(b.start.y);
                                                                             const beX = toM(b.end.x);
                                                                             const beY = toM(b.end.y);
                                                                             const bLen = Math.hypot(beX - bsX, beY - bsY);
                                                                             if (bLen <= 0.05) return false;
-                                                                            const d1 = Math.hypot(p1X - bsX, p1Y - bsY) + Math.hypot(p1X - beX, p1Y - beY);
-                                                                            const d2 = Math.hypot(p2X - bsX, p2Y - bsY) + Math.hypot(p2X - beX, p2Y - beY);
-                                                                            return Math.abs(d1 - bLen) < 0.15 && Math.abs(d2 - bLen) < 0.15;
+                                                                            const bAng = Math.atan2(-(beY - bsY), beX - bsX);
+                                                                            const angleDiff = Math.abs(Math.sin(wallAng - bAng));
+                                                                            if (angleDiff > 0.15) return false;
+                                                                            const bmX = (bsX + beX) / 2;
+                                                                            const bmY = (bsY + beY) / 2;
+                                                                            const distToWall = Math.abs((eY - sY) * bmX - (eX - sX) * bmY + eX * sY - eY * sX) / len;
+                                                                            return distToWall <= 0.6;
                                                                         });
+                                                                        if (collinearBeams.length > 0) return true;
+                                                                        return false;
                                                                     };
-                                                                    // If the whole wall or all subsegments are covered by frame beams, avoid duplicate beam rendering
-                                                                    if (isSegmentCovered(sX, sY, eX, eY)) return null;
-                                                                    const subsegs = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["splitWallByPillars"])(w, floorPillars, w.dimensions.unit);
-                                                                    if (subsegs.length > 0 && subsegs.every((seg)=>isSegmentCovered(toM(seg.start.x), toM(seg.start.y), toM(seg.end.x), toM(seg.end.y)))) {
-                                                                        return null;
-                                                                    }
+                                                                    // If the wall is covered by the structural frame, skip to eliminate duplicate ("double bubble") ring beams
+                                                                    if (isWallCoveredByFrame()) return null;
                                                                     const ang = Math.atan2(-(eY - sY), eX - sX);
                                                                     const mX = (sX + eX) / 2;
                                                                     const mY = (sY + eY) / 2;
-                                                                    const wallThickM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(w.dimensions.thickness, w.dimensions.thicknessUnit || 'in');
+                                                                    const wallThickM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(w.dimensions.thickness, w.dimensions.thicknessUnit || 'in');
                                                                     const beamThickM = actualBeamThickM || wallThickM;
-                                                                    const isBeamXRay = showPillarRebar || showRoofSlabRebar;
+                                                                    const isBeamXRay = isRebarActive;
                                                                     // Clear span for wall-sitting beam
                                                                     const pStart = floorPillars.find((p)=>Math.hypot(toM(p.position?.x ?? p.x ?? 0) - sX, toM(p.position?.y ?? p.y ?? 0) - sY) < 0.3);
                                                                     const pEnd = floorPillars.find((p)=>Math.hypot(toM(p.position?.x ?? p.x ?? 0) - eX, toM(p.position?.y ?? p.y ?? 0) - eY) < 0.3);
-                                                                    const pStartW = pStart ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pStart.width || 9, pStart.unit || 'in') : 0;
-                                                                    const pEndW = pEnd ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMeters"])(pEnd.width || 9, pEnd.unit || 'in') : 0;
+                                                                    const pStartW = pStart ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pStart.width || 9, pStart.unit || 'in') : 0;
+                                                                    const pEndW = pEnd ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(pEnd.width || 9, pEnd.unit || 'in') : 0;
                                                                     const clearSpanWallBeam = Math.max(0.05, len - (pStartW / 2 + pEndW / 2));
-                                                                    const extendedWallBeamLen = len + pStartW / 2 + pEndW / 2;
+                                                                    const extendedWallBeamLen = len;
                                                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].Fragment, {
                                                                         children: [
-                                                                            i === 0 && showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                            i === 0 && (showFullRingBeam || showRingBeamRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                 position: [
                                                                                     mX,
                                                                                     yOffset - actualBeamHeightM / 2,
@@ -5408,48 +8711,61 @@ function VisualEstimator3D({ model }) {
                                                                                     -ang,
                                                                                     0
                                                                                 ],
-                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
-                                                                                    name: "rccPlinthBeamMesh",
-                                                                                    castShadow: !isBeamXRay,
-                                                                                    receiveShadow: !isBeamXRay,
-                                                                                    renderOrder: isBeamXRay ? 2 : 1,
-                                                                                    children: [
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
-                                                                                            args: [
-                                                                                                extendedWallBeamLen,
-                                                                                                actualBeamHeightM,
-                                                                                                beamThickM
-                                                                                            ]
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                            lineNumber: 2209,
-                                                                                            columnNumber: 41
-                                                                                        }, this),
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                                                            color: "#64748b",
-                                                                                            roughness: isBeamXRay ? 0.3 : 0.85,
-                                                                                            metalness: isBeamXRay ? 0.1 : 0.05,
-                                                                                            transparent: isBeamXRay,
-                                                                                            opacity: isBeamXRay ? 0.22 : 1.0,
-                                                                                            depthWrite: !isBeamXRay,
-                                                                                            depthTest: true
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                            lineNumber: 2210,
-                                                                                            columnNumber: 41
-                                                                                        }, this)
-                                                                                    ]
-                                                                                }, void 0, true, {
-                                                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                    lineNumber: 2208,
-                                                                                    columnNumber: 39
-                                                                                }, this)
-                                                                            }, void 0, false, {
+                                                                                children: [
+                                                                                    showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                                                        name: "rccPlinthBeamMesh",
+                                                                                        castShadow: isConcreteSolid,
+                                                                                        receiveShadow: isConcreteSolid,
+                                                                                        renderOrder: isBeamXRay ? 2 : 1,
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                                                                args: [
+                                                                                                    extendedWallBeamLen,
+                                                                                                    actualBeamHeightM,
+                                                                                                    beamThickM
+                                                                                                ]
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                                lineNumber: 3383,
+                                                                                                columnNumber: 43
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                                                color: "#64748b",
+                                                                                                roughness: isBeamXRay ? 0.3 : 0.85,
+                                                                                                metalness: isBeamXRay ? 0.1 : 0.05,
+                                                                                                transparent: isConcreteTransparent,
+                                                                                                opacity: concreteOpacity,
+                                                                                                depthWrite: isConcreteDepthWrite,
+                                                                                                depthTest: true,
+                                                                                                wireframe: isWireframe
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                                lineNumber: 3384,
+                                                                                                columnNumber: 43
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3382,
+                                                                                        columnNumber: 41
+                                                                                    }, this),
+                                                                                    isRebarActive && showRingBeamRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(RingBeamRebarCage, {
+                                                                                        lenM: extendedWallBeamLen,
+                                                                                        heightM: actualBeamHeightM,
+                                                                                        widthM: beamThickM,
+                                                                                        reinf: settings.rccReinforcement
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3397,
+                                                                                        columnNumber: 41
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2207,
+                                                                                lineNumber: 3380,
                                                                                 columnNumber: 37
                                                                             }, this),
-                                                                            showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                            (showFullRingBeam || isRebarActive && showRingBeamRebar) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                 position: [
                                                                                     mX,
                                                                                     junction.fullRingBeamCenterY,
@@ -5461,10 +8777,10 @@ function VisualEstimator3D({ model }) {
                                                                                     0
                                                                                 ],
                                                                                 children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                                                    showFullRingBeam && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                                                                                         name: "rccFullRingBeamMesh",
-                                                                                        castShadow: !isBeamXRay,
-                                                                                        receiveShadow: !isBeamXRay,
+                                                                                        castShadow: isConcreteSolid,
+                                                                                        receiveShadow: isConcreteSolid,
                                                                                         renderOrder: 1,
                                                                                         children: [
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
@@ -5475,25 +8791,40 @@ function VisualEstimator3D({ model }) {
                                                                                                 ]
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2227,
-                                                                                                columnNumber: 41
+                                                                                                lineNumber: 3412,
+                                                                                                columnNumber: 43
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
                                                                                                 color: "#64748b",
-                                                                                                roughness: 0.85,
-                                                                                                metalness: 0.05
+                                                                                                roughness: isBeamXRay ? 0.3 : 0.85,
+                                                                                                metalness: isBeamXRay ? 0.1 : 0.05,
+                                                                                                transparent: isConcreteTransparent,
+                                                                                                opacity: concreteOpacity,
+                                                                                                depthWrite: isConcreteDepthWrite,
+                                                                                                depthTest: true,
+                                                                                                wireframe: isWireframe
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2228,
-                                                                                                columnNumber: 41
+                                                                                                lineNumber: 3413,
+                                                                                                columnNumber: 43
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2226,
-                                                                                        columnNumber: 39
+                                                                                        lineNumber: 3411,
+                                                                                        columnNumber: 41
                                                                                     }, this),
-                                                                                    isSideBeamPlasterVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                                    isRebarActive && showRingBeamRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(RingBeamRebarCage, {
+                                                                                        lenM: extendedWallBeamLen,
+                                                                                        heightM: junction.fullRingBeamHeight,
+                                                                                        widthM: beamThickM,
+                                                                                        reinf: settings.rccReinforcement
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3428,
+                                                                                        columnNumber: 41
+                                                                                    }, this),
+                                                                                    showFullRingBeam && isSideBeamPlasterVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                                                         name: "rccSideBeamPlasterGroup",
                                                                                         children: [
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5515,7 +8846,7 @@ function VisualEstimator3D({ model }) {
                                                                                                         ]
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2245,
+                                                                                                        lineNumber: 3446,
                                                                                                         columnNumber: 45
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5527,13 +8858,13 @@ function VisualEstimator3D({ model }) {
                                                                                                         depthWrite: !plasterXRay
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2246,
+                                                                                                        lineNumber: 3447,
                                                                                                         columnNumber: 45
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2238,
+                                                                                                lineNumber: 3439,
                                                                                                 columnNumber: 43
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5555,7 +8886,7 @@ function VisualEstimator3D({ model }) {
                                                                                                         ]
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2262,
+                                                                                                        lineNumber: 3463,
                                                                                                         columnNumber: 45
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5567,109 +8898,131 @@ function VisualEstimator3D({ model }) {
                                                                                                         depthWrite: !plasterXRay
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                        lineNumber: 2263,
+                                                                                                        lineNumber: 3464,
                                                                                                         columnNumber: 45
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                                lineNumber: 2255,
+                                                                                                lineNumber: 3456,
                                                                                                 columnNumber: 43
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2237,
+                                                                                        lineNumber: 3438,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2225,
+                                                                                lineNumber: 3409,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         ]
                                                                     }, `wall-beam-group-${w.id}`, true, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2204,
+                                                                        lineNumber: 3377,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 })
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2048,
+                                                            lineNumber: 3171,
                                                             columnNumber: 27
                                                         }, this);
                                                     })(),
                                                     (()=>{
-                                                        const isConcreteVisible = showFullRoof;
-                                                        const isRebarActive = showRoofSlabRebar;
-                                                        if (!isConcreteVisible && !isRebarActive) return null;
-                                                        return structuralSlabs.map((slab)=>{
-                                                            const slabUniqueId = `rcc-fullroof-${floor.id}`;
-                                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
-                                                                position: [
-                                                                    slab.centerX,
-                                                                    junction.slabCenterY,
-                                                                    -slab.centerY
-                                                                ],
-                                                                children: [
-                                                                    isConcreteVisible && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
-                                                                        name: "rccFullRoofMesh",
-                                                                        castShadow: !isRebarActive,
-                                                                        receiveShadow: !isRebarActive,
-                                                                        renderOrder: isRebarActive ? 2 : 1,
+                                                        const isSlabEnabled = (isTopFloor ? showFullRoof : showFloorSlab) && slabCfg?.enabled !== false;
+                                                        if (!isSlabEnabled && !isRebarActive) return null;
+                                                        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                            children: [
+                                                                structuralSlabs.map((slab)=>{
+                                                                    const slabUniqueId = `rcc-slab-${floor.id}`;
+                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
+                                                                        position: [
+                                                                            slab.centerX,
+                                                                            (junction.fullRingBeamCenterY ?? junction.slabCenterY) + (slab.elevationOffsetY || 0),
+                                                                            -slab.centerY
+                                                                        ],
                                                                         children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
-                                                                                args: [
-                                                                                    slab.widthM,
-                                                                                    slabThickM,
-                                                                                    slab.depthM
+                                                                            isSlabEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
+                                                                                name: "rccFullRoofMesh",
+                                                                                castShadow: isConcreteSolid,
+                                                                                receiveShadow: isConcreteSolid,
+                                                                                renderOrder: isRebarActive ? 2 : 1,
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("boxGeometry", {
+                                                                                        args: [
+                                                                                            slab.widthM,
+                                                                                            slab.thicknessM,
+                                                                                            slab.depthM
+                                                                                        ]
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3506,
+                                                                                        columnNumber: 39
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
+                                                                                        color: RCC_CONCRETE_MATERIAL_CONFIG.color,
+                                                                                        roughness: isRebarActive ? 0.3 : RCC_CONCRETE_MATERIAL_CONFIG.roughness,
+                                                                                        metalness: isRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness,
+                                                                                        transparent: isConcreteTransparent,
+                                                                                        opacity: concreteOpacity,
+                                                                                        depthWrite: isConcreteDepthWrite,
+                                                                                        depthTest: true,
+                                                                                        wireframe: isWireframe
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                        lineNumber: 3507,
+                                                                                        columnNumber: 39
+                                                                                    }, this)
                                                                                 ]
-                                                                            }, void 0, false, {
+                                                                            }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2304,
-                                                                                columnNumber: 35
+                                                                                lineNumber: 3500,
+                                                                                columnNumber: 37
                                                                             }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
-                                                                                color: RCC_CONCRETE_MATERIAL_CONFIG.color,
-                                                                                roughness: isRebarActive ? 0.3 : RCC_CONCRETE_MATERIAL_CONFIG.roughness,
-                                                                                metalness: isRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness,
-                                                                                transparent: isRebarActive,
-                                                                                opacity: isRebarActive ? 0.20 : 1.0,
-                                                                                depthWrite: !isRebarActive,
-                                                                                depthTest: true
+                                                                            isRebarActive && showRoofSlabRebar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SlabRebarMesh, {
+                                                                                bayWidthM: slab.widthM,
+                                                                                bayDepthM: slab.depthM,
+                                                                                thicknessM: slab.thicknessM,
+                                                                                reinf: settings.rccReinforcement
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2305,
-                                                                                columnNumber: 35
+                                                                                lineNumber: 3522,
+                                                                                columnNumber: 37
                                                                             }, this)
                                                                         ]
-                                                                    }, void 0, true, {
+                                                                    }, slabUniqueId, true, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2298,
+                                                                        lineNumber: 3494,
                                                                         columnNumber: 33
-                                                                    }, this),
-                                                                    isRebarActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SlabRebarMesh, {
-                                                                        bayWidthM: slab.widthM,
-                                                                        bayDepthM: slab.depthM,
-                                                                        thicknessM: slabThickM,
-                                                                        reinf: settings.rccReinforcement
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2319,
-                                                                        columnNumber: 33
-                                                                    }, this)
-                                                                ]
-                                                            }, slabUniqueId, true, {
-                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                lineNumber: 2292,
-                                                                columnNumber: 29
-                                                            }, this);
-                                                        });
+                                                                    }, this);
+                                                                }),
+                                                                showStairs && i < model.floors.length - 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Staircase3D, {
+                                                                    baseY: yOffset,
+                                                                    topY: floorJunctions[i + 1]?.floorBaseY ?? yOffset + floorWallHeightM + junction.fullRingBeamHeight,
+                                                                    startX: 2.5,
+                                                                    startZ: 2.5,
+                                                                    widthM: 1.1,
+                                                                    isConcreteSolid: isConcreteSolid,
+                                                                    isRebarActive: isRebarActive,
+                                                                    isGhosted: isGhosted
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                    lineNumber: 3535,
+                                                                    columnNumber: 31
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                            lineNumber: 3490,
+                                                            columnNumber: 27
+                                                        }, this);
                                                     })(),
-                                                    (showPillars || showPillarRebar) && floorPillars.filter((p)=>p.position && p.showIn3D !== false).map((p, pIdx)=>{
+                                                    (showPillars || showPillarRebar) && floorPillars.filter((p)=>(p.position || p.x !== undefined) && p.showIn3D !== false).map((p, pIdx)=>{
                                                         const norm = normalizePillarRebarConfig(p, settings.rccReinforcement);
                                                         const pW_M = norm.wM;
                                                         const pD_M = norm.dM;
@@ -5678,15 +9031,15 @@ function VisualEstimator3D({ model }) {
                                                         const shaftHeightM = floorWallHeightM;
                                                         const jointHeightM = junction.fullRingBeamHeight;
                                                         const totalColumnHeightM = shaftHeightM + jointHeightM;
-                                                        const effPos = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getEffectivePillarPosition"])(p, floorAllWalls, model.buildingUnit);
+                                                        const effPos = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectivePillarPosition"])(p, floorAllWalls, model.buildingUnit);
                                                         const isPillarSelected = selectedPillar?.id === p.id;
-                                                        const isPillarRebarActive = showPillarRebar || p.showRebar;
+                                                        const isPillarRebarActive = (renderMode === 'rebar' || renderMode === 'combined') && (showPillarRebar || p.showRebar);
                                                         const pillarMatColor = isPillarSelected ? "#0284c7" : isPillarRebarActive ? RCC_CONCRETE_MATERIAL_CONFIG.color : p.finish === 'painted' ? '#cbd5e1' : RCC_CONCRETE_MATERIAL_CONFIG.color;
                                                         const pillarMatRoughness = isPillarRebarActive ? 0.3 : p.finish === 'smooth' ? 0.4 : RCC_CONCRETE_MATERIAL_CONFIG.roughness;
                                                         const pillarMatMetalness = isPillarRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness;
-                                                        const pillarMatTransparent = isPillarRebarActive;
-                                                        const pillarMatOpacity = isPillarRebarActive ? 0.22 : 1.0;
-                                                        const pillarMatDepthWrite = !isPillarRebarActive;
+                                                        const pillarMatTransparent = isConcreteTransparent;
+                                                        const pillarMatOpacity = concreteOpacity;
+                                                        const pillarMatDepthWrite = isConcreteDepthWrite;
                                                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
                                                             position: [
                                                                 toM(effPos.x),
@@ -5717,7 +9070,7 @@ function VisualEstimator3D({ model }) {
                                                                             ]
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2366,
+                                                                            lineNumber: 3585,
                                                                             columnNumber: 35
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5727,16 +9080,17 @@ function VisualEstimator3D({ model }) {
                                                                             transparent: pillarMatTransparent,
                                                                             opacity: pillarMatOpacity,
                                                                             depthWrite: pillarMatDepthWrite,
-                                                                            depthTest: true
+                                                                            depthTest: true,
+                                                                            wireframe: isWireframe
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2367,
+                                                                            lineNumber: 3586,
                                                                             columnNumber: 35
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 2365,
+                                                                    lineNumber: 3584,
                                                                     columnNumber: 33
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
                                                                     position: [
@@ -5756,7 +9110,7 @@ function VisualEstimator3D({ model }) {
                                                                             ]
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2379,
+                                                                            lineNumber: 3599,
                                                                             columnNumber: 35
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshStandardMaterial", {
@@ -5766,22 +9120,23 @@ function VisualEstimator3D({ model }) {
                                                                             transparent: pillarMatTransparent,
                                                                             opacity: pillarMatOpacity,
                                                                             depthWrite: pillarMatDepthWrite,
-                                                                            depthTest: true
+                                                                            depthTest: true,
+                                                                            wireframe: isWireframe
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2380,
+                                                                            lineNumber: 3600,
                                                                             columnNumber: 35
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 2378,
+                                                                    lineNumber: 3598,
                                                                     columnNumber: 33
                                                                 }, this)),
                                                                 showRccPlaster && (()=>{
                                                                     const colPlasterThickMm = floor.plaster?.rcc?.thickness ?? model.plaster?.rcc?.thickness ?? floor.plaster?.rccSurfaces?.thickness ?? 6;
                                                                     const colPlasterUnit = floor.plaster?.rcc?.unit ?? model.plaster?.rcc?.unit ?? 'mm';
-                                                                    const colPlasterThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toMetersPlaster"])(colPlasterThickMm, colPlasterUnit));
+                                                                    const colPlasterThickM = Math.max(0.002, (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMetersPlaster"])(colPlasterThickMm, colPlasterUnit));
                                                                     const floorAllWalls = [
                                                                         ...floor.externalWalls,
                                                                         ...showInternal ? floor.internalWalls : floor.internalWalls
@@ -5796,7 +9151,7 @@ function VisualEstimator3D({ model }) {
                                                                         depthWrite: !plasterXRay
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2402,
+                                                                        lineNumber: 3623,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                     if (p.shape === 'circular') {
@@ -5820,19 +9175,19 @@ function VisualEstimator3D({ model }) {
                                                                                         ]
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2417,
+                                                                                        lineNumber: 3638,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     colPlasterMat
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2416,
+                                                                                lineNumber: 3637,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2415,
+                                                                            lineNumber: 3636,
                                                                             columnNumber: 35
                                                                         }, this);
                                                                     }
@@ -5855,14 +9210,14 @@ function VisualEstimator3D({ model }) {
                                                                                         ]
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2429,
+                                                                                        lineNumber: 3650,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     colPlasterMat
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2428,
+                                                                                lineNumber: 3649,
                                                                                 columnNumber: 37
                                                                             }, this),
                                                                             exposed.west && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5881,14 +9236,14 @@ function VisualEstimator3D({ model }) {
                                                                                         ]
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2436,
+                                                                                        lineNumber: 3657,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     colPlasterMat
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2435,
+                                                                                lineNumber: 3656,
                                                                                 columnNumber: 37
                                                                             }, this),
                                                                             exposed.north && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5907,14 +9262,14 @@ function VisualEstimator3D({ model }) {
                                                                                         ]
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2443,
+                                                                                        lineNumber: 3664,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     colPlasterMat
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2442,
+                                                                                lineNumber: 3663,
                                                                                 columnNumber: 37
                                                                             }, this),
                                                                             exposed.south && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("mesh", {
@@ -5933,20 +9288,20 @@ function VisualEstimator3D({ model }) {
                                                                                         ]
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                        lineNumber: 2450,
+                                                                                        lineNumber: 3671,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     colPlasterMat
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2449,
+                                                                                lineNumber: 3670,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2425,
+                                                                        lineNumber: 3646,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 })(),
@@ -5965,7 +9320,7 @@ function VisualEstimator3D({ model }) {
                                                                             ]
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2461,
+                                                                            lineNumber: 3682,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("meshBasicMaterial", {
@@ -5973,13 +9328,13 @@ function VisualEstimator3D({ model }) {
                                                                             wireframe: true
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                            lineNumber: 2462,
+                                                                            lineNumber: 3683,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 2460,
+                                                                    lineNumber: 3681,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 isPillarRebarActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("group", {
@@ -5998,12 +9353,12 @@ function VisualEstimator3D({ model }) {
                                                                         reinf: norm.reinf
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2469,
+                                                                        lineNumber: 3690,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 2468,
+                                                                    lineNumber: 3689,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 showPillarLabels && p.showLabel !== false && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$react$2d$three$2f$drei$2f$web$2f$Html$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Html"], {
@@ -6032,32 +9387,43 @@ function VisualEstimator3D({ model }) {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2491,
+                                                                                lineNumber: 3712,
                                                                                 columnNumber: 35
                                                                             }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            p.structuralData ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "text-[8px] text-cyan-300 font-mono",
+                                                                                children: [
+                                                                                    Math.round(p.structuralData.serviceLoadKn),
+                                                                                    " kN • ",
+                                                                                    p.structuralRole || 'column'
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
+                                                                                lineNumber: 3714,
+                                                                                columnNumber: 37
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                 className: "text-[8px] text-cyan-300 font-mono",
                                                                                 children: "Joint Aligned"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                                lineNumber: 2492,
-                                                                                columnNumber: 35
+                                                                                lineNumber: 3718,
+                                                                                columnNumber: 37
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                        lineNumber: 2484,
+                                                                        lineNumber: 3705,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                    lineNumber: 2483,
+                                                                    lineNumber: 3704,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, `col-${floor.id}-${p.id || pIdx}`, true, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2354,
+                                                            lineNumber: 3573,
                                                             columnNumber: 27
                                                         }, this);
                                                     }),
@@ -6073,25 +9439,25 @@ function VisualEstimator3D({ model }) {
                                                                 children: room.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                                lineNumber: 2503,
+                                                                lineNumber: 3730,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, room.id, false, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2502,
+                                                            lineNumber: 3729,
                                                             columnNumber: 25
                                                         }, this))
                                                 ]
                                             }, floor.id, true, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 2008,
+                                                lineNumber: 3131,
                                                 columnNumber: 21
                                             }, this);
                                         })
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 1873,
+                                    lineNumber: 2970,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("gridHelper", {
@@ -6108,22 +9474,22 @@ function VisualEstimator3D({ model }) {
                                     ]
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2514,
+                                    lineNumber: 3741,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 1861,
+                            lineNumber: 2958,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 1860,
+                        lineNumber: 2957,
                         columnNumber: 9
                     }, this),
                     selectedFooting && (()=>{
-                        const effSize = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getEffectiveFootingSize"])(selectedFooting, model.foundation);
+                        const effSize = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getEffectiveFootingSize"])(selectedFooting, model.foundation);
                         const isCommon = model.foundation?.useCommonFootingSize;
                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "absolute bottom-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-amber-500 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md",
@@ -6138,20 +9504,20 @@ function VisualEstimator3D({ model }) {
                                                     className: "w-4 h-4 text-amber-400"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2527,
+                                                    lineNumber: 3754,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: selectedFooting.pillarName ? `${selectedFooting.pillarName} Footing` : selectedFooting.id
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2528,
+                                                    lineNumber: 3755,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2526,
+                                            lineNumber: 3753,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6161,18 +9527,18 @@ function VisualEstimator3D({ model }) {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                lineNumber: 2531,
+                                                lineNumber: 3758,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2530,
+                                            lineNumber: 3757,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2525,
+                                    lineNumber: 3752,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6188,7 +9554,7 @@ function VisualEstimator3D({ model }) {
                                                             children: "RCC Footing:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2538,
+                                                            lineNumber: 3765,
                                                             columnNumber: 23
                                                         }, this),
                                                         isCommon && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6196,13 +9562,13 @@ function VisualEstimator3D({ model }) {
                                                             children: "Common"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                            lineNumber: 2539,
+                                                            lineNumber: 3766,
                                                             columnNumber: 36
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2537,
+                                                    lineNumber: 3764,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6217,7 +9583,7 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2541,
+                                                    lineNumber: 3768,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6228,13 +9594,13 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2544,
+                                                    lineNumber: 3771,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2536,
+                                            lineNumber: 3763,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6245,7 +9611,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "PCC Base Lean:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2547,
+                                                    lineNumber: 3774,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6260,7 +9626,7 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2548,
+                                                    lineNumber: 3775,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6271,19 +9637,19 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2551,
+                                                    lineNumber: 3778,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2546,
+                                            lineNumber: 3773,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2535,
+                                    lineNumber: 3762,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6297,7 +9663,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Sand Filling:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2557,
+                                                    lineNumber: 3784,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6308,13 +9674,13 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2558,
+                                                    lineNumber: 3785,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2556,
+                                            lineNumber: 3783,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6325,7 +9691,7 @@ function VisualEstimator3D({ model }) {
                                                     children: "Total Excavation:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2563,
+                                                    lineNumber: 3790,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6336,19 +9702,19 @@ function VisualEstimator3D({ model }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                                    lineNumber: 2564,
+                                                    lineNumber: 3791,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2562,
+                                            lineNumber: 3789,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2555,
+                                    lineNumber: 3782,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6359,7 +9725,7 @@ function VisualEstimator3D({ model }) {
                                             children: "Reinforcement Mesh (2-Way Bottom):"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2571,
+                                            lineNumber: 3798,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6373,7 +9739,7 @@ function VisualEstimator3D({ model }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2572,
+                                            lineNumber: 3799,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6381,13 +9747,13 @@ function VisualEstimator3D({ model }) {
                                             children: "• Starter Ties: 4×16mm Column Anchor Dowels"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2575,
+                                            lineNumber: 3802,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2570,
+                                    lineNumber: 3797,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6397,20 +9763,20 @@ function VisualEstimator3D({ model }) {
                                             className: "w-3 h-3 flex-shrink-0"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                            lineNumber: 2581,
+                                            lineNumber: 3808,
                                             columnNumber: 17
                                         }, this),
                                         "Must be verified by a structural engineer with actual soil data."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                    lineNumber: 2580,
+                                    lineNumber: 3807,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                            lineNumber: 2524,
+                            lineNumber: 3751,
                             columnNumber: 15
                         }, this);
                     })(),
@@ -6421,7 +9787,7 @@ function VisualEstimator3D({ model }) {
                                 className: "w-4 h-4 text-emerald-400 shrink-0"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 2591,
+                                lineNumber: 3818,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6431,7 +9797,7 @@ function VisualEstimator3D({ model }) {
                                         children: toastMessage.title
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 2593,
+                                        lineNumber: 3820,
                                         columnNumber: 17
                                     }, this),
                                     toastMessage.subtitle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6439,25 +9805,25 @@ function VisualEstimator3D({ model }) {
                                         children: toastMessage.subtitle
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                        lineNumber: 2595,
+                                        lineNumber: 3822,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                                lineNumber: 2592,
+                                lineNumber: 3819,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                        lineNumber: 2590,
+                        lineNumber: 3817,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 1438,
+                lineNumber: 2355,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$SaveProjectModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SaveProjectModal"], {
@@ -6471,7 +9837,7 @@ function VisualEstimator3D({ model }) {
                 defaultName: projectName || 'My Construction Plan'
             }, void 0, false, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 2603,
+                lineNumber: 3830,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$ProjectHistoryModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ProjectHistoryModal"], {
@@ -6480,31 +9846,34 @@ function VisualEstimator3D({ model }) {
                 onLoadSuccess: (loadedName)=>triggerToast(`"${loadedName}" loaded into 3D View!`, "All walls, pillars & estimates restored")
             }, void 0, false, {
                 fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-                lineNumber: 2615,
+                lineNumber: 3842,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/3d/VisualEstimator3D.tsx",
-        lineNumber: 1421,
+        lineNumber: 2338,
         columnNumber: 5
     }, this);
 }
-_s3(VisualEstimator3D, "hwbt4i8R40uJXtNm0t7rDVBotoU=", false, function() {
+_s4(VisualEstimator3D, "OGbCRMlwglmwR+ma5xsWbAVwnkU=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$CalculatorContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCalculator"]
     ];
 });
-_c7 = VisualEstimator3D;
-var _c, _c1, _c2, _c3, _c4, _c5, _c6, _c7;
+_c10 = VisualEstimator3D;
+var _c, _c1, _c2, _c3, _c4, _c5, _c6, _c7, _c8, _c9, _c10;
 __turbopack_context__.k.register(_c, "WallPlasterSkin");
 __turbopack_context__.k.register(_c1, "CustomWallMeshWrapper");
 __turbopack_context__.k.register(_c2, "PillarRebarCage");
 __turbopack_context__.k.register(_c3, "SlabRebarMesh");
-__turbopack_context__.k.register(_c4, "FootingRebarMesh");
-__turbopack_context__.k.register(_c5, "Footing3DGroup");
-__turbopack_context__.k.register(_c6, "CameraController");
-__turbopack_context__.k.register(_c7, "VisualEstimator3D");
+__turbopack_context__.k.register(_c4, "RingBeamRebarCage");
+__turbopack_context__.k.register(_c5, "FootingRebarMesh");
+__turbopack_context__.k.register(_c6, "Footing3DGroup");
+__turbopack_context__.k.register(_c7, "Staircase3D");
+__turbopack_context__.k.register(_c8, "Foundation3DSystem");
+__turbopack_context__.k.register(_c9, "CameraController");
+__turbopack_context__.k.register(_c10, "VisualEstimator3D");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

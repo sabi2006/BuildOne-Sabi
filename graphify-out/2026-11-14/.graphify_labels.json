@@ -1,0 +1,14 @@
+{
+  "0": "Calculator Page & Navigation UI",
+  "3": "3D Viewport & Foundation Renderer",
+  "7": "Brick & Structural Domain Types",
+  "10": "Package Dependencies & Tooling",
+  "11": "TypeScript Configuration",
+  "12": "Core Frontend Libraries",
+  "14": "PDF Export Generator API",
+  "19": "Scroll Story 3D Visualization",
+  "20": "React Three Fiber Canvas",
+  "24": "ESLint Configuration",
+  "25": "NPM Build & Dev Scripts",
+  "35": "PostCSS & Tailwind Setup"
+}
