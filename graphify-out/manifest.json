@@ -31,8 +31,8 @@
   },
   "prisma/migrations/0001_init/migration.sql": {
     "mtime": 1790966386.4310534,
-    "seen": 1794664666.4854724,
-    "ast_hash": "",
+    "seen": 1794685497.211094,
+    "ast_hash": "1aca5169487a7fd4f5808764836cec3d",
     "semantic_hash": ""
   },
   "src/app/about/page.tsx": {

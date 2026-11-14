@@ -504,15 +504,15 @@
     "semantic_hash": ""
   },
   "FINAL_GRAPHIFY_DOMAIN_MODEL.md": {
-    "mtime": 1794684393.1720228,
-    "seen": 1794684796.572837,
-    "ast_hash": "c95156d9e4930fe55bda8c62b4f14b66",
+    "mtime": 1794684887.0404685,
+    "seen": 1794685088.0201893,
+    "ast_hash": "7eff1a2028b7ae8f275393bc995cd6dd",
     "semantic_hash": ""
   },
   "FINAL_GRAPH_REPORT.md": {
-    "mtime": 1794684424.5144956,
-    "seen": 1794684796.5728397,
-    "ast_hash": "796a86103a8e782bdcaa04b8536a57ac",
+    "mtime": 1794684951.222584,
+    "seen": 1794685088.0201914,
+    "ast_hash": "f57bc7b1fcc17250119774f416206019",
     "semantic_hash": ""
   },
   "FINAL_POST_IMPLEMENTATION_VALIDATION.md": {
@@ -531,6 +531,18 @@
     "mtime": 1794684449.8234396,
     "seen": 1794684796.5734253,
     "ast_hash": "d18f8ff551ffe15f725780c4ba2004e6",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_AUTOMATION_GUIDE.md": {
+    "mtime": 1794684872.8190978,
+    "seen": 1794685088.0204759,
+    "ast_hash": "798325637b2726e90e12e5cde1dd2c3d",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_SETUP_STATUS.md": {
+    "mtime": 1794684847.215167,
+    "seen": 1794685088.0206144,
+    "ast_hash": "3027d3cf6f9e45b21852b2a59eeb6d49",
     "semantic_hash": ""
   },
   "package-lock.json": {
