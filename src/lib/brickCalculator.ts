@@ -4842,6 +4842,7 @@ export interface RCCRingBeamConfig {
   depth: number;
   depthUnit?: Unit;
   enabled?: boolean;
+  isCustomSize?: boolean;
 }
 
 export const DEFAULT_RCC_RING_BEAM: RCCRingBeamConfig = {
@@ -4893,6 +4894,7 @@ export interface RCCSlabConfig {
   elevationOffset?: number; // vertical elevation offset (in ft or buildingUnit)
   elevationOffsetUnit?: Unit;
   customDimensions?: boolean; // whether custom length/width is used instead of auto frame bounds
+  isCustomSize?: boolean;
 }
 
 export const DEFAULT_RCC_SLAB: RCCSlabConfig = {

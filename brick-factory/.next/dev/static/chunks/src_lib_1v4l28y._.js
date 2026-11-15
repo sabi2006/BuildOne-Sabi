@@ -4348,6 +4348,10 @@ const DEFAULT_BUILDING_CONFIG = {
     allowableSoilBearingPressureKnM2: 150,
     foundationDepthM: 1.5,
     designStatus: 'Preliminary Estimate',
+    autoSizeBeamsAndSlabs: true,
+    beamSizingMode: 'auto_span',
+    slabSizingMode: 'auto_occupancy',
+    customSlabThicknessIn: 5,
     customRates: {
         cementBagPrice: 400,
         sandPricePerCft: 55,
@@ -4524,7 +4528,7 @@ function calculatePillarStructuralDetails(pillarId, pillarName, gridX_m, gridY_m
     // 2. Unit Loads as per Handbook Section 3.1 & IS 875 Parts 1 & 2
     const concreteUnitWeightKnM3 = 25.0; // RCC
     const masonryUnitWeightKnM3 = 19.0; // Brickwork
-    const slabThicknessM = 0.125; // 5 inches standard
+    const slabThicknessM = overrides?.customSlabThicknessMm ? overrides.customSlabThicknessMm * 0.001 : config.slabSizingMode === 'custom' && config.customSlabThicknessIn ? toMeters(config.customSlabThicknessIn, 'in') : config.buildingType === 'commercial' || config.buildingType === 'industrial' ? 0.15 : 0.125;
     const floorHeightM = toMeters(config.floorHeight, config.floorHeightUnit);
     // Slab self-weight: thickness * 25 kN/m³
     const slabSelfWeightIntensityKnM2 = slabThicknessM * concreteUnitWeightKnM3; // 3.125 kN/m²
@@ -4878,6 +4882,9 @@ function calculateBuildingStructuralSummary(pillars, walls, buildingLengthM, bui
         const flRing = p.floorId ? floorRingBeamMap.get(p.floorId) : undefined;
         const configuredBeamWidthMm = flRing ? flRing.widthMm : undefined;
         const configuredBeamDepthMm = flRing ? flRing.depthMm : undefined;
+        const flData = Array.isArray(floorsData) && p.floorId ? floorsData.find((f)=>f.id === p.floorId) : undefined;
+        const flSlab = flData?.slab;
+        const configuredSlabThicknessMm = flSlab?.thickness !== undefined ? Math.round(toMeters(flSlab.thickness, flSlab.thicknessUnit || 'in') * 1000) : undefined;
         return calculatePillarStructuralDetails(p.id, p.name || `C${idx + 1}`, pCoords.x, pCoords.y, buildingLengthM, buildingWidthM, sameFloorCoords.length > 0 ? sameFloorCoords : coordsList, wallLenConnected, config, {
             customWidthMm: p.width && (p.isCustomSize || p.width !== 9) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
             customDepthMm: p.depth && (p.isCustomSize || p.depth !== 9) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
@@ -4886,7 +4893,8 @@ function calculateBuildingStructuralSummary(pillars, walls, buildingLengthM, bui
             supportedFloors,
             singleFloorHeightM,
             customBeamWidthMm: configuredBeamWidthMm,
-            customBeamDepthMm: configuredBeamDepthMm
+            customBeamDepthMm: configuredBeamDepthMm,
+            customSlabThicknessMm: configuredSlabThicknessMm
         });
     });
     // Maintain uniform column cross-section from bottom (ground floor) to top floor along each vertical column shaft.

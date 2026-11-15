@@ -31,8 +31,8 @@
   },
   "prisma/migrations/0001_init/migration.sql": {
     "mtime": 1790966386.4310534,
-    "seen": 1794664666.4854724,
-    "ast_hash": "",
+    "seen": 1794685497.211094,
+    "ast_hash": "1aca5169487a7fd4f5808764836cec3d",
     "semantic_hash": ""
   },
   "src/app/about/page.tsx": {
@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794677585.7521336,
-    "seen": 1794679167.5584335,
-    "ast_hash": "a5872544f9553c2fc319966e5204f5a4",
+    "mtime": 1794719828.005772,
+    "seen": 1794720047.038913,
+    "ast_hash": "254677e2017384f2024b5035eac38b24",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
@@ -180,10 +180,10 @@
     "semantic_hash": "cc40302ff300257e1ed7cbaa032c128b"
   },
   "src/components/calculator/StructuralConfigModal.tsx": {
-    "mtime": 1794563520.2466705,
-    "seen": 1794664666.4855227,
-    "ast_hash": "44bbb14848629a976eb796afbbf4c2bb",
-    "semantic_hash": "44bbb14848629a976eb796afbbf4c2bb"
+    "mtime": 1794719076.9264264,
+    "seen": 1794720047.0389242,
+    "ast_hash": "61d0cdb229364ba7959e88b5f7c40fb1",
+    "semantic_hash": ""
   },
   "src/components/calculator/StructurePreview3D.tsx": {
     "mtime": 1788695089.0921667,
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1794680488.0231056,
-    "seen": 1794680787.5656974,
-    "ast_hash": "8216f15b9fff90a7aec1601d61de823d",
+    "mtime": 1794719018.4361246,
+    "seen": 1794720047.038937,
+    "ast_hash": "9de42484da6c868c7101d07e9d5d60fa",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1794677457.3911448,
-    "seen": 1794679167.5616674,
-    "ast_hash": "beb5cc8c9f92e69a8966f81ae0deb161",
+    "mtime": 1794719621.5915034,
+    "seen": 1794720047.0389419,
+    "ast_hash": "c5bfdb7a3d7d9b678825dbdd2ae77696",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {

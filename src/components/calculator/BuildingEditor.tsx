@@ -15,6 +15,8 @@ import {
   RCCRingBeamConfig,
   DEFAULT_RCC_FULL_RING_BEAM,
   RCCFullRingBeamConfig,
+  DEFAULT_RCC_FULL_ROOF,
+  RCCFullRoofConfig,
   DEFAULT_RCC_SLAB,
   DEFAULT_RCC_ROOF_SLAB,
   RCCSlabConfig,
@@ -1399,12 +1401,19 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       widthUnit: 'in',
       depth: safeD,
       depthUnit: 'in',
-      enabled: true
+      enabled: true,
+      isCustomSize: true
     };
     setModel(prev => {
       const updatedFloors = prev.floors.map(fl => fl.id === activeFloorId ? {
         ...fl,
-        ringBeam: updatedBeam
+        ringBeam: updatedBeam,
+        fullRingBeam: fl.fullRingBeam ? {
+          ...fl.fullRingBeam,
+          thicknessFt: safeD / 12,
+          width: safeW,
+          widthUnit: 'in' as Unit
+        } : fl.fullRingBeam
       } : fl);
       return {
         ...prev,
@@ -1442,7 +1451,12 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     setModel(prev => {
       const updatedFloors = prev.floors.map(fl => fl.id === activeFloorId ? {
         ...fl,
-        fullRingBeam: updatedFullBeam
+        fullRingBeam: updatedFullBeam,
+        ringBeam: fl.ringBeam ? {
+          ...fl.ringBeam,
+          depth: Math.round(safeT * 12),
+          isCustomSize: true
+        } : fl.ringBeam
       } : fl);
       return {
         ...prev,
@@ -1457,7 +1471,11 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       floors: prev.floors.map(fl => {
         if (fl.id === activeFloorId) {
           const curSlab = fl.slab ? { ...fl.slab } : { ...DEFAULT_RCC_SLAB };
-          const updatedSlab: RCCSlabConfig = { ...curSlab, ...changes };
+          const updatedSlab: RCCSlabConfig = {
+            ...curSlab,
+            ...changes,
+            isCustomSize: changes.isCustomSize !== undefined ? changes.isCustomSize : (changes.thickness !== undefined ? true : curSlab.isCustomSize)
+          };
           if (changes.thickness !== undefined) {
             updatedSlab.height = convertUnit(changes.thickness, changes.thicknessUnit || 'in', 'ft');
           }
@@ -1471,7 +1489,11 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const handleUpdateRoofSlab = (changes: Partial<RCCSlabConfig>) => {
     setModel(prev => {
       const curRoof = prev.roofSlab ? { ...prev.roofSlab } : { ...DEFAULT_RCC_ROOF_SLAB };
-      const updatedRoof: RCCSlabConfig = { ...curRoof, ...changes };
+      const updatedRoof: RCCSlabConfig = {
+        ...curRoof,
+        ...changes,
+        isCustomSize: changes.isCustomSize !== undefined ? changes.isCustomSize : (changes.thickness !== undefined ? true : curRoof.isCustomSize)
+      };
       if (changes.thickness !== undefined) {
         updatedRoof.height = convertUnit(changes.thickness, changes.thicknessUnit || 'in', 'ft');
       }
@@ -2918,6 +2940,90 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         dimensions: { ...iw.dimensions, height: h }
       }));
 
+      // Floor-wise engineered sizing for Ring Beams & Slabs (IS 456:2000 & IS 875)
+      const maxBaySpanFt = Math.max(gridSpacingX, gridSpacingY, 10);
+      
+      // 1. Beam Sizing (Span / 12 deflection rule)
+      let beamDepthIn = 12;
+      let beamWidthIn = 9;
+      
+      if (newConfig.autoSizeBeamsAndSlabs !== false) {
+        if (newConfig.beamSizingMode === 'uniform') {
+          beamDepthIn = 12;
+          beamWidthIn = 9;
+        } else {
+          // Span / 12 rule
+          if (i === targetCount - 1) {
+            // Top roof tie beam / perimeter roof band (carries only light parapet / roof slab)
+            beamDepthIn = maxBaySpanFt > 14 ? 12 : 9;
+            beamWidthIn = 9;
+          } else {
+            // Intermediate floor beam carrying upper storey brick masonry infill wall
+            // D = L / 12 (round up to 3" multiples, min 12", max 24")
+            const spanIn = maxBaySpanFt * 12;
+            const rawDepth = spanIn / 12;
+            beamDepthIn = Math.min(24, Math.max(12, Math.ceil(rawDepth / 3) * 3));
+            beamWidthIn = 9;
+          }
+        }
+      }
+
+      const ringBeamCustom = existingFloor?.ringBeam?.isCustomSize;
+      const finalRingWidth = ringBeamCustom ? (existingFloor?.ringBeam?.width ?? 9) : beamWidthIn;
+      const finalRingDepth = ringBeamCustom ? (existingFloor?.ringBeam?.depth ?? 12) : beamDepthIn;
+
+      // 2. Slab Sizing (IS 456 / IS 875 Part 2)
+      let slabThicknessIn = 5.0;
+      if (newConfig.autoSizeBeamsAndSlabs !== false) {
+        if (newConfig.slabSizingMode === 'custom' && newConfig.customSlabThicknessIn) {
+          slabThicknessIn = newConfig.customSlabThicknessIn;
+        } else if (newConfig.buildingType === 'commercial' || newConfig.buildingType === 'industrial') {
+          slabThicknessIn = 6.0;
+        } else {
+          slabThicknessIn = 5.0;
+        }
+      }
+
+      const slabCustom = existingFloor?.slab?.isCustomSize;
+      const finalSlabThick = slabCustom ? (existingFloor?.slab?.thickness ?? 5) : slabThicknessIn;
+
+      const ringBeamConfig: RCCRingBeamConfig = {
+        ...(existingFloor?.ringBeam || model.ringBeam || DEFAULT_RCC_RING_BEAM),
+        width: finalRingWidth,
+        widthUnit: 'in',
+        depth: finalRingDepth,
+        depthUnit: 'in',
+        height: finalRingDepth / 12,
+        heightUnit: 'ft',
+        enabled: existingFloor?.ringBeam?.enabled ?? true,
+        isCustomSize: ringBeamCustom ?? false
+      };
+
+      const fullRingBeamConfig: RCCFullRingBeamConfig = {
+        ...(existingFloor?.fullRingBeam || model.fullRingBeam || DEFAULT_RCC_FULL_RING_BEAM),
+        enabled: existingFloor?.fullRingBeam?.enabled ?? true,
+        thicknessFt: finalRingDepth / 12,
+        width: finalRingWidth,
+        widthUnit: 'in' as Unit
+      };
+
+      const slabConfig: RCCSlabConfig = {
+        ...(existingFloor?.slab || model.slab || DEFAULT_RCC_SLAB),
+        enabled: existingFloor?.slab?.enabled ?? true,
+        thickness: finalSlabThick,
+        thicknessUnit: 'in' as Unit,
+        height: finalSlabThick / 12,
+        heightUnit: 'ft' as Unit,
+        isCustomSize: slabCustom ?? false
+      };
+
+      const fullRoofConfig: RCCFullRoofConfig = {
+        ...(existingFloor?.fullRoof || model.fullRoof || DEFAULT_RCC_FULL_ROOF),
+        enabled: existingFloor?.fullRoof?.enabled ?? true,
+        thickness: finalSlabThick,
+        thicknessUnit: 'in' as Unit
+      };
+
       updatedFloors.push({
         id: floorId,
         name: existingFloor?.name || floorName,
@@ -2927,9 +3033,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         externalWalls: extWalls,
         internalWalls: intWalls,
         pillars: existingFloor?.pillars || [],
-        ringBeam: existingFloor?.ringBeam ? { ...existingFloor.ringBeam } : (model.ringBeam ? { ...model.ringBeam } : { ...DEFAULT_RCC_RING_BEAM }),
-        fullRingBeam: existingFloor?.fullRingBeam ? { ...existingFloor.fullRingBeam } : (model.fullRingBeam ? { ...model.fullRingBeam } : { ...DEFAULT_RCC_FULL_RING_BEAM }),
-        slab: existingFloor?.slab ? { ...existingFloor.slab } : (model.slab ? { ...model.slab } : { ...DEFAULT_RCC_SLAB }),
+        ringBeam: ringBeamConfig,
+        fullRingBeam: fullRingBeamConfig,
+        slab: slabConfig,
+        fullRoof: fullRoofConfig,
         plaster: existingFloor?.plaster ? { ...existingFloor.plaster } : (model.plaster ? { ...model.plaster } : { ...DEFAULT_PLASTER_CONFIG }),
         pillarWidth: existingFloor?.pillarWidth,
         pillarDepth: existingFloor?.pillarDepth
@@ -3022,6 +3129,21 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       equipmentCost: 0
     };
 
+    const roofSlabThickIn = (newConfig.autoSizeBeamsAndSlabs !== false && !model.roofSlab?.isCustomSize)
+      ? (newConfig.slabSizingMode === 'custom' && newConfig.customSlabThicknessIn ? newConfig.customSlabThicknessIn : 5)
+      : (model.roofSlab?.thickness || 5);
+
+    const updatedRoofSlab: RCCSlabConfig = {
+      ...(model.roofSlab || DEFAULT_RCC_ROOF_SLAB),
+      enabled: model.roofSlab?.enabled ?? true,
+      thickness: roofSlabThickIn,
+      thicknessUnit: 'in' as Unit,
+      height: roofSlabThickIn / 12,
+      heightUnit: 'ft' as Unit,
+      overhang: model.roofSlab?.overhang ?? 0.5,
+      ...(newConfig.roofConfig?.type ? { type: newConfig.roofConfig.type } : {})
+    };
+
     const structuralSummary = calculateBuildingStructuralSummary(
       allPillars,
       allWallsForStructural,
@@ -3030,7 +3152,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       newConfig,
       structuralRates,
       updatedFloors,
-      model.roofSlab
+      updatedRoofSlab
     );
 
     // Mutate pillar dimensions and rebar according to calculated loads
@@ -3159,11 +3281,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
     updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, newUnit, newConfig, updatedFloors.length);
 
-    const updatedRoofSlab = model.roofSlab ? {
-      ...model.roofSlab,
-      ...(newConfig.roofConfig?.type ? { type: newConfig.roofConfig.type } : {})
-    } : model.roofSlab;
-
     const finalUpdatedModel: BuildingModel = {
       ...model,
       buildingLength: newLength,
@@ -3171,6 +3288,9 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       buildingUnit: newUnit,
       externalWallThickness: newThickness,
       buildingConfig: newConfig,
+      ringBeam: updatedFloors[0]?.ringBeam || model.ringBeam,
+      fullRingBeam: updatedFloors[0]?.fullRingBeam || model.fullRingBeam,
+      slab: updatedFloors[0]?.slab || model.slab,
       roofSlab: updatedRoofSlab,
       structuralSummary,
       foundation: updatedFoundation,
@@ -3180,6 +3300,18 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
     setModel(finalUpdatedModel);
     setBuildingModel(finalUpdatedModel);
+
+    const activeFl = updatedFloors.find(f => f.id === activeFloorId) || updatedFloors[0];
+    if (activeFl) {
+      if (activeFl.ringBeam) {
+        setBeamWidth(activeFl.ringBeam.width ?? 9);
+        setBeamDepth(activeFl.ringBeam.depth ?? 9);
+        setBeamHeight(activeFl.ringBeam.height ?? 2);
+      }
+      if (activeFl.fullRingBeam) {
+        setFullBeamThickness(activeFl.fullRingBeam.thicknessFt ?? 1);
+      }
+    }
 
     if (!updatedFloors.some(f => f.id === activeFloorId)) {
       setActiveFloorId(updatedFloors[0]?.id || 'floor-0');

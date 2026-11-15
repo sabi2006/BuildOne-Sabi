@@ -435,6 +435,87 @@ export function StructuralConfigModal({
                   </div>
                 </div>
               </div>
+
+              {/* Automated Beam, Slab & Roof Sizing (IS 456) */}
+              <div className="p-4 bg-orange-50/70 rounded-xl border border-orange-200/90 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 block uppercase tracking-wider">
+                      Automated Beam & Slab Sizing (IS 456:2000)
+                    </span>
+                    <p className="text-[11px] text-slate-600">
+                      Dynamically size floor beams, slabs, and rebar based on storey level, spans, and occupancy load.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={localConfig.autoSizeBeamsAndSlabs !== false}
+                      onChange={(e) => setLocalConfig(prev => ({
+                        ...prev,
+                        autoSizeBeamsAndSlabs: e.target.checked
+                      }))}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                  </label>
+                </div>
+
+                {localConfig.autoSizeBeamsAndSlabs !== false && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-orange-200/60">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Beam Sizing Rule
+                      </label>
+                      <select
+                        value={localConfig.beamSizingMode || 'auto_span'}
+                        onChange={(e) => setLocalConfig(prev => ({
+                          ...prev,
+                          beamSizingMode: e.target.value as any
+                        }))}
+                        className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                      >
+                        <option value="auto_span">Span / 12 Rule (Floor-wise depth: 12"-18" / 9" roof tie)</option>
+                        <option value="uniform">Uniform 9" x 12" Across All Floors</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Floor Slab Thickness
+                      </label>
+                      <select
+                        value={localConfig.slabSizingMode || 'auto_occupancy'}
+                        onChange={(e) => setLocalConfig(prev => ({
+                          ...prev,
+                          slabSizingMode: e.target.value as any
+                        }))}
+                        className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                      >
+                        <option value="auto_occupancy">Auto by Occupancy (5" Residential / 6" Commercial)</option>
+                        <option value="custom">Custom Thickness</option>
+                      </select>
+                      {localConfig.slabSizingMode === 'custom' && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="number"
+                            step={0.5}
+                            min={4}
+                            max={12}
+                            value={localConfig.customSlabThicknessIn || 5}
+                            onChange={(e) => setLocalConfig(prev => ({
+                              ...prev,
+                              customSlabThicknessIn: parseFloat(e.target.value) || 5
+                            }))}
+                            className="w-20 text-xs font-semibold px-2 py-1.5 rounded border border-slate-300 bg-white"
+                          />
+                          <span className="text-xs text-slate-600">inches</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

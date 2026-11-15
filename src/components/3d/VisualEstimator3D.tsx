@@ -3052,25 +3052,36 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   // Inherit bottom/ground floor pillar dimensions along the vertical column shaft
                   // Columns maintain uniform cross-section from bottom to top without shrinking
                   const gfPillarsList = model.floors[0]?.pillars || (model.pillars || []).filter(p => !p.floorId || String(p.floorId) === String(model.floors[0]?.id));
-                  const gfDimMap = new Map<string, { width: number; depth: number }>();
-                  gfPillarsList.forEach(gp => {
-                    const gpx = gp.position?.x ?? gp.x ?? 0;
-                    const gpy = gp.position?.y ?? gp.y ?? 0;
-                    const key = gp.verticalColumnId || `${Math.round(gpx * 10)}_${Math.round(gpy * 10)}`;
-                    gfDimMap.set(key, { width: gp.width || 9, depth: gp.depth || 9 });
-                  });
+                  
+                  const findMatchingGfPillar = (p: Pillar): Pillar | undefined => {
+                    const px = p.position?.x ?? p.x ?? 0;
+                    const py = p.position?.y ?? p.y ?? 0;
+                    if (p.verticalColumnId) {
+                      const byId = gfPillarsList.find(gp => gp.verticalColumnId === p.verticalColumnId);
+                      if (byId) return byId;
+                    }
+                    if (p.id) {
+                      const byExactId = gfPillarsList.find(gp => gp.id === p.id);
+                      if (byExactId) return byExactId;
+                    }
+                    return gfPillarsList.find(gp => {
+                      const gpx = gp.position?.x ?? gp.x ?? 0;
+                      const gpy = gp.position?.y ?? gp.y ?? 0;
+                      return Math.hypot(gpx - px, gpy - py) < 1.0;
+                    });
+                  };
 
                   const floorPillars: Pillar[] = rawFloorPillars.map(p => {
                     if (p.isStoreyOverride) return p;
-                    const px = p.position?.x ?? p.x ?? 0;
-                    const py = p.position?.y ?? p.y ?? 0;
-                    const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
-                    const gfDim = gfDimMap.get(key);
-                    if (gfDim) {
+                    const matchGf = findMatchingGfPillar(p);
+                    if (matchGf) {
                       return {
                         ...p,
-                        width: gfDim.width,
-                        depth: gfDim.depth
+                        width: matchGf.width || p.width || 9,
+                        depth: matchGf.depth || p.depth || 9,
+                        alignment: matchGf.alignment || p.alignment,
+                        placementType: matchGf.placementType || p.placementType,
+                        shape: matchGf.shape || p.shape
                       };
                     }
                     return p;

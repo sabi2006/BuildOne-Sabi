@@ -177,6 +177,10 @@ export interface BuildingConfig {
   allowableSoilBearingPressureKnM2: number; // from geotechnical report
   foundationDepthM: number; // approved founding depth
   designStatus: 'Preliminary Estimate' | 'User-Provided Design' | 'Engineer-Verified Design';
+  autoSizeBeamsAndSlabs?: boolean;
+  beamSizingMode?: 'auto_span' | 'uniform';
+  slabSizingMode?: 'auto_occupancy' | 'custom';
+  customSlabThicknessIn?: number;
   customRates?: StructuralRatesConfig;
 }
 
@@ -201,6 +205,10 @@ export const DEFAULT_BUILDING_CONFIG: BuildingConfig = {
   allowableSoilBearingPressureKnM2: 150, // Standard residential design parameter
   foundationDepthM: 1.5, // 5.0 ft standard shallow founding depth
   designStatus: 'Preliminary Estimate',
+  autoSizeBeamsAndSlabs: true,
+  beamSizingMode: 'auto_span',
+  slabSizingMode: 'auto_occupancy',
+  customSlabThicknessIn: 5,
   customRates: {
     cementBagPrice: 400,
     sandPricePerCft: 55,
@@ -520,6 +528,7 @@ export function calculatePillarStructuralDetails(
     singleFloorHeightM?: number;
     customBeamWidthMm?: number;
     customBeamDepthMm?: number;
+    customSlabThicknessMm?: number;
   }
 ): ColumnStructuralCalculation {
   // 1. Determine Surrounding Spans & Tributary Area (Handbook Section 3.3)
@@ -578,7 +587,11 @@ export function calculatePillarStructuralDetails(
   // 2. Unit Loads as per Handbook Section 3.1 & IS 875 Parts 1 & 2
   const concreteUnitWeightKnM3 = 25.0; // RCC
   const masonryUnitWeightKnM3 = 19.0; // Brickwork
-  const slabThicknessM = 0.125; // 5 inches standard
+  const slabThicknessM = overrides?.customSlabThicknessMm
+    ? (overrides.customSlabThicknessMm * 0.001)
+    : (config.slabSizingMode === 'custom' && config.customSlabThicknessIn
+        ? toMeters(config.customSlabThicknessIn, 'in')
+        : (config.buildingType === 'commercial' || config.buildingType === 'industrial' ? 0.15 : 0.125));
   const floorHeightM = toMeters(config.floorHeight, config.floorHeightUnit);
 
   // Slab self-weight: thickness * 25 kN/m³
@@ -1064,6 +1077,14 @@ export function calculateBuildingStructuralSummary(
     const configuredBeamWidthMm = flRing ? flRing.widthMm : undefined;
     const configuredBeamDepthMm = flRing ? flRing.depthMm : undefined;
 
+    const flData = Array.isArray(floorsData) && p.floorId
+      ? (floorsData as any[]).find(f => f.id === p.floorId)
+      : undefined;
+    const flSlab = flData?.slab;
+    const configuredSlabThicknessMm = flSlab?.thickness !== undefined
+      ? Math.round(toMeters(flSlab.thickness, flSlab.thicknessUnit || 'in') * 1000)
+      : undefined;
+
     return calculatePillarStructuralDetails(
       p.id,
       p.name || `C${idx + 1}`,
@@ -1082,7 +1103,8 @@ export function calculateBuildingStructuralSummary(
         supportedFloors,
         singleFloorHeightM,
         customBeamWidthMm: configuredBeamWidthMm,
-        customBeamDepthMm: configuredBeamDepthMm
+        customBeamDepthMm: configuredBeamDepthMm,
+        customSlabThicknessMm: configuredSlabThicknessMm
       }
     );
   });

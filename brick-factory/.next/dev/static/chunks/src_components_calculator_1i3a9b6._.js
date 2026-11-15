@@ -360,11 +360,42 @@ function CalculatorProvider({ children }) {
                     c.pillarId,
                     c
                 ]));
+            // Maintain uniform cross-section along continuous vertical column shafts (ground floor size up to top floor)
+            const shaftColumnSizes = new Map();
+            allPillars.forEach((p)=>{
+                const calc = calcMap.get(p.id);
+                const autoW = calc ? Math.round(calc.providedWidthMm * (1 / 25.4)) : p.width || 9;
+                const autoD = calc ? Math.round(calc.providedDepthMm * (1 / 25.4)) : p.depth || 9;
+                const w = p.isCustomSize ? p.width : autoW;
+                const d = p.isCustomSize ? p.depth : autoD;
+                const px = p.position?.x ?? p.x ?? 0;
+                const py = p.position?.y ?? p.y ?? 0;
+                const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+                const current = shaftColumnSizes.get(key);
+                if (!current) {
+                    shaftColumnSizes.set(key, {
+                        width: w,
+                        depth: d
+                    });
+                } else {
+                    shaftColumnSizes.set(key, {
+                        width: Math.max(current.width, w),
+                        depth: Math.max(current.depth, d)
+                    });
+                }
+            });
             allPillars = allPillars.map((p)=>{
                 const calc = calcMap.get(p.id);
                 if (calc) {
-                    const autoW = Math.round(calc.providedWidthMm * (1 / 25.4));
-                    const autoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+                    const px = p.position?.x ?? p.x ?? 0;
+                    const py = p.position?.y ?? p.y ?? 0;
+                    const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+                    const shaft = shaftColumnSizes.get(key);
+                    const baseAutoW = Math.round(calc.providedWidthMm * (1 / 25.4));
+                    const baseAutoD = Math.round(calc.providedDepthMm * (1 / 25.4));
+                    // Uniform cross-section: Upper floors maintain the exact bottom/ground floor pillar size
+                    const autoW = shaft ? shaft.width : baseAutoW;
+                    const autoD = shaft ? shaft.depth : baseAutoD;
                     const widthIn = p.isCustomSize ? p.width : autoW;
                     const depthIn = p.isCustomSize ? p.depth : autoD;
                     const provW_m = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(widthIn, p.unit || 'in');
@@ -636,7 +667,7 @@ function CalculatorProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/components/calculator/CalculatorContext.tsx",
-        lineNumber: 499,
+        lineNumber: 534,
         columnNumber: 5
     }, this);
 }
