@@ -243,7 +243,17 @@ export const getEffectivePillarPosition = (
     const d1 = Math.hypot(w.start.x - basePos.x, w.start.y - basePos.y);
     const d2 = Math.hypot(w.end.x - basePos.x, w.end.y - basePos.y);
     const tol = Math.max(pW, pD) * 1.5;
-    return d1 <= tol || d2 <= tol;
+    if (d1 <= tol || d2 <= tol) return true;
+
+    // Check if pillar is along the wall segment between start and end
+    const dx = w.end.x - w.start.x;
+    const dy = w.end.y - w.start.y;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq < 0.001) return false;
+    const t = Math.max(0, Math.min(1, ((basePos.x - w.start.x) * dx + (basePos.y - w.start.y) * dy) / lenSq));
+    const projX = w.start.x + t * dx;
+    const projY = w.start.y + t * dy;
+    return Math.hypot(basePos.x - projX, basePos.y - projY) <= tol;
   });
 
   if (connectedWalls.length === 0) {
@@ -577,13 +587,14 @@ export const generateStructuralGridPillars = (
     const len = Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y);
     if (len > maxSpan) {
       const numSegments = Math.max(2, Math.ceil(len / spacingX));
+      const isExtWall = floor.externalWalls.some(ew => ew.id === w.id);
       for (let s = 1; s < numSegments; s++) {
         const frac = s / numSegments;
         const subPt: Coordinate = {
           x: w.start.x + frac * (w.end.x - w.start.x),
           y: w.start.y + frac * (w.end.y - w.start.y)
         };
-        addNode(subPt, 'wall', 'centre');
+        addNode(subPt, 'wall', isExtWall ? 'flush_exterior' : 'centre');
       }
     }
   });
@@ -874,7 +885,7 @@ export const detectPillarToPillarBeams = (
   const beams: StructuralBeam[] = [];
   const beamKeys = new Set<string>();
 
-  const addBeam = (p1: Pillar, p2: Pillar, isHorizontal?: boolean, fixedCoord?: number) => {
+  const addBeam = (p1: Pillar, p2: Pillar, isHorizontal?: boolean, fixedCoord?: number, hasMatchingWall?: boolean) => {
     if (p1.id === p2.id) return;
     const key = [p1.id, p2.id].sort().join('--');
     if (beamKeys.has(key)) return;
@@ -894,9 +905,17 @@ export const detectPillarToPillarBeams = (
       if (isHorizontal) {
         sY = fixedCoord;
         eY = fixedCoord;
+        if (hasMatchingWall) {
+          sX = p1.position?.x ?? p1.x ?? pos1.x;
+          eX = p2.position?.x ?? p2.x ?? pos2.x;
+        }
       } else {
         sX = fixedCoord;
         eX = fixedCoord;
+        if (hasMatchingWall) {
+          sY = p1.position?.y ?? p1.y ?? pos1.y;
+          eY = p2.position?.y ?? p2.y ?? pos2.y;
+        }
       }
     }
 
@@ -930,26 +949,56 @@ export const detectPillarToPillarBeams = (
   };
 
   // Horizontal structural lines (same Y, connect consecutive sorted by X)
-  const yGroups = clusterByCoord(validPillars, p => getPillarPos(p).y);
+  const yGroups = clusterByCoord(validPillars, p => (p.position?.y ?? p.y ?? getPillarPos(p).y));
   for (const group of yGroups) {
-    // Canonical reference Y coordinate across the entire horizontal frame line
-    const avgY = group.reduce((sum, p) => sum + getPillarPos(p).y, 0) / group.length;
-    const refY = Math.round(avgY * 1000) / 1000;
-    group.sort((a, b) => getPillarPos(a).x - getPillarPos(b).x);
+    const rawY = group[0].position?.y ?? group[0].y ?? getPillarPos(group[0]).y;
+    // Check if this horizontal line lies along a wall in walls (e.g. front or back perimeter walls)
+    const matchingWall = walls.find(w => {
+      if (!w.start || !w.end) return false;
+      const isHorizontalWall = Math.abs(w.start.y - w.end.y) < 0.1;
+      return isHorizontalWall && Math.abs(w.start.y - rawY) < 1.0;
+    });
+
+    let refY: number;
+    if (matchingWall && matchingWall.start) {
+      refY = matchingWall.start.y;
+    } else {
+      const exteriorPillars = group.filter(p => p.alignment === 'outside_corner' || p.alignment === 'flush_exterior');
+      const targetGroup = exteriorPillars.length > 0 ? exteriorPillars : group;
+      const avgY = targetGroup.reduce((sum, p) => sum + getPillarPos(p).y, 0) / targetGroup.length;
+      refY = Math.round(avgY * 1000) / 1000;
+    }
+
+    group.sort((a, b) => (a.position?.x ?? a.x ?? getPillarPos(a).x) - (b.position?.x ?? b.x ?? getPillarPos(b).x));
     for (let i = 0; i < group.length - 1; i++) {
-      addBeam(group[i], group[i + 1], true, refY);
+      addBeam(group[i], group[i + 1], true, refY, !!matchingWall);
     }
   }
 
   // Vertical structural lines (same X, connect consecutive sorted by Y)
-  const xGroups = clusterByCoord(validPillars, p => getPillarPos(p).x);
+  const xGroups = clusterByCoord(validPillars, p => (p.position?.x ?? p.x ?? getPillarPos(p).x));
   for (const group of xGroups) {
-    // Canonical reference X coordinate across the entire vertical frame line
-    const avgX = group.reduce((sum, p) => sum + getPillarPos(p).x, 0) / group.length;
-    const refX = Math.round(avgX * 1000) / 1000;
-    group.sort((a, b) => getPillarPos(a).y - getPillarPos(b).y);
+    const rawX = group[0].position?.x ?? group[0].x ?? getPillarPos(group[0]).x;
+    // Check if this vertical line lies along a wall in walls (e.g. left or right perimeter walls)
+    const matchingWall = walls.find(w => {
+      if (!w.start || !w.end) return false;
+      const isVerticalWall = Math.abs(w.start.x - w.end.x) < 0.1;
+      return isVerticalWall && Math.abs(w.start.x - rawX) < 1.0;
+    });
+
+    let refX: number;
+    if (matchingWall && matchingWall.start) {
+      refX = matchingWall.start.x;
+    } else {
+      const exteriorPillars = group.filter(p => p.alignment === 'outside_corner' || p.alignment === 'flush_exterior');
+      const targetGroup = exteriorPillars.length > 0 ? exteriorPillars : group;
+      const avgX = targetGroup.reduce((sum, p) => sum + getPillarPos(p).x, 0) / targetGroup.length;
+      refX = Math.round(avgX * 1000) / 1000;
+    }
+
+    group.sort((a, b) => (a.position?.y ?? a.y ?? getPillarPos(a).y) - (b.position?.y ?? b.y ?? getPillarPos(b).y));
     for (let i = 0; i < group.length - 1; i++) {
-      addBeam(group[i], group[i + 1], false, refX);
+      addBeam(group[i], group[i + 1], false, refX, !!matchingWall);
     }
   }
 
@@ -3269,7 +3318,8 @@ export const generateFootingsForPillars = (
   config?: Partial<FoundationConfig>,
   buildingUnit: Unit = 'ft',
   bConfig?: BuildingConfig,
-  numFloors?: number
+  numFloors?: number,
+  walls: Wall[] = []
 ): FoundationFooting[] => {
   const groundFloorPillars = pillars.filter(p => !p.floorId || p.floorId === 'floor-0' || p.floorId === 'ground');
   const targetPillars = groundFloorPillars.length > 0 ? groundFloorPillars : pillars;
@@ -3295,7 +3345,7 @@ export const generateFootingsForPillars = (
   targetPillars.forEach((pillar, idx) => {
     if (pillar.includeInEstimate === false) return;
     const fId = `footing-${pillar.id || idx + 1}`;
-    const effPos = getEffectivePillarPosition(pillar, [], buildingUnit);
+    const effPos = getEffectivePillarPosition(pillar, walls, buildingUnit);
     
     // Dynamic footing dimensioning based on calculated structural load & soil SBC
     const dynamic = calculateDynamicPillarFooting(pillar, buildingUnit, cfg, bConfig, effectiveFloors);
@@ -3408,7 +3458,7 @@ export const calculateFoundationEstimate = (
   const activeFootings = (foundationConfig?.footings && foundationConfig.footings.length > 0)
     ? foundationConfig.footings.filter(f => f.enabled !== false)
     : (foundationConfig?.enabled !== false && groundPillars.length > 0
-        ? generateFootingsForPillars(groundPillars, foundationConfig, buildingUnit)
+        ? generateFootingsForPillars(groundPillars, foundationConfig, buildingUnit, undefined, undefined, groundWalls)
         : []);
 
   const footingEstimates = activeFootings.map(f => calculateFootingRcc(f, settings, reinf, foundationConfig));

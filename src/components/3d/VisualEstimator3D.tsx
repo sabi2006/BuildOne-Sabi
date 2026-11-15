@@ -1569,10 +1569,17 @@ function Foundation3DSystem({
   // Prepare list of footings (from model.foundation or auto-derived from groundPillars)
   const effectiveFootings: FoundationFooting[] = useMemo(() => {
     if (model.foundation?.footings && model.foundation.footings.length > 0) {
-      return model.foundation.footings;
+      return model.foundation.footings.map(f => {
+        const matchingPillar = groundPillars.find(p => p.id === f.pillarId || p.name === f.pillarName);
+        if (matchingPillar) {
+          const eff = getEffectivePillarPosition(matchingPillar, floorAllWalls, bUnit);
+          return { ...f, position: { x: eff.x, y: eff.y } };
+        }
+        return f;
+      });
     }
-    return generateFootingsForPillars(groundPillars, model.foundation, bUnit);
-  }, [model.foundation, groundPillars, bUnit]);
+    return generateFootingsForPillars(groundPillars, model.foundation, bUnit, model.buildingConfig, model.floors?.length, floorAllWalls);
+  }, [model.foundation, groundPillars, floorAllWalls, bUnit, model.buildingConfig, model.floors?.length]);
 
   // Pillar coordinate helper in meters
   const pillarCoords = useMemo(() => {
@@ -3051,7 +3058,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                   // Inherit bottom/ground floor pillar dimensions along the vertical column shaft
                   // Columns maintain uniform cross-section from bottom to top without shrinking
-                  const gfPillarsList = model.floors[0]?.pillars || (model.pillars || []).filter(p => !p.floorId || String(p.floorId) === String(model.floors[0]?.id));
+                  const gfPillarsList = groundPillars;
                   
                   const findMatchingGfPillar = (p: Pillar): Pillar | undefined => {
                     const px = p.position?.x ?? p.x ?? 0;
@@ -3088,10 +3095,14 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   });
 
                   const floorAllWalls = [...floor.externalWalls, ...floor.internalWalls];
+                  const gfAllWalls = groundFloorWalls;
 
-                  // Effective pillar positions matching 3D rendering
+                  // Effective pillar positions matching 3D rendering (continuous vertical column shafts maintain exact bottom XY coordinates)
                   const effectivePillars = floorPillars.map(p => {
-                    const eff = getEffectivePillarPosition(p, floorAllWalls, model.buildingUnit);
+                    const matchGf = findMatchingGfPillar(p);
+                    const eff = (matchGf && !p.isStoreyOverride)
+                      ? getEffectivePillarPosition(matchGf, gfAllWalls, model.buildingUnit)
+                      : getEffectivePillarPosition(p, floorAllWalls, model.buildingUnit);
                     return { ...p, position: { x: eff.x, y: eff.y } };
                   });
 
@@ -3201,18 +3212,43 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const startPillar = floorPillars.find(p => p.id === beam.startPillarId);
                               const endPillar = floorPillars.find(p => p.id === beam.endPillarId);
                               const startPW = startPillar ? toMeters(startPillar.width || 9, startPillar.unit || 'in') : pW_M;
+                              const startPD = startPillar ? toMeters(startPillar.depth || 9, startPillar.unit || 'in') : pW_M;
                               const endPW = endPillar ? toMeters(endPillar.width || 9, endPillar.unit || 'in') : pW_M;
+                              const endPD = endPillar ? toMeters(endPillar.depth || 9, endPillar.unit || 'in') : pW_M;
                               const clearSpanM = Math.max(0.05, len - (startPW / 2 + endPW / 2));
-                              const beamLenM = len;
+
+                              // Direction unit vector along beam axis
+                              const ux = (eX - sX) / len;
+                              const uy = (eY - sY) / len;
+
+                              // Extension into start and end pillar joints so corners meet flush with zero exposed column notches
+                              // At an exterior corner, beam extends by beamThickM / 2 to meet the building's exterior boundary flush with transverse beams and corner columns
+                              // At an intermediate joint, beam extends into the pillar core so the connection is solid and continuous
+                              const extStartM = (startPillar?.alignment === 'outside_corner')
+                                ? (beamThickM / 2)
+                                : Math.min((Math.abs(ux) * startPW + Math.abs(uy) * startPD) / 2, beamThickM / 2);
+                              const extEndM = (endPillar?.alignment === 'outside_corner')
+                                ? (beamThickM / 2)
+                                : Math.min((Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2, beamThickM / 2);
+
+                              const extSX = sX - ux * extStartM;
+                              const extSY = sY - uy * extStartM;
+                              const extEX = eX + ux * extEndM;
+                              const extEY = eY + uy * extEndM;
+
+                              const fullBeamLenM = len + extStartM + extEndM;
+                              const extMidX = (extSX + extEX) / 2;
+                              const extMidY = (extSY + extEY) / 2;
+                              const localPlasterX = (extStartM - extEndM) / 2;
 
                               return (
                                 <React.Fragment key={`frame-beam-${floor.id}-${beam.id}`}>
                                   {/* 0. Ground Floor RCC Plinth Beam (Base Tie Beam under Brick Infill) */}
                                   {i === 0 && (showFullRingBeam || showRingBeamRebar) && (
-                                    <group position={[mX, yOffset - actualBeamHeightM / 2, -mY]} rotation={[0, -ang, 0]}>
+                                    <group position={[extMidX, yOffset - actualBeamHeightM / 2, -extMidY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccPlinthBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[beamLenM, actualBeamHeightM, beamThickM]} />
+                                          <boxGeometry args={[fullBeamLenM, actualBeamHeightM, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3227,7 +3263,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       )}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={beamLenM} 
+                                          lenM={fullBeamLenM} 
                                           heightM={actualBeamHeightM} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3238,10 +3274,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                                   {/* 1. RCC Full Ring Beam (sitting flush directly at structural junction) */}
                                   {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (
-                                    <group position={[mX, junction.fullRingBeamCenterY, -mY]} rotation={[0, -ang, 0]}>
+                                    <group position={[extMidX, junction.fullRingBeamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccFullRingBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[beamLenM, junction.fullRingBeamHeight, beamThickM]} />
+                                          <boxGeometry args={[fullBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3258,7 +3294,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       {/* Exposed Rebar Cage for Ring Beam */}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={beamLenM} 
+                                          lenM={fullBeamLenM} 
                                           heightM={junction.fullRingBeamHeight} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3270,7 +3306,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                         <group name="rccSideBeamPlasterGroup">
                                           <mesh 
                                             name="rccBeamPlasterMesh"
-                                            position={[0, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
+                                            position={[localPlasterX, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
                                             castShadow={!plasterXRay} 
                                             receiveShadow={!plasterXRay}
                                             renderOrder={plasterXRay ? 10 : 0}
@@ -3287,7 +3323,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           </mesh>
                                           <mesh 
                                             name="rccBeamPlasterMesh"
-                                            position={[0, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
+                                            position={[localPlasterX, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
                                             castShadow={!plasterXRay} 
                                             receiveShadow={!plasterXRay}
                                             renderOrder={plasterXRay ? 10 : 0}
@@ -3377,21 +3413,33 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const isBeamXRay = isRebarActive;
 
                               // Clear span for wall-sitting beam
-                              const pStart = floorPillars.find(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - sX, toM(p.position?.y ?? p.y ?? 0) - sY) < 0.3);
-                              const pEnd = floorPillars.find(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - eX, toM(p.position?.y ?? p.y ?? 0) - eY) < 0.3);
+                              const pStart = floorPillars.find(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - sX, toM(p.position?.y ?? p.y ?? 0) - sY) < 0.6);
+                              const pEnd = floorPillars.find(p => Math.hypot(toM(p.position?.x ?? p.x ?? 0) - eX, toM(p.position?.y ?? p.y ?? 0) - eY) < 0.6);
                               const pStartW = pStart ? toMeters(pStart.width || 9, pStart.unit || 'in') : 0;
                               const pEndW = pEnd ? toMeters(pEnd.width || 9, pEnd.unit || 'in') : 0;
                               const clearSpanWallBeam = Math.max(0.05, len - (pStartW / 2 + pEndW / 2));
-                              const extendedWallBeamLen = len;
+
+                              const wUx = (eX - sX) / len;
+                              const wUy = (eY - sY) / len;
+                              const extStartWall = pStartW / 2;
+                              const extEndWall = pEndW / 2;
+                              const wallExtSX = sX - wUx * extStartWall;
+                              const wallExtSY = sY - wUy * extStartWall;
+                              const wallExtEX = eX + wUx * extEndWall;
+                              const wallExtEY = eY + wUy * extEndWall;
+                              const fullWallBeamLenM = len + extStartWall + extEndWall;
+                              const wallBeamMidX = (wallExtSX + wallExtEX) / 2;
+                              const wallBeamMidY = (wallExtSY + wallExtEY) / 2;
+                              const localWallPlasterX = (extStartWall - extEndWall) / 2;
 
                               return (
                                 <React.Fragment key={`wall-beam-group-${w.id}`}>
                                   {/* 0. Ground Floor RCC Plinth Beam for wall span */}
                                   {i === 0 && (showFullRingBeam || showRingBeamRebar) && (
-                                    <group position={[mX, yOffset - actualBeamHeightM / 2, -mY]} rotation={[0, -ang, 0]}>
+                                    <group position={[wallBeamMidX, yOffset - actualBeamHeightM / 2, -wallBeamMidY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccPlinthBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[extendedWallBeamLen, actualBeamHeightM, beamThickM]} />
+                                          <boxGeometry args={[fullWallBeamLenM, actualBeamHeightM, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3406,7 +3454,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       )}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={extendedWallBeamLen} 
+                                          lenM={fullWallBeamLenM} 
                                           heightM={actualBeamHeightM} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3417,10 +3465,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                                   {/* 1. RCC Full Ring Beam for wall span */}
                                   {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (
-                                    <group position={[mX, junction.fullRingBeamCenterY, -mY]} rotation={[0, -ang, 0]}>
+                                    <group position={[wallBeamMidX, junction.fullRingBeamCenterY, -wallBeamMidY]} rotation={[0, -ang, 0]}>
                                       {showFullRingBeam && (
                                         <mesh name="rccFullRingBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={1}>
-                                          <boxGeometry args={[extendedWallBeamLen, junction.fullRingBeamHeight, beamThickM]} />
+                                          <boxGeometry args={[fullWallBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
                                           <meshStandardMaterial 
                                             color="#64748b" 
                                             roughness={isBeamXRay ? 0.3 : 0.85} 
@@ -3437,7 +3485,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       {/* Exposed Rebar Cage for Wall Ring Beam */}
                                       {isRebarActive && showRingBeamRebar && (
                                         <RingBeamRebarCage 
-                                          lenM={extendedWallBeamLen} 
+                                          lenM={fullWallBeamLenM} 
                                           heightM={junction.fullRingBeamHeight} 
                                           widthM={beamThickM} 
                                           reinf={settings.rccReinforcement} 
@@ -3449,7 +3497,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                         <group name="rccSideBeamPlasterGroup">
                                           <mesh 
                                             name="rccBeamPlasterMesh"
-                                            position={[0, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
+                                            position={[localWallPlasterX, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
                                             castShadow={!plasterXRay} 
                                             receiveShadow={!plasterXRay}
                                             renderOrder={plasterXRay ? 10 : 0}
@@ -3466,7 +3514,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           </mesh>
                                           <mesh 
                                             name="rccBeamPlasterMesh"
-                                            position={[0, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
+                                            position={[localWallPlasterX, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
                                             castShadow={!plasterXRay} 
                                             receiveShadow={!plasterXRay}
                                             renderOrder={plasterXRay ? 10 : 0}
@@ -3569,7 +3617,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                         const jointHeightM = junction.fullRingBeamHeight;
                         const totalColumnHeightM = shaftHeightM + jointHeightM;
 
-                        const effPos = getEffectivePillarPosition(p, floorAllWalls, model.buildingUnit);
+                        const matchGf = findMatchingGfPillar(p);
+                        const effPos = (matchGf && !p.isStoreyOverride)
+                          ? getEffectivePillarPosition(matchGf, gfAllWalls, model.buildingUnit)
+                          : getEffectivePillarPosition(p, floorAllWalls, model.buildingUnit);
                         const isPillarSelected = selectedPillar?.id === p.id;
                         const isPillarRebarActive = (renderMode === 'rebar' || renderMode === 'combined') && (showPillarRebar || p.showRebar);
 

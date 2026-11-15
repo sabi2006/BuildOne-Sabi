@@ -944,7 +944,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     const gfId = model.floors[0]?.id || 'floor-0';
     const gfPillars = (model.pillars || []).filter(p => !p.floorId || p.floorId === gfId || p.floorId === 'floor-0' || p.floorId === 'ground');
     const targetPillars = gfPillars.length > 0 ? gfPillars : (model.floors[0]?.pillars || []);
-    const newFootings = generateFootingsForPillars(targetPillars, model.foundation || DEFAULT_FOUNDATION_CONFIG, model.buildingUnit);
+    const newFootings = generateFootingsForPillars(targetPillars, model.foundation || DEFAULT_FOUNDATION_CONFIG, model.buildingUnit, model.buildingConfig, model.floors?.length, allWalls);
     
     // Apply autoCreateStub setting
     const formattedNewFootings = autoCreateStub ? newFootings : newFootings.map(f => ({
@@ -1838,12 +1838,14 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       let updatedFoundation = prev.foundation;
       if (isGroundFloor && prev.foundation?.enabled) {
         const nextConfig = prev.buildingConfig || DEFAULT_BUILDING_CONFIG;
+        const gfWalls = [...activeFloor.externalWalls, ...(activeFloor.internalWalls || [])];
         const newFootings = generateFootingsForPillars(
           generated,
           prev.foundation,
           prev.buildingUnit,
           nextConfig,
-          prev.floors.length
+          prev.floors.length,
+          gfWalls
         );
         updatedFoundation = {
           ...prev.foundation,
@@ -3279,7 +3281,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       concreteGrade: newConfig.concreteGrade
     };
 
-    updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, newUnit, newConfig, updatedFloors.length);
+    const gfWalls = updatedFloors[0]?.externalWalls ? [...updatedFloors[0].externalWalls, ...(updatedFloors[0].internalWalls || [])] : [];
+    updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, newUnit, newConfig, updatedFloors.length, gfWalls);
 
     const finalUpdatedModel: BuildingModel = {
       ...model,

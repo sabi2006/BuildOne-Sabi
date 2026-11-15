@@ -1781,7 +1781,7 @@ describe('Ground Floor Foundation & Sub-grade Construction System', () => {
       { id: 'p4', name: 'P4', width: 9, depth: 9, height: 10, count: 1, unit: 'in', position: { x: 0, y: 30 }, floorId: 'floor-0' },
     ];
 
-    const footings = generateFootingsForPillars(pillars, DEFAULT_FOUNDATION_CONFIG, 'ft');
+    const footings = generateFootingsForPillars(pillars, { ...DEFAULT_FOUNDATION_CONFIG, useCommonFootingSize: true }, 'ft');
 
     expect(footings.length).toBe(4);
     expect(footings[0].pillarId).toBe('p1');
@@ -1998,7 +1998,7 @@ describe('Ground Floor Foundation & Sub-grade Construction System', () => {
     ];
 
     // Generate initial footings (both have stubs by default)
-    const footings = generateFootingsForPillars(pillars, DEFAULT_FOUNDATION_CONFIG, 'ft');
+    const footings = generateFootingsForPillars(pillars, { ...DEFAULT_FOUNDATION_CONFIG, useCommonFootingSize: true }, 'ft');
     expect(footings.length).toBe(2);
     expect(footings[0].hasFoundationPillar).toBe(true);
     expect(footings[0].foundationPillarId).toBe('FP1');
@@ -4046,6 +4046,91 @@ describe('Phase 5 Stage 1: Core Beam Geometry & RCC Estimation De-duplication', 
     // 80 ft * 0.75 ft * 2 ft = 120 CFT
     expect(res.concreteVolumeCft).toBeCloseTo(120, 1);
     expect(res.lengthM).toBeCloseTo(toMeters(80, 'ft'), 2);
+  });
+});
+
+describe('Pillar & Beam Structural Position Alignment Regression Suite', () => {
+  const wallThickIn = 9;
+  const wallThickFt = wallThickIn / 12; // 0.75 ft
+  const pWFt = 1.0; // 12 in
+  const pDFt = 1.0; // 12 in
+  const expectedDiffFt = (pWFt - wallThickFt) / 2; // 0.125 ft
+
+  const perimeterWalls: Wall[] = [
+    { id: 'w-front', name: 'Front Wall', start: { x: 0, y: 0 }, end: { x: 40, y: 0 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    { id: 'w-right', name: 'Right Wall', start: { x: 40, y: 0 }, end: { x: 40, y: 30 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    { id: 'w-back',  name: 'Back Wall',  start: { x: 40, y: 30 }, end: { x: 0, y: 30 }, dimensions: { length: 40, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] },
+    { id: 'w-left',  name: 'Left Wall',  start: { x: 0, y: 30 }, end: { x: 0, y: 0 }, dimensions: { length: 30, height: 10, thickness: 9, unit: 'ft', thicknessUnit: 'in' }, openings: [] }
+  ];
+
+  it('ISSUE 1: ensures intermediate pillars along all 4 exterior walls align flush with exterior faces', () => {
+    const pillars: Pillar[] = [
+      { id: 'c1', name: 'C1', position: { x: 0, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'p-fmid', name: 'P-FMid', position: { x: 20, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'flush_exterior', placementType: 'wall' },
+      { id: 'c2', name: 'C2', position: { x: 40, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'p-rmid', name: 'P-RMid', position: { x: 40, y: 15 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'flush_exterior', placementType: 'wall' },
+      { id: 'c3', name: 'C3', position: { x: 40, y: 30 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'p-bmid', name: 'P-BMid', position: { x: 20, y: 30 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'flush_exterior', placementType: 'wall' },
+      { id: 'c4', name: 'C4', position: { x: 0, y: 30 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'p-lmid', name: 'P-LMid', position: { x: 0, y: 15 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'flush_exterior', placementType: 'wall' }
+    ];
+
+    pillars.forEach(p => {
+      const eff = getEffectivePillarPosition(p, perimeterWalls, 'ft');
+      if (p.position!.y === 0) {
+        expect(eff.y - pDFt / 2).toBeCloseTo(-wallThickFt / 2, 4); // Front face flush
+      }
+      if (p.position!.y === 30) {
+        expect(eff.y + pDFt / 2).toBeCloseTo(30 + wallThickFt / 2, 4); // Back face flush
+      }
+      if (p.position!.x === 0) {
+        expect(eff.x - pWFt / 2).toBeCloseTo(-wallThickFt / 2, 4); // Left face flush
+      }
+      if (p.position!.x === 40) {
+        expect(eff.x + pWFt / 2).toBeCloseTo(40 + wallThickFt / 2, 4); // Right face flush
+      }
+    });
+  });
+
+  it('ISSUE 2: generates straight collinear frame beams without jogs across all exterior frame lines', () => {
+    const pillars: Pillar[] = [
+      { id: 'c1', name: 'C1', position: { x: 0, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' },
+      { id: 'p-fmid', name: 'P-FMid', position: { x: 20, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'flush_exterior', placementType: 'wall' },
+      { id: 'c2', name: 'C2', position: { x: 40, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' }
+    ];
+
+    const beams = detectPillarToPillarBeams(pillars, 'ft', perimeterWalls);
+    expect(beams.length).toBe(2);
+    beams.forEach(b => {
+      expect(b.start.y).toBeCloseTo(0.0, 3);
+      expect(b.end.y).toBeCloseTo(0.0, 3);
+      expect(Math.abs(b.start.y - b.end.y)).toBeLessThan(0.001); // Perfectly horizontal
+    });
+  });
+
+  it('ISSUE 3: aligns footing pedestal and pad coordinates coaxially with column shaft position', () => {
+    const c1: Pillar = { id: 'c1', name: 'C1', position: { x: 0, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner', placementType: 'corner' };
+    const footings = generateFootingsForPillars([c1], DEFAULT_FOUNDATION_CONFIG, 'ft', undefined, 1, perimeterWalls);
+    
+    expect(footings.length).toBe(1);
+    expect(footings[0].position.x).toBeCloseTo(expectedDiffFt, 4);
+    expect(footings[0].position.y).toBeCloseTo(expectedDiffFt, 4);
+  });
+
+  it('ISSUE 4: preserves isStoreyOverride for custom upper-floor pillar positions', () => {
+    const gfPillar: Pillar = { id: 'gf-p1', name: 'P1', verticalColumnId: 'col-1', position: { x: 0, y: 0 }, width: 12, depth: 12, height: 10, count: 1, unit: 'in', alignment: 'outside_corner' };
+    const overridePillar: Pillar = { id: 'f1-p1', name: 'P1', verticalColumnId: 'col-1', position: { x: 2, y: 2 }, width: 9, depth: 9, height: 10, count: 1, unit: 'in', alignment: 'centre', isStoreyOverride: true };
+    const continuousPillar: Pillar = { id: 'f1-p2', name: 'P2', verticalColumnId: 'col-1', position: { x: 0, y: 0 }, width: 9, depth: 9, height: 10, count: 1, unit: 'in', alignment: 'centre', isStoreyOverride: false };
+
+    // When isStoreyOverride is true: effPos evaluates its own position (2, 2)
+    const overrideEff = getEffectivePillarPosition(overridePillar, perimeterWalls, 'ft');
+    expect(overrideEff.x).toBeCloseTo(2, 4);
+    expect(overrideEff.y).toBeCloseTo(2, 4);
+
+    // Continuous shaft inherits ground floor pillar effective position
+    const gfEff = getEffectivePillarPosition(gfPillar, perimeterWalls, 'ft');
+    expect(gfEff.x).toBeCloseTo(expectedDiffFt, 4);
+    expect(gfEff.y).toBeCloseTo(expectedDiffFt, 4);
   });
 });
 

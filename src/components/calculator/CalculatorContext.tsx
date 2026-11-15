@@ -411,7 +411,8 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
         concreteGrade: nextConfig.concreteGrade
       };
 
-      updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, prevModel.buildingUnit || 'ft', nextConfig, updatedFloors.length);
+      const gfWalls = updatedFloors[0]?.externalWalls ? [...updatedFloors[0].externalWalls, ...(updatedFloors[0].internalWalls || [])] : [];
+      updatedFoundation.footings = generateFootingsForPillars(gfPillars, updatedFoundation, prevModel.buildingUnit || 'ft', nextConfig, updatedFloors.length, gfWalls);
 
       return {
         ...prevModel,
