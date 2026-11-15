@@ -100,7 +100,7 @@ function CalculatorProvider({ children }) {
         settings,
         activeTab
     ]);
-    const updateBuildingConfig = (updates)=>{
+    const updateBuildingConfig = (updates, buildingDetails)=>{
         setBuildingConfig((prev)=>({
                 ...prev,
                 ...updates
@@ -120,9 +120,10 @@ function CalculatorProvider({ children }) {
                 ...prevModel.pillars || []
             ];
             const h = updates.floorHeight || nextConfig.floorHeight || 10;
-            const w = prevModel.buildingLength || 30;
-            const d = prevModel.buildingWidth || 30;
-            const t = prevModel.externalWallThickness || 9;
+            const w = buildingDetails && buildingDetails.length > 0 ? buildingDetails.length : prevModel.buildingLength || 30;
+            const d = buildingDetails && buildingDetails.width > 0 ? buildingDetails.width : prevModel.buildingWidth || 30;
+            const bUnit = buildingDetails?.unit || prevModel.buildingUnit || 'ft';
+            const t = buildingDetails && buildingDetails.wallThickness !== undefined && buildingDetails.wallThickness > 0 ? buildingDetails.wallThickness : prevModel.externalWallThickness || 9;
             // 1. Synchronize floor heights across existing floors
             updatedFloors = updatedFloors.map((fl)=>({
                     ...fl,
@@ -452,6 +453,114 @@ function CalculatorProvider({ children }) {
                     ...fl,
                     pillars: allPillars.filter((p)=>p.floorId === fl.id)
                 }));
+            // Synchronize floor-wise slab & ring beam sizing and rebar configurations
+            if (nextConfig.autoSizeBeamsAndSlabs !== false && structuralSummary) {
+                const slabCalcMap = new Map((structuralSummary.floorSlabCalculations || []).map((s)=>[
+                        s.floorId,
+                        s
+                    ]));
+                const beamCalcMap = new Map((structuralSummary.floorBeamCalculations || []).map((b)=>[
+                        b.floorId,
+                        b
+                    ]));
+                updatedFloors = updatedFloors.map((fl, fIdx)=>{
+                    const sCalc = slabCalcMap.get(fl.id) || structuralSummary.floorSlabCalculations?.[fIdx];
+                    const bCalc = beamCalcMap.get(fl.id) || structuralSummary.floorBeamCalculations?.[fIdx];
+                    let updatedSlab = fl.slab;
+                    let updatedFullRoof = fl.fullRoof;
+                    if (sCalc && !fl.slab?.isCustomSize) {
+                        const autoThickIn = sCalc.providedThicknessIn;
+                        updatedSlab = {
+                            ...fl.slab || __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_SLAB"],
+                            enabled: fl.slab?.enabled ?? true,
+                            thickness: autoThickIn,
+                            thicknessUnit: 'in',
+                            height: autoThickIn / 12,
+                            heightUnit: 'ft',
+                            isCustomSize: false,
+                            structuralDetails: sCalc,
+                            rebarConfig: {
+                                slabMainBarDiaMm: sCalc.mainBarDiaMm,
+                                slabMainBarSpacingMm: sCalc.mainBarSpacingMm,
+                                slabDistBarDiaMm: sCalc.distBarDiaMm,
+                                slabDistBarSpacingMm: sCalc.distBarSpacingMm,
+                                slabCoverMm: sCalc.nominalCoverMm
+                            }
+                        };
+                        if (updatedFullRoof) {
+                            updatedFullRoof = {
+                                ...updatedFullRoof,
+                                thickness: autoThickIn,
+                                thicknessUnit: 'in'
+                            };
+                        }
+                    }
+                    let updatedRingBeam = fl.ringBeam;
+                    let updatedFullRingBeam = fl.fullRingBeam;
+                    if (bCalc && !fl.ringBeam?.isCustomSize) {
+                        const autoWidthIn = bCalc.beamWidthIn;
+                        const autoDepthIn = bCalc.beamDepthIn;
+                        updatedRingBeam = {
+                            ...fl.ringBeam || __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["DEFAULT_RCC_RING_BEAM"],
+                            enabled: fl.ringBeam?.enabled ?? true,
+                            width: autoWidthIn,
+                            widthUnit: 'in',
+                            depth: autoDepthIn,
+                            depthUnit: 'in',
+                            height: autoDepthIn / 12,
+                            heightUnit: 'ft',
+                            isCustomSize: false,
+                            structuralDetails: bCalc,
+                            rebarConfig: {
+                                beamTopBarDiaMm: bCalc.topAnchorBarDiaMm,
+                                beamTopBarCount: bCalc.topAnchorBarCount,
+                                beamBottomBarDiaMm: bCalc.bottomMainBarDiaMm,
+                                beamBottomBarCount: bCalc.bottomMainBarCount,
+                                beamStirrupDiaMm: bCalc.stirrupDiaMm,
+                                beamStirrupSpacingMm: bCalc.stirrupSpacingMm,
+                                beamCoverMm: bCalc.nominalCoverMm
+                            }
+                        };
+                        if (updatedFullRingBeam) {
+                            updatedFullRingBeam = {
+                                ...updatedFullRingBeam,
+                                thicknessFt: autoDepthIn / 12,
+                                width: autoWidthIn,
+                                widthUnit: 'in'
+                            };
+                        }
+                    }
+                    return {
+                        ...fl,
+                        slab: updatedSlab,
+                        fullRoof: updatedFullRoof,
+                        ringBeam: updatedRingBeam,
+                        fullRingBeam: updatedFullRingBeam
+                    };
+                });
+            }
+            // Synchronize independent Roof Slab if present
+            let updatedRoofSlab = prevModel.roofSlab;
+            if (structuralSummary?.roofSlabCalculation && prevModel.roofSlab && !prevModel.roofSlab.isCustomSize) {
+                const rCalc = structuralSummary.roofSlabCalculation;
+                const autoRoofThickIn = rCalc.providedThicknessIn;
+                updatedRoofSlab = {
+                    ...prevModel.roofSlab,
+                    thickness: autoRoofThickIn,
+                    thicknessUnit: 'in',
+                    height: autoRoofThickIn / 12,
+                    heightUnit: 'ft',
+                    isCustomSize: false,
+                    structuralDetails: rCalc,
+                    rebarConfig: {
+                        slabMainBarDiaMm: rCalc.mainBarDiaMm,
+                        slabMainBarSpacingMm: rCalc.mainBarSpacingMm,
+                        slabDistBarDiaMm: rCalc.distBarDiaMm,
+                        slabDistBarSpacingMm: rCalc.distBarSpacingMm,
+                        slabCoverMm: rCalc.nominalCoverMm
+                    }
+                };
+            }
             // 4. Update foundation configuration & footings dynamically
             const groundFloor = updatedFloors[0];
             const gfPillars = allPillars.filter((p)=>!p.floorId || String(p.floorId) === String(groundFloor?.id));
@@ -470,13 +579,22 @@ function CalculatorProvider({ children }) {
                 defaultExcavationDepth: fDepthFt,
                 concreteGrade: nextConfig.concreteGrade
             };
-            updatedFoundation.footings = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateFootingsForPillars"])(gfPillars, updatedFoundation, prevModel.buildingUnit || 'ft', nextConfig, updatedFloors.length);
+            const gfWalls = updatedFloors[0]?.externalWalls ? [
+                ...updatedFloors[0].externalWalls,
+                ...updatedFloors[0].internalWalls || []
+            ] : [];
+            updatedFoundation.footings = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateFootingsForPillars"])(gfPillars, updatedFoundation, prevModel.buildingUnit || 'ft', nextConfig, updatedFloors.length, gfWalls);
             return {
                 ...prevModel,
+                buildingLength: w,
+                buildingWidth: d,
+                buildingUnit: bUnit,
+                externalWallThickness: t,
                 buildingConfig: nextConfig,
                 structuralSummary,
                 foundation: updatedFoundation,
                 floors: updatedFloors,
+                roofSlab: updatedRoofSlab,
                 pillars: allPillars
             };
         });
@@ -667,7 +785,7 @@ function CalculatorProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/components/calculator/CalculatorContext.tsx",
-        lineNumber: 534,
+        lineNumber: 657,
         columnNumber: 5
     }, this);
 }

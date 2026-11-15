@@ -16,7 +16,12 @@ import {
   Droplets,
   Coins,
   Hammer,
-  Truck
+  Truck,
+  RotateCcw,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Edit3
 } from 'lucide-react';
 import { 
   BuildingConfig, 
@@ -29,7 +34,12 @@ import {
   SOIL_CATALOG, 
   CONCRETE_MIX_DATABASE,
   DEFAULT_BUILDING_CONFIG,
-  Unit
+  Unit,
+  calculateFloorSlabStructuralDetails,
+  calculateFloorBeamStructuralDetails,
+  FloorSlabStructuralCalculation,
+  FloorBeamStructuralCalculation,
+  toMeters
 } from '@/lib/brickCalculator';
 
 export interface BuildingDetailsConfig {
@@ -92,6 +102,155 @@ export function StructuralConfigModal({
       if (wallThickness !== undefined) setLocalWallThickness(wallThickness);
     }
   }, [isOpen, config, buildingLength, buildingWidth, buildingUnit, wallThickness]);
+
+  const [expandedFloorId, setExpandedFloorId] = useState<string | null>(null);
+
+  const handleFloorSlabOverride = (floorId: string, thicknessIn: number) => {
+    setLocalConfig(prev => {
+      const existing = prev.floorOverrides?.[floorId] || {};
+      return {
+        ...prev,
+        floorOverrides: {
+          ...(prev.floorOverrides || {}),
+          [floorId]: {
+            ...existing,
+            customSlabThicknessIn: thicknessIn,
+            isCustomSlab: true
+          }
+        }
+      };
+    });
+  };
+
+  const handleFloorBeamOverride = (floorId: string, widthIn?: number, depthIn?: number) => {
+    setLocalConfig(prev => {
+      const existing = prev.floorOverrides?.[floorId] || {};
+      return {
+        ...prev,
+        floorOverrides: {
+          ...(prev.floorOverrides || {}),
+          [floorId]: {
+            ...existing,
+            ...(widthIn !== undefined ? { customBeamWidthIn: widthIn } : {}),
+            ...(depthIn !== undefined ? { customBeamDepthIn: depthIn } : {}),
+            isCustomBeam: true
+          }
+        }
+      };
+    });
+  };
+
+  const handleResetFloorOverride = (floorId: string) => {
+    setLocalConfig(prev => {
+      if (!prev.floorOverrides) return prev;
+      const copy = { ...prev.floorOverrides };
+      delete copy[floorId];
+      return {
+        ...prev,
+        floorOverrides: copy
+      };
+    });
+  };
+
+  const floorCalculationsPreview = React.useMemo(() => {
+    const numFloors = Math.max(1, localConfig.floorCount);
+    const buildingLengthM = toMeters(localLength, localUnit);
+    const buildingWidthM = toMeters(localWidth, localUnit);
+    const storeyHeightM = toMeters(localConfig.floorHeight || 10, localConfig.floorHeightUnit || 'ft');
+    const wallThickM = toMeters(localWallThickness || 9, 'in');
+
+    const maxDimM = Math.max(buildingLengthM, buildingWidthM);
+    const minDimM = Math.min(buildingLengthM, buildingWidthM);
+    const bayCountX = Math.max(1, Math.round(maxDimM / 3.96));
+    const bayCountY = Math.max(1, Math.round(minDimM / 3.96));
+    const spanY_M = Math.max(2.5, maxDimM / bayCountX);
+    const spanX_M = Math.max(2.0, minDimM / bayCountY);
+    const typicalBeamSpanM = spanY_M;
+    const floorAreaM2 = buildingLengthM * buildingWidthM;
+    const approxTotalBeamLengthPerFloorM = 2 * (buildingLengthM + buildingWidthM) + (bayCountX - 1) * minDimM + (bayCountY - 1) * maxDimM;
+
+    const floors = [];
+
+    for (let fIdx = 0; fIdx < numFloors; fIdx++) {
+      const floorId = `floor-${fIdx}`;
+      const floorName = fIdx === 0 ? 'Ground Floor' : `Floor ${fIdx}`;
+      const override = localConfig.floorOverrides?.[floorId];
+
+      const slabCalc = calculateFloorSlabStructuralDetails(
+        floorId,
+        fIdx,
+        floorName,
+        false,
+        spanY_M,
+        spanX_M,
+        floorAreaM2,
+        localConfig,
+        {
+          customThicknessMm: override?.customSlabThicknessIn ? Math.round(override.customSlabThicknessIn * 25.4) : (localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn ? Math.round(localConfig.customSlabThicknessIn * 25.4) : undefined),
+          isCustomThickness: Boolean(override?.isCustomSlab || (localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn))
+        }
+      );
+
+      const beamCalc = calculateFloorBeamStructuralDetails(
+        floorId,
+        fIdx,
+        floorName,
+        false,
+        typicalBeamSpanM,
+        approxTotalBeamLengthPerFloorM,
+        storeyHeightM,
+        wallThickM,
+        spanX_M,
+        slabCalc,
+        localConfig,
+        {
+          customWidthMm: override?.customBeamWidthIn ? Math.round(override.customBeamWidthIn * 25.4) : undefined,
+          customDepthMm: override?.customBeamDepthIn ? Math.round(override.customBeamDepthIn * 25.4) : undefined,
+          isCustomSize: Boolean(override?.isCustomBeam)
+        }
+      );
+
+      floors.push({ floorId, floorLevel: fIdx, floorName, slab: slabCalc, beam: beamCalc, override });
+    }
+
+    // Roof Slab & Roof Ring Beam
+    const roofOverride = localConfig.floorOverrides?.['roof'] || localConfig.floorOverrides?.[`floor-${numFloors}`];
+    const roofSlabCalc = calculateFloorSlabStructuralDetails(
+      'roof',
+      numFloors,
+      'Roof Slab & Terrace',
+      true,
+      spanY_M,
+      spanX_M,
+      floorAreaM2,
+      localConfig,
+      {
+        customThicknessMm: roofOverride?.customSlabThicknessIn ? Math.round(roofOverride.customSlabThicknessIn * 25.4) : (localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn ? Math.round(localConfig.customSlabThicknessIn * 25.4) : undefined),
+        isCustomThickness: Boolean(roofOverride?.isCustomSlab || (localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn))
+      }
+    );
+
+    const roofBeamCalc = calculateFloorBeamStructuralDetails(
+      'roof-ring',
+      numFloors,
+      'Roof RCC Ring Beam',
+      true,
+      typicalBeamSpanM,
+      approxTotalBeamLengthPerFloorM,
+      storeyHeightM,
+      wallThickM,
+      spanX_M,
+      roofSlabCalc,
+      localConfig,
+      {
+        customWidthMm: roofOverride?.customBeamWidthIn ? Math.round(roofOverride.customBeamWidthIn * 25.4) : undefined,
+        customDepthMm: roofOverride?.customBeamDepthIn ? Math.round(roofOverride.customBeamDepthIn * 25.4) : undefined,
+        isCustomSize: Boolean(roofOverride?.isCustomBeam)
+      }
+    );
+
+    return { floors, roof: { slab: roofSlabCalc, beam: roofBeamCalc, override: roofOverride } };
+  }, [localConfig, localLength, localWidth, localUnit, localWallThickness]);
 
   if (!isOpen) return null;
 
@@ -462,56 +621,439 @@ export function StructuralConfigModal({
                 </div>
 
                 {localConfig.autoSizeBeamsAndSlabs !== false && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-orange-200/60">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Beam Sizing Rule
-                      </label>
-                      <select
-                        value={localConfig.beamSizingMode || 'auto_span'}
-                        onChange={(e) => setLocalConfig(prev => ({
-                          ...prev,
-                          beamSizingMode: e.target.value as any
-                        }))}
-                        className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
-                      >
-                        <option value="auto_span">Span / 12 Rule (Floor-wise depth: 12"-18" / 9" roof tie)</option>
-                        <option value="uniform">Uniform 9" x 12" Across All Floors</option>
-                      </select>
+                  <div className="space-y-4 pt-2 border-t border-orange-200/60">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Beam Sizing Rule
+                        </label>
+                        <select
+                          value={localConfig.beamSizingMode || 'auto_span'}
+                          onChange={(e) => setLocalConfig(prev => ({
+                            ...prev,
+                            beamSizingMode: e.target.value as any
+                          }))}
+                          className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                        >
+                          <option value="auto_span">Span / 12 Rule (Floor-wise depth: 12"-18" / 9" roof tie)</option>
+                          <option value="uniform">Uniform 9" x 12" Across All Floors</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Floor Slab Thickness
+                        </label>
+                        <select
+                          value={localConfig.slabSizingMode || 'auto_occupancy'}
+                          onChange={(e) => setLocalConfig(prev => ({
+                            ...prev,
+                            slabSizingMode: e.target.value as any
+                          }))}
+                          className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                        >
+                          <option value="auto_occupancy">Auto by Occupancy (5" Residential / 6" Commercial)</option>
+                          <option value="custom">Custom Global Thickness</option>
+                        </select>
+                        {localConfig.slabSizingMode === 'custom' && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <input
+                              type="number"
+                              step={0.5}
+                              min={4}
+                              max={12}
+                              value={localConfig.customSlabThicknessIn || 5}
+                              onChange={(e) => setLocalConfig(prev => ({
+                                ...prev,
+                                customSlabThicknessIn: parseFloat(e.target.value) || 5
+                              }))}
+                              className="w-20 text-xs font-semibold px-2 py-1.5 rounded border border-slate-300 bg-white"
+                            />
+                            <span className="text-xs text-slate-600">inches</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Floor Slab Thickness
-                      </label>
-                      <select
-                        value={localConfig.slabSizingMode || 'auto_occupancy'}
-                        onChange={(e) => setLocalConfig(prev => ({
-                          ...prev,
-                          slabSizingMode: e.target.value as any
-                        }))}
-                        className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
-                      >
-                        <option value="auto_occupancy">Auto by Occupancy (5" Residential / 6" Commercial)</option>
-                        <option value="custom">Custom Thickness</option>
-                      </select>
-                      {localConfig.slabSizingMode === 'custom' && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <input
-                            type="number"
-                            step={0.5}
-                            min={4}
-                            max={12}
-                            value={localConfig.customSlabThicknessIn || 5}
-                            onChange={(e) => setLocalConfig(prev => ({
-                              ...prev,
-                              customSlabThicknessIn: parseFloat(e.target.value) || 5
-                            }))}
-                            className="w-20 text-xs font-semibold px-2 py-1.5 rounded border border-slate-300 bg-white"
-                          />
-                          <span className="text-xs text-slate-600">inches</span>
+                    {/* Floor-by-Floor Engineered Dimensions & Rebar Schedule */}
+                    <div className="space-y-3 pt-3 border-t border-orange-200/80">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+                            Floor-Wise IS 456 Structural Sizing & Reinforcement Schedules
+                          </span>
+                          <span className="text-[11px] text-slate-600">
+                            Engineered dimensions, moment capacity, shear checks, and itemized steel reinforcement for each level.
+                          </span>
                         </div>
-                      )}
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          {floorCalculationsPreview.floors.length + 1} Structural Levels Active
+                        </span>
+                      </div>
+
+                      {/* Floor Cards */}
+                      <div className="space-y-3">
+                        {floorCalculationsPreview.floors.map(({ floorId, floorLevel, floorName, slab, beam, override }) => {
+                          const isOverridden = Boolean(override?.isCustomSlab || override?.isCustomBeam);
+                          return (
+                            <div key={floorId} className="bg-white rounded-xl border border-slate-200/90 p-3.5 shadow-xs space-y-3">
+                              {/* Floor Header */}
+                              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                                    {floorName} (Level {floorLevel})
+                                  </span>
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                    isOverridden 
+                                      ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                                      : 'bg-blue-100 text-blue-800 border-blue-200'
+                                  }`}>
+                                    {isOverridden ? 'Manual Override' : 'Auto IS 456:2000'}
+                                  </span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    {slab.status === 'SAFE' && beam.status === 'SAFE' ? 'IS 456 Safe' : 'Checks Active'}
+                                  </span>
+                                </div>
+                                {isOverridden && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetFloorOverride(floorId)}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-950 px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors"
+                                  >
+                                    <RotateCcw className="w-3 h-3" />
+                                    Reset to Auto
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Two Columns: Slab & Ring Beam */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                {/* Floor Slab Details */}
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                                      <Layers className="w-3.5 h-3.5 text-orange-600" />
+                                      Floor Slab Sizing
+                                    </span>
+                                    <span className="font-mono font-bold text-slate-900">
+                                      {slab.providedThicknessIn}" ({slab.providedThicknessMm} mm)
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-600 space-y-0.5">
+                                    <div className="flex justify-between">
+                                      <span>Span & Panel Type:</span>
+                                      <span className="font-medium text-slate-800">{slab.spanWidthM.toFixed(1)}m × {slab.spanLengthM.toFixed(1)}m ({slab.slabType === 'two_way' ? '2-Way' : '1-Way'})</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Factored Load & Moment:</span>
+                                      <span className="font-mono text-slate-800">Wu: {slab.factoredLoadWuKnM2} kN/m² • Mu: {slab.designMomentMuKnM} kNm</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Main Rebar:</span>
+                                      <span className="font-bold text-blue-700">⌀{slab.mainBarDiaMm}mm @ {slab.mainBarSpacingMm}mm c/c</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Distribution Rebar:</span>
+                                      <span className="font-medium text-slate-700">⌀{slab.distBarDiaMm}mm @ {slab.distBarSpacingMm}mm c/c</span>
+                                    </div>
+                                    {slab.topSupportBarDiaMm && (
+                                      <div className="flex justify-between">
+                                        <span>Top Support Bars:</span>
+                                        <span className="font-medium text-slate-700">⌀{slab.topSupportBarDiaMm}mm @ {slab.topSupportBarSpacingMm}mm c/c</span>
+                                      </div>
+                                    )}
+                                    <div className="flex justify-between pt-1 border-t border-slate-200 text-slate-500">
+                                      <span>Material Takeoff:</span>
+                                      <span className="font-bold text-slate-800">{slab.totalSteelWeightKg} kg steel • {slab.concreteVolumeM3.toFixed(2)} m³ conc</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Inline Slab Override Input */}
+                                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between gap-2">
+                                    <span className="text-[11px] text-slate-500 font-medium">Custom Slab Thickness:</span>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={3.5}
+                                        max={14}
+                                        placeholder={String(slab.providedThicknessIn)}
+                                        value={override?.customSlabThicknessIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          if (!isNaN(val) && val > 0) {
+                                            handleFloorSlabOverride(floorId, val);
+                                          } else if (e.target.value === '') {
+                                            handleFloorSlabOverride(floorId, slab.recommendedThicknessMm / 25.4);
+                                          }
+                                        }}
+                                        className="w-16 text-center text-xs font-bold text-slate-900 px-1.5 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-[11px] text-slate-500">in</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* RCC Ring Beam Details */}
+                                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                                      RCC Ring Beam Sizing
+                                    </span>
+                                    <span className="font-mono font-bold text-slate-900">
+                                      {beam.beamWidthIn}" × {beam.beamDepthIn}" ({beam.beamWidthMm} × {beam.beamDepthMm} mm)
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-600 space-y-0.5">
+                                    <div className="flex justify-between">
+                                      <span>Span & Loading:</span>
+                                      <span className="font-medium text-slate-800">{beam.effectiveSpanM}m span • Wu: {beam.factoredLoadWuPerM_Kn} kN/m</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Moments & Shear:</span>
+                                      <span className="font-mono text-slate-800">Mu: {beam.designBendingMomentMuKnM} kNm • Vu: {beam.designShearForceVuKn} kN</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Bottom Main Steel:</span>
+                                      <span className="font-bold text-indigo-700">{beam.bottomMainBarCount}-⌀{beam.bottomMainBarDiaMm}mm bars</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Top Anchor Steel:</span>
+                                      <span className="font-medium text-slate-700">{beam.topAnchorBarCount}-⌀{beam.topAnchorBarDiaMm}mm bars</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Stirrups / Ties:</span>
+                                      <span className="font-bold text-blue-700">2L-⌀{beam.stirrupDiaMm}mm @ {beam.stirrupSpacingMm}mm c/c</span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 border-t border-slate-200 text-slate-500">
+                                      <span>Development & Takeoff:</span>
+                                      <span className="font-bold text-slate-800">Ld: {beam.developmentLengthLdMm}mm • {beam.totalSteelWeightKg} kg steel</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Inline Beam Override Inputs */}
+                                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1">
+                                    <span className="text-[11px] text-slate-500 font-medium">Custom Beam (W × D):</span>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={6}
+                                        max={30}
+                                        placeholder={String(beam.beamWidthIn)}
+                                        value={override?.customBeamWidthIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          handleFloorBeamOverride(floorId, !isNaN(val) ? val : undefined, override?.customBeamDepthIn);
+                                        }}
+                                        className="w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-slate-400">×</span>
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={6}
+                                        max={36}
+                                        placeholder={String(beam.beamDepthIn)}
+                                        value={override?.customBeamDepthIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          handleFloorBeamOverride(floorId, override?.customBeamWidthIn, !isNaN(val) ? val : undefined);
+                                        }}
+                                        className="w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-[11px] text-slate-500">in</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Roof Level Card */}
+                        {(() => {
+                          const { slab, beam, override } = floorCalculationsPreview.roof;
+                          const isRoofOverridden = Boolean(override?.isCustomSlab || override?.isCustomBeam);
+                          return (
+                            <div className="bg-white rounded-xl border-2 border-orange-200 p-3.5 shadow-xs space-y-3">
+                              {/* Roof Header */}
+                              <div className="flex items-center justify-between border-b border-orange-100 pb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-orange-950 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+                                    Roof Slab, Terrace & RCC Tie Ring Beam
+                                  </span>
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                    isRoofOverridden 
+                                      ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                                      : 'bg-orange-100 text-orange-900 border-orange-200'
+                                  }`}>
+                                    {isRoofOverridden ? 'Manual Override' : 'Auto IS 456:2000'}
+                                  </span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    IS 456 Safe
+                                  </span>
+                                </div>
+                                {isRoofOverridden && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetFloorOverride('roof')}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-950 px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors"
+                                  >
+                                    <RotateCcw className="w-3 h-3" />
+                                    Reset to Auto
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Two Columns: Roof Slab & Roof Ring Beam */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                {/* Roof Slab Details */}
+                                <div className="p-2.5 rounded-lg bg-orange-50/50 border border-orange-200/80 space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                                      <Layers className="w-3.5 h-3.5 text-orange-600" />
+                                      Roof Slab Sizing
+                                    </span>
+                                    <span className="font-mono font-bold text-slate-900">
+                                      {slab.providedThicknessIn}" ({slab.providedThicknessMm} mm)
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-600 space-y-0.5">
+                                    <div className="flex justify-between">
+                                      <span>Weathering & Finish:</span>
+                                      <span className="font-medium text-slate-800">{localConfig.roofConfig.weatheringCourseThicknessMm || 75}mm Coba ({slab.floorFinishKnM2} kN/m²)</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Roof Live Load:</span>
+                                      <span className="font-medium text-slate-800">{slab.liveLoadKnM2} kN/m² ({localConfig.roofConfig.type === 'accessible_terrace' ? 'Accessible' : 'Non-Accessible'})</span>
+                                    </div>
+                                    {slab.waterTankCapacityLitres && slab.waterTankCapacityLitres > 0 && (
+                                      <div className="flex justify-between bg-amber-100/70 p-1 rounded text-amber-950">
+                                        <span>Overhead Tank ({slab.waterTankCapacityLitres}L):</span>
+                                        <span className="font-mono font-bold">{slab.waterTankLoadKn || 12.3} kN on {slab.waterTankFootprintM2 || 1.44} m²</span>
+                                      </div>
+                                    )}
+                                    <div className="flex justify-between">
+                                      <span>Main Rebar:</span>
+                                      <span className="font-bold text-orange-700">⌀{slab.mainBarDiaMm}mm @ {slab.mainBarSpacingMm}mm c/c</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Distribution Rebar:</span>
+                                      <span className="font-medium text-slate-700">⌀{slab.distBarDiaMm}mm @ {slab.distBarSpacingMm}mm c/c</span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 border-t border-orange-200 text-slate-500">
+                                      <span>Material Takeoff:</span>
+                                      <span className="font-bold text-slate-800">{slab.totalSteelWeightKg} kg steel • {slab.concreteVolumeM3.toFixed(2)} m³ conc</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Inline Roof Slab Override */}
+                                  <div className="pt-2 border-t border-orange-200/80 flex items-center justify-between gap-2">
+                                    <span className="text-[11px] text-slate-500 font-medium">Custom Roof Slab:</span>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={3.5}
+                                        max={14}
+                                        placeholder={String(slab.providedThicknessIn)}
+                                        value={override?.customSlabThicknessIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          if (!isNaN(val) && val > 0) {
+                                            handleFloorSlabOverride('roof', val);
+                                          } else if (e.target.value === '') {
+                                            handleFloorSlabOverride('roof', slab.recommendedThicknessMm / 25.4);
+                                          }
+                                        }}
+                                        className="w-16 text-center text-xs font-bold text-slate-900 px-1.5 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-[11px] text-slate-500">in</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Roof Tie Ring Beam Details */}
+                                <div className="p-2.5 rounded-lg bg-orange-50/50 border border-orange-200/80 space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                                      Roof Tie Ring Beam
+                                    </span>
+                                    <span className="font-mono font-bold text-slate-900">
+                                      {beam.beamWidthIn}" × {beam.beamDepthIn}" ({beam.beamWidthMm} × {beam.beamDepthMm} mm)
+                                    </span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-600 space-y-0.5">
+                                    <div className="flex justify-between">
+                                      <span>Parapet & Roof Load:</span>
+                                      <span className="font-medium text-slate-800">{beam.effectiveSpanM}m span • Wu: {beam.factoredLoadWuPerM_Kn} kN/m</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Moments & Shear:</span>
+                                      <span className="font-mono text-slate-800">Mu: {beam.designBendingMomentMuKnM} kNm • Vu: {beam.designShearForceVuKn} kN</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Bottom Main Steel:</span>
+                                      <span className="font-bold text-indigo-700">{beam.bottomMainBarCount}-⌀{beam.bottomMainBarDiaMm}mm bars</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Top Anchor Steel:</span>
+                                      <span className="font-medium text-slate-700">{beam.topAnchorBarCount}-⌀{beam.topAnchorBarDiaMm}mm bars</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Stirrups / Ties:</span>
+                                      <span className="font-bold text-blue-700">2L-⌀{beam.stirrupDiaMm}mm @ {beam.stirrupSpacingMm}mm c/c</span>
+                                    </div>
+                                    <div className="flex justify-between pt-1 border-t border-orange-200 text-slate-500">
+                                      <span>Development & Takeoff:</span>
+                                      <span className="font-bold text-slate-800">Ld: {beam.developmentLengthLdMm}mm • {beam.totalSteelWeightKg} kg steel</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Inline Roof Beam Override Inputs */}
+                                  <div className="pt-2 border-t border-orange-200/80 flex items-center justify-between gap-1">
+                                    <span className="text-[11px] text-slate-500 font-medium">Custom Beam (W × D):</span>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={6}
+                                        max={30}
+                                        placeholder={String(beam.beamWidthIn)}
+                                        value={override?.customBeamWidthIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          handleFloorBeamOverride('roof', !isNaN(val) ? val : undefined, override?.customBeamDepthIn);
+                                        }}
+                                        className="w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-slate-400">×</span>
+                                      <input
+                                        type="number"
+                                        step={0.5}
+                                        min={6}
+                                        max={36}
+                                        placeholder={String(beam.beamDepthIn)}
+                                        value={override?.customBeamDepthIn ?? ''}
+                                        onChange={(e) => {
+                                          const val = parseFloat(e.target.value);
+                                          handleFloorBeamOverride('roof', override?.customBeamWidthIn, !isNaN(val) ? val : undefined);
+                                        }}
+                                        className="w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                      />
+                                      <span className="text-[11px] text-slate-500">in</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </div>
                 )}

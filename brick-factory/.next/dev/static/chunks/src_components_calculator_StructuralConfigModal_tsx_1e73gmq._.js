@@ -20,6 +20,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/shield-check.mjs [app-client] (ecmascript) <export default as ShieldCheck>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$coins$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Coins$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/coins.mjs [app-client] (ecmascript) <export default as Coins>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$hammer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Hammer$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/hammer.mjs [app-client] (ecmascript) <export default as Hammer>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs [app-client] (ecmascript) <export default as RotateCcw>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/sparkles.mjs [app-client] (ecmascript) <export default as Sparkles>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/src/lib/brickCalculator.ts [app-client] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/structuralCalculationService.ts [app-client] (ecmascript)");
 ;
@@ -69,6 +71,123 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
         buildingUnit,
         wallThickness
     ]);
+    const [expandedFloorId, setExpandedFloorId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const handleFloorSlabOverride = (floorId, thicknessIn)=>{
+        setLocalConfig((prev)=>{
+            const existing = prev.floorOverrides?.[floorId] || {};
+            return {
+                ...prev,
+                floorOverrides: {
+                    ...prev.floorOverrides || {},
+                    [floorId]: {
+                        ...existing,
+                        customSlabThicknessIn: thicknessIn,
+                        isCustomSlab: true
+                    }
+                }
+            };
+        });
+    };
+    const handleFloorBeamOverride = (floorId, widthIn, depthIn)=>{
+        setLocalConfig((prev)=>{
+            const existing = prev.floorOverrides?.[floorId] || {};
+            return {
+                ...prev,
+                floorOverrides: {
+                    ...prev.floorOverrides || {},
+                    [floorId]: {
+                        ...existing,
+                        ...widthIn !== undefined ? {
+                            customBeamWidthIn: widthIn
+                        } : {},
+                        ...depthIn !== undefined ? {
+                            customBeamDepthIn: depthIn
+                        } : {},
+                        isCustomBeam: true
+                    }
+                }
+            };
+        });
+    };
+    const handleResetFloorOverride = (floorId)=>{
+        setLocalConfig((prev)=>{
+            if (!prev.floorOverrides) return prev;
+            const copy = {
+                ...prev.floorOverrides
+            };
+            delete copy[floorId];
+            return {
+                ...prev,
+                floorOverrides: copy
+            };
+        });
+    };
+    const floorCalculationsPreview = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].useMemo({
+        "StructuralConfigModal.useMemo[floorCalculationsPreview]": ()=>{
+            const numFloors = Math.max(1, localConfig.floorCount);
+            const buildingLengthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(localLength, localUnit);
+            const buildingWidthM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(localWidth, localUnit);
+            const storeyHeightM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(localConfig.floorHeight || 10, localConfig.floorHeightUnit || 'ft');
+            const wallThickM = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$brickCalculator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["toMeters"])(localWallThickness || 9, 'in');
+            const maxDimM = Math.max(buildingLengthM, buildingWidthM);
+            const minDimM = Math.min(buildingLengthM, buildingWidthM);
+            const bayCountX = Math.max(1, Math.round(maxDimM / 3.96));
+            const bayCountY = Math.max(1, Math.round(minDimM / 3.96));
+            const spanY_M = Math.max(2.5, maxDimM / bayCountX);
+            const spanX_M = Math.max(2.0, minDimM / bayCountY);
+            const typicalBeamSpanM = spanY_M;
+            const floorAreaM2 = buildingLengthM * buildingWidthM;
+            const approxTotalBeamLengthPerFloorM = 2 * (buildingLengthM + buildingWidthM) + (bayCountX - 1) * minDimM + (bayCountY - 1) * maxDimM;
+            const floors = [];
+            for(let fIdx = 0; fIdx < numFloors; fIdx++){
+                const floorId = `floor-${fIdx}`;
+                const floorName = fIdx === 0 ? 'Ground Floor' : `Floor ${fIdx}`;
+                const override = localConfig.floorOverrides?.[floorId];
+                const slabCalc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateFloorSlabStructuralDetails"])(floorId, fIdx, floorName, false, spanY_M, spanX_M, floorAreaM2, localConfig, {
+                    customThicknessMm: override?.customSlabThicknessIn ? Math.round(override.customSlabThicknessIn * 25.4) : localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn ? Math.round(localConfig.customSlabThicknessIn * 25.4) : undefined,
+                    isCustomThickness: Boolean(override?.isCustomSlab || localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn)
+                });
+                const beamCalc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateFloorBeamStructuralDetails"])(floorId, fIdx, floorName, false, typicalBeamSpanM, approxTotalBeamLengthPerFloorM, storeyHeightM, wallThickM, spanX_M, slabCalc, localConfig, {
+                    customWidthMm: override?.customBeamWidthIn ? Math.round(override.customBeamWidthIn * 25.4) : undefined,
+                    customDepthMm: override?.customBeamDepthIn ? Math.round(override.customBeamDepthIn * 25.4) : undefined,
+                    isCustomSize: Boolean(override?.isCustomBeam)
+                });
+                floors.push({
+                    floorId,
+                    floorLevel: fIdx,
+                    floorName,
+                    slab: slabCalc,
+                    beam: beamCalc,
+                    override
+                });
+            }
+            // Roof Slab & Roof Ring Beam
+            const roofOverride = localConfig.floorOverrides?.['roof'] || localConfig.floorOverrides?.[`floor-${numFloors}`];
+            const roofSlabCalc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateFloorSlabStructuralDetails"])('roof', numFloors, 'Roof Slab & Terrace', true, spanY_M, spanX_M, floorAreaM2, localConfig, {
+                customThicknessMm: roofOverride?.customSlabThicknessIn ? Math.round(roofOverride.customSlabThicknessIn * 25.4) : localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn ? Math.round(localConfig.customSlabThicknessIn * 25.4) : undefined,
+                isCustomThickness: Boolean(roofOverride?.isCustomSlab || localConfig.slabSizingMode === 'custom' && localConfig.customSlabThicknessIn)
+            });
+            const roofBeamCalc = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["calculateFloorBeamStructuralDetails"])('roof-ring', numFloors, 'Roof RCC Ring Beam', true, typicalBeamSpanM, approxTotalBeamLengthPerFloorM, storeyHeightM, wallThickM, spanX_M, roofSlabCalc, localConfig, {
+                customWidthMm: roofOverride?.customBeamWidthIn ? Math.round(roofOverride.customBeamWidthIn * 25.4) : undefined,
+                customDepthMm: roofOverride?.customBeamDepthIn ? Math.round(roofOverride.customBeamDepthIn * 25.4) : undefined,
+                isCustomSize: Boolean(roofOverride?.isCustomBeam)
+            });
+            return {
+                floors,
+                roof: {
+                    slab: roofSlabCalc,
+                    beam: roofBeamCalc,
+                    override: roofOverride
+                }
+            };
+        }
+    }["StructuralConfigModal.useMemo[floorCalculationsPreview]"], [
+        localConfig,
+        localLength,
+        localWidth,
+        localUnit,
+        localWallThickness
+    ]);
     if (!isOpen) return null;
     const currentSoilInfo = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SOIL_CATALOG"][localConfig.soilClassification] || __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SOIL_CATALOG"].dense_sand_gravel;
     const handleSave = ()=>{
@@ -107,12 +226,12 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                        lineNumber: 130,
+                                        lineNumber: 289,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 129,
+                                    lineNumber: 288,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -122,7 +241,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Structural Engineering & Building Configuration"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 133,
+                                            lineNumber: 292,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -130,19 +249,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Configure storeys, load parameters, IS 456 materials, and soil bearing capacity"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 134,
+                                            lineNumber: 293,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 132,
+                                    lineNumber: 291,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 128,
+                            lineNumber: 287,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -153,18 +272,18 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                 className: "w-5 h-5"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                lineNumber: 144,
+                                lineNumber: 303,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 139,
+                            lineNumber: 298,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                    lineNumber: 127,
+                    lineNumber: 286,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -179,20 +298,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 159,
+                                    lineNumber: 318,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Storeys & Building Details"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 160,
+                                    lineNumber: 319,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 150,
+                            lineNumber: 309,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -204,20 +323,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 171,
+                                    lineNumber: 330,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Concrete & Steel Grades"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 172,
+                                    lineNumber: 331,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 162,
+                            lineNumber: 321,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -229,20 +348,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 183,
+                                    lineNumber: 342,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Geotechnical & Foundation"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 184,
+                                    lineNumber: 343,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 174,
+                            lineNumber: 333,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -254,26 +373,26 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 195,
+                                    lineNumber: 354,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Rates & Construction Costs"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 196,
+                                    lineNumber: 355,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 186,
+                            lineNumber: 345,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                    lineNumber: 149,
+                    lineNumber: 308,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -289,7 +408,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             className: "w-5 h-5 text-orange-600 shrink-0 mt-0.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 207,
+                                            lineNumber: 366,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -299,20 +418,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Accumulated Structural Loads:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 209,
+                                                    lineNumber: 368,
                                                     columnNumber: 19
                                                 }, this),
                                                 " Columns accumulate dead loads (slabs, beams, masonry walls, finishes) and live loads floor-by-floor. Changing the building dimensions or floor count recalculates the required column cross-sections and reinforcement automatically."
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 208,
+                                            lineNumber: 367,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 206,
+                                    lineNumber: 365,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -328,20 +447,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "w-4 h-4 text-orange-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 376,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Building Plan Dimensions & Footprint"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 218,
+                                                            lineNumber: 377,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 375,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -357,13 +476,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 220,
+                                                    lineNumber: 379,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 215,
+                                            lineNumber: 374,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -376,7 +495,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Building Length"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 227,
+                                                            lineNumber: 386,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -392,7 +511,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 231,
+                                                                    lineNumber: 390,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -400,19 +519,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: localUnit
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 240,
+                                                                    lineNumber: 399,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 230,
+                                                            lineNumber: 389,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 226,
+                                                    lineNumber: 385,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -422,7 +541,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Building Width"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 247,
+                                                            lineNumber: 406,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -438,7 +557,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 251,
+                                                                    lineNumber: 410,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -446,19 +565,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: localUnit
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 260,
+                                                                    lineNumber: 419,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 250,
+                                                            lineNumber: 409,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 246,
+                                                    lineNumber: 405,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -468,7 +587,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Dimension Unit"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 267,
+                                                            lineNumber: 426,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -481,7 +600,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Feet (ft)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 275,
+                                                                    lineNumber: 434,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -489,19 +608,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Meters (m)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 276,
+                                                                    lineNumber: 435,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 270,
+                                                            lineNumber: 429,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 266,
+                                                    lineNumber: 425,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -511,7 +630,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Outer Wall Thickness"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 281,
+                                                            lineNumber: 440,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -527,7 +646,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 285,
+                                                                    lineNumber: 444,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -535,31 +654,31 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "in"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 294,
+                                                                    lineNumber: 453,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 284,
+                                                            lineNumber: 443,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 280,
+                                                    lineNumber: 439,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 225,
+                                            lineNumber: 384,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 214,
+                                    lineNumber: 373,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -569,7 +688,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Number of Occupied Floors"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 304,
+                                            lineNumber: 463,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -592,7 +711,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                         children: num === 1 ? '1 (G+0)' : `${num} (G+${num - 1})`
                                                     }, num, false, {
                                                         fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                        lineNumber: 309,
+                                                        lineNumber: 468,
                                                         columnNumber: 21
                                                     }, this)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -603,7 +722,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Custom:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 323,
+                                                            lineNumber: 482,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -618,25 +737,25 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "w-14 text-sm font-bold text-slate-800 focus:outline-none"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 324,
+                                                            lineNumber: 483,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 322,
+                                                    lineNumber: 481,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 307,
+                                            lineNumber: 466,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 303,
+                                    lineNumber: 462,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -649,7 +768,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Building Occupancy / Use"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 339,
+                                                    lineNumber: 498,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -669,7 +788,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Residential Building (2.0 kN/m² live load)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 358,
+                                                            lineNumber: 517,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -677,7 +796,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Commercial / Office (4.0 kN/m² live load)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 359,
+                                                            lineNumber: 518,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -685,7 +804,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Industrial / Warehouse (5.0 kN/m² live load)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 360,
+                                                            lineNumber: 519,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -693,19 +812,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Institutional / Other"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 361,
+                                                            lineNumber: 520,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 342,
+                                                    lineNumber: 501,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 338,
+                                            lineNumber: 497,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -715,7 +834,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Floor-to-Floor Height"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 366,
+                                                    lineNumber: 525,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -734,7 +853,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "w-full text-xs font-semibold px-3 py-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 370,
+                                                            lineNumber: 529,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -742,25 +861,25 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: localConfig.floorHeightUnit
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 379,
+                                                            lineNumber: 538,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 369,
+                                                    lineNumber: 528,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 365,
+                                            lineNumber: 524,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 337,
+                                    lineNumber: 496,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -771,7 +890,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Roof Slab & Overhead Tank"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 388,
+                                            lineNumber: 547,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -784,7 +903,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Roof Type"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 393,
+                                                            lineNumber: 552,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -807,7 +926,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Accessible Terrace (1.5 kN/m² live load)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 409,
+                                                                    lineNumber: 568,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -815,7 +934,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Non-Accessible Roof (0.75 kN/m² live load)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 410,
+                                                                    lineNumber: 569,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -823,19 +942,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Sloped Roof"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 411,
+                                                                    lineNumber: 570,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 394,
+                                                            lineNumber: 553,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 392,
+                                                    lineNumber: 551,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -845,7 +964,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Overhead Water Tank"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 416,
+                                                            lineNumber: 575,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -867,7 +986,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 418,
+                                                                    lineNumber: 577,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -875,31 +994,31 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Litres"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 433,
+                                                                    lineNumber: 592,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 417,
+                                                            lineNumber: 576,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 415,
+                                                    lineNumber: 574,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 391,
+                                            lineNumber: 550,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 387,
+                                    lineNumber: 546,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -915,7 +1034,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Automated Beam & Slab Sizing (IS 456:2000)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 443,
+                                                            lineNumber: 602,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -923,13 +1042,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Dynamically size floor beams, slabs, and rebar based on storey level, spans, and occupancy load."
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 446,
+                                                            lineNumber: 605,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 442,
+                                                    lineNumber: 601,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -945,172 +1064,1634 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "sr-only peer"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 451,
+                                                            lineNumber: 610,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 460,
+                                                            lineNumber: 619,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 450,
+                                                    lineNumber: 609,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 441,
+                                            lineNumber: 600,
                                             columnNumber: 17
                                         }, this),
                                         localConfig.autoSizeBeamsAndSlabs !== false && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-orange-200/60",
+                                            className: "space-y-4 pt-2 border-t border-orange-200/60",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "grid grid-cols-1 sm:grid-cols-2 gap-3",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            className: "block text-xs font-semibold text-slate-700 mb-1",
-                                                            children: "Beam Sizing Rule"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 467,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                            value: localConfig.beamSizingMode || 'auto_span',
-                                                            onChange: (e)=>setLocalConfig((prev)=>({
-                                                                        ...prev,
-                                                                        beamSizingMode: e.target.value
-                                                                    })),
-                                                            className: "w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "auto_span",
-                                                                    children: 'Span / 12 Rule (Floor-wise depth: 12"-18" / 9" roof tie)'
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-xs font-semibold text-slate-700 mb-1",
+                                                                    children: "Beam Sizing Rule"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 478,
+                                                                    lineNumber: 627,
                                                                     columnNumber: 25
                                                                 }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "uniform",
-                                                                    children: 'Uniform 9" x 12" Across All Floors'
-                                                                }, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                    value: localConfig.beamSizingMode || 'auto_span',
+                                                                    onChange: (e)=>setLocalConfig((prev)=>({
+                                                                                ...prev,
+                                                                                beamSizingMode: e.target.value
+                                                                            })),
+                                                                    className: "w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                            value: "auto_span",
+                                                                            children: 'Span / 12 Rule (Floor-wise depth: 12"-18" / 9" roof tie)'
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 638,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                            value: "uniform",
+                                                                            children: 'Uniform 9" x 12" Across All Floors'
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 639,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 479,
+                                                                    lineNumber: 630,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 470,
+                                                            lineNumber: 626,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    className: "block text-xs font-semibold text-slate-700 mb-1",
+                                                                    children: "Floor Slab Thickness"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                    lineNumber: 644,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                    value: localConfig.slabSizingMode || 'auto_occupancy',
+                                                                    onChange: (e)=>setLocalConfig((prev)=>({
+                                                                                ...prev,
+                                                                                slabSizingMode: e.target.value
+                                                                            })),
+                                                                    className: "w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                            value: "auto_occupancy",
+                                                                            children: 'Auto by Occupancy (5" Residential / 6" Commercial)'
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 655,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                            value: "custom",
+                                                                            children: "Custom Global Thickness"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 656,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                    lineNumber: 647,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                localConfig.slabSizingMode === 'custom' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "mt-2 flex items-center gap-2",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "number",
+                                                                            step: 0.5,
+                                                                            min: 4,
+                                                                            max: 12,
+                                                                            value: localConfig.customSlabThicknessIn || 5,
+                                                                            onChange: (e)=>setLocalConfig((prev)=>({
+                                                                                        ...prev,
+                                                                                        customSlabThicknessIn: parseFloat(e.target.value) || 5
+                                                                                    })),
+                                                                            className: "w-20 text-xs font-semibold px-2 py-1.5 rounded border border-slate-300 bg-white"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 660,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "text-xs text-slate-600",
+                                                                            children: "inches"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 672,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                    lineNumber: 659,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                            lineNumber: 643,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 466,
+                                                    lineNumber: 625,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "space-y-3 pt-3 border-t border-orange-200/80",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            className: "block text-xs font-semibold text-slate-700 mb-1",
-                                                            children: "Floor Slab Thickness"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 484,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                            value: localConfig.slabSizingMode || 'auto_occupancy',
-                                                            onChange: (e)=>setLocalConfig((prev)=>({
-                                                                        ...prev,
-                                                                        slabSizingMode: e.target.value
-                                                                    })),
-                                                            className: "w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white",
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-center justify-between",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "auto_occupancy",
-                                                                    children: 'Auto by Occupancy (5" Residential / 6" Commercial)'
-                                                                }, void 0, false, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "text-xs font-bold text-slate-900 uppercase tracking-wider block",
+                                                                            children: "Floor-Wise IS 456 Structural Sizing & Reinforcement Schedules"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 682,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "text-[11px] text-slate-600",
+                                                                            children: "Engineered dimensions, moment capacity, shear checks, and itemized steel reinforcement for each level."
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                            lineNumber: 685,
+                                                                            columnNumber: 27
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 495,
+                                                                    lineNumber: 681,
                                                                     columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "custom",
-                                                                    children: "Custom Thickness"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 496,
-                                                                    columnNumber: 25
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 487,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        localConfig.slabSizingMode === 'custom' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "mt-2 flex items-center gap-2",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                    type: "number",
-                                                                    step: 0.5,
-                                                                    min: 4,
-                                                                    max: 12,
-                                                                    value: localConfig.customSlabThicknessIn || 5,
-                                                                    onChange: (e)=>setLocalConfig((prev)=>({
-                                                                                ...prev,
-                                                                                customSlabThicknessIn: parseFloat(e.target.value) || 5
-                                                                            })),
-                                                                    className: "w-20 text-xs font-semibold px-2 py-1.5 rounded border border-slate-300 bg-white"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 500,
-                                                                    columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    className: "text-xs text-slate-600",
-                                                                    children: "inches"
-                                                                }, void 0, false, {
+                                                                    className: "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300",
+                                                                    children: [
+                                                                        floorCalculationsPreview.floors.length + 1,
+                                                                        " Structural Levels Active"
+                                                                    ]
+                                                                }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 512,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 689,
+                                                                    columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 499,
-                                                            columnNumber: 25
+                                                            lineNumber: 680,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "space-y-3",
+                                                            children: [
+                                                                floorCalculationsPreview.floors.map(({ floorId, floorLevel, floorName, slab, beam, override })=>{
+                                                                    const isOverridden = Boolean(override?.isCustomSlab || override?.isCustomBeam);
+                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "bg-white rounded-xl border border-slate-200/90 p-3.5 shadow-xs space-y-3",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex items-center justify-between border-b border-slate-100 pb-2",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex items-center gap-2",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: "text-xs font-bold text-slate-900 uppercase tracking-wider",
+                                                                                                children: [
+                                                                                                    floorName,
+                                                                                                    " (Level ",
+                                                                                                    floorLevel,
+                                                                                                    ")"
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 703,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: `text-[10px] font-bold px-2 py-0.5 rounded-full border ${isOverridden ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-blue-100 text-blue-800 border-blue-200'}`,
+                                                                                                children: isOverridden ? 'Manual Override' : 'Auto IS 456:2000'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 706,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200",
+                                                                                                children: slab.status === 'SAFE' && beam.status === 'SAFE' ? 'IS 456 Safe' : 'Checks Active'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 713,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 702,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    isOverridden && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                        type: "button",
+                                                                                        onClick: ()=>handleResetFloorOverride(floorId),
+                                                                                        className: "flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-950 px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__["RotateCcw"], {
+                                                                                                className: "w-3 h-3"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 723,
+                                                                                                columnNumber: 37
+                                                                                            }, this),
+                                                                                            "Reset to Auto"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 718,
+                                                                                        columnNumber: 35
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                lineNumber: 701,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "grid grid-cols-1 md:grid-cols-2 gap-3 text-xs",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-1.5",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "flex items-center justify-between",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-bold text-slate-800 flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__["Layers"], {
+                                                                                                                className: "w-3.5 h-3.5 text-orange-600"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 735,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            "Floor Slab Sizing"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 734,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-mono font-bold text-slate-900",
+                                                                                                        children: [
+                                                                                                            slab.providedThicknessIn,
+                                                                                                            '" (',
+                                                                                                            slab.providedThicknessMm,
+                                                                                                            " mm)"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 738,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 733,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-[11px] text-slate-600 space-y-0.5",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Span & Panel Type:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 744,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-800",
+                                                                                                                children: [
+                                                                                                                    slab.spanWidthM.toFixed(1),
+                                                                                                                    "m × ",
+                                                                                                                    slab.spanLengthM.toFixed(1),
+                                                                                                                    "m (",
+                                                                                                                    slab.slabType === 'two_way' ? '2-Way' : '1-Way',
+                                                                                                                    ")"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 745,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 743,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Factored Load & Moment:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 748,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-mono text-slate-800",
+                                                                                                                children: [
+                                                                                                                    "Wu: ",
+                                                                                                                    slab.factoredLoadWuKnM2,
+                                                                                                                    " kN/m² • Mu: ",
+                                                                                                                    slab.designMomentMuKnM,
+                                                                                                                    " kNm"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 749,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 747,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Main Rebar:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 752,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-blue-700",
+                                                                                                                children: [
+                                                                                                                    "⌀",
+                                                                                                                    slab.mainBarDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    slab.mainBarSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 753,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 751,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Distribution Rebar:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 756,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-700",
+                                                                                                                children: [
+                                                                                                                    "⌀",
+                                                                                                                    slab.distBarDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    slab.distBarSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 757,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 755,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    slab.topSupportBarDiaMm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Top Support Bars:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 761,
+                                                                                                                columnNumber: 41
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-700",
+                                                                                                                children: [
+                                                                                                                    "⌀",
+                                                                                                                    slab.topSupportBarDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    slab.topSupportBarSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 762,
+                                                                                                                columnNumber: 41
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 760,
+                                                                                                        columnNumber: 39
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between pt-1 border-t border-slate-200 text-slate-500",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Material Takeoff:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 766,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-slate-800",
+                                                                                                                children: [
+                                                                                                                    slab.totalSteelWeightKg,
+                                                                                                                    " kg steel • ",
+                                                                                                                    slab.concreteVolumeM3.toFixed(2),
+                                                                                                                    " m³ conc"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 767,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 765,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 742,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "pt-2 border-t border-slate-200/80 flex items-center justify-between gap-2",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "text-[11px] text-slate-500 font-medium",
+                                                                                                        children: "Custom Slab Thickness:"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 773,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 3.5,
+                                                                                                                max: 14,
+                                                                                                                placeholder: String(slab.providedThicknessIn),
+                                                                                                                value: override?.customSlabThicknessIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    if (!isNaN(val) && val > 0) {
+                                                                                                                        handleFloorSlabOverride(floorId, val);
+                                                                                                                    } else if (e.target.value === '') {
+                                                                                                                        handleFloorSlabOverride(floorId, slab.recommendedThicknessMm / 25.4);
+                                                                                                                    }
+                                                                                                                },
+                                                                                                                className: "w-16 text-center text-xs font-bold text-slate-900 px-1.5 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 775,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-[11px] text-slate-500",
+                                                                                                                children: "in"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 792,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 774,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 772,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 732,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 space-y-1.5",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "flex items-center justify-between",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-bold text-slate-800 flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
+                                                                                                                className: "w-3.5 h-3.5 text-blue-600"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 801,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            "RCC Ring Beam Sizing"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 800,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-mono font-bold text-slate-900",
+                                                                                                        children: [
+                                                                                                            beam.beamWidthIn,
+                                                                                                            '" × ',
+                                                                                                            beam.beamDepthIn,
+                                                                                                            '" (',
+                                                                                                            beam.beamWidthMm,
+                                                                                                            " × ",
+                                                                                                            beam.beamDepthMm,
+                                                                                                            " mm)"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 804,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 799,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-[11px] text-slate-600 space-y-0.5",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Span & Loading:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 810,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-800",
+                                                                                                                children: [
+                                                                                                                    beam.effectiveSpanM,
+                                                                                                                    "m span • Wu: ",
+                                                                                                                    beam.factoredLoadWuPerM_Kn,
+                                                                                                                    " kN/m"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 811,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 809,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Moments & Shear:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 814,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-mono text-slate-800",
+                                                                                                                children: [
+                                                                                                                    "Mu: ",
+                                                                                                                    beam.designBendingMomentMuKnM,
+                                                                                                                    " kNm • Vu: ",
+                                                                                                                    beam.designShearForceVuKn,
+                                                                                                                    " kN"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 815,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 813,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Bottom Main Steel:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 818,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-indigo-700",
+                                                                                                                children: [
+                                                                                                                    beam.bottomMainBarCount,
+                                                                                                                    "-⌀",
+                                                                                                                    beam.bottomMainBarDiaMm,
+                                                                                                                    "mm bars"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 819,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 817,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Top Anchor Steel:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 822,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-700",
+                                                                                                                children: [
+                                                                                                                    beam.topAnchorBarCount,
+                                                                                                                    "-⌀",
+                                                                                                                    beam.topAnchorBarDiaMm,
+                                                                                                                    "mm bars"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 823,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 821,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Stirrups / Ties:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 826,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-blue-700",
+                                                                                                                children: [
+                                                                                                                    "2L-⌀",
+                                                                                                                    beam.stirrupDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    beam.stirrupSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 827,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 825,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between pt-1 border-t border-slate-200 text-slate-500",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Development & Takeoff:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 830,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-slate-800",
+                                                                                                                children: [
+                                                                                                                    "Ld: ",
+                                                                                                                    beam.developmentLengthLdMm,
+                                                                                                                    "mm • ",
+                                                                                                                    beam.totalSteelWeightKg,
+                                                                                                                    " kg steel"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 831,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 829,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 808,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "text-[11px] text-slate-500 font-medium",
+                                                                                                        children: "Custom Beam (W × D):"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 837,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 6,
+                                                                                                                max: 30,
+                                                                                                                placeholder: String(beam.beamWidthIn),
+                                                                                                                value: override?.customBeamWidthIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    handleFloorBeamOverride(floorId, !isNaN(val) ? val : undefined, override?.customBeamDepthIn);
+                                                                                                                },
+                                                                                                                className: "w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 839,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-slate-400",
+                                                                                                                children: "×"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 852,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 6,
+                                                                                                                max: 36,
+                                                                                                                placeholder: String(beam.beamDepthIn),
+                                                                                                                value: override?.customBeamDepthIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    handleFloorBeamOverride(floorId, override?.customBeamWidthIn, !isNaN(val) ? val : undefined);
+                                                                                                                },
+                                                                                                                className: "w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 853,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-[11px] text-slate-500",
+                                                                                                                children: "in"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 866,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 838,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 836,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 798,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                lineNumber: 730,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, floorId, true, {
+                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                        lineNumber: 699,
+                                                                        columnNumber: 29
+                                                                    }, this);
+                                                                }),
+                                                                (()=>{
+                                                                    const { slab, beam, override } = floorCalculationsPreview.roof;
+                                                                    const isRoofOverridden = Boolean(override?.isCustomSlab || override?.isCustomBeam);
+                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                        className: "bg-white rounded-xl border-2 border-orange-200 p-3.5 shadow-xs space-y-3",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "flex items-center justify-between border-b border-orange-100 pb-2",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "flex items-center gap-2",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: "text-xs font-bold text-orange-950 uppercase tracking-wider flex items-center gap-1.5",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__["Sparkles"], {
+                                                                                                        className: "w-3.5 h-3.5 text-orange-600"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 885,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    "Roof Slab, Terrace & RCC Tie Ring Beam"
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 884,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: `text-[10px] font-bold px-2 py-0.5 rounded-full border ${isRoofOverridden ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-orange-100 text-orange-900 border-orange-200'}`,
+                                                                                                children: isRoofOverridden ? 'Manual Override' : 'Auto IS 456:2000'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 888,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200",
+                                                                                                children: "IS 456 Safe"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 895,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 883,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    isRoofOverridden && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                        type: "button",
+                                                                                        onClick: ()=>handleResetFloorOverride('roof'),
+                                                                                        className: "flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-950 px-2 py-1 rounded bg-amber-50 hover:bg-amber-100 transition-colors",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__["RotateCcw"], {
+                                                                                                className: "w-3 h-3"
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 905,
+                                                                                                columnNumber: 37
+                                                                                            }, this),
+                                                                                            "Reset to Auto"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 900,
+                                                                                        columnNumber: 35
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                lineNumber: 882,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "grid grid-cols-1 md:grid-cols-2 gap-3 text-xs",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "p-2.5 rounded-lg bg-orange-50/50 border border-orange-200/80 space-y-1.5",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "flex items-center justify-between",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-bold text-slate-800 flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__["Layers"], {
+                                                                                                                className: "w-3.5 h-3.5 text-orange-600"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 917,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            "Roof Slab Sizing"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 916,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-mono font-bold text-slate-900",
+                                                                                                        children: [
+                                                                                                            slab.providedThicknessIn,
+                                                                                                            '" (',
+                                                                                                            slab.providedThicknessMm,
+                                                                                                            " mm)"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 920,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 915,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-[11px] text-slate-600 space-y-0.5",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Weathering & Finish:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 926,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-800",
+                                                                                                                children: [
+                                                                                                                    localConfig.roofConfig.weatheringCourseThicknessMm || 75,
+                                                                                                                    "mm Coba (",
+                                                                                                                    slab.floorFinishKnM2,
+                                                                                                                    " kN/m²)"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 927,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 925,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Roof Live Load:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 930,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-800",
+                                                                                                                children: [
+                                                                                                                    slab.liveLoadKnM2,
+                                                                                                                    " kN/m² (",
+                                                                                                                    localConfig.roofConfig.type === 'accessible_terrace' ? 'Accessible' : 'Non-Accessible',
+                                                                                                                    ")"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 931,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 929,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    slab.waterTankCapacityLitres && slab.waterTankCapacityLitres > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between bg-amber-100/70 p-1 rounded text-amber-950",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: [
+                                                                                                                    "Overhead Tank (",
+                                                                                                                    slab.waterTankCapacityLitres,
+                                                                                                                    "L):"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 935,
+                                                                                                                columnNumber: 41
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-mono font-bold",
+                                                                                                                children: [
+                                                                                                                    slab.waterTankLoadKn || 12.3,
+                                                                                                                    " kN on ",
+                                                                                                                    slab.waterTankFootprintM2 || 1.44,
+                                                                                                                    " m²"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 936,
+                                                                                                                columnNumber: 41
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 934,
+                                                                                                        columnNumber: 39
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Main Rebar:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 940,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-orange-700",
+                                                                                                                children: [
+                                                                                                                    "⌀",
+                                                                                                                    slab.mainBarDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    slab.mainBarSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 941,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 939,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Distribution Rebar:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 944,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-700",
+                                                                                                                children: [
+                                                                                                                    "⌀",
+                                                                                                                    slab.distBarDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    slab.distBarSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 945,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 943,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between pt-1 border-t border-orange-200 text-slate-500",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Material Takeoff:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 948,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-slate-800",
+                                                                                                                children: [
+                                                                                                                    slab.totalSteelWeightKg,
+                                                                                                                    " kg steel • ",
+                                                                                                                    slab.concreteVolumeM3.toFixed(2),
+                                                                                                                    " m³ conc"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 949,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 947,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 924,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "pt-2 border-t border-orange-200/80 flex items-center justify-between gap-2",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "text-[11px] text-slate-500 font-medium",
+                                                                                                        children: "Custom Roof Slab:"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 955,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 3.5,
+                                                                                                                max: 14,
+                                                                                                                placeholder: String(slab.providedThicknessIn),
+                                                                                                                value: override?.customSlabThicknessIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    if (!isNaN(val) && val > 0) {
+                                                                                                                        handleFloorSlabOverride('roof', val);
+                                                                                                                    } else if (e.target.value === '') {
+                                                                                                                        handleFloorSlabOverride('roof', slab.recommendedThicknessMm / 25.4);
+                                                                                                                    }
+                                                                                                                },
+                                                                                                                className: "w-16 text-center text-xs font-bold text-slate-900 px-1.5 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 957,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-[11px] text-slate-500",
+                                                                                                                children: "in"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 974,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 956,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 954,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 914,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "p-2.5 rounded-lg bg-orange-50/50 border border-orange-200/80 space-y-1.5",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "flex items-center justify-between",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-bold text-slate-800 flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
+                                                                                                                className: "w-3.5 h-3.5 text-blue-600"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 983,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            "Roof Tie Ring Beam"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 982,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "font-mono font-bold text-slate-900",
+                                                                                                        children: [
+                                                                                                            beam.beamWidthIn,
+                                                                                                            '" × ',
+                                                                                                            beam.beamDepthIn,
+                                                                                                            '" (',
+                                                                                                            beam.beamWidthMm,
+                                                                                                            " × ",
+                                                                                                            beam.beamDepthMm,
+                                                                                                            " mm)"
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 986,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 981,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "text-[11px] text-slate-600 space-y-0.5",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Parapet & Roof Load:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 992,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-800",
+                                                                                                                children: [
+                                                                                                                    beam.effectiveSpanM,
+                                                                                                                    "m span • Wu: ",
+                                                                                                                    beam.factoredLoadWuPerM_Kn,
+                                                                                                                    " kN/m"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 993,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 991,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Moments & Shear:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 996,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-mono text-slate-800",
+                                                                                                                children: [
+                                                                                                                    "Mu: ",
+                                                                                                                    beam.designBendingMomentMuKnM,
+                                                                                                                    " kNm • Vu: ",
+                                                                                                                    beam.designShearForceVuKn,
+                                                                                                                    " kN"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 997,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 995,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Bottom Main Steel:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1000,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-indigo-700",
+                                                                                                                children: [
+                                                                                                                    beam.bottomMainBarCount,
+                                                                                                                    "-⌀",
+                                                                                                                    beam.bottomMainBarDiaMm,
+                                                                                                                    "mm bars"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1001,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 999,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Top Anchor Steel:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1004,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-medium text-slate-700",
+                                                                                                                children: [
+                                                                                                                    beam.topAnchorBarCount,
+                                                                                                                    "-⌀",
+                                                                                                                    beam.topAnchorBarDiaMm,
+                                                                                                                    "mm bars"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1005,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 1003,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Stirrups / Ties:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1008,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-blue-700",
+                                                                                                                children: [
+                                                                                                                    "2L-⌀",
+                                                                                                                    beam.stirrupDiaMm,
+                                                                                                                    "mm @ ",
+                                                                                                                    beam.stirrupSpacingMm,
+                                                                                                                    "mm c/c"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1009,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 1007,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex justify-between pt-1 border-t border-orange-200 text-slate-500",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                children: "Development & Takeoff:"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1012,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "font-bold text-slate-800",
+                                                                                                                children: [
+                                                                                                                    "Ld: ",
+                                                                                                                    beam.developmentLengthLdMm,
+                                                                                                                    "mm • ",
+                                                                                                                    beam.totalSteelWeightKg,
+                                                                                                                    " kg steel"
+                                                                                                                ]
+                                                                                                            }, void 0, true, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1013,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 1011,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 990,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "pt-2 border-t border-orange-200/80 flex items-center justify-between gap-1",
+                                                                                                children: [
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                        className: "text-[11px] text-slate-500 font-medium",
+                                                                                                        children: "Custom Beam (W × D):"
+                                                                                                    }, void 0, false, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 1019,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this),
+                                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                        className: "flex items-center gap-1",
+                                                                                                        children: [
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 6,
+                                                                                                                max: 30,
+                                                                                                                placeholder: String(beam.beamWidthIn),
+                                                                                                                value: override?.customBeamWidthIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    handleFloorBeamOverride('roof', !isNaN(val) ? val : undefined, override?.customBeamDepthIn);
+                                                                                                                },
+                                                                                                                className: "w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1021,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-slate-400",
+                                                                                                                children: "×"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1034,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                                                type: "number",
+                                                                                                                step: 0.5,
+                                                                                                                min: 6,
+                                                                                                                max: 36,
+                                                                                                                placeholder: String(beam.beamDepthIn),
+                                                                                                                value: override?.customBeamDepthIn ?? '',
+                                                                                                                onChange: (e)=>{
+                                                                                                                    const val = parseFloat(e.target.value);
+                                                                                                                    handleFloorBeamOverride('roof', override?.customBeamWidthIn, !isNaN(val) ? val : undefined);
+                                                                                                                },
+                                                                                                                className: "w-14 text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1035,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this),
+                                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                                className: "text-[11px] text-slate-500",
+                                                                                                                children: "in"
+                                                                                                            }, void 0, false, {
+                                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                                lineNumber: 1048,
+                                                                                                                columnNumber: 39
+                                                                                                            }, this)
+                                                                                                        ]
+                                                                                                    }, void 0, true, {
+                                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                        lineNumber: 1020,
+                                                                                                        columnNumber: 37
+                                                                                                    }, this)
+                                                                                                ]
+                                                                                            }, void 0, true, {
+                                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                                lineNumber: 1018,
+                                                                                                columnNumber: 35
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                        lineNumber: 980,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                                lineNumber: 912,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                                        lineNumber: 880,
+                                                                        columnNumber: 29
+                                                                    }, this);
+                                                                })()
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
+                                                            lineNumber: 695,
+                                                            columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 483,
+                                                    lineNumber: 679,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 465,
+                                            lineNumber: 624,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 440,
+                                    lineNumber: 599,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 205,
+                            lineNumber: 364,
                             columnNumber: 13
                         }, this),
                         activeTab === 'materials' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1123,7 +2704,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Structural Concrete Grade (IS 456 Table 2)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 527,
+                                            lineNumber: 1069,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1153,20 +2734,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: grade
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 546,
+                                                                    lineNumber: 1088,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__["CheckCircle2"], {
                                                                     className: "w-4 h-4 text-blue-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 547,
+                                                                    lineNumber: 1089,
                                                                     columnNumber: 42
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 545,
+                                                            lineNumber: 1087,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1178,7 +2759,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 549,
+                                                            lineNumber: 1091,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1186,19 +2767,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: mix?.mixType === 'nominal' ? 'Nominal Mix' : 'Design Mix'
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 550,
+                                                            lineNumber: 1092,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, grade, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 535,
+                                                    lineNumber: 1077,
                                                     columnNumber: 23
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 530,
+                                            lineNumber: 1072,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1206,13 +2787,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "* Note: IS 456 Clause 6.1 stipulates M20 as the minimum permissible grade for reinforced concrete work."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 555,
+                                            lineNumber: 1097,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 526,
+                                    lineNumber: 1068,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1222,7 +2803,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Reinforcement Steel Grade (TMT Bars)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 562,
+                                            lineNumber: 1104,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1264,20 +2845,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: st.grade
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 584,
+                                                                    lineNumber: 1126,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__["CheckCircle2"], {
                                                                     className: "w-4 h-4 text-orange-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 585,
+                                                                    lineNumber: 1127,
                                                                     columnNumber: 42
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 583,
+                                                            lineNumber: 1125,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1289,7 +2870,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 587,
+                                                            lineNumber: 1129,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1297,25 +2878,25 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: st.desc
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 588,
+                                                            lineNumber: 1130,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, st.grade, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 573,
+                                                    lineNumber: 1115,
                                                     columnNumber: 23
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 565,
+                                            lineNumber: 1107,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 561,
+                                    lineNumber: 1103,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1330,7 +2911,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                         children: "Fine Aggregate / Sand Selection"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                        lineNumber: 599,
+                                                        lineNumber: 1141,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1338,18 +2919,18 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                         children: "Concrete mix proportions govern structural performance; sand type updates material procurement rate."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                        lineNumber: 602,
+                                                        lineNumber: 1144,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                lineNumber: 598,
+                                                lineNumber: 1140,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 597,
+                                            lineNumber: 1139,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1373,7 +2954,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "mt-1 text-amber-600 focus:ring-amber-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 614,
+                                                            lineNumber: 1156,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1384,7 +2965,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "M-Sand (Manufactured Sand)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 629,
+                                                                    lineNumber: 1171,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1392,19 +2973,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Crushed stone sand graded to IS 383 Zone II. Standard rate approx. ₹55/CFT."
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 630,
+                                                                    lineNumber: 1172,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 628,
+                                                            lineNumber: 1170,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 609,
+                                                    lineNumber: 1151,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -1425,7 +3006,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "mt-1 text-amber-600 focus:ring-amber-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 641,
+                                                            lineNumber: 1183,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1436,7 +3017,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "River Sand (Natural Dredged)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 656,
+                                                                    lineNumber: 1198,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1444,31 +3025,31 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Natural river bed sand. Standard rate approx. ₹80/CFT."
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 657,
+                                                                    lineNumber: 1199,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 655,
+                                                            lineNumber: 1197,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 636,
+                                                    lineNumber: 1178,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 608,
+                                            lineNumber: 1150,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 596,
+                                    lineNumber: 1138,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1481,7 +3062,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Design Verification Status: "
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 668,
+                                                    lineNumber: 1210,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1489,13 +3070,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: localConfig.designStatus
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 669,
+                                                    lineNumber: 1211,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 667,
+                                            lineNumber: 1209,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1503,19 +3084,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "IS 456 Clause 39.3 Tied Column Method"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 671,
+                                            lineNumber: 1213,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 666,
+                                    lineNumber: 1208,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 524,
+                            lineNumber: 1066,
                             columnNumber: 13
                         }, this),
                         activeTab === 'soil' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1528,7 +3109,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             className: "w-5 h-5 text-amber-600 shrink-0 mt-0.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 681,
+                                            lineNumber: 1223,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1538,20 +3119,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Geotechnical Report Requirement:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 683,
+                                                    lineNumber: 1225,
                                                     columnNumber: 19
                                                 }, this),
                                                 " Soil classification alone is not sufficient to size footings. The Safe Bearing Capacity (SBC) must be entered directly from the qualified site borehole investigation report."
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 682,
+                                            lineNumber: 1224,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 680,
+                                    lineNumber: 1222,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1561,7 +3142,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Site Soil Stratum Classification"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 689,
+                                            lineNumber: 1231,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1596,7 +3177,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: soil.name
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 723,
+                                                                    lineNumber: 1265,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 soil.requiresSpecialFoundation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1604,13 +3185,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "Special Foundation"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 725,
+                                                                    lineNumber: 1267,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 722,
+                                                            lineNumber: 1264,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1618,7 +3199,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: soil.description
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 730,
+                                                            lineNumber: 1272,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1626,25 +3207,25 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: soil.typicalSbcRangeKnM2
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 731,
+                                                            lineNumber: 1273,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, soilKey, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 697,
+                                                    lineNumber: 1239,
                                                     columnNumber: 23
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 692,
+                                            lineNumber: 1234,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 688,
+                                    lineNumber: 1230,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1657,7 +3238,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     className: "w-4 h-4 text-emerald-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 741,
+                                                    lineNumber: 1283,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1669,13 +3250,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 742,
+                                                    lineNumber: 1284,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 740,
+                                            lineNumber: 1282,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1687,7 +3268,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Key Investigation Item:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 747,
+                                                            lineNumber: 1289,
                                                             columnNumber: 24
                                                         }, this),
                                                         " ",
@@ -1695,7 +3276,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 747,
+                                                    lineNumber: 1289,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1704,7 +3285,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Structural Design Concern:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 748,
+                                                            lineNumber: 1290,
                                                             columnNumber: 24
                                                         }, this),
                                                         " ",
@@ -1712,7 +3293,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 748,
+                                                    lineNumber: 1290,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1722,7 +3303,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Recommended Foundation System:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 750,
+                                                            lineNumber: 1292,
                                                             columnNumber: 21
                                                         }, this),
                                                         " ",
@@ -1730,19 +3311,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 749,
+                                                    lineNumber: 1291,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 746,
+                                            lineNumber: 1288,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 739,
+                                    lineNumber: 1281,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1755,7 +3336,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Allowable Soil Bearing Capacity (q)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 758,
+                                                    lineNumber: 1300,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1774,7 +3355,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "w-full text-xs font-bold text-orange-700 px-3 py-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 762,
+                                                            lineNumber: 1304,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1782,13 +3363,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "kN/m²"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 771,
+                                                            lineNumber: 1313,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 761,
+                                                    lineNumber: 1303,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1796,13 +3377,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "From Borehole Geotech Report"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 773,
+                                                    lineNumber: 1315,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 757,
+                                            lineNumber: 1299,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1812,7 +3393,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Foundation Depth (Df)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 777,
+                                                    lineNumber: 1319,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1831,7 +3412,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             className: "w-full text-xs font-semibold px-3 py-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 781,
+                                                            lineNumber: 1323,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1843,13 +3424,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 790,
+                                                            lineNumber: 1332,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 780,
+                                                    lineNumber: 1322,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1857,13 +3438,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Excavation to hard founding bed"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 792,
+                                                    lineNumber: 1334,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 776,
+                                            lineNumber: 1318,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1873,7 +3454,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Groundwater Conditions"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 796,
+                                                    lineNumber: 1338,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1889,7 +3470,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Deep Dry Table (> 2m below footing)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 804,
+                                                            lineNumber: 1346,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1897,7 +3478,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Seasonal Water Table (Monsoon Rise)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 805,
+                                                            lineNumber: 1347,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1905,13 +3486,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "High Water Table (Requires Dewatering)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 806,
+                                                            lineNumber: 1348,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 799,
+                                                    lineNumber: 1341,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1919,19 +3500,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Affects effective soil overburden weight"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 808,
+                                                    lineNumber: 1350,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 795,
+                                            lineNumber: 1337,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 756,
+                                    lineNumber: 1298,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1941,7 +3522,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             children: "Foundation Construction Type"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 814,
+                                            lineNumber: 1356,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1981,24 +3562,24 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: ft.label
                                                 }, ft.id, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 826,
+                                                    lineNumber: 1368,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 817,
+                                            lineNumber: 1359,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 813,
+                                    lineNumber: 1355,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 678,
+                            lineNumber: 1220,
                             columnNumber: 13
                         }, this),
                         activeTab === 'rates' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2011,7 +3592,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                             className: "w-5 h-5 text-emerald-600 shrink-0 mt-0.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 848,
+                                            lineNumber: 1390,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2021,20 +3602,20 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     children: "Material & Labour Procurement Rates:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 850,
+                                                    lineNumber: 1392,
                                                     columnNumber: 19
                                                 }, this),
                                                 " Configure standard local market material prices, mason/helper wages, and equipment rates. Updating rates will immediately recalculate the entire bill of quantities and final construction project estimate."
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 849,
+                                            lineNumber: 1391,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 847,
+                                    lineNumber: 1389,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2046,14 +3627,14 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     className: "w-4 h-4 text-orange-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 857,
+                                                    lineNumber: 1399,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Primary Construction Material Rates"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 856,
+                                            lineNumber: 1398,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2066,7 +3647,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Cement Price (50kg Bag)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 862,
+                                                            lineNumber: 1404,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2077,7 +3658,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 864,
+                                                                    lineNumber: 1406,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2089,7 +3670,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 865,
+                                                                    lineNumber: 1407,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2097,19 +3678,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/bag"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 873,
+                                                                    lineNumber: 1415,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 863,
+                                                            lineNumber: 1405,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 861,
+                                                    lineNumber: 1403,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2122,7 +3703,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 878,
+                                                            lineNumber: 1420,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2133,7 +3714,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 882,
+                                                                    lineNumber: 1424,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2145,7 +3726,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 883,
+                                                                    lineNumber: 1425,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2153,19 +3734,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/CFT"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 891,
+                                                                    lineNumber: 1433,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 881,
+                                                            lineNumber: 1423,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 877,
+                                                    lineNumber: 1419,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2175,7 +3756,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "20mm Aggregate (Jalli)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 896,
+                                                            lineNumber: 1438,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2186,7 +3767,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 898,
+                                                                    lineNumber: 1440,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2198,7 +3779,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 899,
+                                                                    lineNumber: 1441,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2206,19 +3787,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/CFT"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 907,
+                                                                    lineNumber: 1449,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 897,
+                                                            lineNumber: 1439,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 895,
+                                                    lineNumber: 1437,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2228,7 +3809,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Reinforcement TMT Steel"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 912,
+                                                            lineNumber: 1454,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2239,7 +3820,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 914,
+                                                                    lineNumber: 1456,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2251,7 +3832,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 915,
+                                                                    lineNumber: 1457,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2259,19 +3840,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/kg"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 923,
+                                                                    lineNumber: 1465,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 913,
+                                                            lineNumber: 1455,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 911,
+                                                    lineNumber: 1453,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2281,7 +3862,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Clay / Red Brick Price"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 928,
+                                                            lineNumber: 1470,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2292,7 +3873,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 930,
+                                                                    lineNumber: 1472,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2305,7 +3886,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 931,
+                                                                    lineNumber: 1473,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2313,19 +3894,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/brick"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 940,
+                                                                    lineNumber: 1482,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 929,
+                                                            lineNumber: 1471,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 927,
+                                                    lineNumber: 1469,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2335,7 +3916,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Foundation Sand Filling"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 945,
+                                                            lineNumber: 1487,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2346,7 +3927,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 947,
+                                                                    lineNumber: 1489,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2358,7 +3939,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 948,
+                                                                    lineNumber: 1490,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2366,31 +3947,31 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/CFT"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 956,
+                                                                    lineNumber: 1498,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 946,
+                                                            lineNumber: 1488,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 944,
+                                                    lineNumber: 1486,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 860,
+                                            lineNumber: 1402,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 855,
+                                    lineNumber: 1397,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2402,14 +3983,14 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     className: "w-4 h-4 text-blue-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 965,
+                                                    lineNumber: 1507,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Labour & Construction Execution Rates"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 964,
+                                            lineNumber: 1506,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2422,7 +4003,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Earthwork Excavation Rate"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 970,
+                                                            lineNumber: 1512,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2433,7 +4014,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 972,
+                                                                    lineNumber: 1514,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2445,7 +4026,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 973,
+                                                                    lineNumber: 1515,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2453,19 +4034,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/m³"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 981,
+                                                                    lineNumber: 1523,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 971,
+                                                            lineNumber: 1513,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 969,
+                                                    lineNumber: 1511,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2475,7 +4056,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "PCC Lean Concrete Labour"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 986,
+                                                            lineNumber: 1528,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2486,7 +4067,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 988,
+                                                                    lineNumber: 1530,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2498,7 +4079,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 989,
+                                                                    lineNumber: 1531,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2506,19 +4087,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/m³"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 997,
+                                                                    lineNumber: 1539,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 987,
+                                                            lineNumber: 1529,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 985,
+                                                    lineNumber: 1527,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2528,7 +4109,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "RCC Footing Labour Rate"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1002,
+                                                            lineNumber: 1544,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2539,7 +4120,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1004,
+                                                                    lineNumber: 1546,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2551,7 +4132,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1005,
+                                                                    lineNumber: 1547,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2559,19 +4140,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/m³"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1013,
+                                                                    lineNumber: 1555,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1003,
+                                                            lineNumber: 1545,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1001,
+                                                    lineNumber: 1543,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2581,7 +4162,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "RCC Column / Beam / Slab Labour"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1018,
+                                                            lineNumber: 1560,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2592,7 +4173,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1020,
+                                                                    lineNumber: 1562,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2604,7 +4185,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1021,
+                                                                    lineNumber: 1563,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2612,19 +4193,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/m³"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1029,
+                                                                    lineNumber: 1571,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1019,
+                                                            lineNumber: 1561,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1017,
+                                                    lineNumber: 1559,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2634,7 +4215,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Mason Daily Wage"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1034,
+                                                            lineNumber: 1576,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2645,7 +4226,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1036,
+                                                                    lineNumber: 1578,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2657,7 +4238,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1037,
+                                                                    lineNumber: 1579,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2665,19 +4246,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/day"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1045,
+                                                                    lineNumber: 1587,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1035,
+                                                            lineNumber: 1577,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1033,
+                                                    lineNumber: 1575,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2687,7 +4268,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Helper Daily Wage"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1050,
+                                                            lineNumber: 1592,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2698,7 +4279,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1052,
+                                                                    lineNumber: 1594,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2710,7 +4291,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1053,
+                                                                    lineNumber: 1595,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2718,31 +4299,31 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/day"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1061,
+                                                                    lineNumber: 1603,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1051,
+                                                            lineNumber: 1593,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1049,
+                                                    lineNumber: 1591,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 968,
+                                            lineNumber: 1510,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 963,
+                                    lineNumber: 1505,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2754,14 +4335,14 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                     className: "w-4 h-4 text-purple-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1070,
+                                                    lineNumber: 1612,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Formwork, Wastage & Contingency Percentages"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 1069,
+                                            lineNumber: 1611,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2774,7 +4355,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Formwork Shuttering"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1075,
+                                                            lineNumber: 1617,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2785,7 +4366,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "₹"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1077,
+                                                                    lineNumber: 1619,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2797,7 +4378,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1078,
+                                                                    lineNumber: 1620,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2805,19 +4386,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "/m²"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1086,
+                                                                    lineNumber: 1628,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1076,
+                                                            lineNumber: 1618,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1074,
+                                                    lineNumber: 1616,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2827,7 +4408,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Material Wastage"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1091,
+                                                            lineNumber: 1633,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2842,7 +4423,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1093,
+                                                                    lineNumber: 1635,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2850,19 +4431,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "%"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1101,
+                                                                    lineNumber: 1643,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1092,
+                                                            lineNumber: 1634,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1090,
+                                                    lineNumber: 1632,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2872,7 +4453,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Contingency Allowance"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1106,
+                                                            lineNumber: 1648,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2887,7 +4468,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1108,
+                                                                    lineNumber: 1650,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2895,19 +4476,19 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "%"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1116,
+                                                                    lineNumber: 1658,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1107,
+                                                            lineNumber: 1649,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1105,
+                                                    lineNumber: 1647,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2917,7 +4498,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                             children: "Tax / GST"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1121,
+                                                            lineNumber: 1663,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2932,7 +4513,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     className: "w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1123,
+                                                                    lineNumber: 1665,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2940,43 +4521,43 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                                                     children: "%"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                                    lineNumber: 1131,
+                                                                    lineNumber: 1673,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                            lineNumber: 1122,
+                                                            lineNumber: 1664,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                                    lineNumber: 1120,
+                                                    lineNumber: 1662,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                            lineNumber: 1073,
+                                            lineNumber: 1615,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 1068,
+                                    lineNumber: 1610,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 846,
+                            lineNumber: 1388,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                    lineNumber: 201,
+                    lineNumber: 360,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2999,7 +4580,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 1144,
+                                    lineNumber: 1686,
                                     columnNumber: 13
                                 }, this),
                                 " • ",
@@ -3019,13 +4600,13 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 1144,
+                                    lineNumber: 1686,
                                     columnNumber: 337
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 1143,
+                            lineNumber: 1685,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3038,7 +4619,7 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 1147,
+                                    lineNumber: 1689,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3048,34 +4629,34 @@ function StructuralConfigModal({ isOpen, config, buildingLength, buildingWidth, 
                                     children: "Apply & Recalculate"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                                    lineNumber: 1154,
+                                    lineNumber: 1696,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                            lineNumber: 1146,
+                            lineNumber: 1688,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-                    lineNumber: 1142,
+                    lineNumber: 1684,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-            lineNumber: 124,
+            lineNumber: 283,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/calculator/StructuralConfigModal.tsx",
-        lineNumber: 123,
+        lineNumber: 282,
         columnNumber: 5
     }, this);
 }
-_s(StructuralConfigModal, "t+VDLNugLfzJ6CFoDnoOPxN+QGA=");
+_s(StructuralConfigModal, "I5k7wIWR3El44J0X0whRU3nyJHY=");
 _c = StructuralConfigModal;
 var _c;
 __turbopack_context__.k.register(_c, "StructuralConfigModal");

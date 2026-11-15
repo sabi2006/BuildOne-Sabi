@@ -3014,6 +3014,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   const actualBeamHeightM = junction.ringBeamHeight;
                   const actualBeamThickM = junction.ringBeamWidth;
                   const isAnyBeamActiveIn3D = showFullRingBeam || showRingBeamRebar;
+                  const floorBeamReinf = {
+                    ...settings.rccReinforcement,
+                    ...(floor.ringBeam?.rebarConfig || {})
+                  };
 
                   const fullBeamThicknessM = junction.fullRingBeamHeight;
 
@@ -3116,6 +3120,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                   // Full Closed RCC Roof / Floor Slab covering that floor's complete structural support envelope
                   const slabCfg = isTopFloor ? (model.roofSlab || floor.slab) : floor.slab;
+                  const floorSlabReinf = {
+                    ...settings.rccReinforcement,
+                    ...(slabCfg?.rebarConfig || floor.slab?.rebarConfig || {})
+                  };
                   const overhangM = slabCfg?.overhang ? toMeters(slabCfg.overhang, slabCfg.overhangUnit || model.buildingUnit) : 0;
                   
                   let slabWidthM = floorBounds.widthM + 2 * overhangM;
@@ -3225,10 +3233,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               // At an exterior corner, beam extends by beamThickM / 2 to meet the building's exterior boundary flush with transverse beams and corner columns
                               // At an intermediate joint, beam extends into the pillar core so the connection is solid and continuous
                               const extStartM = (startPillar?.alignment === 'outside_corner')
-                                ? (beamThickM / 2)
+                                ? Math.max(beamThickM / 2, (Math.abs(ux) * startPW + Math.abs(uy) * startPD) / 2)
                                 : Math.min((Math.abs(ux) * startPW + Math.abs(uy) * startPD) / 2, beamThickM / 2);
                               const extEndM = (endPillar?.alignment === 'outside_corner')
-                                ? (beamThickM / 2)
+                                ? Math.max(beamThickM / 2, (Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2)
                                 : Math.min((Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2, beamThickM / 2);
 
                               const extSX = sX - ux * extStartM;
@@ -3266,7 +3274,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           lenM={fullBeamLenM} 
                                           heightM={actualBeamHeightM} 
                                           widthM={beamThickM} 
-                                          reinf={settings.rccReinforcement} 
+                                          reinf={floorBeamReinf} 
                                         />
                                       )}
                                     </group>
@@ -3297,7 +3305,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           lenM={fullBeamLenM} 
                                           heightM={junction.fullRingBeamHeight} 
                                           widthM={beamThickM} 
-                                          reinf={settings.rccReinforcement} 
+                                          reinf={floorBeamReinf} 
                                         />
                                       )}
 
@@ -3457,7 +3465,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           lenM={fullWallBeamLenM} 
                                           heightM={actualBeamHeightM} 
                                           widthM={beamThickM} 
-                                          reinf={settings.rccReinforcement} 
+                                          reinf={floorBeamReinf} 
                                         />
                                       )}
                                     </group>
@@ -3488,7 +3496,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                           lenM={fullWallBeamLenM} 
                                           heightM={junction.fullRingBeamHeight} 
                                           widthM={beamThickM} 
-                                          reinf={settings.rccReinforcement} 
+                                          reinf={floorBeamReinf} 
                                         />
                                       )}
 
@@ -3582,7 +3590,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                       bayWidthM={slab.widthM} 
                                       bayDepthM={slab.depthM} 
                                       thicknessM={slab.thicknessM} 
-                                      reinf={settings.rccReinforcement} 
+                                      reinf={floorSlabReinf} 
                                     />
                                   )}
                                 </group>
@@ -3608,7 +3616,18 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                       {/* Solid Concrete Pillars (RCC Columns) & Exposed Pillar Rebar Cage (Continuous through joint) */}
                       {(showPillars || showPillarRebar) && floorPillars.filter(p => (p.position || p.x !== undefined) && p.showIn3D !== false).map((p, pIdx) => {
-                        const norm = normalizePillarRebarConfig(p, settings.rccReinforcement);
+                        const matchGf = findMatchingGfPillar(p);
+                        const effectivePillarForRender = (matchGf && !p.isStoreyOverride)
+                          ? {
+                              ...p,
+                              width: matchGf.width || p.width || 9,
+                              depth: matchGf.depth || p.depth || 9,
+                              alignment: matchGf.alignment || p.alignment,
+                              placementType: matchGf.placementType || p.placementType,
+                              shape: matchGf.shape || p.shape
+                            }
+                          : p;
+                        const norm = normalizePillarRebarConfig(effectivePillarForRender, settings.rccReinforcement);
                         const pW_M = norm.wM;
                         const pD_M = norm.dM;
                         // Structural Story Breakdown: Shaft Height (clear room) + Joint Height
@@ -3617,7 +3636,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                         const jointHeightM = junction.fullRingBeamHeight;
                         const totalColumnHeightM = shaftHeightM + jointHeightM;
 
-                        const matchGf = findMatchingGfPillar(p);
                         const effPos = (matchGf && !p.isStoreyOverride)
                           ? getEffectivePillarPosition(matchGf, gfAllWalls, model.buildingUnit)
                           : getEffectivePillarPosition(p, floorAllWalls, model.buildingUnit);

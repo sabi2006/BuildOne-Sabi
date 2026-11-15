@@ -120,9 +120,9 @@
     "semantic_hash": "74bdf5ee815a19345224ce987c4158e3"
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1794725709.6898625,
-    "seen": 1794726197.7293322,
-    "ast_hash": "8293efc4a5aa8bf447fdbd1918859a04",
+    "mtime": 1794734432.3130572,
+    "seen": 1794736561.7054543,
+    "ast_hash": "066abfff1f0dc550ffbde119d64d147d",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -132,15 +132,15 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794725858.3377903,
-    "seen": 1794726197.7293348,
-    "ast_hash": "3a072dc0698178c8c999abf4efe7cd0a",
+    "mtime": 1794734191.4644473,
+    "seen": 1794736561.7054577,
+    "ast_hash": "7562653a91bb33b14fc656f9b9795fec",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
-    "mtime": 1794725770.158128,
-    "seen": 1794726197.729336,
-    "ast_hash": "9343e6fb50da7671c2ba434f3c2e53d2",
+    "mtime": 1794734131.3433836,
+    "seen": 1794736561.705459,
+    "ast_hash": "073cb3d1aece241d2350233a6fc3ab91",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorSettings.tsx": {
@@ -180,9 +180,9 @@
     "semantic_hash": "cc40302ff300257e1ed7cbaa032c128b"
   },
   "src/components/calculator/StructuralConfigModal.tsx": {
-    "mtime": 1794719076.9264264,
-    "seen": 1794720047.0389242,
-    "ast_hash": "61d0cdb229364ba7959e88b5f7c40fb1",
+    "mtime": 1794735544.7233365,
+    "seen": 1794736561.7054684,
+    "ast_hash": "592726b1fdbf617222747182d757955c",
     "semantic_hash": ""
   },
   "src/components/calculator/StructurePreview3D.tsx": {
@@ -198,10 +198,10 @@
     "semantic_hash": "8c2b640aeeb62b60044e141e237a1a5b"
   },
   "src/components/calculator/VisualEstimatorResults.tsx": {
-    "mtime": 1794564208.8855042,
-    "seen": 1794664666.4855256,
-    "ast_hash": "4d58801c0b58d3377a02a2fc3d2696fc",
-    "semantic_hash": "4d58801c0b58d3377a02a2fc3d2696fc"
+    "mtime": 1794735751.966628,
+    "seen": 1794736561.7054722,
+    "ast_hash": "38ee13fb860f7f41efbcd3301d7e3385",
+    "semantic_hash": ""
   },
   "src/components/calculator/VisualPreviews.tsx": {
     "mtime": 1786975360.3014386,
@@ -234,15 +234,15 @@
     "semantic_hash": "66cc1e171a37185bac1df604a514e011"
   },
   "src/lib/brickCalculator.test.ts": {
-    "mtime": 1794726983.6385815,
-    "seen": 1794727148.0635085,
-    "ast_hash": "3f519948e06cd251241a6bd74e43d74a",
+    "mtime": 1794730869.0807393,
+    "seen": 1794736561.70548,
+    "ast_hash": "00bd4998be572a728de683dff3d22f74",
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1794726878.4755087,
-    "seen": 1794727148.0635104,
-    "ast_hash": "938bc1506cd05ec1070b3b1e1d255c65",
+    "mtime": 1794736129.3809848,
+    "seen": 1794736561.7054813,
+    "ast_hash": "e74cc7e43b98b3c0fbbb669370f4de14",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1794719621.5915034,
-    "seen": 1794720047.0389419,
-    "ast_hash": "c5bfdb7a3d7d9b678825dbdd2ae77696",
+    "mtime": 1794735352.9179523,
+    "seen": 1794736561.7054884,
+    "ast_hash": "28b830298c5b4ded1f4df6533236cd3f",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {
@@ -545,184 +545,10 @@
     "ast_hash": "3027d3cf6f9e45b21852b2a59eeb6d49",
     "semantic_hash": ""
   },
-  "scratch/analyze_img1.py": {
-    "mtime": 1794723817.9750667,
-    "seen": 1794726197.7292814,
-    "ast_hash": "792fbc99ead74f9a84d9eaaeb99b5f67",
-    "semantic_hash": ""
-  },
-  "scratch/ascii_4imgs.py": {
-    "mtime": 1794723851.8853905,
-    "seen": 1794726197.7292833,
-    "ast_hash": "0405c2c9c2273e61e9a212261644544f",
-    "semantic_hash": ""
-  },
-  "scratch/ascii_img1.py": {
-    "mtime": 1794723832.8500226,
-    "seen": 1794726197.7292845,
-    "ast_hash": "e9132426579036af45056aa011588d4b",
-    "semantic_hash": ""
-  },
-  "scratch/explain_beam_gap.py": {
-    "mtime": 1794724155.3165927,
-    "seen": 1794726197.729286,
-    "ast_hash": "2a787ab6c1b92bef7e7336865017fbe8",
-    "semantic_hash": ""
-  },
-  "scratch/find_alignments.py": {
-    "mtime": 1794724058.281871,
-    "seen": 1794726197.7292871,
-    "ast_hash": "4c45fe3116dd7f6dfd562fc7c6f59a1b",
-    "semantic_hash": ""
-  },
-  "scratch/find_all_gen_footings.py": {
-    "mtime": 1794725458.3490798,
-    "seen": 1794726197.729288,
-    "ast_hash": "d378c7953d6ea21b1cca5815dae6dd25",
-    "semantic_hash": ""
-  },
-  "scratch/find_beam_dims.py": {
-    "mtime": 1794723699.6437547,
-    "seen": 1794726197.7292893,
-    "ast_hash": "09bed63a3bf4baa95b7fb79acc95d947",
-    "semantic_hash": ""
-  },
-  "scratch/find_calc_pillars.py": {
-    "mtime": 1794723910.0307078,
-    "seen": 1794726197.7292902,
-    "ast_hash": "347e11634df26a9f94d92a4b0acf790e",
-    "semantic_hash": ""
-  },
-  "scratch/find_context_pillars.py": {
-    "mtime": 1794723875.0566454,
-    "seen": 1794726197.7292914,
-    "ast_hash": "93b2aeabf21c10cd6999687e2eccab0a",
-    "semantic_hash": ""
-  },
-  "scratch/find_editor_pillars.py": {
-    "mtime": 1794724472.655993,
-    "seen": 1794726197.7292924,
-    "ast_hash": "5536189755e04f040679b9922316f4da",
-    "semantic_hash": ""
-  },
-  "scratch/find_editor_shaft.py": {
-    "mtime": 1794724751.2881076,
-    "seen": 1794726197.7292933,
-    "ast_hash": "63badee9f4a47b6f62c6c81de1f315ec",
-    "semantic_hash": ""
-  },
-  "scratch/find_floor_pillars.py": {
-    "mtime": 1794724231.1836722,
-    "seen": 1794726197.7292943,
-    "ast_hash": "fc52417bb680001ba619d4a0483da191",
-    "semantic_hash": ""
-  },
-  "scratch/find_footings.py": {
-    "mtime": 1794724982.3787413,
-    "seen": 1794726197.729295,
-    "ast_hash": "16ff7c5cce30ad37d4630fb82d4e794c",
-    "semantic_hash": ""
-  },
-  "scratch/find_funcs.py": {
-    "mtime": 1794723722.143166,
-    "seen": 1794726197.7292962,
-    "ast_hash": "ec09f0c3de659dd19c383fb76a775285",
-    "semantic_hash": ""
-  },
-  "scratch/find_gen_footings.py": {
-    "mtime": 1794725165.7549627,
-    "seen": 1794726197.7292972,
-    "ast_hash": "9702b75c7c37345c9fc3ca0f53031f75",
-    "semantic_hash": ""
-  },
-  "scratch/find_junction.py": {
-    "mtime": 1794724181.8914726,
-    "seen": 1794726197.729298,
-    "ast_hash": "255107315135d384fe4842cf24e2f065",
-    "semantic_hash": ""
-  },
-  "scratch/find_lines.py": {
-    "mtime": 1794723645.2808156,
-    "seen": 1794726197.7292993,
-    "ast_hash": "5b9374b933e384d13308218a22e7d129",
-    "semantic_hash": ""
-  },
-  "scratch/find_pillars.py": {
-    "mtime": 1794723675.0093951,
-    "seen": 1794726197.7293003,
-    "ast_hash": "1fc08eff2402976946ee2cf3df44a1d0",
-    "semantic_hash": ""
-  },
-  "scratch/find_tests.py": {
-    "mtime": 1794724021.067082,
-    "seen": 1794726197.7293012,
-    "ast_hash": "1d690c5d5e04ba14061ad74243bff6c6",
-    "semantic_hash": ""
-  },
-  "scratch/find_wall_mesh.py": {
-    "mtime": 1794724110.6387732,
-    "seen": 1794726197.729302,
-    "ast_hash": "345541a8e31465429d2ec45cbb8f307b",
-    "semantic_hash": ""
-  },
-  "scratch/inspect_images_details.py": {
-    "mtime": 1794723781.1787045,
-    "seen": 1794726197.7293031,
-    "ast_hash": "7c77ed40289b531ab0e835adb0afd351",
-    "semantic_hash": ""
-  },
-  "scratch/list_uploads.py": {
-    "mtime": 1794723766.262315,
-    "seen": 1794726197.729304,
-    "ast_hash": "9f2c6ea15438ddfa7d9fa8319cb18284",
-    "semantic_hash": ""
-  },
-  "scratch/locate_tests.py": {
-    "mtime": 1794725927.856207,
-    "seen": 1794726197.729305,
-    "ast_hash": "5397e98a113124cd975e58f0dae36eb2",
-    "semantic_hash": ""
-  },
-  "scratch/run_tests.js": {
-    "mtime": 1794726036.1584618,
-    "seen": 1794726197.7293062,
-    "ast_hash": "cd1d7b642d27e9e51413cd1c741e58a7",
-    "semantic_hash": ""
-  },
-  "scratch/sim_frame.py": {
-    "mtime": 1794724279.46111,
-    "seen": 1794726197.7293072,
-    "ast_hash": "ac550c4fab37d646613975ea28d56f69",
-    "semantic_hash": ""
-  },
-  "scratch/test_eff_pos.py": {
-    "mtime": 1794724089.5049043,
-    "seen": 1794726197.7293084,
-    "ast_hash": "55d3a18a39c48eb0455281107f4ad318",
-    "semantic_hash": ""
-  },
-  "scratch/test_pillar_positions.js": {
-    "mtime": 1794723943.3359282,
-    "seen": 1794726197.729309,
-    "ast_hash": "cc853256c5c272e1f4fd47a54afda480",
-    "semantic_hash": ""
-  },
-  "scratch/test_position_alignment_complete.js": {
-    "mtime": 1794726121.4594455,
-    "seen": 1794726197.7293105,
-    "ast_hash": "3c9f5df1efb28e6ae723b81e20cc31b5",
-    "semantic_hash": ""
-  },
-  "scratch/test_span_math.js": {
-    "mtime": 1794724650.5069823,
-    "seen": 1794726197.7293115,
-    "ast_hash": "ef392fa93d0eb00648b5caeed1943c72",
-    "semantic_hash": ""
-  },
-  "scratch/verify_corner_gap.py": {
-    "mtime": 1794724335.8256285,
-    "seen": 1794726197.7293124,
-    "ast_hash": "b5f6a46ec092f87a68847cc0050ac03e",
+  "src/lib/slabBeamRoofSteel.test.ts": {
+    "mtime": 1794736432.3190167,
+    "seen": 1794736561.7054858,
+    "ast_hash": "208626fe738b65b3ae92efb057fcce43",
     "semantic_hash": ""
   },
   "package-lock.json": {

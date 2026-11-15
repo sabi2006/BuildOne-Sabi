@@ -1856,6 +1856,135 @@ Please contact me.`;
                 </div>
               </div>
 
+              {/* Floor-wise Slab, Beam & Roof Engineered Schedule (IS 456:2000) */}
+              {((s.floorSlabCalculations && s.floorSlabCalculations.length > 0) || s.roofSlabCalculation) && (
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
+                  <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider block">
+                        Floor-Wise IS 456 Slabs, Ring Beams & Reinforcement Schedules
+                      </span>
+                      <span className="text-[11px] text-slate-300">
+                        Engineered slab thickness, beam dimensions, flexural design moments, and steel reinforcement
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-emerald-400">
+                      IS 456:2000 Compliant
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 text-xs">
+                      <thead className="bg-slate-50 text-slate-600 font-semibold uppercase">
+                        <tr>
+                          <th className="py-2.5 px-3 text-left">Level / Element</th>
+                          <th className="py-2.5 px-3 text-left">Slab Thickness & Spans</th>
+                          <th className="py-2.5 px-3 text-left">Slab Reinforcement</th>
+                          <th className="py-2.5 px-3 text-left">RCC Ring Beam Cross-Section</th>
+                          <th className="py-2.5 px-3 text-left">Beam Longitudinal & Stirrup Steel</th>
+                          <th className="py-2.5 px-3 text-right">Steel / Conc</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-slate-700">
+                        {s.floorSlabCalculations?.map((slab, idx) => {
+                          const beam = s.floorBeamCalculations?.[idx];
+                          return (
+                            <tr key={slab.floorId || idx} className="hover:bg-slate-50/60 transition-colors">
+                              <td className="py-2.5 px-3 font-bold text-slate-900 whitespace-nowrap">
+                                <div>{slab.floorName}</div>
+                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${slab.isCustomThickness || beam?.isCustomSize ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-800'}`}>
+                                  {slab.isCustomThickness || beam?.isCustomSize ? 'Manual Override' : 'Auto IS 456'}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-bold text-slate-800">{slab.providedThicknessIn}" ({slab.providedThicknessMm} mm)</div>
+                                <div className="text-[11px] text-slate-500 font-mono">{slab.spanWidthM.toFixed(1)}m × {slab.spanLengthM.toFixed(1)}m ({slab.slabType === 'two_way' ? '2-Way' : '1-Way'})</div>
+                                <div className="text-[10px] text-slate-400">Mu: {slab.designMomentMuKnM} kNm • L/d: {slab.actualLoverD}</div>
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-bold text-blue-700">Main: ⌀{slab.mainBarDiaMm}mm @ {slab.mainBarSpacingMm}mm c/c</div>
+                                <div className="text-[11px] text-slate-600">Dist: ⌀{slab.distBarDiaMm}mm @ {slab.distBarSpacingMm}mm c/c</div>
+                                {slab.topSupportBarDiaMm && (
+                                  <div className="text-[10px] text-slate-500">Top: ⌀{slab.topSupportBarDiaMm}mm @ {slab.topSupportBarSpacingMm}mm</div>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                {beam ? (
+                                  <>
+                                    <div className="font-bold text-slate-800">{beam.beamWidthIn}" × {beam.beamDepthIn}" ({beam.beamWidthMm} × {beam.beamDepthMm} mm)</div>
+                                    <div className="text-[11px] text-slate-500 font-mono">Span: {beam.effectiveSpanM}m • Wu: {beam.factoredLoadWuPerM_Kn} kN/m</div>
+                                    <div className="text-[10px] text-slate-400">Mu: {beam.designBendingMomentMuKnM} kNm • Vu: {beam.designShearForceVuKn} kN</div>
+                                  </>
+                                ) : <span className="text-slate-400">-</span>}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                {beam ? (
+                                  <>
+                                    <div className="font-bold text-indigo-700">Bot: {beam.bottomMainBarCount}-⌀{beam.bottomMainBarDiaMm}mm • Top: {beam.topAnchorBarCount}-⌀{beam.topAnchorBarDiaMm}mm</div>
+                                    <div className="text-[11px] text-slate-600">Stirrups: 2L-⌀{beam.stirrupDiaMm}mm @ {beam.stirrupSpacingMm}mm c/c</div>
+                                    <div className="text-[10px] text-slate-500 font-mono">Dev Length Ld: {beam.developmentLengthLdMm}mm</div>
+                                  </>
+                                ) : <span className="text-slate-400">-</span>}
+                              </td>
+                              <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                <div className="font-bold text-emerald-700">{Math.round((slab.totalSteelWeightKg || 0) + (beam?.totalSteelWeightKg || 0)).toLocaleString('en-IN')} kg</div>
+                                <div className="text-[11px] text-slate-500">{((slab.concreteVolumeM3 || 0) + (beam?.concreteVolumeM3 || 0)).toFixed(2)} m³</div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+
+                        {/* Roof Level Row */}
+                        {s.roofSlabCalculation && (() => {
+                          const slab = s.roofSlabCalculation;
+                          const beam = s.roofBeamCalculation;
+                          return (
+                            <tr className="bg-orange-50/40 hover:bg-orange-50/70 transition-colors">
+                              <td className="py-2.5 px-3 font-bold text-orange-950 whitespace-nowrap">
+                                <div>Roof Slab & Terrace</div>
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-900 border border-orange-200">
+                                  Top Roof Level
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-bold text-slate-800">{slab.providedThicknessIn}" ({slab.providedThicknessMm} mm)</div>
+                                <div className="text-[11px] text-slate-500 font-mono">LL: {slab.liveLoadKnM2} kN/m² • Weathering: {bConfig.roofConfig.weatheringCourseThicknessMm || 75}mm</div>
+                                {slab.waterTankCapacityLitres && slab.waterTankCapacityLitres > 0 && (
+                                  <div className="text-[10px] text-amber-800 font-bold">Tank: {slab.waterTankCapacityLitres}L ({slab.waterTankLoadKn || 12.3} kN)</div>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-bold text-orange-700">Main: ⌀{slab.mainBarDiaMm}mm @ {slab.mainBarSpacingMm}mm c/c</div>
+                                <div className="text-[11px] text-slate-600">Dist: ⌀{slab.distBarDiaMm}mm @ {slab.distBarSpacingMm}mm c/c</div>
+                              </td>
+                              <td className="py-2.5 px-3">
+                                {beam ? (
+                                  <>
+                                    <div className="font-bold text-slate-800">{beam.beamWidthIn}" × {beam.beamDepthIn}" ({beam.beamWidthMm} × {beam.beamDepthMm} mm)</div>
+                                    <div className="text-[11px] text-slate-500 font-mono">Roof Tie Ring Beam • Span: {beam.effectiveSpanM}m</div>
+                                  </>
+                                ) : <span className="text-slate-400">-</span>}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                {beam ? (
+                                  <>
+                                    <div className="font-bold text-indigo-700">Bot: {beam.bottomMainBarCount}-⌀{beam.bottomMainBarDiaMm}mm • Top: {beam.topAnchorBarCount}-⌀{beam.topAnchorBarDiaMm}mm</div>
+                                    <div className="text-[11px] text-slate-600">Stirrups: 2L-⌀{beam.stirrupDiaMm}mm @ {beam.stirrupSpacingMm}mm c/c</div>
+                                  </>
+                                ) : <span className="text-slate-400">-</span>}
+                              </td>
+                              <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                <div className="font-bold text-emerald-700">{Math.round((slab.totalSteelWeightKg || 0) + (beam?.totalSteelWeightKg || 0)).toLocaleString('en-IN')} kg</div>
+                                <div className="text-[11px] text-slate-500">{((slab.concreteVolumeM3 || 0) + (beam?.concreteVolumeM3 || 0)).toFixed(2)} m³</div>
+                              </td>
+                            </tr>
+                          );
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {/* Fine Aggregate / Sand Segregation Card */}
               <div className="bg-amber-50/80 border border-amber-300 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
@@ -2823,21 +2952,7 @@ Please contact me.`;
         wallThickness={buildingModel?.externalWallThickness}
         onClose={() => setIsStructuralModalOpen(false)}
         onSave={(newCfg, bDetails) => {
-          updateBuildingConfig(newCfg);
-          if (buildingModel && setBuildingModel) {
-            const newL = bDetails?.length ?? buildingModel.buildingLength;
-            const newW = bDetails?.width ?? buildingModel.buildingWidth;
-            const newU = bDetails?.unit ?? buildingModel.buildingUnit;
-            const newT = bDetails?.wallThickness ?? buildingModel.externalWallThickness;
-            setBuildingModel({
-              ...buildingModel,
-              buildingLength: newL,
-              buildingWidth: newW,
-              buildingUnit: newU,
-              externalWallThickness: newT,
-              buildingConfig: newCfg
-            });
-          }
+          updateBuildingConfig(newCfg, bDetails);
           if (newCfg.concreteGrade === 'M15') {
             setRccMixRatio('1:2:4');
           } else if (newCfg.concreteGrade === 'M20') {

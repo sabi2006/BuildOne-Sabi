@@ -181,6 +181,13 @@ export interface BuildingConfig {
   beamSizingMode?: 'auto_span' | 'uniform';
   slabSizingMode?: 'auto_occupancy' | 'custom';
   customSlabThicknessIn?: number;
+  floorOverrides?: Record<string, {
+    customSlabThicknessIn?: number;
+    customBeamWidthIn?: number;
+    customBeamDepthIn?: number;
+    isCustomSlab?: boolean;
+    isCustomBeam?: boolean;
+  }>;
   customRates?: StructuralRatesConfig;
 }
 
@@ -383,12 +390,173 @@ export interface ColumnStructuralCalculation {
   notes: string[];
 }
 
+export interface FloorSlabStructuralCalculation {
+  floorId: string;
+  floorLevel: number;
+  floorName: string;
+  isRoof: boolean;
+
+  // Geometry & Spans
+  spanLengthM: number;
+  spanWidthM: number;
+  aspectRatio: number;
+  slabType: 'one_way' | 'two_way';
+  supportCondition: 'simply_supported' | 'continuous_interior' | 'continuous_end' | 'cantilever';
+
+  // Thickness & Depth
+  recommendedThicknessMm: number;
+  providedThicknessMm: number;
+  providedThicknessIn: number;
+  effectiveDepthD_mm: number;
+  nominalCoverMm: number;
+  isCustomThickness: boolean;
+
+  // Loading (IS 875 & IS 456)
+  slabSelfWeightKnM2: number;
+  floorFinishKnM2: number;
+  waterproofingKnM2?: number;
+  liveLoadKnM2: number;
+  waterTankLoadKnM2?: number;
+  waterTankFootprintM2?: number;
+  waterTankCapacityLitres?: number;
+  waterTankLoadKn?: number;
+  totalDeadLoadKnM2: number;
+  totalServiceLoadKnM2: number;
+  factoredLoadWuKnM2: number;
+
+  // Design Moments (IS 456:2000 Cl. 24 & Table 26)
+  bendingMomentShortSpanMuxKnM: number;
+  bendingMomentLongSpanMuyKnM: number;
+  designMomentMuKnM: number;
+  requiredEffectiveDepthMm: number;
+
+  // Shear Check (IS 456 Cl. 40)
+  designShearForceVuKn: number;
+  nominalShearStressTauV_Mpa: number;
+  permissibleShearStressTauC_Mpa: number;
+  isShearSafe: boolean;
+
+  // Deflection Check (IS 456 Cl. 23.2.1)
+  basicLoverD: number;
+  modificationFactorMt: number;
+  allowableLoverD: number;
+  actualLoverD: number;
+  isDeflectionSafe: boolean;
+
+  // Reinforcement Configuration (IS 456 Cl. 26.5.2)
+  mainBarDiaMm: number;
+  mainBarSpacingMm: number;
+  mainSteelAreaRequiredAstMm2: number;
+  mainSteelAreaProvidedAstMm2: number;
+
+  distBarDiaMm: number;
+  distBarSpacingMm: number;
+  distSteelAreaRequiredAstMm2: number;
+  distSteelAreaProvidedAstMm2: number;
+
+  topSupportBarDiaMm?: number;
+  topSupportBarSpacingMm?: number;
+
+  // Material Volumes & Steel Weight
+  slabAreaM2: number;
+  concreteVolumeM3: number;
+  concreteVolumeCft: number;
+  mainSteelWeightKg: number;
+  distSteelWeightKg: number;
+  topSupportSteelWeightKg: number;
+  totalSteelWeightKg: number;
+  steelDensityKgPerM3: number;
+  coverBlocksCount: number;
+
+  status: 'SAFE' | 'WARNING';
+  notes: string[];
+}
+
+export interface FloorBeamStructuralCalculation {
+  floorId: string;
+  floorLevel: number;
+  floorName: string;
+  isRoofTie: boolean;
+
+  // Geometry & Spans
+  beamWidthMm: number;
+  beamDepthMm: number;
+  beamWidthIn: number;
+  beamDepthIn: number;
+  effectiveSpanM: number;
+  effectiveDepthD_mm: number;
+  nominalCoverMm: number;
+  isCustomSize: boolean;
+
+  // Tributary Loads
+  tributarySlabWidthM: number;
+  slabDeadLoadPerM_Kn: number;
+  slabLiveLoadPerM_Kn: number;
+  wallLoadPerM_Kn: number;
+  beamSelfWeightPerM_Kn: number;
+  totalDeadLoadPerM_Kn: number;
+  totalLiveLoadPerM_Kn: number;
+  totalServiceLoadPerM_Kn: number;
+  factoredLoadWuPerM_Kn: number;
+
+  // Moments & Shear (IS 456)
+  designBendingMomentMuKnM: number;
+  designShearForceVuKn: number;
+  requiredEffectiveDepthMm: number;
+
+  // Deflection Check (IS 456 Cl. 23.2.1)
+  basicLoverD: number;
+  allowableLoverD: number;
+  actualLoverD: number;
+  isDeflectionSafe: boolean;
+
+  // Flexural Reinforcement (IS 456 Cl. 26.5.1.1)
+  bottomMainBarCount: number;
+  bottomMainBarDiaMm: number;
+  bottomAstRequiredMm2: number;
+  bottomAstProvidedMm2: number;
+
+  topAnchorBarCount: number;
+  topAnchorBarDiaMm: number;
+  topAstProvidedMm2: number;
+
+  developmentLengthLdMm: number;
+
+  // Shear Reinforcement / Stirrups (IS 456 Cl. 26.5.1.6 & Table 19)
+  nominalShearStressTauV_Mpa: number;
+  designConcreteShearStrengthTauC_Mpa: number;
+  maxShearStressTauCMax_Mpa: number;
+  stirrupDiaMm: number;
+  stirrupLegs: number;
+  stirrupSpacingMm: number;
+  stirrupsSafe: boolean;
+
+  // Material Volumes & Steel Weight
+  totalBeamLengthM: number;
+  concreteVolumeM3: number;
+  concreteVolumeCft: number;
+  longitudinalSteelWeightKg: number;
+  stirrupSteelWeightKg: number;
+  totalSteelWeightKg: number;
+  steelDensityKgPerM3: number;
+  coverBlocksCount: number;
+
+  status: 'SAFE' | 'WARNING';
+  notes: string[];
+}
+
 export interface BuildingStructuralSummary {
   buildingConfig: BuildingConfig;
   totalFloorAreaM2: number;
   totalFloorAreaSqFt: number;
   totalBuiltUpAreaSqFt: number;
   totalPillarsCount: number;
+
+  // Floor-wise Structural Analysis & Reinforcement Schedules (IS 456 & IS 875)
+  floorSlabCalculations?: FloorSlabStructuralCalculation[];
+  floorBeamCalculations?: FloorBeamStructuralCalculation[];
+  roofSlabCalculation?: FloorSlabStructuralCalculation;
+  roofBeamCalculation?: FloorBeamStructuralCalculation;
   
   // Pillars load analysis
   pillarsCalculations: ColumnStructuralCalculation[];
@@ -484,6 +652,551 @@ export interface BuildingStructuralSummary {
 // -------------------------------------------------------------
 // CORE STRUCTURAL CALCULATION ENGINE
 // -------------------------------------------------------------
+
+/**
+ * Calculate IS 456 Cl. 26.2.1 tension bar development length Ld (mm)
+ */
+export function calculateDevelopmentLengthMm(
+  barDiaMm: number,
+  steelGrade: SteelGrade = 'Fe500',
+  concreteGrade: ConcreteGrade = 'M20'
+): number {
+  const fy = STEEL_YIELD_STRENGTH[steelGrade] || 500;
+  const tauBdMap: Record<ConcreteGrade, number> = {
+    M15: 1.0,
+    M20: 1.2,
+    M25: 1.4,
+    M30: 1.5,
+    M35: 1.7
+  };
+  const tauBdPlain = tauBdMap[concreteGrade] || 1.2;
+  // For deformed bars (HYSD), tau_bd is increased by 60% (IS 456 Cl. 26.2.1.1)
+  const tauBd = 1.6 * tauBdPlain;
+  // Ld = (phi * 0.87 * fy) / (4 * tau_bd)
+  const Ld = (barDiaMm * 0.87 * fy) / (4 * tauBd);
+  return Math.ceil(Ld);
+}
+
+/**
+ * Rigorous IS 456:2000 & IS 875 floor slab structural calculation.
+ * Determines required slab thickness, moment demands, shear, deflection control,
+ * main & distribution rebar schedules, and exact steel weights.
+ */
+export function calculateFloorSlabStructuralDetails(
+  floorId: string,
+  floorLevel: number,
+  floorName: string,
+  isRoof: boolean,
+  spanLengthM: number,
+  spanWidthM: number,
+  slabAreaM2: number,
+  config: BuildingConfig,
+  overrides?: {
+    customThicknessMm?: number;
+    isCustomThickness?: boolean;
+    supportCondition?: 'simply_supported' | 'continuous_interior' | 'continuous_end' | 'cantilever';
+  }
+): FloorSlabStructuralCalculation {
+  const Lx = Math.max(0.5, Math.min(spanLengthM, spanWidthM));
+  const Ly = Math.max(Lx, Math.max(spanLengthM, spanWidthM));
+  const aspectRatio = Ly / Lx;
+  const slabType: 'one_way' | 'two_way' = aspectRatio > 2.0 ? 'one_way' : 'two_way';
+
+  const defaultSupport = isRoof ? 'continuous_end' : (floorLevel === 0 ? 'continuous_interior' : 'continuous_interior');
+  const supportCondition = overrides?.supportCondition || defaultSupport;
+
+  // Deflection basic L/d factor (IS 456 Cl. 23.2.1)
+  const basicLoverD = supportCondition === 'cantilever' ? 7 : (supportCondition === 'simply_supported' ? 20 : 26);
+
+  // Preliminary depth from deflection control (assuming modification factor Mt ~ 1.35)
+  const assumedMt = 1.35;
+  const d_prelimMm = (Lx * 1000) / (basicLoverD * assumedMt);
+  const nominalCoverMm = 20; // IS 456 Table 16 for slabs
+  const assumedBarDiaMm = (config.buildingType === 'commercial' || config.buildingType === 'industrial' || Lx > 4.0) ? 10 : 8;
+  const D_prelimMm = d_prelimMm + nominalCoverMm + assumedBarDiaMm / 2;
+
+  // Practical minimum slab thickness:
+  // Residential: 125 mm (5")
+  // Commercial / Industrial: 150 mm (6")
+  // Roof slab: 125 mm (5")
+  const minThicknessMm = (config.buildingType === 'commercial' || config.buildingType === 'industrial') ? 150 : 125;
+  const recommendedThicknessMm = Math.max(minThicknessMm, Math.ceil(D_prelimMm / 5) * 5);
+
+  const isCustomThickness = Boolean(overrides?.isCustomThickness && overrides.customThicknessMm);
+  const providedThicknessMm = isCustomThickness ? (overrides?.customThicknessMm || 125) : recommendedThicknessMm;
+  const providedThicknessIn = Math.round((providedThicknessMm / 25.4) * 10) / 10;
+  const effectiveDepthD_mm = Math.max(40, providedThicknessMm - nominalCoverMm - assumedBarDiaMm / 2);
+
+  // Loading: IS 875 Part 1 & 2
+  const concreteDensityKnM3 = 25.0; // IS 875 Part 1
+  const slabSelfWeightKnM2 = (providedThicknessMm / 1000) * concreteDensityKnM3;
+  
+  let floorFinishKnM2 = 1.0; // screed + tiles 50mm
+  let waterproofingKnM2: number | undefined = undefined;
+  let liveLoadKnM2 = 2.0; // IS 875 Part 2 Category A
+  let waterTankLoadKnM2: number | undefined = undefined;
+  let waterTankFootprintM2: number | undefined = undefined;
+  let waterTankCapacityLitres: number | undefined = undefined;
+  let waterTankLoadKn: number | undefined = undefined;
+
+  const notes: string[] = [];
+
+  if (isRoof) {
+    const weatheringMm = config.roofConfig?.weatheringCourseThicknessMm || 75;
+    waterproofingKnM2 = (weatheringMm / 1000) * 20.0; // brick bat coba density 20 kN/m3
+    floorFinishKnM2 = waterproofingKnM2;
+    liveLoadKnM2 = config.roofConfig?.liveLoadKnM2 ?? (config.roofConfig?.type === 'accessible_terrace' ? 1.5 : 0.75);
+
+    if (config.roofConfig?.tankCapacityLitres && config.roofConfig.tankCapacityLitres > 0) {
+      waterTankCapacityLitres = config.roofConfig.tankCapacityLitres;
+      const waterWeightKn = (waterTankCapacityLitres * 9.81) / 1000;
+      const pedestalSelfWeightKn = 2.5; // masonry pedestal / ring
+      const totalTankWeightKn = waterWeightKn + pedestalSelfWeightKn;
+      // Realistic pedestal footprint
+      waterTankFootprintM2 = Math.max(1.44, Math.round(Math.PI * Math.pow(Math.sqrt(waterTankCapacityLitres / 1000) / 2, 2) * 100) / 100);
+      waterTankLoadKnM2 = Math.round((totalTankWeightKn / waterTankFootprintM2) * 100) / 100;
+      waterTankLoadKn = Math.round(totalTankWeightKn * 10) / 10;
+      notes.push(`Overhead water tank (${waterTankCapacityLitres} L / ${totalTankWeightKn.toFixed(1)} kN) localized on ${waterTankFootprintM2} m² support pedestal (${waterTankLoadKnM2.toFixed(1)} kN/m²).`);
+    }
+  } else {
+    if (config.buildingType === 'commercial') {
+      liveLoadKnM2 = 4.0;
+    } else if (config.buildingType === 'industrial') {
+      liveLoadKnM2 = 5.0;
+    } else if (config.buildingType === 'other') {
+      liveLoadKnM2 = 3.0;
+    } else {
+      liveLoadKnM2 = 2.0; // residential
+    }
+  }
+
+  const ceilingPlasterAndServicesKnM2 = 0.25;
+  const totalDeadLoadKnM2 = slabSelfWeightKnM2 + floorFinishKnM2 + ceilingPlasterAndServicesKnM2;
+  const totalServiceLoadKnM2 = totalDeadLoadKnM2 + liveLoadKnM2;
+  const factoredLoadWuKnM2 = 1.5 * totalServiceLoadKnM2;
+
+  // Design Moments (IS 456 Table 26 / Cl. 24)
+  let bendingMomentShortSpanMuxKnM = 0;
+  let bendingMomentLongSpanMuyKnM = 0;
+
+  if (slabType === 'two_way') {
+    // Coefficients for interior/continuous panel (IS 456 Table 26)
+    const alpha_x = supportCondition === 'simply_supported'
+      ? Math.pow(aspectRatio, 4) / (8 * (1 + Math.pow(aspectRatio, 4)))
+      : Math.min(0.065, Math.max(0.032, 0.024 + 0.015 * aspectRatio));
+    const alpha_y = supportCondition === 'simply_supported'
+      ? Math.pow(aspectRatio, 2) / (8 * (1 + Math.pow(aspectRatio, 4)))
+      : 0.028;
+    bendingMomentShortSpanMuxKnM = alpha_x * factoredLoadWuKnM2 * Lx * Lx;
+    bendingMomentLongSpanMuyKnM = alpha_y * factoredLoadWuKnM2 * Lx * Lx;
+  } else {
+    // One-way slab: continuous Mu = wu * Lx^2 / 10 or simply supported wu * Lx^2 / 8
+    const momentCoeff = supportCondition === 'simply_supported' ? 8 : (supportCondition === 'cantilever' ? 2 : 10);
+    bendingMomentShortSpanMuxKnM = (factoredLoadWuKnM2 * Lx * Lx) / momentCoeff;
+    bendingMomentLongSpanMuyKnM = 0.20 * bendingMomentShortSpanMuxKnM;
+  }
+
+  const designMomentMuKnM = Math.max(bendingMomentShortSpanMuxKnM, bendingMomentLongSpanMuyKnM);
+
+  // Section Flexural Capacity Check (IS 456 Cl. 38.1 & G-1.1)
+  const fck = CONCRETE_MIX_DATABASE[config.concreteGrade]?.fckMpa || 20;
+  const fy = STEEL_YIELD_STRENGTH[config.steelGrade] || 500;
+  const ruCoeff = fy <= 415 ? 0.138 : (fy <= 500 ? 0.133 : 0.130);
+  const Ru_max = ruCoeff * fck;
+  const requiredEffectiveDepthMm = Math.sqrt((designMomentMuKnM * 1e6) / (Ru_max * 1000));
+
+  // Flexural Reinforcement (IS 456 Cl. 26.5.2 & G-1.1)
+  const b = 1000; // 1 meter strip
+  const term = 1 - (4.6 * designMomentMuKnM * 1e6) / (fck * b * effectiveDepthD_mm * effectiveDepthD_mm);
+  const Ast_calcMm2 = term > 0
+    ? (0.5 * fck / fy) * (1 - Math.sqrt(term)) * b * effectiveDepthD_mm
+    : (Ru_max * b * effectiveDepthD_mm) / (0.87 * fy);
+  
+  // Minimum Reinforcement (IS 456 Cl. 26.5.2.1): 0.12% for HYSD, 0.15% for mild steel
+  const minSteelPercent = fy >= 415 ? 0.0012 : 0.0015;
+  const Ast_minMm2 = minSteelPercent * b * providedThicknessMm;
+  const mainSteelAreaRequiredAstMm2 = Math.max(Ast_calcMm2, Ast_minMm2);
+
+  // Main Bar selection (8 mm or 10 mm, max dia <= D / 8)
+  const maxAllowedBarDiaMm = Math.floor(providedThicknessMm / 8);
+  const mainBarDiaMm = Math.min(maxAllowedBarDiaMm, (mainSteelAreaRequiredAstMm2 > 280 || Lx > 3.8) ? 10 : 8);
+  const mainBarAreaMm2 = (Math.PI * mainBarDiaMm * mainBarDiaMm) / 4;
+  
+  // Spacing limits (IS 456 Cl. 26.5.2.2): <= min(3d, 300 mm)
+  const maxMainSpacingMm = Math.min(3 * effectiveDepthD_mm, 300);
+  const calculatedMainSpacingMm = (mainBarAreaMm2 * 1000) / mainSteelAreaRequiredAstMm2;
+  const mainBarSpacingMm = Math.max(75, Math.min(maxMainSpacingMm, Math.floor(calculatedMainSpacingMm / 25) * 25 || 150));
+  const mainSteelAreaProvidedAstMm2 = Math.round((mainBarAreaMm2 * 1000) / mainBarSpacingMm);
+
+  // Distribution Steel (IS 456 Cl. 26.5.2.1)
+  const distBarDiaMm = 8;
+  const distBarAreaMm2 = (Math.PI * distBarDiaMm * distBarDiaMm) / 4;
+  const distSteelAreaRequiredAstMm2 = Ast_minMm2;
+  const maxDistSpacingMm = Math.min(5 * effectiveDepthD_mm, 450);
+  const calculatedDistSpacingMm = (distBarAreaMm2 * 1000) / distSteelAreaRequiredAstMm2;
+  const distBarSpacingMm = Math.max(100, Math.min(maxDistSpacingMm, Math.floor(calculatedDistSpacingMm / 25) * 25 || 175));
+  const distSteelAreaProvidedAstMm2 = Math.round((distBarAreaMm2 * 1000) / distBarSpacingMm);
+
+  // Top support reinforcement (curtailed bars or extra top mesh near supports)
+  const topSupportBarDiaMm = (supportCondition.includes('continuous')) ? mainBarDiaMm : undefined;
+  const topSupportBarSpacingMm = topSupportBarDiaMm ? mainBarSpacingMm * 2 : undefined;
+
+  // Deflection Check (IS 456 Cl. 23.2.1)
+  const ptProvided = (mainSteelAreaProvidedAstMm2 / (b * effectiveDepthD_mm)) * 100;
+  const fs = 0.58 * fy * (mainSteelAreaRequiredAstMm2 / Math.max(1, mainSteelAreaProvidedAstMm2));
+  const logPt = ptProvided > 0 ? Math.log10(1 / Math.max(0.01, ptProvided)) : 0;
+  const denom = 0.225 + 0.0032 * fs - 0.625 * logPt;
+  const modificationFactorMt = denom > 0 ? Math.min(2.0, Math.max(1.0, 1 / denom)) : 1.35;
+  const allowableLoverD = Math.round(basicLoverD * modificationFactorMt * 10) / 10;
+  const actualLoverD = Math.round(((Lx * 1000) / effectiveDepthD_mm) * 10) / 10;
+  const isDeflectionSafe = actualLoverD <= allowableLoverD;
+
+  // Shear Check (IS 456 Cl. 40)
+  const designShearForceVuKn = (factoredLoadWuKnM2 * Lx) / 2;
+  const nominalShearStressTauV_Mpa = (designShearForceVuKn * 1000) / (b * effectiveDepthD_mm);
+  const kFactor = providedThicknessMm <= 150 ? 1.30 : (providedThicknessMm <= 175 ? 1.25 : (providedThicknessMm <= 200 ? 1.20 : 1.10));
+  const tau_c = Math.min(0.85, Math.max(0.28, 0.28 + (ptProvided * 0.40) * Math.sqrt(fck / 20)));
+  const permissibleShearStressTauC_Mpa = Math.round(kFactor * tau_c * 100) / 100;
+  const isShearSafe = nominalShearStressTauV_Mpa <= permissibleShearStressTauC_Mpa;
+
+  // Volumes & Material Estimations
+  const concreteVolumeM3 = slabAreaM2 * (providedThicknessMm / 1000);
+  const concreteVolumeCft = concreteVolumeM3 * 35.3147;
+
+  // Weight per meter for steel bars: D^2 / 162
+  const mainBarWeightPerM = (mainBarDiaMm * mainBarDiaMm) / 162;
+  const distBarWeightPerM = (distBarDiaMm * distBarDiaMm) / 162;
+  const lapAndBendFactor = 1.10; // 10% hooks, bends & laps
+
+  const mainBarsPerM = 1000 / mainBarSpacingMm;
+  const distBarsPerM = 1000 / distBarSpacingMm;
+  const mainSteelWeightKg = slabAreaM2 * (mainBarsPerM * mainBarWeightPerM) * lapAndBendFactor;
+  const distSteelWeightKg = slabAreaM2 * (distBarsPerM * distBarWeightPerM) * lapAndBendFactor;
+  const topSupportSteelWeightKg = topSupportBarDiaMm ? (slabAreaM2 * 0.3 * (1000 / (topSupportBarSpacingMm || 300)) * ((topSupportBarDiaMm * topSupportBarDiaMm) / 162)) : 0;
+  const totalSteelWeightKg = Math.round((mainSteelWeightKg + distSteelWeightKg + topSupportSteelWeightKg) * 10) / 10;
+  const steelDensityKgPerM3 = concreteVolumeM3 > 0 ? Math.round((totalSteelWeightKg / concreteVolumeM3) * 10) / 10 : 75;
+  const coverBlocksCount = Math.max(4, Math.ceil(slabAreaM2 * 4));
+
+  const status: 'SAFE' | 'WARNING' = (isDeflectionSafe && isShearSafe && effectiveDepthD_mm >= requiredEffectiveDepthMm) ? 'SAFE' : 'WARNING';
+  if (!isDeflectionSafe) notes.push(`Actual L/d (${actualLoverD}) exceeds allowable (${allowableLoverD}). Recommend increasing thickness.`);
+  if (!isShearSafe) notes.push(`Nominal shear stress (${nominalShearStressTauV_Mpa.toFixed(2)} MPa) exceeds permissible (${permissibleShearStressTauC_Mpa.toFixed(2)} MPa).`);
+
+  return {
+    floorId,
+    floorLevel,
+    floorName,
+    isRoof,
+    spanLengthM: Ly,
+    spanWidthM: Lx,
+    aspectRatio: Math.round(aspectRatio * 100) / 100,
+    slabType,
+    supportCondition,
+    recommendedThicknessMm,
+    providedThicknessMm,
+    providedThicknessIn,
+    effectiveDepthD_mm,
+    nominalCoverMm,
+    isCustomThickness,
+    slabSelfWeightKnM2: Math.round(slabSelfWeightKnM2 * 100) / 100,
+    floorFinishKnM2: Math.round(floorFinishKnM2 * 100) / 100,
+    waterproofingKnM2,
+    liveLoadKnM2,
+    waterTankLoadKnM2,
+    waterTankFootprintM2,
+    waterTankCapacityLitres,
+    waterTankLoadKn,
+    totalDeadLoadKnM2: Math.round(totalDeadLoadKnM2 * 100) / 100,
+    totalServiceLoadKnM2: Math.round(totalServiceLoadKnM2 * 100) / 100,
+    factoredLoadWuKnM2: Math.round(factoredLoadWuKnM2 * 100) / 100,
+    bendingMomentShortSpanMuxKnM: Math.round(bendingMomentShortSpanMuxKnM * 100) / 100,
+    bendingMomentLongSpanMuyKnM: Math.round(bendingMomentLongSpanMuyKnM * 100) / 100,
+    designMomentMuKnM: Math.round(designMomentMuKnM * 100) / 100,
+    requiredEffectiveDepthMm: Math.round(requiredEffectiveDepthMm * 10) / 10,
+    designShearForceVuKn: Math.round(designShearForceVuKn * 100) / 100,
+    nominalShearStressTauV_Mpa: Math.round(nominalShearStressTauV_Mpa * 100) / 100,
+    permissibleShearStressTauC_Mpa,
+    isShearSafe,
+    basicLoverD,
+    modificationFactorMt: Math.round(modificationFactorMt * 100) / 100,
+    allowableLoverD,
+    actualLoverD,
+    isDeflectionSafe,
+    mainBarDiaMm,
+    mainBarSpacingMm,
+    mainSteelAreaRequiredAstMm2: Math.round(mainSteelAreaRequiredAstMm2),
+    mainSteelAreaProvidedAstMm2,
+    distBarDiaMm,
+    distBarSpacingMm,
+    distSteelAreaRequiredAstMm2: Math.round(distSteelAreaRequiredAstMm2),
+    distSteelAreaProvidedAstMm2,
+    topSupportBarDiaMm,
+    topSupportBarSpacingMm,
+    slabAreaM2: Math.round(slabAreaM2 * 100) / 100,
+    concreteVolumeM3: Math.round(concreteVolumeM3 * 1000) / 1000,
+    concreteVolumeCft: Math.round(concreteVolumeCft * 100) / 100,
+    mainSteelWeightKg: Math.round(mainSteelWeightKg * 10) / 10,
+    distSteelWeightKg: Math.round(distSteelWeightKg * 10) / 10,
+    topSupportSteelWeightKg: Math.round(topSupportSteelWeightKg * 10) / 10,
+    totalSteelWeightKg,
+    steelDensityKgPerM3,
+    coverBlocksCount,
+    status,
+    notes
+  };
+}
+
+/**
+ * Rigorous IS 456:2000 & IS 875 RCC Ring Beam & Frame Beam structural calculation.
+ * Determines required beam cross-section (width x depth), tributary slab & wall loads,
+ * moment demands, shear, longitudinal rebar count & dia, stirrup tie spacing, development length,
+ * and exact steel quantities.
+ */
+export function calculateFloorBeamStructuralDetails(
+  floorId: string,
+  floorLevel: number,
+  floorName: string,
+  isRoofTie: boolean,
+  effectiveSpanM: number,
+  totalBeamLengthM: number,
+  wallHeightM: number,
+  wallThicknessM: number,
+  tributarySlabWidthM: number,
+  slabCalculation: FloorSlabStructuralCalculation,
+  config: BuildingConfig,
+  overrides?: {
+    customWidthMm?: number;
+    customDepthMm?: number;
+    isCustomSize?: boolean;
+  }
+): FloorBeamStructuralCalculation {
+  const spanM = Math.max(1.0, effectiveSpanM);
+  const fck = CONCRETE_MIX_DATABASE[config.concreteGrade]?.fckMpa || 20;
+  const fy = STEEL_YIELD_STRENGTH[config.steelGrade] || 500;
+  const notes: string[] = [];
+
+  // Width: standard wall thickness (230 mm / 9 in)
+  const defaultWidthMm = Math.max(200, Math.round(wallThicknessM * 1000));
+  const beamWidthMm = overrides?.customWidthMm || defaultWidthMm;
+  const beamWidthIn = Math.round((beamWidthMm / 25.4) * 10) / 10;
+
+  // Depth determination
+  let recommendedDepthMm = 300;
+  if (config.beamSizingMode === 'uniform') {
+    recommendedDepthMm = 300; // 12 in uniform
+  } else if (isRoofTie) {
+    // Top roof tie beam: carries only roof slab reaction + light parapet wall (span / 15)
+    const rawRoofDepth = (spanM * 1000) / 15;
+    recommendedDepthMm = Math.max(230, Math.ceil(rawRoofDepth / 25) * 25);
+    if (recommendedDepthMm > 350) recommendedDepthMm = 350;
+  } else {
+    // Intermediate floor beam: carries upper floor masonry wall + slab reactions (span / 12)
+    const rawFloorDepth = (spanM * 1000) / 12;
+    recommendedDepthMm = Math.min(600, Math.max(300, Math.ceil(rawFloorDepth / 25) * 25));
+  }
+
+  const isCustomSize = Boolean(overrides?.isCustomSize && overrides.customDepthMm);
+  let beamDepthMm = isCustomSize ? (overrides?.customDepthMm || 300) : recommendedDepthMm;
+  let beamDepthIn = Math.round((beamDepthMm / 25.4) * 10) / 10;
+
+  const nominalCoverMm = 25; // IS 456 Table 16 for beams
+  const stirrupDiaMm = 8;
+  const assumedMainBarDiaMm = 16;
+  let effectiveDepthD_mm = Math.max(150, beamDepthMm - nominalCoverMm - stirrupDiaMm - assumedMainBarDiaMm / 2);
+
+  // Tributary Loads on Beam (per linear meter)
+  const beamSelfWeightPerM_Kn = (beamWidthMm / 1000) * (beamDepthMm / 1000) * 25.0;
+
+  // Wall load: if roof tie, parapet wall (approx 0.9m height x 0.115m thickness x 20 kN/m3)
+  // if intermediate floor, full brick infill wall above beam
+  const masonryDensityKnM3 = 20.0;
+  const effectiveWallHeightM = isRoofTie ? 0.9 : Math.max(0, wallHeightM - (beamDepthMm / 1000));
+  const effectiveWallThicknessM = isRoofTie ? Math.min(wallThicknessM, 0.115) : wallThicknessM;
+  const wallLoadPerM_Kn = effectiveWallHeightM * effectiveWallThicknessM * masonryDensityKnM3;
+
+  // Slab tributary reaction per meter of beam
+  const tributarySlabWidth = Math.max(0.5, Math.min(tributarySlabWidthM, spanM / 2));
+  const slabDeadLoadPerM_Kn = tributarySlabWidth * slabCalculation.totalDeadLoadKnM2;
+  const slabLiveLoadPerM_Kn = tributarySlabWidth * slabCalculation.liveLoadKnM2;
+
+  const totalDeadLoadPerM_Kn = beamSelfWeightPerM_Kn + wallLoadPerM_Kn + slabDeadLoadPerM_Kn;
+  const totalLiveLoadPerM_Kn = slabLiveLoadPerM_Kn;
+  const totalServiceLoadPerM_Kn = totalDeadLoadPerM_Kn + totalLiveLoadPerM_Kn;
+  const factoredLoadWuPerM_Kn = 1.5 * totalServiceLoadPerM_Kn;
+
+  // Design Bending Moment & Shear (Continuous frame: Mu = wu * L^2 / 10, Vu = wu * L / 2)
+  const designBendingMomentMuKnM = (factoredLoadWuPerM_Kn * spanM * spanM) / 10;
+  const designShearForceVuKn = (factoredLoadWuPerM_Kn * spanM) / 2;
+
+  // Ru,max check
+  const ruCoeff = fy <= 415 ? 0.138 : (fy <= 500 ? 0.133 : 0.130);
+  const Ru_max = ruCoeff * fck;
+  let requiredEffectiveDepthMm = Math.sqrt((designBendingMomentMuKnM * 1e6) / (Ru_max * beamWidthMm));
+
+  // If auto-sizing and required flexural depth or deflection exceeds current trial depth, auto-adjust to safe standard depth
+  if (!isCustomSize && requiredEffectiveDepthMm > effectiveDepthD_mm) {
+    const minNeededDepthMm = Math.ceil((requiredEffectiveDepthMm + nominalCoverMm + stirrupDiaMm + assumedMainBarDiaMm / 2) / 25) * 25;
+    beamDepthMm = Math.min(750, Math.max(beamDepthMm, minNeededDepthMm));
+    beamDepthIn = Math.round((beamDepthMm / 25.4) * 10) / 10;
+    effectiveDepthD_mm = Math.max(150, beamDepthMm - nominalCoverMm - stirrupDiaMm - assumedMainBarDiaMm / 2);
+  }
+
+  // Flexural Reinforcement (IS 456 Cl. 26.5.1.1 & G-1.1)
+  const term = 1 - (4.6 * designBendingMomentMuKnM * 1e6) / (fck * beamWidthMm * effectiveDepthD_mm * effectiveDepthD_mm);
+  const Ast_calcMm2 = term > 0
+    ? (0.5 * fck / fy) * (1 - Math.sqrt(term)) * beamWidthMm * effectiveDepthD_mm
+    : (Ru_max * beamWidthMm * effectiveDepthD_mm) / (0.87 * fy);
+  const Ast_minMm2 = (0.85 * beamWidthMm * effectiveDepthD_mm) / fy;
+  const bottomAstRequiredMm2 = Math.max(Ast_calcMm2, Ast_minMm2);
+
+  // Bottom Main Bars Selection: e.g. 2 or 3 bars of 12mm or 16mm
+  let bottomMainBarDiaMm = 16;
+  let bottomMainBarCount = 2;
+  const barArea12 = (Math.PI * 12 * 12) / 4;
+  const barArea16 = (Math.PI * 16 * 16) / 4;
+  const barArea20 = (Math.PI * 20 * 20) / 4;
+
+  if (bottomAstRequiredMm2 <= 2 * barArea12) {
+    bottomMainBarDiaMm = 12;
+    bottomMainBarCount = 2;
+  } else if (bottomAstRequiredMm2 <= 3 * barArea12) {
+    bottomMainBarDiaMm = 12;
+    bottomMainBarCount = 3;
+  } else if (bottomAstRequiredMm2 <= 2 * barArea16) {
+    bottomMainBarDiaMm = 16;
+    bottomMainBarCount = 2;
+  } else if (bottomAstRequiredMm2 <= 3 * barArea16) {
+    bottomMainBarDiaMm = 16;
+    bottomMainBarCount = 3;
+  } else if (bottomAstRequiredMm2 <= 4 * barArea16) {
+    bottomMainBarDiaMm = 16;
+    bottomMainBarCount = 4;
+  } else {
+    bottomMainBarDiaMm = 20;
+    bottomMainBarCount = Math.max(3, Math.ceil(bottomAstRequiredMm2 / barArea20));
+  }
+  const bottomBarSingleArea = (Math.PI * bottomMainBarDiaMm * bottomMainBarDiaMm) / 4;
+  const bottomAstProvidedMm2 = Math.round(bottomMainBarCount * bottomBarSingleArea);
+
+  // Top Anchor / Hanger Bars (at least 2 bars of 10mm or 12mm for stirrup cages)
+  const topAnchorBarCount = 2;
+  const topAnchorBarDiaMm = bottomMainBarDiaMm >= 16 ? 12 : 10;
+  const topBarSingleArea = (Math.PI * topAnchorBarDiaMm * topAnchorBarDiaMm) / 4;
+  const topAstProvidedMm2 = Math.round(topAnchorBarCount * topBarSingleArea);
+
+  // Development Length Ld (IS 456 Cl. 26.2.1)
+  const developmentLengthLdMm = calculateDevelopmentLengthMm(bottomMainBarDiaMm, config.steelGrade, config.concreteGrade);
+
+  // Shear Reinforcement (Stirrups) - IS 456 Cl. 26.5.1.6 & Cl. 40
+  const nominalShearStressTauV_Mpa = (designShearForceVuKn * 1000) / (beamWidthMm * effectiveDepthD_mm);
+  const tauCMaxMap: Record<ConcreteGrade, number> = { M15: 2.5, M20: 2.8, M25: 3.1, M30: 3.5, M35: 3.7 };
+  const maxShearStressTauCMax_Mpa = tauCMaxMap[config.concreteGrade] || 2.8;
+
+  const ptBeam = (bottomAstProvidedMm2 / (beamWidthMm * effectiveDepthD_mm)) * 100;
+  const designConcreteShearStrengthTauC_Mpa = Math.min(maxShearStressTauCMax_Mpa, Math.max(0.30, 0.28 + (ptBeam * 0.35) * Math.sqrt(fck / 20)));
+
+  const stirrupLegs = 2;
+  const AsvMm2 = stirrupLegs * ((Math.PI * stirrupDiaMm * stirrupDiaMm) / 4); // ~100.5 mm2
+  const maxStirrupSpacingMm = Math.min(0.75 * effectiveDepthD_mm, 300);
+
+  let calculatedStirrupSpacingMm = maxStirrupSpacingMm;
+  if (nominalShearStressTauV_Mpa > designConcreteShearStrengthTauC_Mpa) {
+    const VusKn = designShearForceVuKn - ((designConcreteShearStrengthTauC_Mpa * beamWidthMm * effectiveDepthD_mm) / 1000);
+    calculatedStirrupSpacingMm = (0.87 * fy * AsvMm2 * effectiveDepthD_mm) / (VusKn * 1000);
+  } else {
+    // Minimum shear reinforcement formula (IS 456 Cl. 26.5.1.6): Asv / (b * sv) >= 0.4 / (0.87 * fy)
+    calculatedStirrupSpacingMm = (0.87 * fy * AsvMm2) / (0.4 * beamWidthMm);
+  }
+  const stirrupSpacingMm = Math.max(75, Math.min(maxStirrupSpacingMm, Math.floor(calculatedStirrupSpacingMm / 25) * 25 || 150));
+  const stirrupsSafe = nominalShearStressTauV_Mpa <= maxShearStressTauCMax_Mpa;
+
+  // Deflection Check (IS 456 Cl. 23.2.1)
+  const basicLoverD = 26; // continuous beam
+  const allowableLoverD = Math.round(basicLoverD * 1.15 * 10) / 10;
+  const actualLoverD = Math.round(((spanM * 1000) / effectiveDepthD_mm) * 10) / 10;
+  const isDeflectionSafe = actualLoverD <= allowableLoverD;
+
+  // Material Volumes & Steel Quantities
+  const concreteVolumeM3 = totalBeamLengthM * (beamWidthMm / 1000) * (beamDepthMm / 1000);
+  const concreteVolumeCft = concreteVolumeM3 * 35.3147;
+
+  const botWeightPerM = (bottomMainBarDiaMm * bottomMainBarDiaMm) / 162;
+  const topWeightPerM = (topAnchorBarDiaMm * topAnchorBarDiaMm) / 162;
+  const stirrupWeightPerM = (stirrupDiaMm * stirrupDiaMm) / 162;
+  const lapFactor = 1.10;
+
+  const longitudinalSteelWeightKg = totalBeamLengthM * ((bottomMainBarCount * botWeightPerM) + (topAnchorBarCount * topWeightPerM)) * lapFactor;
+
+  // Stirrup count and cut length: core width + core depth with hooks (24 * dia)
+  const coreW_m = Math.max(0.05, (beamWidthMm - 2 * nominalCoverMm) / 1000);
+  const coreH_m = Math.max(0.05, (beamDepthMm - 2 * nominalCoverMm) / 1000);
+  const stirrupCutLengthM = 2 * (coreW_m + coreH_m) + 0.15; // with 135 deg seismic hooks
+  const stirrupCount = Math.max(2, Math.ceil((totalBeamLengthM * 1000) / stirrupSpacingMm) + 1);
+  const stirrupSteelWeightKg = stirrupCount * stirrupCutLengthM * stirrupWeightPerM;
+
+  const totalSteelWeightKg = Math.round((longitudinalSteelWeightKg + stirrupSteelWeightKg) * 10) / 10;
+  const steelDensityKgPerM3 = concreteVolumeM3 > 0 ? Math.round((totalSteelWeightKg / concreteVolumeM3) * 10) / 10 : 120;
+  const coverBlocksCount = Math.max(4, Math.ceil(totalBeamLengthM * 2));
+
+  const status: 'SAFE' | 'WARNING' = (isDeflectionSafe && stirrupsSafe && effectiveDepthD_mm >= requiredEffectiveDepthMm) ? 'SAFE' : 'WARNING';
+  if (!isDeflectionSafe) notes.push(`Actual L/d (${actualLoverD}) exceeds allowable (${allowableLoverD}). Recommend increasing beam depth.`);
+  if (!stirrupsSafe) notes.push(`Nominal shear stress (${nominalShearStressTauV_Mpa.toFixed(2)} MPa) exceeds tau_c_max (${maxShearStressTauCMax_Mpa} MPa). Increase beam section.`);
+
+  return {
+    floorId,
+    floorLevel,
+    floorName,
+    isRoofTie,
+    beamWidthMm,
+    beamDepthMm,
+    beamWidthIn,
+    beamDepthIn,
+    effectiveSpanM: Math.round(spanM * 100) / 100,
+    effectiveDepthD_mm,
+    nominalCoverMm,
+    isCustomSize,
+    tributarySlabWidthM: Math.round(tributarySlabWidth * 100) / 100,
+    slabDeadLoadPerM_Kn: Math.round(slabDeadLoadPerM_Kn * 100) / 100,
+    slabLiveLoadPerM_Kn: Math.round(slabLiveLoadPerM_Kn * 100) / 100,
+    wallLoadPerM_Kn: Math.round(wallLoadPerM_Kn * 100) / 100,
+    beamSelfWeightPerM_Kn: Math.round(beamSelfWeightPerM_Kn * 100) / 100,
+    totalDeadLoadPerM_Kn: Math.round(totalDeadLoadPerM_Kn * 100) / 100,
+    totalLiveLoadPerM_Kn: Math.round(totalLiveLoadPerM_Kn * 100) / 100,
+    totalServiceLoadPerM_Kn: Math.round(totalServiceLoadPerM_Kn * 100) / 100,
+    factoredLoadWuPerM_Kn: Math.round(factoredLoadWuPerM_Kn * 100) / 100,
+    designBendingMomentMuKnM: Math.round(designBendingMomentMuKnM * 100) / 100,
+    designShearForceVuKn: Math.round(designShearForceVuKn * 100) / 100,
+    requiredEffectiveDepthMm: Math.round(requiredEffectiveDepthMm * 10) / 10,
+    basicLoverD,
+    allowableLoverD,
+    actualLoverD,
+    isDeflectionSafe,
+    bottomMainBarCount,
+    bottomMainBarDiaMm,
+    bottomAstRequiredMm2: Math.round(bottomAstRequiredMm2),
+    bottomAstProvidedMm2,
+    topAnchorBarCount,
+    topAnchorBarDiaMm,
+    topAstProvidedMm2,
+    developmentLengthLdMm,
+    nominalShearStressTauV_Mpa: Math.round(nominalShearStressTauV_Mpa * 100) / 100,
+    designConcreteShearStrengthTauC_Mpa: Math.round(designConcreteShearStrengthTauC_Mpa * 100) / 100,
+    maxShearStressTauCMax_Mpa,
+    stirrupDiaMm,
+    stirrupLegs,
+    stirrupSpacingMm,
+    stirrupsSafe,
+    totalBeamLengthM: Math.round(totalBeamLengthM * 100) / 100,
+    concreteVolumeM3: Math.round(concreteVolumeM3 * 1000) / 1000,
+    concreteVolumeCft: Math.round(concreteVolumeCft * 100) / 100,
+    longitudinalSteelWeightKg: Math.round(longitudinalSteelWeightKg * 10) / 10,
+    stirrupSteelWeightKg: Math.round(stirrupSteelWeightKg * 10) / 10,
+    totalSteelWeightKg,
+    steelDensityKgPerM3,
+    coverBlocksCount,
+    status,
+    notes
+  };
+}
 
 /**
  * Standard practical RCC column sizes in Indian construction practice (mm)
@@ -1309,10 +2022,186 @@ export function calculateBuildingStructuralSummary(
   // Total Reinforcement Steel
   const footingSteelKg = pillarsCalculations.reduce((sum, c) => sum + c.footingSteelKg, 0);
   const columnSteelKg = pillarsCalculations.reduce((sum, c) => sum + c.totalSteelWeightKg, 0);
-  // Beams: ~1.5% steel = 120 kg/m³
-  const beamSteelKg = totalBeamRccM3 * 120;
-  // Slabs: ~0.8% steel = 65 kg/m³
-  const slabSteelKg = totalSlabRccM3 * 65;
+
+  // Floor-wise Structural Analysis & Reinforcement Schedules (IS 456:2000 & IS 875)
+  const floorSlabCalculations: FloorSlabStructuralCalculation[] = [];
+  const floorBeamCalculations: FloorBeamStructuralCalculation[] = [];
+
+  const effectiveFloorsList = (Array.isArray(floorsData) && floorsData.length > 0)
+    ? (floorsData as any[])
+    : Array.from({ length: numFloors }).map((_, fIdx) => ({
+        id: `floor-${fIdx}`,
+        level: fIdx,
+        name: fIdx === 0 ? 'Ground Floor' : `Floor ${fIdx}`,
+        height: floorHeightsM ? (floorHeightsM[fIdx] ? floorHeightsM[fIdx] / 0.3048 : 10) : 10,
+        unit: 'ft'
+      }));
+
+  effectiveFloorsList.forEach((fl, fIdx) => {
+    const isTopStorey = fIdx === effectiveFloorsList.length - 1;
+    const floorId = fl.id || `floor-${fIdx}`;
+    const floorName = fl.name || (fIdx === 0 ? 'Ground Floor' : `Floor ${fIdx}`);
+    const flOverrides = config.floorOverrides?.[floorId];
+
+    // Compute maximum frame span on this floor
+    const flBeams: any[] = fl.detectedBeams || fl.structuralBeams || [];
+    let maxSpanM = 3.96; // default ~13 ft
+    if (flBeams.length > 0) {
+      const beamLens = flBeams.map((b: any) => toMeters(b.length, b.unit || 'ft'));
+      maxSpanM = Math.max(...beamLens, 2.5);
+    } else {
+      const sameFlPillars = pillars.filter(p => p.floorId === floorId || (!p.floorId && fIdx === 0));
+      if (sameFlPillars.length >= 2) {
+        let maxPairDist = 0;
+        for (let i = 0; i < sameFlPillars.length; i++) {
+          for (let j = i + 1; j < sameFlPillars.length; j++) {
+            const pi = sameFlPillars[i];
+            const pj = sameFlPillars[j];
+            const xi = toMeters(pi.position?.x ?? pi.x ?? 0, 'ft');
+            const yi = toMeters(pi.position?.y ?? pi.y ?? 0, 'ft');
+            const xj = toMeters(pj.position?.x ?? pj.x ?? 0, 'ft');
+            const yj = toMeters(pj.position?.y ?? pj.y ?? 0, 'ft');
+            const dist = Math.hypot(xj - xi, yj - yi);
+            if (dist > 1.5 && dist < 8.0 && dist > maxPairDist) {
+              maxPairDist = dist;
+            }
+          }
+        }
+        if (maxPairDist > 0) maxSpanM = maxPairDist;
+      } else {
+        maxSpanM = Math.min(buildingLengthM, Math.max(3.5, buildingLengthM / 3));
+      }
+    }
+
+    const flSlabAreaM2 = (fl.slab?.length && fl.slab?.width)
+      ? (toMeters(fl.slab.length, 'ft') * toMeters(fl.slab.width, 'ft'))
+      : singleFloorAreaM2;
+
+    const customSlabThickMm = flOverrides?.customSlabThicknessIn
+      ? Math.round(flOverrides.customSlabThicknessIn * 25.4)
+      : (fl.slab?.isCustomSize && fl.slab?.thickness !== undefined
+          ? Math.round(toMeters(fl.slab.thickness, fl.slab.thicknessUnit || 'in') * 1000)
+          : (config.slabSizingMode === 'custom' && config.customSlabThicknessIn ? Math.round(config.customSlabThicknessIn * 25.4) : undefined));
+
+    const slabCalc = calculateFloorSlabStructuralDetails(
+      floorId,
+      fIdx,
+      floorName,
+      false,
+      maxSpanM,
+      maxSpanM * 0.9,
+      flSlabAreaM2,
+      config,
+      {
+        customThicknessMm: customSlabThickMm,
+        isCustomThickness: Boolean(customSlabThickMm)
+      }
+    );
+    floorSlabCalculations.push(slabCalc);
+
+    // Beam calculation for this floor
+    const flWallHeightM = fl.height ? toMeters(fl.height, fl.unit || 'ft') : 3.0;
+    const flWallThickM = 0.23;
+
+    let flBeamLenM = 0;
+    if (flBeams.length > 0) {
+      flBeamLenM = flBeams.reduce((sum: number, b: any) => sum + toMeters(b.length, b.unit || 'ft'), 0);
+    } else {
+      const flWalls: any[] = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+      if (flWalls.length > 0) {
+        flBeamLenM = flWalls.reduce((sum: number, w: any) => {
+          if (w.dimensions?.length) return sum + toMeters(w.dimensions.length, w.dimensions.unit || 'ft');
+          if (w.start && w.end) return sum + toMeters(Math.hypot(w.end.x - w.start.x, w.end.y - w.start.y), 'ft');
+          return sum;
+        }, 0);
+      } else {
+        flBeamLenM = 2 * (buildingLengthM + buildingWidthM);
+      }
+    }
+
+    const customBeamWMm = flOverrides?.customBeamWidthIn
+      ? Math.round(flOverrides.customBeamWidthIn * 25.4)
+      : (fl.ringBeam?.isCustomSize && fl.ringBeam?.width !== undefined
+          ? Math.round(toMeters(fl.ringBeam.width, fl.ringBeam.widthUnit || 'in') * 1000)
+          : undefined);
+
+    const customBeamDMm = flOverrides?.customBeamDepthIn
+      ? Math.round(flOverrides.customBeamDepthIn * 25.4)
+      : (fl.ringBeam?.isCustomSize && fl.ringBeam?.depth !== undefined
+          ? Math.round(toMeters(fl.ringBeam.depth, fl.ringBeam.depthUnit || 'in') * 1000)
+          : undefined);
+
+    const beamCalc = calculateFloorBeamStructuralDetails(
+      floorId,
+      fIdx,
+      floorName,
+      isTopStorey,
+      maxSpanM,
+      flBeamLenM,
+      flWallHeightM,
+      flWallThickM,
+      maxSpanM / 2,
+      slabCalc,
+      config,
+      {
+        customWidthMm: customBeamWMm,
+        customDepthMm: customBeamDMm,
+        isCustomSize: Boolean(customBeamWMm || customBeamDMm)
+      }
+    );
+    floorBeamCalculations.push(beamCalc);
+  });
+
+  // Independent Roof Slab calculation if configured or top roof slab
+  let roofSlabCalculation: FloorSlabStructuralCalculation | undefined = undefined;
+  let roofBeamCalculation: FloorBeamStructuralCalculation | undefined = undefined;
+  if (roofSlabData && roofSlabData.enabled !== false) {
+    const rArea = (roofSlabData.length && roofSlabData.width)
+      ? (toMeters(roofSlabData.length, 'ft') * toMeters(roofSlabData.width, 'ft'))
+      : singleFloorAreaM2;
+    const rThickMm = roofSlabData.thickness !== undefined
+      ? Math.round(toMeters(roofSlabData.thickness, roofSlabData.thicknessUnit || 'in') * 1000)
+      : undefined;
+    const maxRoofSpanM = floorSlabCalculations[0]?.spanLengthM || 3.96;
+    roofSlabCalculation = calculateFloorSlabStructuralDetails(
+      'roof-slab',
+      numFloors,
+      'Roof Slab',
+      true,
+      maxRoofSpanM,
+      maxRoofSpanM * 0.9,
+      rArea,
+      config,
+      {
+        customThicknessMm: rThickMm,
+        isCustomThickness: Boolean(rThickMm)
+      }
+    );
+
+    const roofPerimeterM = 2 * (buildingLengthM + buildingWidthM);
+    roofBeamCalculation = calculateFloorBeamStructuralDetails(
+      'roof-ring-beam',
+      numFloors,
+      'Roof Tie Beam',
+      true,
+      maxRoofSpanM,
+      roofPerimeterM,
+      0.9,
+      0.23,
+      maxRoofSpanM / 2,
+      roofSlabCalculation,
+      config
+    );
+  }
+
+  // Beams: ~1.5% steel = 120 kg/m³ or detailed calculation sum
+  const detailedBeamSteelKg = floorBeamCalculations.reduce((sum, b) => sum + b.totalSteelWeightKg, 0);
+  const beamSteelKg = detailedBeamSteelKg > 0 ? detailedBeamSteelKg : (totalBeamRccM3 * 120);
+
+  // Slabs: ~0.8% steel = 65 kg/m³ or detailed calculation sum
+  const detailedSlabSteelKg = floorSlabCalculations.reduce((sum, s) => sum + s.totalSteelWeightKg, 0) + (roofSlabCalculation?.totalSteelWeightKg || 0);
+  const slabSteelKg = detailedSlabSteelKg > 0 ? detailedSlabSteelKg : (totalSlabRccM3 * 65);
+
   const totalSteelWeightKg = footingSteelKg + columnSteelKg + beamSteelKg + slabSteelKg;
   const totalSteelTonnes = totalSteelWeightKg / 1000;
 
@@ -1466,6 +2355,10 @@ export function calculateBuildingStructuralSummary(
     totalPillarsCount: pillarsCalculations.length,
 
     pillarsCalculations,
+    floorSlabCalculations,
+    floorBeamCalculations,
+    roofSlabCalculation,
+    roofBeamCalculation,
     totalVerticalLoadKn,
     averageLoadPerPillarKn,
     maxLoadPillarId,

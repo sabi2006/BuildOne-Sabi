@@ -8113,6 +8113,705 @@ Please contact me.`;
                                     lineNumber: 1777,
                                     columnNumber: 15
                                 }, this),
+                                (s.floorSlabCalculations && s.floorSlabCalculations.length > 0 || s.roofSlabCalculation) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "bg-slate-900 text-white px-4 py-3 flex items-center justify-between",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-xs font-bold uppercase tracking-wider block",
+                                                            children: "Floor-Wise IS 456 Slabs, Ring Beams & Reinforcement Schedules"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                            lineNumber: 1864,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-[11px] text-slate-300",
+                                                            children: "Engineered slab thickness, beam dimensions, flexural design moments, and steel reinforcement"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                            lineNumber: 1867,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                    lineNumber: 1863,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-xs font-mono font-bold text-emerald-400",
+                                                    children: "IS 456:2000 Compliant"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                    lineNumber: 1871,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                            lineNumber: 1862,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "overflow-x-auto",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                                className: "min-w-full divide-y divide-slate-200 text-xs",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                                        className: "bg-slate-50 text-slate-600 font-semibold uppercase",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-left",
+                                                                    children: "Level / Element"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1879,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-left",
+                                                                    children: "Slab Thickness & Spans"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1880,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-left",
+                                                                    children: "Slab Reinforcement"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1881,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-left",
+                                                                    children: "RCC Ring Beam Cross-Section"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1882,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-left",
+                                                                    children: "Beam Longitudinal & Stirrup Steel"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1883,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    className: "py-2.5 px-3 text-right",
+                                                                    children: "Steel / Conc"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1884,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                            lineNumber: 1878,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                        lineNumber: 1877,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                                        className: "divide-y divide-slate-100 text-slate-700",
+                                                        children: [
+                                                            s.floorSlabCalculations?.map((slab, idx)=>{
+                                                                const beam = s.floorBeamCalculations?.[idx];
+                                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    className: "hover:bg-slate-50/60 transition-colors",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3 font-bold text-slate-900 whitespace-nowrap",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    children: slab.floorName
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1893,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: `text-[9px] font-bold px-1.5 py-0.5 rounded ${slab.isCustomThickness || beam?.isCustomSize ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-800'}`,
+                                                                                    children: slab.isCustomThickness || beam?.isCustomSize ? 'Manual Override' : 'Auto IS 456'
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1894,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1892,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-slate-800",
+                                                                                    children: [
+                                                                                        slab.providedThicknessIn,
+                                                                                        '" (',
+                                                                                        slab.providedThicknessMm,
+                                                                                        " mm)"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1899,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-500 font-mono",
+                                                                                    children: [
+                                                                                        slab.spanWidthM.toFixed(1),
+                                                                                        "m × ",
+                                                                                        slab.spanLengthM.toFixed(1),
+                                                                                        "m (",
+                                                                                        slab.slabType === 'two_way' ? '2-Way' : '1-Way',
+                                                                                        ")"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1900,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[10px] text-slate-400",
+                                                                                    children: [
+                                                                                        "Mu: ",
+                                                                                        slab.designMomentMuKnM,
+                                                                                        " kNm • L/d: ",
+                                                                                        slab.actualLoverD
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1901,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1898,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-blue-700",
+                                                                                    children: [
+                                                                                        "Main: ⌀",
+                                                                                        slab.mainBarDiaMm,
+                                                                                        "mm @ ",
+                                                                                        slab.mainBarSpacingMm,
+                                                                                        "mm c/c"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1904,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-600",
+                                                                                    children: [
+                                                                                        "Dist: ⌀",
+                                                                                        slab.distBarDiaMm,
+                                                                                        "mm @ ",
+                                                                                        slab.distBarSpacingMm,
+                                                                                        "mm c/c"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1905,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                slab.topSupportBarDiaMm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[10px] text-slate-500",
+                                                                                    children: [
+                                                                                        "Top: ⌀",
+                                                                                        slab.topSupportBarDiaMm,
+                                                                                        "mm @ ",
+                                                                                        slab.topSupportBarSpacingMm,
+                                                                                        "mm"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1907,
+                                                                                    columnNumber: 35
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1903,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: beam ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "font-bold text-slate-800",
+                                                                                        children: [
+                                                                                            beam.beamWidthIn,
+                                                                                            '" × ',
+                                                                                            beam.beamDepthIn,
+                                                                                            '" (',
+                                                                                            beam.beamWidthMm,
+                                                                                            " × ",
+                                                                                            beam.beamDepthMm,
+                                                                                            " mm)"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1913,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[11px] text-slate-500 font-mono",
+                                                                                        children: [
+                                                                                            "Span: ",
+                                                                                            beam.effectiveSpanM,
+                                                                                            "m • Wu: ",
+                                                                                            beam.factoredLoadWuPerM_Kn,
+                                                                                            " kN/m"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1914,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[10px] text-slate-400",
+                                                                                        children: [
+                                                                                            "Mu: ",
+                                                                                            beam.designBendingMomentMuKnM,
+                                                                                            " kNm • Vu: ",
+                                                                                            beam.designShearForceVuKn,
+                                                                                            " kN"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1915,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1912,
+                                                                                columnNumber: 35
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-slate-400",
+                                                                                children: "-"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1917,
+                                                                                columnNumber: 37
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1910,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: beam ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "font-bold text-indigo-700",
+                                                                                        children: [
+                                                                                            "Bot: ",
+                                                                                            beam.bottomMainBarCount,
+                                                                                            "-⌀",
+                                                                                            beam.bottomMainBarDiaMm,
+                                                                                            "mm • Top: ",
+                                                                                            beam.topAnchorBarCount,
+                                                                                            "-⌀",
+                                                                                            beam.topAnchorBarDiaMm,
+                                                                                            "mm"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1922,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[11px] text-slate-600",
+                                                                                        children: [
+                                                                                            "Stirrups: 2L-⌀",
+                                                                                            beam.stirrupDiaMm,
+                                                                                            "mm @ ",
+                                                                                            beam.stirrupSpacingMm,
+                                                                                            "mm c/c"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1923,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[10px] text-slate-500 font-mono",
+                                                                                        children: [
+                                                                                            "Dev Length Ld: ",
+                                                                                            beam.developmentLengthLdMm,
+                                                                                            "mm"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1924,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1921,
+                                                                                columnNumber: 35
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-slate-400",
+                                                                                children: "-"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1926,
+                                                                                columnNumber: 37
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1919,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3 text-right whitespace-nowrap",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-emerald-700",
+                                                                                    children: [
+                                                                                        Math.round((slab.totalSteelWeightKg || 0) + (beam?.totalSteelWeightKg || 0)).toLocaleString('en-IN'),
+                                                                                        " kg"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1929,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-500",
+                                                                                    children: [
+                                                                                        ((slab.concreteVolumeM3 || 0) + (beam?.concreteVolumeM3 || 0)).toFixed(2),
+                                                                                        " m³"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1930,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1928,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    ]
+                                                                }, slab.floorId || idx, true, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1891,
+                                                                    columnNumber: 29
+                                                                }, this);
+                                                            }),
+                                                            s.roofSlabCalculation && (()=>{
+                                                                const slab = s.roofSlabCalculation;
+                                                                const beam = s.roofBeamCalculation;
+                                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    className: "bg-orange-50/40 hover:bg-orange-50/70 transition-colors",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3 font-bold text-orange-950 whitespace-nowrap",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    children: "Roof Slab & Terrace"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1943,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-900 border border-orange-200",
+                                                                                    children: "Top Roof Level"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1944,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1942,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-slate-800",
+                                                                                    children: [
+                                                                                        slab.providedThicknessIn,
+                                                                                        '" (',
+                                                                                        slab.providedThicknessMm,
+                                                                                        " mm)"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1949,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-500 font-mono",
+                                                                                    children: [
+                                                                                        "LL: ",
+                                                                                        slab.liveLoadKnM2,
+                                                                                        " kN/m² • Weathering: ",
+                                                                                        bConfig.roofConfig.weatheringCourseThicknessMm || 75,
+                                                                                        "mm"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1950,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                slab.waterTankCapacityLitres && slab.waterTankCapacityLitres > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[10px] text-amber-800 font-bold",
+                                                                                    children: [
+                                                                                        "Tank: ",
+                                                                                        slab.waterTankCapacityLitres,
+                                                                                        "L (",
+                                                                                        slab.waterTankLoadKn || 12.3,
+                                                                                        " kN)"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1952,
+                                                                                    columnNumber: 35
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1948,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-orange-700",
+                                                                                    children: [
+                                                                                        "Main: ⌀",
+                                                                                        slab.mainBarDiaMm,
+                                                                                        "mm @ ",
+                                                                                        slab.mainBarSpacingMm,
+                                                                                        "mm c/c"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1956,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-600",
+                                                                                    children: [
+                                                                                        "Dist: ⌀",
+                                                                                        slab.distBarDiaMm,
+                                                                                        "mm @ ",
+                                                                                        slab.distBarSpacingMm,
+                                                                                        "mm c/c"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1957,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1955,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: beam ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "font-bold text-slate-800",
+                                                                                        children: [
+                                                                                            beam.beamWidthIn,
+                                                                                            '" × ',
+                                                                                            beam.beamDepthIn,
+                                                                                            '" (',
+                                                                                            beam.beamWidthMm,
+                                                                                            " × ",
+                                                                                            beam.beamDepthMm,
+                                                                                            " mm)"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1962,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[11px] text-slate-500 font-mono",
+                                                                                        children: [
+                                                                                            "Roof Tie Ring Beam • Span: ",
+                                                                                            beam.effectiveSpanM,
+                                                                                            "m"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1963,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1961,
+                                                                                columnNumber: 35
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-slate-400",
+                                                                                children: "-"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1965,
+                                                                                columnNumber: 37
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1959,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3",
+                                                                            children: beam ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "font-bold text-indigo-700",
+                                                                                        children: [
+                                                                                            "Bot: ",
+                                                                                            beam.bottomMainBarCount,
+                                                                                            "-⌀",
+                                                                                            beam.bottomMainBarDiaMm,
+                                                                                            "mm • Top: ",
+                                                                                            beam.topAnchorBarCount,
+                                                                                            "-⌀",
+                                                                                            beam.topAnchorBarDiaMm,
+                                                                                            "mm"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1970,
+                                                                                        columnNumber: 37
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[11px] text-slate-600",
+                                                                                        children: [
+                                                                                            "Stirrups: 2L-⌀",
+                                                                                            beam.stirrupDiaMm,
+                                                                                            "mm @ ",
+                                                                                            beam.stirrupSpacingMm,
+                                                                                            "mm c/c"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                        lineNumber: 1971,
+                                                                                        columnNumber: 37
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1969,
+                                                                                columnNumber: 35
+                                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "text-slate-400",
+                                                                                children: "-"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                lineNumber: 1973,
+                                                                                columnNumber: 37
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1967,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "py-2.5 px-3 text-right whitespace-nowrap",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "font-bold text-emerald-700",
+                                                                                    children: [
+                                                                                        Math.round((slab.totalSteelWeightKg || 0) + (beam?.totalSteelWeightKg || 0)).toLocaleString('en-IN'),
+                                                                                        " kg"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1976,
+                                                                                    columnNumber: 33
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "text-[11px] text-slate-500",
+                                                                                    children: [
+                                                                                        ((slab.concreteVolumeM3 || 0) + (beam?.concreteVolumeM3 || 0)).toFixed(2),
+                                                                                        " m³"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                                    lineNumber: 1977,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                            lineNumber: 1975,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                                    lineNumber: 1941,
+                                                                    columnNumber: 29
+                                                                }, this);
+                                                            })()
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                        lineNumber: 1887,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                                lineNumber: 1876,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                            lineNumber: 1875,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
+                                    lineNumber: 1861,
+                                    columnNumber: 17
+                                }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "bg-amber-50/80 border border-amber-300 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4",
                                     children: [
@@ -8127,7 +8826,7 @@ Please contact me.`;
                                                             children: "Fine Aggregate Specification:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1863,
+                                                            lineNumber: 1992,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8135,13 +8834,13 @@ Please contact me.`;
                                                             children: bConfig.fineAggregateType === 'm_sand' ? 'M-Sand (Manufactured Sand)' : 'River Sand (Natural Dredged)'
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1864,
+                                                            lineNumber: 1993,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1862,
+                                                    lineNumber: 1991,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8155,7 +8854,7 @@ Please contact me.`;
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1869,
+                                                            lineNumber: 1998,
                                                             columnNumber: 118
                                                         }, this),
                                                         ". Rate: ₹",
@@ -8164,13 +8863,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1868,
+                                                    lineNumber: 1997,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1861,
+                                            lineNumber: 1990,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8181,7 +8880,7 @@ Please contact me.`;
                                                     children: "Total Sand Expenditure"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1874,
+                                                    lineNumber: 2003,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8192,19 +8891,19 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1875,
+                                                    lineNumber: 2004,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1873,
+                                            lineNumber: 2002,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 1860,
+                                    lineNumber: 1989,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8218,7 +8917,7 @@ Please contact me.`;
                                                     children: "Full Construction Cost Takeoff (IS 456 Structural Schedule)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1884,
+                                                    lineNumber: 2013,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8232,13 +8931,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1887,
+                                                    lineNumber: 2016,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1883,
+                                            lineNumber: 2012,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
@@ -8253,7 +8952,7 @@ Please contact me.`;
                                                                 children: "Trade / Construction Scope"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 1894,
+                                                                lineNumber: 2023,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -8261,7 +8960,7 @@ Please contact me.`;
                                                                 children: "Materials (₹)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 1895,
+                                                                lineNumber: 2024,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -8269,7 +8968,7 @@ Please contact me.`;
                                                                 children: "Labour & Formwork (₹)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 1896,
+                                                                lineNumber: 2025,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -8277,18 +8976,18 @@ Please contact me.`;
                                                                 children: "Scope Total (₹)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 1897,
+                                                                lineNumber: 2026,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 1893,
+                                                        lineNumber: 2022,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1892,
+                                                    lineNumber: 2021,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -8301,7 +9000,7 @@ Please contact me.`;
                                                                     children: "1. Substructure (Excavation, PCC, RCC Footings & Rebar)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1902,
+                                                                    lineNumber: 2031,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8312,7 +9011,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1903,
+                                                                    lineNumber: 2032,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8323,7 +9022,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1904,
+                                                                    lineNumber: 2033,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8334,13 +9033,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1905,
+                                                                    lineNumber: 2034,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1901,
+                                                            lineNumber: 2030,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8350,7 +9049,7 @@ Please contact me.`;
                                                                     children: "2. RCC Columns / Pillars (IS 456 Sized Sections)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1908,
+                                                                    lineNumber: 2037,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8361,7 +9060,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1909,
+                                                                    lineNumber: 2038,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8372,7 +9071,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1910,
+                                                                    lineNumber: 2039,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8383,13 +9082,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1911,
+                                                                    lineNumber: 2040,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1907,
+                                                            lineNumber: 2036,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8399,7 +9098,7 @@ Please contact me.`;
                                                                     children: "3. RCC Plinth Beams & Ring Beams"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1914,
+                                                                    lineNumber: 2043,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8410,7 +9109,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1915,
+                                                                    lineNumber: 2044,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8421,7 +9120,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1916,
+                                                                    lineNumber: 2045,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8432,13 +9131,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1917,
+                                                                    lineNumber: 2046,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1913,
+                                                            lineNumber: 2042,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8448,7 +9147,7 @@ Please contact me.`;
                                                                     children: "4. RCC Floor & Roof Slabs"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1920,
+                                                                    lineNumber: 2049,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8459,7 +9158,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1921,
+                                                                    lineNumber: 2050,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8470,7 +9169,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1922,
+                                                                    lineNumber: 2051,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8481,13 +9180,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1923,
+                                                                    lineNumber: 2052,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1919,
+                                                            lineNumber: 2048,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8501,7 +9200,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1926,
+                                                                    lineNumber: 2055,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8512,7 +9211,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1927,
+                                                                    lineNumber: 2056,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8523,7 +9222,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1928,
+                                                                    lineNumber: 2057,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8534,13 +9233,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1929,
+                                                                    lineNumber: 2058,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1925,
+                                                            lineNumber: 2054,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8550,7 +9249,7 @@ Please contact me.`;
                                                                     children: "6. Wall & Ceiling Plastering"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1932,
+                                                                    lineNumber: 2061,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8561,7 +9260,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1933,
+                                                                    lineNumber: 2062,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8572,7 +9271,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1934,
+                                                                    lineNumber: 2063,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8583,13 +9282,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1935,
+                                                                    lineNumber: 2064,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1931,
+                                                            lineNumber: 2060,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8599,7 +9298,7 @@ Please contact me.`;
                                                                     children: "7. Architectural Finishes (Flooring & Painting)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1938,
+                                                                    lineNumber: 2067,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8610,7 +9309,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1939,
+                                                                    lineNumber: 2068,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8621,7 +9320,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1940,
+                                                                    lineNumber: 2069,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8632,13 +9331,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1941,
+                                                                    lineNumber: 2070,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1937,
+                                                            lineNumber: 2066,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8649,7 +9348,7 @@ Please contact me.`;
                                                                     children: "Direct Construction Cost Subtotal"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1944,
+                                                                    lineNumber: 2073,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8658,7 +9357,7 @@ Please contact me.`;
                                                                     children: "All Trades Combined"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1945,
+                                                                    lineNumber: 2074,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8669,13 +9368,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1946,
+                                                                    lineNumber: 2075,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1943,
+                                                            lineNumber: 2072,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8686,7 +9385,7 @@ Please contact me.`;
                                                                     children: "+ Material Wastage Allowance (5%)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1949,
+                                                                    lineNumber: 2078,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8695,7 +9394,7 @@ Please contact me.`;
                                                                     children: "Bricks, Cement, Rebar Off-cuts"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1950,
+                                                                    lineNumber: 2079,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8706,13 +9405,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1951,
+                                                                    lineNumber: 2080,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1948,
+                                                            lineNumber: 2077,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8723,7 +9422,7 @@ Please contact me.`;
                                                                     children: "+ Contractor Overheads (5%)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1954,
+                                                                    lineNumber: 2083,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8732,7 +9431,7 @@ Please contact me.`;
                                                                     children: "Site supervision, tools, safety"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1955,
+                                                                    lineNumber: 2084,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8743,13 +9442,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1956,
+                                                                    lineNumber: 2085,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1953,
+                                                            lineNumber: 2082,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8760,7 +9459,7 @@ Please contact me.`;
                                                                     children: "+ Construction Contingency (5%)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1959,
+                                                                    lineNumber: 2088,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8769,7 +9468,7 @@ Please contact me.`;
                                                                     children: "Unforeseen site conditions"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1960,
+                                                                    lineNumber: 2089,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8780,13 +9479,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1961,
+                                                                    lineNumber: 2090,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1958,
+                                                            lineNumber: 2087,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8797,7 +9496,7 @@ Please contact me.`;
                                                                     children: "+ Statutory GST (18%)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1964,
+                                                                    lineNumber: 2093,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8806,7 +9505,7 @@ Please contact me.`;
                                                                     children: "Works Contract GST Rate"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1965,
+                                                                    lineNumber: 2094,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8817,13 +9516,13 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1966,
+                                                                    lineNumber: 2095,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1963,
+                                                            lineNumber: 2092,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -8834,7 +9533,7 @@ Please contact me.`;
                                                                     children: "Grand Total Construction Estimate"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1969,
+                                                                    lineNumber: 2098,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8847,7 +9546,7 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1970,
+                                                                    lineNumber: 2099,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -8858,31 +9557,31 @@ Please contact me.`;
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 1973,
+                                                                    lineNumber: 2102,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 1968,
+                                                            lineNumber: 2097,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1900,
+                                                    lineNumber: 2029,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1891,
+                                            lineNumber: 2020,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 1882,
+                                    lineNumber: 2011,
                                     columnNumber: 15
                                 }, this)
                             ]
@@ -8916,14 +9615,14 @@ Please contact me.`;
                                                     children: "🏗️"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 1994,
+                                                    lineNumber: 2123,
                                                     columnNumber: 19
                                                 }, this),
                                                 " Live RCC Structural Construction Estimate"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1993,
+                                            lineNumber: 2122,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8931,13 +9630,13 @@ Please contact me.`;
                                             children: "Reinforced Concrete model-driven estimation for Pillars, Ring Beams, and Full RCC Top across all floors."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 1996,
+                                            lineNumber: 2125,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 1992,
+                                    lineNumber: 2121,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8953,7 +9652,7 @@ Please contact me.`;
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2001,
+                                            lineNumber: 2130,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8964,19 +9663,19 @@ Please contact me.`;
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2004,
+                                            lineNumber: 2133,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2000,
+                                    lineNumber: 2129,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 1991,
+                            lineNumber: 2120,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8992,7 +9691,7 @@ Please contact me.`;
                                                     children: "🏢 Floor-by-Floor RCC Breakdown"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2014,
+                                                    lineNumber: 2143,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9006,13 +9705,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2015,
+                                                    lineNumber: 2144,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2013,
+                                            lineNumber: 2142,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9031,7 +9730,7 @@ Please contact me.`;
                                                                             children: fl.floorName
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2023,
+                                                                            lineNumber: 2152,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9042,13 +9741,13 @@ Please contact me.`;
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2024,
+                                                                            lineNumber: 2153,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2022,
+                                                                    lineNumber: 2151,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9065,13 +9764,13 @@ Please contact me.`;
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2027,
+                                                                                    lineNumber: 2156,
                                                                                     columnNumber: 82
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2027,
+                                                                            lineNumber: 2156,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9085,13 +9784,13 @@ Please contact me.`;
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2028,
+                                                                                    lineNumber: 2157,
                                                                                     columnNumber: 79
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2028,
+                                                                            lineNumber: 2157,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9102,19 +9801,19 @@ Please contact me.`;
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2029,
+                                                                            lineNumber: 2158,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2026,
+                                                                    lineNumber: 2155,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2021,
+                                                            lineNumber: 2150,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9136,14 +9835,14 @@ Please contact me.`;
                                                                                                     children: "🏛️"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2040,
+                                                                                                    lineNumber: 2169,
                                                                                                     columnNumber: 33
                                                                                                 }, this),
                                                                                                 " Pillars / Columns"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2039,
+                                                                                            lineNumber: 2168,
                                                                                             columnNumber: 31
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9154,13 +9853,13 @@ Please contact me.`;
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2042,
+                                                                                            lineNumber: 2171,
                                                                                             columnNumber: 31
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2038,
+                                                                                    lineNumber: 2167,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 fl.elements.pillars.count > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9173,7 +9872,7 @@ Please contact me.`;
                                                                                                     children: "Concrete:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2048,
+                                                                                                    lineNumber: 2177,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9185,13 +9884,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2048,
+                                                                                                    lineNumber: 2177,
                                                                                                     columnNumber: 94
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2048,
+                                                                                            lineNumber: 2177,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9201,7 +9900,7 @@ Please contact me.`;
                                                                                                     children: "Steel:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2049,
+                                                                                                    lineNumber: 2178,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9213,13 +9912,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2049,
+                                                                                                    lineNumber: 2178,
                                                                                                     columnNumber: 91
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2049,
+                                                                                            lineNumber: 2178,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9229,7 +9928,7 @@ Please contact me.`;
                                                                                                     children: "Cement:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2050,
+                                                                                                    lineNumber: 2179,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9241,13 +9940,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2050,
+                                                                                                    lineNumber: 2179,
                                                                                                     columnNumber: 92
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2050,
+                                                                                            lineNumber: 2179,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9257,7 +9956,7 @@ Please contact me.`;
                                                                                                     children: "Element Cost:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2052,
+                                                                                                    lineNumber: 2181,
                                                                                                     columnNumber: 35
                                                                                                 }, this),
                                                                                                 " ",
@@ -9268,32 +9967,32 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2052,
+                                                                                                    lineNumber: 2181,
                                                                                                     columnNumber: 62
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2051,
+                                                                                            lineNumber: 2180,
                                                                                             columnNumber: 33
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2047,
+                                                                                    lineNumber: 2176,
                                                                                     columnNumber: 31
                                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                                     className: "text-[11px] italic mt-2",
                                                                                     children: "No active columns on this floor"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2056,
+                                                                                    lineNumber: 2185,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2037,
+                                                                            lineNumber: 2166,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9309,14 +10008,14 @@ Please contact me.`;
                                                                                                     children: "📏"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2064,
+                                                                                                    lineNumber: 2193,
                                                                                                     columnNumber: 33
                                                                                                 }, this),
                                                                                                 " RCC Ring Beam"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2063,
+                                                                                            lineNumber: 2192,
                                                                                             columnNumber: 31
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9324,13 +10023,13 @@ Please contact me.`;
                                                                                             children: fl.elements.ringBeams.concreteVolumeM3 > 0 ? 'Active' : 'Suppressed'
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2066,
+                                                                                            lineNumber: 2195,
                                                                                             columnNumber: 31
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2062,
+                                                                                    lineNumber: 2191,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 fl.elements.ringBeams.concreteVolumeM3 > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9343,7 +10042,7 @@ Please contact me.`;
                                                                                                     children: "Concrete:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2072,
+                                                                                                    lineNumber: 2201,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9355,13 +10054,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2072,
+                                                                                                    lineNumber: 2201,
                                                                                                     columnNumber: 94
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2072,
+                                                                                            lineNumber: 2201,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9371,7 +10070,7 @@ Please contact me.`;
                                                                                                     children: "Steel:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2073,
+                                                                                                    lineNumber: 2202,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9383,13 +10082,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2073,
+                                                                                                    lineNumber: 2202,
                                                                                                     columnNumber: 91
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2073,
+                                                                                            lineNumber: 2202,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9399,7 +10098,7 @@ Please contact me.`;
                                                                                                     children: "Cement:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2074,
+                                                                                                    lineNumber: 2203,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9411,13 +10110,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2074,
+                                                                                                    lineNumber: 2203,
                                                                                                     columnNumber: 92
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2074,
+                                                                                            lineNumber: 2203,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9427,7 +10126,7 @@ Please contact me.`;
                                                                                                     children: "Element Cost:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2076,
+                                                                                                    lineNumber: 2205,
                                                                                                     columnNumber: 35
                                                                                                 }, this),
                                                                                                 " ",
@@ -9438,32 +10137,32 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2076,
+                                                                                                    lineNumber: 2205,
                                                                                                     columnNumber: 62
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2075,
+                                                                                            lineNumber: 2204,
                                                                                             columnNumber: 33
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2071,
+                                                                                    lineNumber: 2200,
                                                                                     columnNumber: 31
                                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                                     className: "text-[11px] italic mt-2",
                                                                                     children: "Mode suppressed or not configured"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2080,
+                                                                                    lineNumber: 2209,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2061,
+                                                                            lineNumber: 2190,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9479,14 +10178,14 @@ Please contact me.`;
                                                                                                     children: "🛡️"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2088,
+                                                                                                    lineNumber: 2217,
                                                                                                     columnNumber: 33
                                                                                                 }, this),
                                                                                                 " Full RCC Top / Roof"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2087,
+                                                                                            lineNumber: 2216,
                                                                                             columnNumber: 31
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9494,13 +10193,13 @@ Please contact me.`;
                                                                                             children: fl.elements.fullRccTop.count > 0 ? `${fl.elements.fullRccTop.count} Closed Bays` : 'OFF'
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2090,
+                                                                                            lineNumber: 2219,
                                                                                             columnNumber: 31
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2086,
+                                                                                    lineNumber: 2215,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 fl.elements.fullRccTop.count > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9513,7 +10212,7 @@ Please contact me.`;
                                                                                                     children: "Concrete:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2096,
+                                                                                                    lineNumber: 2225,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9525,13 +10224,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2096,
+                                                                                                    lineNumber: 2225,
                                                                                                     columnNumber: 94
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2096,
+                                                                                            lineNumber: 2225,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9541,7 +10240,7 @@ Please contact me.`;
                                                                                                     children: "Steel:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2097,
+                                                                                                    lineNumber: 2226,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9553,13 +10252,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2097,
+                                                                                                    lineNumber: 2226,
                                                                                                     columnNumber: 91
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2097,
+                                                                                            lineNumber: 2226,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9569,7 +10268,7 @@ Please contact me.`;
                                                                                                     children: "Cement:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2098,
+                                                                                                    lineNumber: 2227,
                                                                                                     columnNumber: 71
                                                                                                 }, this),
                                                                                                 " ",
@@ -9581,13 +10280,13 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2098,
+                                                                                                    lineNumber: 2227,
                                                                                                     columnNumber: 92
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2098,
+                                                                                            lineNumber: 2227,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9597,7 +10296,7 @@ Please contact me.`;
                                                                                                     children: "Element Cost:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2100,
+                                                                                                    lineNumber: 2229,
                                                                                                     columnNumber: 35
                                                                                                 }, this),
                                                                                                 " ",
@@ -9608,38 +10307,38 @@ Please contact me.`;
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                                    lineNumber: 2100,
+                                                                                                    lineNumber: 2229,
                                                                                                     columnNumber: 62
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                            lineNumber: 2099,
+                                                                                            lineNumber: 2228,
                                                                                             columnNumber: 33
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2095,
+                                                                                    lineNumber: 2224,
                                                                                     columnNumber: 31
                                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                                     className: "text-[11px] italic mt-2",
                                                                                     children: "No closed pillar bays detected"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                    lineNumber: 2104,
+                                                                                    lineNumber: 2233,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2085,
+                                                                            lineNumber: 2214,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2035,
+                                                                    lineNumber: 2164,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9655,7 +10354,7 @@ Please contact me.`;
                                                                                         children: "Cement"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2113,
+                                                                                        lineNumber: 2242,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9666,13 +10365,13 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2114,
+                                                                                        lineNumber: 2243,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2112,
+                                                                                lineNumber: 2241,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9683,7 +10382,7 @@ Please contact me.`;
                                                                                         children: bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2117,
+                                                                                        lineNumber: 2246,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9694,13 +10393,13 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2118,
+                                                                                        lineNumber: 2247,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2116,
+                                                                                lineNumber: 2245,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9711,7 +10410,7 @@ Please contact me.`;
                                                                                         children: "20mm Jalli"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2121,
+                                                                                        lineNumber: 2250,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9722,13 +10421,13 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2122,
+                                                                                        lineNumber: 2251,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2120,
+                                                                                lineNumber: 2249,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9739,7 +10438,7 @@ Please contact me.`;
                                                                                         children: "TMT Steel"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2125,
+                                                                                        lineNumber: 2254,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9750,13 +10449,13 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2126,
+                                                                                        lineNumber: 2255,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2124,
+                                                                                lineNumber: 2253,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9767,7 +10466,7 @@ Please contact me.`;
                                                                                         children: "Water"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2129,
+                                                                                        lineNumber: 2258,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9778,13 +10477,13 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2130,
+                                                                                        lineNumber: 2259,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2128,
+                                                                                lineNumber: 2257,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9795,7 +10494,7 @@ Please contact me.`;
                                                                                         children: "Cover Blocks"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2133,
+                                                                                        lineNumber: 2262,
                                                                                         columnNumber: 31
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -9806,47 +10505,47 @@ Please contact me.`;
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                        lineNumber: 2134,
+                                                                                        lineNumber: 2263,
                                                                                         columnNumber: 31
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2132,
+                                                                                lineNumber: 2261,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2111,
+                                                                        lineNumber: 2240,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2110,
+                                                                    lineNumber: 2239,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2033,
+                                                            lineNumber: 2162,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, fl.floorId, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2020,
+                                                    lineNumber: 2149,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2018,
+                                            lineNumber: 2147,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2012,
+                                    lineNumber: 2141,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9860,7 +10559,7 @@ Please contact me.`;
                                                     children: "📊 Total Project RCC Materials & Recommended Purchase"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2147,
+                                                    lineNumber: 2276,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9877,7 +10576,7 @@ Please contact me.`;
                                                                             children: "Material Item"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2152,
+                                                                            lineNumber: 2281,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -9885,7 +10584,7 @@ Please contact me.`;
                                                                             children: "Calculated Quantity"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2153,
+                                                                            lineNumber: 2282,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -9893,7 +10592,7 @@ Please contact me.`;
                                                                             children: "Rec. Purchase"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2154,
+                                                                            lineNumber: 2283,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -9901,7 +10600,7 @@ Please contact me.`;
                                                                             children: "Rate"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2155,
+                                                                            lineNumber: 2284,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -9909,18 +10608,18 @@ Please contact me.`;
                                                                             children: "Amount (₹)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2156,
+                                                                            lineNumber: 2285,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2151,
+                                                                    lineNumber: 2280,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2150,
+                                                                lineNumber: 2279,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -9933,7 +10632,7 @@ Please contact me.`;
                                                                                 children: "Cement (50kg bags)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2161,
+                                                                                lineNumber: 2290,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -9944,7 +10643,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2162,
+                                                                                lineNumber: 2291,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -9955,7 +10654,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2163,
+                                                                                lineNumber: 2292,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -9966,7 +10665,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2164,
+                                                                                lineNumber: 2293,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -9977,13 +10676,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2165,
+                                                                                lineNumber: 2294,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2160,
+                                                                        lineNumber: 2289,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -9996,7 +10695,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2168,
+                                                                                lineNumber: 2297,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10009,7 +10708,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2169,
+                                                                                lineNumber: 2298,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10020,7 +10719,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2170,
+                                                                                lineNumber: 2299,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10032,7 +10731,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2171,
+                                                                                lineNumber: 2300,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10043,13 +10742,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2172,
+                                                                                lineNumber: 2301,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2167,
+                                                                        lineNumber: 2296,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10059,7 +10758,7 @@ Please contact me.`;
                                                                                 children: "20mm Jalli (Coarse Aggregate)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2175,
+                                                                                lineNumber: 2304,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10072,7 +10771,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2176,
+                                                                                lineNumber: 2305,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10083,7 +10782,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2177,
+                                                                                lineNumber: 2306,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10095,7 +10794,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2178,
+                                                                                lineNumber: 2307,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10106,13 +10805,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2179,
+                                                                                lineNumber: 2308,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2174,
+                                                                        lineNumber: 2303,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10122,7 +10821,7 @@ Please contact me.`;
                                                                                 children: "TMT Steel Reinforcement"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2182,
+                                                                                lineNumber: 2311,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10135,7 +10834,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2183,
+                                                                                lineNumber: 2312,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10146,7 +10845,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2184,
+                                                                                lineNumber: 2313,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10158,7 +10857,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2185,
+                                                                                lineNumber: 2314,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10169,13 +10868,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2186,
+                                                                                lineNumber: 2315,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2181,
+                                                                        lineNumber: 2310,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10185,7 +10884,7 @@ Please contact me.`;
                                                                                 children: "Binding Wire"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2189,
+                                                                                lineNumber: 2318,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10196,7 +10895,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2190,
+                                                                                lineNumber: 2319,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10207,7 +10906,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2191,
+                                                                                lineNumber: 2320,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10215,7 +10914,7 @@ Please contact me.`;
                                                                                 children: "₹85 / kg"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2192,
+                                                                                lineNumber: 2321,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10226,13 +10925,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2193,
+                                                                                lineNumber: 2322,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2188,
+                                                                        lineNumber: 2317,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10242,7 +10941,7 @@ Please contact me.`;
                                                                                 children: "Cover Blocks"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2196,
+                                                                                lineNumber: 2325,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10253,7 +10952,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2197,
+                                                                                lineNumber: 2326,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10264,7 +10963,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2198,
+                                                                                lineNumber: 2327,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10272,7 +10971,7 @@ Please contact me.`;
                                                                                 children: "₹3 / piece"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2199,
+                                                                                lineNumber: 2328,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10283,13 +10982,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2200,
+                                                                                lineNumber: 2329,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2195,
+                                                                        lineNumber: 2324,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10299,7 +10998,7 @@ Please contact me.`;
                                                                                 children: "Water (Approx)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2203,
+                                                                                lineNumber: 2332,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10310,7 +11009,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2204,
+                                                                                lineNumber: 2333,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10318,7 +11017,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2205,
+                                                                                lineNumber: 2334,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10326,7 +11025,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2206,
+                                                                                lineNumber: 2335,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10334,13 +11033,13 @@ Please contact me.`;
                                                                                 children: "Site water"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2207,
+                                                                                lineNumber: 2336,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2202,
+                                                                        lineNumber: 2331,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10350,7 +11049,7 @@ Please contact me.`;
                                                                                 children: "RCC Concreting Labour"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2210,
+                                                                                lineNumber: 2339,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10361,7 +11060,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2211,
+                                                                                lineNumber: 2340,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10369,7 +11068,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2212,
+                                                                                lineNumber: 2341,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10381,7 +11080,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2213,
+                                                                                lineNumber: 2342,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10392,13 +11091,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2214,
+                                                                                lineNumber: 2343,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2209,
+                                                                        lineNumber: 2338,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -10410,7 +11109,7 @@ Please contact me.`;
                                                                                 children: "Total Project RCC Cost"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2217,
+                                                                                lineNumber: 2346,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -10421,36 +11120,36 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2218,
+                                                                                lineNumber: 2347,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2216,
+                                                                        lineNumber: 2345,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2159,
+                                                                lineNumber: 2288,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2149,
+                                                        lineNumber: 2278,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2148,
+                                                    lineNumber: 2277,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2146,
+                                            lineNumber: 2275,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10461,7 +11160,7 @@ Please contact me.`;
                                                     children: "⚙️ RCC Calculation Settings"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2227,
+                                                    lineNumber: 2356,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10474,7 +11173,7 @@ Please contact me.`;
                                                                     children: "Concrete Grade / Mix Ratio"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2231,
+                                                                    lineNumber: 2360,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -10487,7 +11186,7 @@ Please contact me.`;
                                                                             children: "M20 (1 : 1.5 : 3 - Standard RCC)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2237,
+                                                                            lineNumber: 2366,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -10495,7 +11194,7 @@ Please contact me.`;
                                                                             children: "M15 (1 : 2 : 4 - Standard RCC)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2238,
+                                                                            lineNumber: 2367,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -10503,7 +11202,7 @@ Please contact me.`;
                                                                             children: "M25 (1 : 1 : 2 - High Strength RCC)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2239,
+                                                                            lineNumber: 2368,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -10511,19 +11210,19 @@ Please contact me.`;
                                                                             children: "Design Mix (M30 / M35 Special)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2240,
+                                                                            lineNumber: 2369,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2232,
+                                                                    lineNumber: 2361,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2230,
+                                                            lineNumber: 2359,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10536,7 +11235,7 @@ Please contact me.`;
                                                                             children: "Jalli (₹ / CFT)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2246,
+                                                                            lineNumber: 2375,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -10546,13 +11245,13 @@ Please contact me.`;
                                                                             className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2247,
+                                                                            lineNumber: 2376,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2245,
+                                                                    lineNumber: 2374,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10562,7 +11261,7 @@ Please contact me.`;
                                                                             children: "Steel (₹ / kg)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2255,
+                                                                            lineNumber: 2384,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -10572,19 +11271,19 @@ Please contact me.`;
                                                                             className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2256,
+                                                                            lineNumber: 2385,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2254,
+                                                                    lineNumber: 2383,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2244,
+                                                            lineNumber: 2373,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10594,7 +11293,7 @@ Please contact me.`;
                                                                     children: "RCC Labour (₹ / m³)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2266,
+                                                                    lineNumber: 2395,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -10604,13 +11303,13 @@ Please contact me.`;
                                                                     className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2267,
+                                                                    lineNumber: 2396,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2265,
+                                                            lineNumber: 2394,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10621,44 +11320,44 @@ Please contact me.`;
                                                                     children: "Engineering Rule:"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2276,
+                                                                    lineNumber: 2405,
                                                                     columnNumber: 26
                                                                 }, this),
                                                                 " Dry volume conversion factor = 1.54. Steel weight formula = D²/162 kg/m. All quantities update live as you edit the 3D model."
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2275,
+                                                            lineNumber: 2404,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2229,
+                                                    lineNumber: 2358,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2226,
+                                            lineNumber: 2355,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2145,
+                                    lineNumber: 2274,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2010,
+                            lineNumber: 2139,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                    lineNumber: 1990,
+                    lineNumber: 2119,
                     columnNumber: 11
                 }, this);
             })(),
@@ -10680,14 +11379,14 @@ Please contact me.`;
                                                     children: "🏛️"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2295,
+                                                    lineNumber: 2424,
                                                     columnNumber: 19
                                                 }, this),
                                                 " Ground Floor Foundation / Base Estimate"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2294,
+                                            lineNumber: 2423,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -10695,13 +11394,13 @@ Please contact me.`;
                                             children: "Layer-by-layer sub-grade estimation: Soil Bed → Excavation → Sand Filling → Plain PCC Base → RCC Footings + Starter Dowels → Plinth/DPC."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2297,
+                                            lineNumber: 2426,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2293,
+                                    lineNumber: 2422,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10715,7 +11414,7 @@ Please contact me.`;
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2302,
+                                            lineNumber: 2431,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10726,19 +11425,19 @@ Please contact me.`;
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2305,
+                                            lineNumber: 2434,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2301,
+                                    lineNumber: 2430,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2292,
+                            lineNumber: 2421,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10755,7 +11454,7 @@ Please contact me.`;
                                                     children: "🚜 Total Excavation"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2315,
+                                                    lineNumber: 2444,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10766,7 +11465,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2316,
+                                                    lineNumber: 2445,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10778,13 +11477,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2317,
+                                                    lineNumber: 2446,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2314,
+                                            lineNumber: 2443,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10795,7 +11494,7 @@ Please contact me.`;
                                                     children: "🏖️ Sand Filling"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2320,
+                                                    lineNumber: 2449,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10806,7 +11505,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2321,
+                                                    lineNumber: 2450,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10818,13 +11517,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2322,
+                                                    lineNumber: 2451,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2319,
+                                            lineNumber: 2448,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10835,7 +11534,7 @@ Please contact me.`;
                                                     children: "🧱 Plain PCC Base"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2325,
+                                                    lineNumber: 2454,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10846,7 +11545,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2326,
+                                                    lineNumber: 2455,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10858,13 +11557,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2327,
+                                                    lineNumber: 2456,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2324,
+                                            lineNumber: 2453,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10875,7 +11574,7 @@ Please contact me.`;
                                                     children: "🏛️ RCC Footing Concrete"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2330,
+                                                    lineNumber: 2459,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10886,7 +11585,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2331,
+                                                    lineNumber: 2460,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10898,13 +11597,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2332,
+                                                    lineNumber: 2461,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2329,
+                                            lineNumber: 2458,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10915,7 +11614,7 @@ Please contact me.`;
                                                     children: "🏛️ Column Stubs"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2335,
+                                                    lineNumber: 2464,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10926,7 +11625,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2336,
+                                                    lineNumber: 2465,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10938,13 +11637,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2337,
+                                                    lineNumber: 2466,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2334,
+                                            lineNumber: 2463,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10955,7 +11654,7 @@ Please contact me.`;
                                                     children: "🔩 TMT Steel (Mesh+Starter)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2340,
+                                                    lineNumber: 2469,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10966,7 +11665,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2341,
+                                                    lineNumber: 2470,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -10978,13 +11677,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2342,
+                                                    lineNumber: 2471,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2339,
+                                            lineNumber: 2468,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10995,7 +11694,7 @@ Please contact me.`;
                                                     children: "🛡️ Plinth / DPC Area"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2345,
+                                                    lineNumber: 2474,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -11006,7 +11705,7 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2346,
+                                                    lineNumber: 2475,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -11018,19 +11717,19 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2347,
+                                                    lineNumber: 2476,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2344,
+                                            lineNumber: 2473,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2313,
+                                    lineNumber: 2442,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -11043,7 +11742,7 @@ Please contact me.`;
                                                     children: "📋 Footing-by-Footing Schedule & Dimensions"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2354,
+                                                    lineNumber: 2483,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -11054,13 +11753,13 @@ Please contact me.`;
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2355,
+                                                    lineNumber: 2484,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2353,
+                                            lineNumber: 2482,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -11077,7 +11776,7 @@ Please contact me.`;
                                                                     children: "Footing / Pillar"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2361,
+                                                                    lineNumber: 2490,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11085,7 +11784,7 @@ Please contact me.`;
                                                                     children: "Excavation (L×W×D)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2362,
+                                                                    lineNumber: 2491,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11093,7 +11792,7 @@ Please contact me.`;
                                                                     children: "Sand Fill Depth"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2363,
+                                                                    lineNumber: 2492,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11101,7 +11800,7 @@ Please contact me.`;
                                                                     children: "PCC Base (L×W×T)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2364,
+                                                                    lineNumber: 2493,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11109,7 +11808,7 @@ Please contact me.`;
                                                                     children: "RCC Footing (L×W×D)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2365,
+                                                                    lineNumber: 2494,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11117,7 +11816,7 @@ Please contact me.`;
                                                                     children: "Column Stub (H×W×D)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2366,
+                                                                    lineNumber: 2495,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11125,7 +11824,7 @@ Please contact me.`;
                                                                     children: "Steel Mesh + Starter"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2367,
+                                                                    lineNumber: 2496,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11133,18 +11832,18 @@ Please contact me.`;
                                                                     children: "Unit Total Cost"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2368,
+                                                                    lineNumber: 2497,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2360,
+                                                            lineNumber: 2489,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2359,
+                                                        lineNumber: 2488,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -11157,7 +11856,7 @@ Please contact me.`;
                                                                         children: item.pillarName ? `${item.pillarName} Footing` : item.footingId
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2374,
+                                                                        lineNumber: 2503,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11168,7 +11867,7 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2377,
+                                                                        lineNumber: 2506,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11179,7 +11878,7 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2380,
+                                                                        lineNumber: 2509,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11192,7 +11891,7 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2383,
+                                                                        lineNumber: 2512,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11205,7 +11904,7 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2386,
+                                                                        lineNumber: 2515,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11225,13 +11924,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2391,
+                                                                                lineNumber: 2520,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2389,
+                                                                        lineNumber: 2518,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11242,7 +11941,7 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2393,
+                                                                        lineNumber: 2522,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11253,35 +11952,35 @@ Please contact me.`;
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2396,
+                                                                        lineNumber: 2525,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, item.footingId, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2373,
+                                                                lineNumber: 2502,
                                                                 columnNumber: 25
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2371,
+                                                        lineNumber: 2500,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2358,
+                                                lineNumber: 2487,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2357,
+                                            lineNumber: 2486,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2352,
+                                    lineNumber: 2481,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -11295,7 +11994,7 @@ Please contact me.`;
                                                     children: "📊 Total Foundation Materials & Recommended Purchase"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2409,
+                                                    lineNumber: 2538,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -11312,7 +12011,7 @@ Please contact me.`;
                                                                             children: "Material / Operation Item"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2414,
+                                                                            lineNumber: 2543,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11320,7 +12019,7 @@ Please contact me.`;
                                                                             children: "Calculated Quantity"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2415,
+                                                                            lineNumber: 2544,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11328,7 +12027,7 @@ Please contact me.`;
                                                                             children: "Rec. Purchase"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2416,
+                                                                            lineNumber: 2545,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11336,7 +12035,7 @@ Please contact me.`;
                                                                             children: "Rate"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2417,
+                                                                            lineNumber: 2546,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -11344,18 +12043,18 @@ Please contact me.`;
                                                                             children: "Amount (₹)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2418,
+                                                                            lineNumber: 2547,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2413,
+                                                                    lineNumber: 2542,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2412,
+                                                                lineNumber: 2541,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -11368,7 +12067,7 @@ Please contact me.`;
                                                                                 children: "Earth Excavation (Pit digging)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2423,
+                                                                                lineNumber: 2552,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11381,7 +12080,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2424,
+                                                                                lineNumber: 2553,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11389,7 +12088,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2425,
+                                                                                lineNumber: 2554,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11401,7 +12100,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2426,
+                                                                                lineNumber: 2555,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11412,13 +12111,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2427,
+                                                                                lineNumber: 2556,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2422,
+                                                                        lineNumber: 2551,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11428,7 +12127,7 @@ Please contact me.`;
                                                                                 children: "Sand Filling (Base bed compaction)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2430,
+                                                                                lineNumber: 2559,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11439,7 +12138,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2431,
+                                                                                lineNumber: 2560,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11450,7 +12149,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2432,
+                                                                                lineNumber: 2561,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11462,7 +12161,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2433,
+                                                                                lineNumber: 2562,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11473,13 +12172,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2434,
+                                                                                lineNumber: 2563,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2429,
+                                                                        lineNumber: 2558,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11489,7 +12188,7 @@ Please contact me.`;
                                                                                 children: "PCC Base Lean Concrete (1:4:8 / 1:3:6)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2437,
+                                                                                lineNumber: 2566,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11500,7 +12199,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2438,
+                                                                                lineNumber: 2567,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11508,7 +12207,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2439,
+                                                                                lineNumber: 2568,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11520,7 +12219,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2440,
+                                                                                lineNumber: 2569,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11531,13 +12230,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2441,
+                                                                                lineNumber: 2570,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2436,
+                                                                        lineNumber: 2565,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11547,7 +12246,7 @@ Please contact me.`;
                                                                                 children: "RCC Footing Concreting Labour"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2444,
+                                                                                lineNumber: 2573,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11558,7 +12257,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2445,
+                                                                                lineNumber: 2574,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11566,7 +12265,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2446,
+                                                                                lineNumber: 2575,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11578,7 +12277,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2447,
+                                                                                lineNumber: 2576,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11589,13 +12288,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2448,
+                                                                                lineNumber: 2577,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2443,
+                                                                        lineNumber: 2572,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     fnd.totalStubVolumeM3 && fnd.totalStubVolumeM3 > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11605,7 +12304,7 @@ Please contact me.`;
                                                                                 children: "RCC Column Stub Concreting Labour"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2452,
+                                                                                lineNumber: 2581,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11618,7 +12317,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2453,
+                                                                                lineNumber: 2582,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11626,7 +12325,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2454,
+                                                                                lineNumber: 2583,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11638,7 +12337,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2455,
+                                                                                lineNumber: 2584,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11649,13 +12348,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2456,
+                                                                                lineNumber: 2585,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2451,
+                                                                        lineNumber: 2580,
                                                                         columnNumber: 27
                                                                     }, this) : null,
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11665,7 +12364,7 @@ Please contact me.`;
                                                                                 children: "Cement (PCC + Footings + Stubs)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2460,
+                                                                                lineNumber: 2589,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11676,7 +12375,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2461,
+                                                                                lineNumber: 2590,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11687,7 +12386,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2462,
+                                                                                lineNumber: 2591,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11698,7 +12397,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2463,
+                                                                                lineNumber: 2592,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11709,13 +12408,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2464,
+                                                                                lineNumber: 2593,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2459,
+                                                                        lineNumber: 2588,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11728,7 +12427,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2467,
+                                                                                lineNumber: 2596,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11739,7 +12438,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2468,
+                                                                                lineNumber: 2597,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11750,7 +12449,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2469,
+                                                                                lineNumber: 2598,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11762,7 +12461,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2470,
+                                                                                lineNumber: 2599,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11773,13 +12472,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2471,
+                                                                                lineNumber: 2600,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2466,
+                                                                        lineNumber: 2595,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11789,7 +12488,7 @@ Please contact me.`;
                                                                                 children: "20mm/40mm Coarse Aggregate (Jalli)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2474,
+                                                                                lineNumber: 2603,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11800,7 +12499,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2475,
+                                                                                lineNumber: 2604,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11811,7 +12510,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2476,
+                                                                                lineNumber: 2605,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11823,7 +12522,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2477,
+                                                                                lineNumber: 2606,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11834,13 +12533,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2478,
+                                                                                lineNumber: 2607,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2473,
+                                                                        lineNumber: 2602,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11850,7 +12549,7 @@ Please contact me.`;
                                                                                 children: "TMT Steel (Mesh + Stub Starters & Ties)"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2481,
+                                                                                lineNumber: 2610,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11861,7 +12560,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2482,
+                                                                                lineNumber: 2611,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11872,7 +12571,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2483,
+                                                                                lineNumber: 2612,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11884,7 +12583,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2484,
+                                                                                lineNumber: 2613,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11895,13 +12594,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2485,
+                                                                                lineNumber: 2614,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2480,
+                                                                        lineNumber: 2609,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11911,7 +12610,7 @@ Please contact me.`;
                                                                                 children: "Binding Wire & Cover Blocks"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2488,
+                                                                                lineNumber: 2617,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11924,7 +12623,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2489,
+                                                                                lineNumber: 2618,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11935,7 +12634,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2490,
+                                                                                lineNumber: 2619,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11943,7 +12642,7 @@ Please contact me.`;
                                                                                 children: "₹85/kg • ₹3/pc"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2491,
+                                                                                lineNumber: 2620,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11954,13 +12653,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2492,
+                                                                                lineNumber: 2621,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2487,
+                                                                        lineNumber: 2616,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -11970,7 +12669,7 @@ Please contact me.`;
                                                                                 children: "Plinth / DPC Damp Proof Course"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2495,
+                                                                                lineNumber: 2624,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11983,7 +12682,7 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2496,
+                                                                                lineNumber: 2625,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11991,7 +12690,7 @@ Please contact me.`;
                                                                                 children: "—"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2497,
+                                                                                lineNumber: 2626,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -11999,7 +12698,7 @@ Please contact me.`;
                                                                                 children: "₹150 / m²"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2498,
+                                                                                lineNumber: 2627,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12010,13 +12709,13 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2499,
+                                                                                lineNumber: 2628,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2494,
+                                                                        lineNumber: 2623,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12028,7 +12727,7 @@ Please contact me.`;
                                                                                 children: "Total Foundation & Base Cost"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2502,
+                                                                                lineNumber: 2631,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12039,36 +12738,36 @@ Please contact me.`;
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                                lineNumber: 2503,
+                                                                                lineNumber: 2632,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                        lineNumber: 2501,
+                                                                        lineNumber: 2630,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2421,
+                                                                lineNumber: 2550,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2411,
+                                                        lineNumber: 2540,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2410,
+                                                    lineNumber: 2539,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2408,
+                                            lineNumber: 2537,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12081,14 +12780,14 @@ Please contact me.`;
                                                             children: "⚙️"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2513,
+                                                            lineNumber: 2642,
                                                             columnNumber: 21
                                                         }, this),
                                                         " Foundation Unit Rates"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2512,
+                                                    lineNumber: 2641,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12101,7 +12800,7 @@ Please contact me.`;
                                                                     children: "Excavation Rate (₹ / m³)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2518,
+                                                                    lineNumber: 2647,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12111,13 +12810,13 @@ Please contact me.`;
                                                                     className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2519,
+                                                                    lineNumber: 2648,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2517,
+                                                            lineNumber: 2646,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12127,7 +12826,7 @@ Please contact me.`;
                                                                     children: "Sand Filling Rate (₹ / CFT)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2528,
+                                                                    lineNumber: 2657,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12137,13 +12836,13 @@ Please contact me.`;
                                                                     className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2529,
+                                                                    lineNumber: 2658,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2527,
+                                                            lineNumber: 2656,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12156,7 +12855,7 @@ Please contact me.`;
                                                                             children: "PCC Labour (₹/m³)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2539,
+                                                                            lineNumber: 2668,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12166,13 +12865,13 @@ Please contact me.`;
                                                                             className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2540,
+                                                                            lineNumber: 2669,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2538,
+                                                                    lineNumber: 2667,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12182,7 +12881,7 @@ Please contact me.`;
                                                                             children: "Footing Labour (₹/m³)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2548,
+                                                                            lineNumber: 2677,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12192,19 +12891,19 @@ Please contact me.`;
                                                                             className: "w-full px-3 py-1.5 border border-slate-300 bg-white rounded-lg font-mono text-slate-900"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2549,
+                                                                            lineNumber: 2678,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2547,
+                                                                    lineNumber: 2676,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2537,
+                                                            lineNumber: 2666,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12217,51 +12916,51 @@ Please contact me.`;
                                                                             className: "w-3.5 h-3.5 flex-shrink-0"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                            lineNumber: 2560,
+                                                                            lineNumber: 2689,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         "Structural Engineering Notice:"
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2559,
+                                                                    lineNumber: 2688,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Foundation dimensions, reinforcement and bearing capacity must be verified by a qualified structural engineer using actual site soil investigation data."
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2558,
+                                                            lineNumber: 2687,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2516,
+                                                    lineNumber: 2645,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2511,
+                                            lineNumber: 2640,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2407,
+                                    lineNumber: 2536,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2311,
+                            lineNumber: 2440,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                    lineNumber: 2291,
+                    lineNumber: 2420,
                     columnNumber: 11
                 }, this);
             })(),
@@ -12275,12 +12974,12 @@ Please contact me.`;
                             children: "AI Visual Building Estimate"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2577,
+                            lineNumber: 2706,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                        lineNumber: 2576,
+                        lineNumber: 2705,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12298,7 +12997,7 @@ Please contact me.`;
                                                     children: "Item"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2583,
+                                                    lineNumber: 2712,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -12306,7 +13005,7 @@ Please contact me.`;
                                                     children: "Quantity"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2584,
+                                                    lineNumber: 2713,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -12314,7 +13013,7 @@ Please contact me.`;
                                                     children: "Unit"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2585,
+                                                    lineNumber: 2714,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -12322,7 +13021,7 @@ Please contact me.`;
                                                     children: "Rate"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2586,
+                                                    lineNumber: 2715,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -12330,18 +13029,18 @@ Please contact me.`;
                                                     children: "Amount"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2587,
+                                                    lineNumber: 2716,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2582,
+                                            lineNumber: 2711,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                        lineNumber: 2581,
+                                        lineNumber: 2710,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -12354,7 +13053,7 @@ Please contact me.`;
                                                         children: brickType.supplierBrand || 'A V M Bricks'
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2592,
+                                                        lineNumber: 2721,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12362,7 +13061,7 @@ Please contact me.`;
                                                         children: computedResult.totalBricks.toLocaleString()
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2593,
+                                                        lineNumber: 2722,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12370,7 +13069,7 @@ Please contact me.`;
                                                         children: "Nos"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2594,
+                                                        lineNumber: 2723,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12381,7 +13080,7 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2595,
+                                                        lineNumber: 2724,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12392,13 +13091,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2596,
+                                                        lineNumber: 2725,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2591,
+                                                lineNumber: 2720,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12408,7 +13107,7 @@ Please contact me.`;
                                                         children: "Cement"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2599,
+                                                        lineNumber: 2728,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12416,7 +13115,7 @@ Please contact me.`;
                                                         children: computedResult.cementBags.toLocaleString()
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2600,
+                                                        lineNumber: 2729,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12424,7 +13123,7 @@ Please contact me.`;
                                                         children: "Bags"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2601,
+                                                        lineNumber: 2730,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12435,7 +13134,7 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2602,
+                                                        lineNumber: 2731,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12446,13 +13145,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2603,
+                                                        lineNumber: 2732,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2598,
+                                                lineNumber: 2727,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12462,7 +13161,7 @@ Please contact me.`;
                                                         children: "Sand"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2606,
+                                                        lineNumber: 2735,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12470,7 +13169,7 @@ Please contact me.`;
                                                         children: sandUnit === 'CFT' ? (computedResult.sandVolume * 35.3147).toFixed(1) : computedResult.sandVolume.toFixed(2)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2607,
+                                                        lineNumber: 2736,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12478,7 +13177,7 @@ Please contact me.`;
                                                         children: sandUnit
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2608,
+                                                        lineNumber: 2737,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12489,7 +13188,7 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2609,
+                                                        lineNumber: 2738,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12500,13 +13199,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2610,
+                                                        lineNumber: 2739,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2605,
+                                                lineNumber: 2734,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12516,7 +13215,7 @@ Please contact me.`;
                                                         children: "Mortar Volume"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2613,
+                                                        lineNumber: 2742,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12524,7 +13223,7 @@ Please contact me.`;
                                                         children: computedResult.wetMortarVolume.toFixed(2)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2614,
+                                                        lineNumber: 2743,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12532,7 +13231,7 @@ Please contact me.`;
                                                         children: "m³"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2615,
+                                                        lineNumber: 2744,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12540,7 +13239,7 @@ Please contact me.`;
                                                         children: "—"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2616,
+                                                        lineNumber: 2745,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12548,13 +13247,13 @@ Please contact me.`;
                                                         children: "Included"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2617,
+                                                        lineNumber: 2746,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2612,
+                                                lineNumber: 2741,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12564,7 +13263,7 @@ Please contact me.`;
                                                         children: "Mason Labour"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2620,
+                                                        lineNumber: 2749,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12572,7 +13271,7 @@ Please contact me.`;
                                                         children: masonDays
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2621,
+                                                        lineNumber: 2750,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12580,7 +13279,7 @@ Please contact me.`;
                                                         children: "Days"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2622,
+                                                        lineNumber: 2751,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12591,7 +13290,7 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2623,
+                                                        lineNumber: 2752,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12602,13 +13301,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2624,
+                                                        lineNumber: 2753,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2619,
+                                                lineNumber: 2748,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12618,7 +13317,7 @@ Please contact me.`;
                                                         children: "Helper Labour"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2627,
+                                                        lineNumber: 2756,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12626,7 +13325,7 @@ Please contact me.`;
                                                         children: helperDays
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2628,
+                                                        lineNumber: 2757,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12634,7 +13333,7 @@ Please contact me.`;
                                                         children: "Days"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2629,
+                                                        lineNumber: 2758,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12645,7 +13344,7 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2630,
+                                                        lineNumber: 2759,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12656,13 +13355,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2631,
+                                                        lineNumber: 2760,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2626,
+                                                lineNumber: 2755,
                                                 columnNumber: 15
                                             }, this),
                                             computedResult.rccProjectEstimate && computedResult.rccProjectEstimate.totalConcreteVolumeM3 > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12673,7 +13372,7 @@ Please contact me.`;
                                                         children: "RCC Structural Construction (All Floors)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2635,
+                                                        lineNumber: 2764,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12681,7 +13380,7 @@ Please contact me.`;
                                                         children: computedResult.rccProjectEstimate.totalConcreteVolumeCft.toFixed(1)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2636,
+                                                        lineNumber: 2765,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12689,7 +13388,7 @@ Please contact me.`;
                                                         children: "CFT"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2637,
+                                                        lineNumber: 2766,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12697,7 +13396,7 @@ Please contact me.`;
                                                         children: "—"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2638,
+                                                        lineNumber: 2767,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12708,13 +13407,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2639,
+                                                        lineNumber: 2768,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2634,
+                                                lineNumber: 2763,
                                                 columnNumber: 17
                                             }, this),
                                             computedResult.foundationEstimate && (computedResult.foundationEstimate.footingCount ?? 0) > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12725,7 +13424,7 @@ Please contact me.`;
                                                         children: "Ground Floor Foundation / Base (PCC + RCC Footings)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2644,
+                                                        lineNumber: 2773,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12733,7 +13432,7 @@ Please contact me.`;
                                                         children: computedResult.foundationEstimate.footingCount
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2645,
+                                                        lineNumber: 2774,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12741,7 +13440,7 @@ Please contact me.`;
                                                         children: "Units"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2646,
+                                                        lineNumber: 2775,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12749,7 +13448,7 @@ Please contact me.`;
                                                         children: "—"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2647,
+                                                        lineNumber: 2776,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12760,13 +13459,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2648,
+                                                        lineNumber: 2777,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2643,
+                                                lineNumber: 2772,
                                                 columnNumber: 17
                                             }, this),
                                             computedResult.plasterEstimate && computedResult.plasterEstimate.totalNetPlasterAreaSqFt > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -12777,7 +13476,7 @@ Please contact me.`;
                                                         children: "Plaster & Cement Finish (Inner + Outer + RCC Columns & Side Beams)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2653,
+                                                        lineNumber: 2782,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12785,7 +13484,7 @@ Please contact me.`;
                                                         children: computedResult.plasterEstimate.totalNetPlasterAreaSqFt.toFixed(1)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2654,
+                                                        lineNumber: 2783,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12793,7 +13492,7 @@ Please contact me.`;
                                                         children: "sq.ft"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2655,
+                                                        lineNumber: 2784,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12801,7 +13500,7 @@ Please contact me.`;
                                                         children: "—"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2656,
+                                                        lineNumber: 2785,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -12812,25 +13511,25 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2657,
+                                                        lineNumber: 2786,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2652,
+                                                lineNumber: 2781,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                        lineNumber: 2590,
+                                        lineNumber: 2719,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                lineNumber: 2580,
+                                lineNumber: 2709,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12848,7 +13547,7 @@ Please contact me.`;
                                                             children: "Transport Cost (₹)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2668,
+                                                            lineNumber: 2797,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12858,13 +13557,13 @@ Please contact me.`;
                                                             className: "block w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2669,
+                                                            lineNumber: 2798,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2667,
+                                                    lineNumber: 2796,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12874,7 +13573,7 @@ Please contact me.`;
                                                             children: "Contingency / Tax (%)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2672,
+                                                            lineNumber: 2801,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12884,24 +13583,24 @@ Please contact me.`;
                                                             className: "block w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2673,
+                                                            lineNumber: 2802,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2671,
+                                                    lineNumber: 2800,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2666,
+                                            lineNumber: 2795,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                        lineNumber: 2665,
+                                        lineNumber: 2794,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12915,7 +13614,7 @@ Please contact me.`;
                                                         children: "Brick Masonry Cost"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2681,
+                                                        lineNumber: 2810,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12926,13 +13625,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2682,
+                                                        lineNumber: 2811,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2680,
+                                                lineNumber: 2809,
                                                 columnNumber: 15
                                             }, this),
                                             computedResult.rccProjectEstimate && computedResult.rccProjectEstimate.costs.total > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12943,7 +13642,7 @@ Please contact me.`;
                                                         children: "RCC Structural Cost"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2686,
+                                                        lineNumber: 2815,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12954,13 +13653,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2687,
+                                                        lineNumber: 2816,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2685,
+                                                lineNumber: 2814,
                                                 columnNumber: 17
                                             }, this),
                                             computedResult.foundationEstimate && computedResult.foundationEstimate.costs.total > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12971,7 +13670,7 @@ Please contact me.`;
                                                         children: "Foundation / Base Cost"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2692,
+                                                        lineNumber: 2821,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12982,13 +13681,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2693,
+                                                        lineNumber: 2822,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2691,
+                                                lineNumber: 2820,
                                                 columnNumber: 17
                                             }, this),
                                             computedResult.plasterEstimate && computedResult.plasterEstimate.costs.total > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12999,7 +13698,7 @@ Please contact me.`;
                                                         children: "Plaster & Finish Cost"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2698,
+                                                        lineNumber: 2827,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13010,13 +13709,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2699,
+                                                        lineNumber: 2828,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2697,
+                                                lineNumber: 2826,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13027,7 +13726,7 @@ Please contact me.`;
                                                         children: "Transport & Extras"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2703,
+                                                        lineNumber: 2832,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13038,13 +13737,13 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2704,
+                                                        lineNumber: 2833,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2702,
+                                                lineNumber: 2831,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13057,7 +13756,7 @@ Please contact me.`;
                                                                 children: "Combined Estimate"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2708,
+                                                                lineNumber: 2837,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13065,13 +13764,13 @@ Please contact me.`;
                                                                 children: "Final Total Cost"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2709,
+                                                                lineNumber: 2838,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2707,
+                                                        lineNumber: 2836,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13082,37 +13781,37 @@ Please contact me.`;
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2711,
+                                                        lineNumber: 2840,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2706,
+                                                lineNumber: 2835,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                        lineNumber: 2679,
+                                        lineNumber: 2808,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                lineNumber: 2663,
+                                lineNumber: 2792,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                        lineNumber: 2579,
+                        lineNumber: 2708,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2575,
+                lineNumber: 2704,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13125,12 +13824,12 @@ Please contact me.`;
                             children: "👷 Labour Estimate"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2723,
+                            lineNumber: 2852,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                        lineNumber: 2722,
+                        lineNumber: 2851,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13152,7 +13851,7 @@ Please contact me.`;
                                                             children: "Labour Type"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2731,
+                                                            lineNumber: 2860,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -13160,7 +13859,7 @@ Please contact me.`;
                                                             children: "Daily Rate"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2732,
+                                                            lineNumber: 2861,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -13168,7 +13867,7 @@ Please contact me.`;
                                                             children: "Estimated Days"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2733,
+                                                            lineNumber: 2862,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -13176,18 +13875,18 @@ Please contact me.`;
                                                             children: "Estimated Cost"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2734,
+                                                            lineNumber: 2863,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2730,
+                                                    lineNumber: 2859,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2729,
+                                                lineNumber: 2858,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -13200,7 +13899,7 @@ Please contact me.`;
                                                                 children: "Mason"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2739,
+                                                                lineNumber: 2868,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13211,7 +13910,7 @@ Please contact me.`;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2740,
+                                                                lineNumber: 2869,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13219,7 +13918,7 @@ Please contact me.`;
                                                                 children: masonDays
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2741,
+                                                                lineNumber: 2870,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13230,13 +13929,13 @@ Please contact me.`;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2742,
+                                                                lineNumber: 2871,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2738,
+                                                        lineNumber: 2867,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -13246,7 +13945,7 @@ Please contact me.`;
                                                                 children: "Helper"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2745,
+                                                                lineNumber: 2874,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13257,7 +13956,7 @@ Please contact me.`;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2746,
+                                                                lineNumber: 2875,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13265,7 +13964,7 @@ Please contact me.`;
                                                                 children: helperDays
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2747,
+                                                                lineNumber: 2876,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13276,13 +13975,13 @@ Please contact me.`;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2748,
+                                                                lineNumber: 2877,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2744,
+                                                        lineNumber: 2873,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -13294,7 +13993,7 @@ Please contact me.`;
                                                                 children: "Total Labour Cost"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2751,
+                                                                lineNumber: 2880,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -13305,30 +14004,30 @@ Please contact me.`;
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                lineNumber: 2752,
+                                                                lineNumber: 2881,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                        lineNumber: 2750,
+                                                        lineNumber: 2879,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                lineNumber: 2737,
+                                                lineNumber: 2866,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                        lineNumber: 2728,
+                                        lineNumber: 2857,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2727,
+                                    lineNumber: 2856,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13339,7 +14038,7 @@ Please contact me.`;
                                             children: "Labour Settings"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2760,
+                                            lineNumber: 2889,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13354,7 +14053,7 @@ Please contact me.`;
                                                                     children: "Mason Productivity"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2764,
+                                                                    lineNumber: 2893,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13362,13 +14061,13 @@ Please contact me.`;
                                                                     children: "bricks/day"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2765,
+                                                                    lineNumber: 2894,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2763,
+                                                            lineNumber: 2892,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13378,13 +14077,13 @@ Please contact me.`;
                                                             className: "mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2767,
+                                                            lineNumber: 2896,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2762,
+                                                    lineNumber: 2891,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13397,7 +14096,7 @@ Please contact me.`;
                                                                     children: "Mason Wage (₹)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2771,
+                                                                    lineNumber: 2900,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13407,13 +14106,13 @@ Please contact me.`;
                                                                     className: "mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2772,
+                                                                    lineNumber: 2901,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2770,
+                                                            lineNumber: 2899,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13423,7 +14122,7 @@ Please contact me.`;
                                                                     children: "Helper Wage (₹)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2775,
+                                                                    lineNumber: 2904,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13433,48 +14132,48 @@ Please contact me.`;
                                                                     className: "mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                                    lineNumber: 2776,
+                                                                    lineNumber: 2905,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                            lineNumber: 2774,
+                                                            lineNumber: 2903,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                                    lineNumber: 2769,
+                                                    lineNumber: 2898,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2761,
+                                            lineNumber: 2890,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2759,
+                                    lineNumber: 2888,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2726,
+                            lineNumber: 2855,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                        lineNumber: 2725,
+                        lineNumber: 2854,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2721,
+                lineNumber: 2850,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13489,25 +14188,25 @@ Please contact me.`;
                             className: "h-6 w-6 mr-3 animate-spin"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2792,
+                            lineNumber: 2921,
                             columnNumber: 32
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(WhatsAppIcon, {
                             className: "h-6 w-6 mr-3"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2792,
+                            lineNumber: 2921,
                             columnNumber: 84
                         }, this),
                         " Request a Quote from A V M Bricks"
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                    lineNumber: 2786,
+                    lineNumber: 2915,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2785,
+                lineNumber: 2914,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13519,7 +14218,7 @@ Please contact me.`;
                             className: "h-6 w-6 text-yellow-600 mt-0.5 shrink-0"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2798,
+                            lineNumber: 2927,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13530,7 +14229,7 @@ Please contact me.`;
                                     children: "Mandatory Safety and Accuracy Disclaimer"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2800,
+                                    lineNumber: 2929,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13540,7 +14239,7 @@ Please contact me.`;
                                             children: "This is an approximate material and labour estimate based on the dimensions, wall layout, openings, selected brick size, mortar ratio, local prices, and reinforcement configurations entered by the user."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2802,
+                                            lineNumber: 2931,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -13548,37 +14247,37 @@ Please contact me.`;
                                             children: "Concrete pillar locations, sizes, beam reinforcement, slab design, footing, and load-bearing requirements must be designed and approved by a qualified structural/civil engineer. This tool provides an approximate visual layout and material estimate only; it is not a structural design or construction approval."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2805,
+                                            lineNumber: 2934,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             children: "Actual quantities, construction methods, labour requirements, and final costs may vary. Please verify with a qualified civil engineer, contractor, and A V M Bricks representative before ordering or construction."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                            lineNumber: 2808,
+                                            lineNumber: 2937,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                                    lineNumber: 2801,
+                                    lineNumber: 2930,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                            lineNumber: 2799,
+                            lineNumber: 2928,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                    lineNumber: 2797,
+                    lineNumber: 2926,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2796,
+                lineNumber: 2925,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$StructuralConfigModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StructuralConfigModal"], {
@@ -13590,21 +14289,7 @@ Please contact me.`;
                 wallThickness: buildingModel?.externalWallThickness,
                 onClose: ()=>setIsStructuralModalOpen(false),
                 onSave: (newCfg, bDetails)=>{
-                    updateBuildingConfig(newCfg);
-                    if (buildingModel && setBuildingModel) {
-                        const newL = bDetails?.length ?? buildingModel.buildingLength;
-                        const newW = bDetails?.width ?? buildingModel.buildingWidth;
-                        const newU = bDetails?.unit ?? buildingModel.buildingUnit;
-                        const newT = bDetails?.wallThickness ?? buildingModel.externalWallThickness;
-                        setBuildingModel({
-                            ...buildingModel,
-                            buildingLength: newL,
-                            buildingWidth: newW,
-                            buildingUnit: newU,
-                            externalWallThickness: newT,
-                            buildingConfig: newCfg
-                        });
-                    }
+                    updateBuildingConfig(newCfg, bDetails);
                     if (newCfg.concreteGrade === 'M15') {
                         setRccMixRatio('1:2:4');
                     } else if (newCfg.concreteGrade === 'M20') {
@@ -13638,7 +14323,7 @@ Please contact me.`;
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2817,
+                lineNumber: 2946,
                 columnNumber: 7
             }, this),
             buildingModel && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$SaveProjectModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SaveProjectModal"], {
@@ -13651,7 +14336,7 @@ Please contact me.`;
                 defaultName: projectName || 'My Construction Plan'
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2876,
+                lineNumber: 2991,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$ProjectHistoryModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ProjectHistoryModal"], {
@@ -13659,7 +14344,7 @@ Please contact me.`;
                 onClose: ()=>setIsHistoryModalOpen(false)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/VisualEstimatorResults.tsx",
-                lineNumber: 2888,
+                lineNumber: 3003,
                 columnNumber: 7
             }, this)
         ]

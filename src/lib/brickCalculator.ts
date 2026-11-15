@@ -7,6 +7,8 @@ import {
   BuildingStructuralSummary,
   DEFAULT_BUILDING_CONFIG,
   calculateBuildingStructuralSummary,
+  FloorSlabStructuralCalculation,
+  FloorBeamStructuralCalculation,
   ColumnRole,
   SoilClassification,
   ConcreteGrade
@@ -234,8 +236,9 @@ export const getEffectivePillarPosition = (
     return basePos;
   }
 
-  const pW = convertUnit(pillar.width, pillar.unit, targetUnit);
-  const pD = pillar.shape === 'circular' ? pW : convertUnit(pillar.depth, pillar.unit, targetUnit);
+  const pUnit = pillar.unit || 'in';
+  const pW = convertUnit(pillar.width, pUnit, targetUnit);
+  const pD = pillar.shape === 'circular' ? pW : convertUnit(pillar.depth, pUnit, targetUnit);
 
   // Find connected/adjacent walls to determine corner / face alignment orientation
   const connectedWalls = walls.filter(w => {
@@ -291,6 +294,24 @@ export const getEffectivePillarPosition = (
       }
     });
 
+    // Fallback if one or both directions are 0: point toward building centroid
+    if (dirX === 0 || dirY === 0) {
+      let avgX = 0, avgY = 0, count = 0;
+      walls.forEach(w => {
+        if (w.start && w.end) {
+          avgX += w.start.x + w.end.x;
+          avgY += w.start.y + w.end.y;
+          count += 2;
+        }
+      });
+      if (count > 0) {
+        avgX /= count;
+        avgY /= count;
+        if (dirX === 0) dirX = Math.sign(avgX - basePos.x) || 1;
+        if (dirY === 0) dirY = Math.sign(avgY - basePos.y) || 1;
+      }
+    }
+
     const sign = pillar.alignment === 'outside_corner' ? 1 : -1;
     return {
       x: basePos.x + sign * dirX * diffW,
@@ -299,17 +320,49 @@ export const getEffectivePillarPosition = (
   }
 
   if (pillar.alignment === 'flush_exterior' || pillar.alignment === 'flush_interior') {
-    const diffD = (pD - wallThick) / 2;
-    if (Math.abs(diffD) < 0.001) {
-      return basePos;
-    }
-    const w = connectedWalls[0];
+    // Prioritize exterior perimeter walls over internal partition walls
+    const extWall = connectedWalls.find(cw => {
+      const isInternal = cw.id?.includes('int') || (cw as any).isInternal;
+      return !isInternal;
+    }) || connectedWalls[0];
+
+    const w = extWall;
     const dx = (w.end?.x || 0) - (w.start?.x || 0);
     const dy = (w.end?.y || 0) - (w.start?.y || 0);
     const len = Math.hypot(dx, dy);
     if (len > 0.01) {
-      const normX = -dy / len;
-      const normY = dx / len;
+      // Determine the dimension perpendicular to the wall axis:
+      // If wall is mostly horizontal (|dx| >= |dy|), thickness and transverse shift is along Y (use pD)
+      // If wall is mostly vertical (|dy| > |dx|), thickness and transverse shift is along X (use pW)
+      const transverseDim = Math.abs(dx) >= Math.abs(dy) ? pD : pW;
+      const diffD = (transverseDim - wallThick) / 2;
+      if (Math.abs(diffD) < 0.001) {
+        return basePos;
+      }
+
+      let normX = -dy / len;
+      let normY = dx / len;
+
+      // Ensure normal points toward building interior (centroid)
+      let avgX = 0, avgY = 0, ptCount = 0;
+      walls.forEach(wl => {
+        if (wl.start && wl.end) {
+          avgX += wl.start.x + wl.end.x;
+          avgY += wl.start.y + wl.end.y;
+          ptCount += 2;
+        }
+      });
+      if (ptCount > 0) {
+        avgX /= ptCount;
+        avgY /= ptCount;
+        const toInteriorX = avgX - basePos.x;
+        const toInteriorY = avgY - basePos.y;
+        if (normX * toInteriorX + normY * toInteriorY < 0) {
+          normX = -normX;
+          normY = -normY;
+        }
+      }
+
       const sign = pillar.alignment === 'flush_exterior' ? 1 : -1;
       return {
         x: basePos.x + sign * normX * diffD,
@@ -2223,7 +2276,7 @@ export const calculateWallMetrics = (wall: Wall) => {
   const grossArea = l * h;
   
   let openingArea = 0;
-  wall.openings.forEach(op => {
+  (wall.openings || []).forEach(op => {
     const w = toMeters(op.width, op.unit || unit);
     const opH = toMeters(op.height, op.unit || unit);
     openingArea += (w * opH * (op.count || 1));
@@ -4627,10 +4680,10 @@ export const calculateProject = (
 
     const bLengthM = toMeters(bModel.buildingLength, bModel.buildingUnit);
     const bWidthM = toMeters(bModel.buildingWidth, bModel.buildingUnit);
-    const allWallsForStructural = bModel.floors.flatMap(f => [...f.externalWalls, ...f.internalWalls]);
+    const allWallsForStructural = (bModel.floors || []).flatMap(f => [...(f.externalWalls || []), ...(f.internalWalls || [])]);
 
     // Attach detected beams to each floor for accurate structural calculation
-    const floorsWithBeams = bModel.floors.map(fl => {
+    const floorsWithBeams = (bModel.floors || []).map(fl => {
       const flPillars = fl.pillars || [];
       const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
       const flBeams = getEffectiveFloorBeams(flPillars, flWalls, bModel.buildingUnit || 'ft');
@@ -4752,10 +4805,100 @@ export const calculateProject = (
     });
 
     // Keep individual floor pillars synchronized with structural dimensions
-    bModel.floors.forEach((fl, fIdx) => {
+    (bModel.floors || []).forEach((fl, fIdx) => {
       const isGround = fIdx === 0 || fl.level === 0 || fl.id === 'floor-0';
       fl.pillars = effectivePillars.filter(p => p.floorId === fl.id || (isGround && (!p.floorId || p.floorId === 'ground')));
     });
+
+    // Synchronize calculated floor slab and ring beam sizing and reinforcement
+    const summary = structuralSummary;
+    if (bConfig.autoSizeBeamsAndSlabs !== false && summary) {
+      const slabCalcMap = new Map((summary.floorSlabCalculations || []).map(s => [s.floorId, s]));
+      const beamCalcMap = new Map((summary.floorBeamCalculations || []).map(b => [b.floorId, b]));
+
+      (bModel.floors || []).forEach((fl, fIdx) => {
+        const sCalc = slabCalcMap.get(fl.id) || summary.floorSlabCalculations?.[fIdx];
+        const bCalc = beamCalcMap.get(fl.id) || summary.floorBeamCalculations?.[fIdx];
+
+        if (sCalc && (!fl.slab?.isCustomSize)) {
+          const autoThickIn = sCalc.providedThicknessIn;
+          fl.slab = {
+            ...(fl.slab || DEFAULT_RCC_SLAB),
+            enabled: fl.slab?.enabled ?? true,
+            thickness: autoThickIn,
+            thicknessUnit: 'in',
+            height: autoThickIn / 12,
+            heightUnit: 'ft',
+            isCustomSize: false,
+            structuralDetails: sCalc,
+            rebarConfig: {
+              slabMainBarDiaMm: sCalc.mainBarDiaMm,
+              slabMainBarSpacingMm: sCalc.mainBarSpacingMm,
+              slabDistBarDiaMm: sCalc.distBarDiaMm,
+              slabDistBarSpacingMm: sCalc.distBarSpacingMm,
+              slabCoverMm: sCalc.nominalCoverMm
+            }
+          };
+          if (fl.fullRoof) {
+            fl.fullRoof.thickness = autoThickIn;
+            fl.fullRoof.thicknessUnit = 'in';
+          }
+        }
+
+        if (bCalc && (!fl.ringBeam?.isCustomSize)) {
+          const autoWidthIn = bCalc.beamWidthIn;
+          const autoDepthIn = bCalc.beamDepthIn;
+          fl.ringBeam = {
+            ...(fl.ringBeam || DEFAULT_RCC_RING_BEAM),
+            enabled: fl.ringBeam?.enabled ?? true,
+            width: autoWidthIn,
+            widthUnit: 'in',
+            depth: autoDepthIn,
+            depthUnit: 'in',
+            height: autoDepthIn / 12,
+            heightUnit: 'ft',
+            isCustomSize: false,
+            structuralDetails: bCalc,
+            rebarConfig: {
+              beamTopBarDiaMm: bCalc.topAnchorBarDiaMm,
+              beamTopBarCount: bCalc.topAnchorBarCount,
+              beamBottomBarDiaMm: bCalc.bottomMainBarDiaMm,
+              beamBottomBarCount: bCalc.bottomMainBarCount,
+              beamStirrupDiaMm: bCalc.stirrupDiaMm,
+              beamStirrupSpacingMm: bCalc.stirrupSpacingMm,
+              beamCoverMm: bCalc.nominalCoverMm
+            }
+          };
+          if (fl.fullRingBeam) {
+            fl.fullRingBeam.thicknessFt = autoDepthIn / 12;
+            fl.fullRingBeam.width = autoWidthIn;
+            fl.fullRingBeam.widthUnit = 'in';
+          }
+        }
+      });
+
+      // Synchronize independent Roof Slab if present
+      if (structuralSummary.roofSlabCalculation && bModel.roofSlab && (!bModel.roofSlab.isCustomSize)) {
+        const rCalc = structuralSummary.roofSlabCalculation;
+        const autoRoofThickIn = rCalc.providedThicknessIn;
+        bModel.roofSlab = {
+          ...bModel.roofSlab,
+          thickness: autoRoofThickIn,
+          thicknessUnit: 'in',
+          height: autoRoofThickIn / 12,
+          heightUnit: 'ft',
+          isCustomSize: false,
+          structuralDetails: rCalc,
+          rebarConfig: {
+            slabMainBarDiaMm: rCalc.mainBarDiaMm,
+            slabMainBarSpacingMm: rCalc.mainBarSpacingMm,
+            slabDistBarDiaMm: rCalc.distBarDiaMm,
+            slabDistBarSpacingMm: rCalc.distBarSpacingMm,
+            slabCoverMm: rCalc.nominalCoverMm
+          }
+        };
+      }
+    }
   }
 
   let rccProjectEstimate: RCCProjectEstimate | undefined;
@@ -4893,6 +5036,8 @@ export interface RCCRingBeamConfig {
   depthUnit?: Unit;
   enabled?: boolean;
   isCustomSize?: boolean;
+  rebarConfig?: Partial<RCCReinforcementConfig>;
+  structuralDetails?: FloorBeamStructuralCalculation;
 }
 
 export const DEFAULT_RCC_RING_BEAM: RCCRingBeamConfig = {
@@ -4945,6 +5090,8 @@ export interface RCCSlabConfig {
   elevationOffsetUnit?: Unit;
   customDimensions?: boolean; // whether custom length/width is used instead of auto frame bounds
   isCustomSize?: boolean;
+  rebarConfig?: Partial<RCCReinforcementConfig>;
+  structuralDetails?: FloorSlabStructuralCalculation;
 }
 
 export const DEFAULT_RCC_SLAB: RCCSlabConfig = {

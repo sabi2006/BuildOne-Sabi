@@ -50,6 +50,8 @@ import {
   DEFAULT_BUILDING_CONFIG,
   toMeters,
   calculateBuildingStructuralSummary,
+  calculateFloorSlabStructuralDetails,
+  calculateFloorBeamStructuralDetails,
   getConcreteMixRatios
 } from '@/lib/brickCalculator';
 import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw } from 'lucide-react';
@@ -2944,50 +2946,57 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
       // Floor-wise engineered sizing for Ring Beams & Slabs (IS 456:2000 & IS 875)
       const maxBaySpanFt = Math.max(gridSpacingX, gridSpacingY, 10);
-      
-      // 1. Beam Sizing (Span / 12 deflection rule)
-      let beamDepthIn = 12;
-      let beamWidthIn = 9;
-      
-      if (newConfig.autoSizeBeamsAndSlabs !== false) {
-        if (newConfig.beamSizingMode === 'uniform') {
-          beamDepthIn = 12;
-          beamWidthIn = 9;
-        } else {
-          // Span / 12 rule
-          if (i === targetCount - 1) {
-            // Top roof tie beam / perimeter roof band (carries only light parapet / roof slab)
-            beamDepthIn = maxBaySpanFt > 14 ? 12 : 9;
-            beamWidthIn = 9;
-          } else {
-            // Intermediate floor beam carrying upper storey brick masonry infill wall
-            // D = L / 12 (round up to 3" multiples, min 12", max 24")
-            const spanIn = maxBaySpanFt * 12;
-            const rawDepth = spanIn / 12;
-            beamDepthIn = Math.min(24, Math.max(12, Math.ceil(rawDepth / 3) * 3));
-            beamWidthIn = 9;
-          }
+      const maxBaySpanM = toMeters(maxBaySpanFt, 'ft');
+      const singleFloorAreaM2 = toMeters(newLength, newUnit) * toMeters(newWidth, newUnit);
+      const isTopStorey = (i === targetCount - 1);
+      const flOverrides = newConfig.floorOverrides?.[floorId];
+
+      const calculatedSlab = calculateFloorSlabStructuralDetails(
+        floorId,
+        i,
+        floorName,
+        isTopStorey,
+        maxBaySpanM,
+        maxBaySpanM * 0.9,
+        singleFloorAreaM2,
+        newConfig,
+        {
+          customThicknessMm: flOverrides?.customSlabThicknessIn ? Math.round(flOverrides.customSlabThicknessIn * 25.4) : undefined,
+          isCustomThickness: Boolean(flOverrides?.customSlabThicknessIn)
         }
-      }
+      );
 
-      const ringBeamCustom = existingFloor?.ringBeam?.isCustomSize;
-      const finalRingWidth = ringBeamCustom ? (existingFloor?.ringBeam?.width ?? 9) : beamWidthIn;
-      const finalRingDepth = ringBeamCustom ? (existingFloor?.ringBeam?.depth ?? 12) : beamDepthIn;
-
-      // 2. Slab Sizing (IS 456 / IS 875 Part 2)
-      let slabThicknessIn = 5.0;
-      if (newConfig.autoSizeBeamsAndSlabs !== false) {
-        if (newConfig.slabSizingMode === 'custom' && newConfig.customSlabThicknessIn) {
-          slabThicknessIn = newConfig.customSlabThicknessIn;
-        } else if (newConfig.buildingType === 'commercial' || newConfig.buildingType === 'industrial') {
-          slabThicknessIn = 6.0;
-        } else {
-          slabThicknessIn = 5.0;
+      const calculatedBeam = calculateFloorBeamStructuralDetails(
+        floorId,
+        i,
+        floorName,
+        isTopStorey,
+        maxBaySpanM,
+        2 * (toMeters(newLength, newUnit) + toMeters(newWidth, newUnit)),
+        toMeters(h, newUnit),
+        toMeters(newThickness, 'in'),
+        maxBaySpanM / 2,
+        calculatedSlab,
+        newConfig,
+        {
+          customWidthMm: flOverrides?.customBeamWidthIn ? Math.round(flOverrides.customBeamWidthIn * 25.4) : undefined,
+          customDepthMm: flOverrides?.customBeamDepthIn ? Math.round(flOverrides.customBeamDepthIn * 25.4) : undefined,
+          isCustomSize: Boolean(flOverrides?.customBeamWidthIn || flOverrides?.customBeamDepthIn)
         }
-      }
+      );
 
-      const slabCustom = existingFloor?.slab?.isCustomSize;
-      const finalSlabThick = slabCustom ? (existingFloor?.slab?.thickness ?? 5) : slabThicknessIn;
+      const ringBeamCustom = Boolean(existingFloor?.ringBeam?.isCustomSize || flOverrides?.isCustomBeam);
+      const finalRingWidth = ringBeamCustom
+        ? (flOverrides?.customBeamWidthIn ?? existingFloor?.ringBeam?.width ?? 9)
+        : (newConfig.autoSizeBeamsAndSlabs !== false ? calculatedBeam.beamWidthIn : 9);
+      const finalRingDepth = ringBeamCustom
+        ? (flOverrides?.customBeamDepthIn ?? existingFloor?.ringBeam?.depth ?? 12)
+        : (newConfig.autoSizeBeamsAndSlabs !== false ? calculatedBeam.beamDepthIn : 12);
+
+      const slabCustom = Boolean(existingFloor?.slab?.isCustomSize || flOverrides?.isCustomSlab);
+      const finalSlabThick = slabCustom
+        ? (flOverrides?.customSlabThicknessIn ?? existingFloor?.slab?.thickness ?? 5)
+        : (newConfig.autoSizeBeamsAndSlabs !== false ? calculatedSlab.providedThicknessIn : 5.0);
 
       const ringBeamConfig: RCCRingBeamConfig = {
         ...(existingFloor?.ringBeam || model.ringBeam || DEFAULT_RCC_RING_BEAM),
@@ -2998,7 +3007,17 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         height: finalRingDepth / 12,
         heightUnit: 'ft',
         enabled: existingFloor?.ringBeam?.enabled ?? true,
-        isCustomSize: ringBeamCustom ?? false
+        isCustomSize: ringBeamCustom,
+        structuralDetails: calculatedBeam,
+        rebarConfig: {
+          beamTopBarDiaMm: calculatedBeam.topAnchorBarDiaMm,
+          beamTopBarCount: calculatedBeam.topAnchorBarCount,
+          beamBottomBarDiaMm: calculatedBeam.bottomMainBarDiaMm,
+          beamBottomBarCount: calculatedBeam.bottomMainBarCount,
+          beamStirrupDiaMm: calculatedBeam.stirrupDiaMm,
+          beamStirrupSpacingMm: calculatedBeam.stirrupSpacingMm,
+          beamCoverMm: calculatedBeam.nominalCoverMm
+        }
       };
 
       const fullRingBeamConfig: RCCFullRingBeamConfig = {
@@ -3016,7 +3035,15 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         thicknessUnit: 'in' as Unit,
         height: finalSlabThick / 12,
         heightUnit: 'ft' as Unit,
-        isCustomSize: slabCustom ?? false
+        isCustomSize: slabCustom,
+        structuralDetails: calculatedSlab,
+        rebarConfig: {
+          slabMainBarDiaMm: calculatedSlab.mainBarDiaMm,
+          slabMainBarSpacingMm: calculatedSlab.mainBarSpacingMm,
+          slabDistBarDiaMm: calculatedSlab.distBarDiaMm,
+          slabDistBarSpacingMm: calculatedSlab.distBarSpacingMm,
+          slabCoverMm: calculatedSlab.nominalCoverMm
+        }
       };
 
       const fullRoofConfig: RCCFullRoofConfig = {
