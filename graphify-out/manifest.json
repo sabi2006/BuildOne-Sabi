@@ -114,15 +114,15 @@
     "semantic_hash": "adf9a50c20f94d057d4a5c94cdc4bb86"
   },
   "src/components/3d/SharedBrickWall.tsx": {
-    "mtime": 1794158556.3298416,
-    "seen": 1794664666.485506,
-    "ast_hash": "74bdf5ee815a19345224ce987c4158e3",
-    "semantic_hash": "74bdf5ee815a19345224ce987c4158e3"
+    "mtime": 1794849284.5831995,
+    "seen": 1794850058.0439856,
+    "ast_hash": "196ca90305f99804a90bb34c6ba52124",
+    "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1794815386.131947,
-    "seen": 1794832644.4573247,
-    "ast_hash": "ffe61e5c57539fb2b9d33ee571f16f23",
+    "mtime": 1794849991.2068613,
+    "seen": 1794850058.0439873,
+    "ast_hash": "3b77cf1e7806918c2640f8c3e20d2ba7",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -132,15 +132,15 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794823139.7711778,
-    "seen": 1794832644.4573276,
-    "ast_hash": "91212cf15346ddcd4a49e5b6f4947040",
+    "mtime": 1794849551.492989,
+    "seen": 1794850058.0439901,
+    "ast_hash": "ec48439ec63667ad30f3a1ac4e4637ab",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
-    "mtime": 1794815349.5975616,
-    "seen": 1794832644.457329,
-    "ast_hash": "604afdaac63a411b33ff59a6db41d9ab",
+    "mtime": 1794837683.7318401,
+    "seen": 1794838914.302661,
+    "ast_hash": "4abda5b1064206936e5984c2684713e7",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorSettings.tsx": {
@@ -180,9 +180,9 @@
     "semantic_hash": "cc40302ff300257e1ed7cbaa032c128b"
   },
   "src/components/calculator/StructuralConfigModal.tsx": {
-    "mtime": 1794735544.7233365,
-    "seen": 1794736561.7054684,
-    "ast_hash": "592726b1fdbf617222747182d757955c",
+    "mtime": 1794845352.962025,
+    "seen": 1794845491.1139212,
+    "ast_hash": "2be0348012e5ebcea92ce31aa9e8160a",
     "semantic_hash": ""
   },
   "src/components/calculator/StructurePreview3D.tsx": {
@@ -198,9 +198,9 @@
     "semantic_hash": "8c2b640aeeb62b60044e141e237a1a5b"
   },
   "src/components/calculator/VisualEstimatorResults.tsx": {
-    "mtime": 1794813597.5170345,
-    "seen": 1794832644.4573438,
-    "ast_hash": "9a28f8ec3a3b65eede2e942c50288712",
+    "mtime": 1794841215.1450486,
+    "seen": 1794841301.4233174,
+    "ast_hash": "a7eb6e962b8b409a83f9f805cdb675a7",
     "semantic_hash": ""
   },
   "src/components/calculator/VisualPreviews.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1794822744.332905,
-    "seen": 1794832644.4573555,
-    "ast_hash": "cdaeae4566ddaea95d58d54e8310c657",
+    "mtime": 1794849270.939893,
+    "seen": 1794850058.0440137,
+    "ast_hash": "18cf20e2a1c48a6d3be68906f025a291",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1794822668.9418955,
-    "seen": 1794832644.4573622,
-    "ast_hash": "bb7cb10604a5ba7e54d490ffe8b7cb5d",
+    "mtime": 1794839978.367713,
+    "seen": 1794840444.5416925,
+    "ast_hash": "3c4911f05fef28cd5e1c9dcf2f7685a6",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {

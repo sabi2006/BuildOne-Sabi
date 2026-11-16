@@ -24,7 +24,9 @@ import {
   ChevronDown,
   ChevronUp,
   Building2,
-  Check
+  Check,
+  Coins,
+  Hammer
 } from 'lucide-react';
 import { VisualEstimator3D } from '../3d/VisualEstimator3D';
 import { SaveProjectModal } from './SaveProjectModal';
@@ -47,7 +49,11 @@ import {
   BuildingConfig,
   DEFAULT_BUILDING_CONFIG,
   SOIL_CATALOG,
-  ColumnStructuralCalculation
+  ColumnStructuralCalculation,
+  BOQProductItem,
+  FloorBOQSchedule,
+  CategoryCostItem,
+  BuildingBOQSummary
 } from '@/lib/brickCalculator';
 
 function cn(...classes: (string | undefined | null | false)[]) {
@@ -182,12 +188,34 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
   const [rccMixRatio, setRccMixRatio] = useState<'1:1.5:3' | '1:2:4' | '1:1:2' | '1:3:6' | 'custom'>('1:1.5:3');
   const [rccLabourRate, setRccLabourRate] = useState<number>(settings.rccLabourRate || 4000); // per m3
   const [steelRate, setSteelRate] = useState<number>(settings.steelRate || 65); // per kg
+  const [bindingWireRate, setBindingWireRate] = useState<number>(settings.bindingWireRatePerKg || 90); // per kg
+  const [concreteRate, setConcreteRate] = useState<number>(settings.concreteRatePerM3 || 4500); // per m3
+  const [mortarRate, setMortarRate] = useState<number>(settings.mortarRatePerM3 || 3800); // per m3
 
   // Foundation specific rate states
   const [excavationRate, setExcavationRate] = useState<number>(settings.excavationRatePerM3 || 250); // ₹ per m3
   const [sandFillRate, setSandFillRate] = useState<number>(settings.sandFillRatePerCft || 45); // ₹ per CFT
   const [pccLabourRate, setPccLabourRate] = useState<number>(settings.pccLabourRatePerM3 || 2500); // ₹ per m3
   const [footingLabourRate, setFootingLabourRate] = useState<number>(settings.footingLabourRatePerM3 || 4200); // ₹ per m3
+
+  // Helper to update individual product rate and persist to model config
+  const handleProductRateChange = (field: string, value: number) => {
+    if (field === 'cementBagPrice') setCementPrice(value);
+    else if (field === 'sandPricePerCft') setSandPrice(value);
+    else if (field === 'aggregatePricePerCft') setAggregatePrice(value);
+    else if (field === 'steelRatePerKg') setSteelRate(value);
+    else if (field === 'bindingWireRatePerKg') setBindingWireRate(value);
+    else if (field === 'brickPrice') setBrickPrice(value);
+    else if (field === 'concreteRatePerM3') setConcreteRate(value);
+    else if (field === 'mortarRatePerM3') setMortarRate(value);
+
+    updateBuildingConfig({
+      customRates: {
+        ...(bConfig.customRates || {}),
+        [field]: value
+      }
+    });
+  };
 
   // Synchronize local states whenever buildingConfig or customRates changes
   useEffect(() => {
@@ -198,6 +226,9 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
         if (cfg.customRates.sandPricePerCft !== undefined) setSandPrice(cfg.customRates.sandPricePerCft);
         if (cfg.customRates.aggregatePricePerCft !== undefined) setAggregatePrice(cfg.customRates.aggregatePricePerCft);
         if (cfg.customRates.steelRatePerKg !== undefined) setSteelRate(cfg.customRates.steelRatePerKg);
+        if (cfg.customRates.bindingWireRatePerKg !== undefined) setBindingWireRate(cfg.customRates.bindingWireRatePerKg);
+        if (cfg.customRates.concreteRatePerM3 !== undefined) setConcreteRate(cfg.customRates.concreteRatePerM3);
+        if (cfg.customRates.mortarRatePerM3 !== undefined) setMortarRate(cfg.customRates.mortarRatePerM3);
         if (cfg.customRates.brickPrice !== undefined) setBrickPrice(cfg.customRates.brickPrice);
         if (cfg.customRates.excavationRatePerM3 !== undefined) setExcavationRate(cfg.customRates.excavationRatePerM3);
         if (cfg.customRates.pccLabourRatePerM3 !== undefined) setPccLabourRate(cfg.customRates.pccLabourRatePerM3);
@@ -266,6 +297,9 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
       footingLabourRatePerM3: footingLabourRate,
 
       // Additional structural & labour rates
+      bindingWireRatePerKg: bindingWireRate,
+      concreteRatePerM3: concreteRate,
+      mortarRatePerM3: mortarRate,
       contingencyPercent: contingencyPercent,
       taxPercent: buildingModel.buildingConfig?.customRates?.taxPercent ?? 18,
       formworkRatePerM2: buildingModel.buildingConfig?.customRates?.formworkRatePerM2 ?? 350,
@@ -274,7 +308,7 @@ export function VisualEstimatorResults({ onBack }: VisualEstimatorResultsProps) 
     };
 
     return calculateProject({ walls: [], pillars: buildingModel.pillars || [], buildingModel }, brickType, localSettings);
-  }, [buildingModel, brickType, settings, wastagePercent, mortarRatio, brickPrice, cementPrice, sandPrice, sandUnit, transportCost, rccMixRatio, aggregatePrice, steelRate, rccLabourRate, excavationRate, sandFillRate, pccLabourRate, footingLabourRate, contingencyPercent, masonWage, helperWage]);
+  }, [buildingModel, brickType, settings, wastagePercent, mortarRatio, brickPrice, cementPrice, sandPrice, sandUnit, transportCost, rccMixRatio, aggregatePrice, steelRate, bindingWireRate, concreteRate, mortarRate, rccLabourRate, excavationRate, sandFillRate, pccLabourRate, footingLabourRate, contingencyPercent, masonWage, helperWage]);
 
   // Wall Area Breakdown Calculation
   const breakdown = useMemo(() => {
@@ -900,9 +934,9 @@ Please contact me.`;
                   <span className="text-[10px] text-amber-700 font-mono">({plEst.totalSandM3.toFixed(2)} m³ • No Jalli)</span>
                 </div>
                 <div className="p-2.5 bg-blue-50/60 border border-blue-200 rounded-xl">
-                  <span className="text-[10px] uppercase font-bold text-blue-800 block">💧 Curing Water</span>
-                  <span className="font-bold text-slate-900 font-mono text-sm block mt-1">{plEst.totalWaterLitres.toFixed(0)} L</span>
-                  <span className="text-[10px] text-slate-500 font-mono">(~28 L/bag)</span>
+                  <span className="text-[10px] uppercase font-bold text-blue-800 block">🧪 Plaster Mortar</span>
+                  <span className="font-bold text-slate-900 font-mono text-sm block mt-1">{(plEst.totalWetVolumeM3 * 35.3147).toFixed(1)} CFT</span>
+                  <span className="text-[10px] text-slate-500 font-mono">({plEst.totalWetVolumeM3.toFixed(2)} m³ mix)</span>
                 </div>
               </div>
 
@@ -2006,106 +2040,6 @@ Please contact me.`;
                   </span>
                 </div>
               </div>
-
-              {/* Complete Structural & Building Financial Takeoff Table */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs bg-white">
-                <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    Full Construction Cost Takeoff (IS 456 Structural Schedule)
-                  </span>
-                  <span className="text-xs font-mono font-bold text-emerald-400">
-                    Grand Total: ₹{Math.round(s.costs.grandTotal).toLocaleString('en-IN')} (₹{Math.round(s.costs.costPerSqFt)} / sq.ft)
-                  </span>
-                </div>
-                <table className="min-w-full divide-y divide-slate-200 text-xs">
-                  <thead className="bg-slate-50 text-slate-600 font-semibold uppercase">
-                    <tr>
-                      <th className="py-2.5 px-4 text-left">Trade / Construction Scope</th>
-                      <th className="py-2.5 px-4 text-right">Materials (₹)</th>
-                      <th className="py-2.5 px-4 text-right">Labour & Formwork (₹)</th>
-                      <th className="py-2.5 px-4 text-right">Scope Total (₹)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">1. Substructure (Excavation, PCC, RCC Footings & Rebar)</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.foundation.rccFooting + s.costs.foundation.steel + s.costs.foundation.pcc).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.foundation.excavation + s.costs.foundation.sandFill + s.costs.foundation.backfill).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.foundation.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">2. RCC Columns / Pillars (IS 456 Sized Sections)</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.columns.concrete + s.costs.columns.mainSteel + s.costs.columns.stirrupSteel).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.columns.formwork + s.costs.columns.labour).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.columns.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">3. RCC Plinth Beams & Ring Beams</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.beams.concrete + s.costs.beams.steel).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.beams.formwork + s.costs.beams.labour).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.beams.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">4. RCC Floor & Roof Slabs</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.slabs.concrete + s.costs.slabs.steel).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.slabs.formwork + s.costs.slabs.labour).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.slabs.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">5. Masonry Superstructure ({computedResult.baseBrickQuantity.toLocaleString()} Bricks)</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.masonry.bricks + s.costs.masonry.mortarCement + s.costs.masonry.mortarSand).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.masonry.labour).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.masonry.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">6. Wall & Ceiling Plastering</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.plaster.materials).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.plaster.labour).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.plaster.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">7. Architectural Finishes (Flooring & Painting)</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.finishes.flooring).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono">₹{Math.round(s.costs.finishes.painting).toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-4 text-right font-mono font-bold text-slate-900">₹{Math.round(s.costs.finishes.total).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="bg-slate-50 font-bold text-slate-900 border-t-2 border-slate-300">
-                      <td className="py-3 px-4">Direct Construction Cost Subtotal</td>
-                      <td colSpan={2} className="py-3 px-4 text-right text-slate-500 font-normal">All Trades Combined</td>
-                      <td className="py-3 px-4 text-right font-mono text-sm">₹{Math.round(s.costs.directCostSubtotal).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="text-slate-600">
-                      <td className="py-2 px-4">+ Material Wastage Allowance (5%)</td>
-                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Bricks, Cement, Rebar Off-cuts</td>
-                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.wastageAllowance).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="text-slate-600">
-                      <td className="py-2 px-4">+ Contractor Overheads (5%)</td>
-                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Site supervision, tools, safety</td>
-                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.overheads).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="text-slate-600">
-                      <td className="py-2 px-4">+ Construction Contingency (5%)</td>
-                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Unforeseen site conditions</td>
-                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.contingency).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="text-slate-600">
-                      <td className="py-2 px-4">+ Statutory GST (18%)</td>
-                      <td colSpan={2} className="py-2 px-4 text-right text-slate-400">Works Contract GST Rate</td>
-                      <td className="py-2 px-4 text-right font-mono font-semibold">₹{Math.round(s.costs.taxGst).toLocaleString('en-IN')}</td>
-                    </tr>
-                    <tr className="bg-slate-900 text-white font-extrabold text-sm">
-                      <td className="py-3.5 px-4 text-amber-400 uppercase tracking-wider">Grand Total Construction Estimate</td>
-                      <td colSpan={2} className="py-3.5 px-4 text-right text-xs text-slate-300 font-normal">
-                        Total Built-up: {Math.round(s.totalBuiltUpAreaSqFt).toLocaleString('en-IN')} sq.ft
-                      </td>
-                      <td className="py-3.5 px-4 text-right font-mono text-emerald-400 text-base">
-                        ₹{Math.round(s.costs.grandTotal).toLocaleString('en-IN')}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         );
@@ -2255,12 +2189,12 @@ Please contact me.`;
                               <span className="font-bold text-slate-900 font-mono">{fl.steelKg.toFixed(1)} kg</span>
                             </div>
                             <div className="p-2 bg-slate-50 rounded">
-                              <span className="text-[10px] text-slate-500 block">Water</span>
-                              <span className="font-bold text-slate-900 font-mono">{fl.waterLitres} L</span>
+                              <span className="text-[10px] text-slate-500 block">Binding Wire</span>
+                              <span className="font-bold text-slate-900 font-mono">{(fl.steelKg * 0.011).toFixed(1)} kg</span>
                             </div>
                             <div className="p-2 bg-slate-50 rounded">
-                              <span className="text-[10px] text-slate-500 block">Cover Blocks</span>
-                              <span className="font-bold text-slate-900 font-mono">{fl.coverBlocks} Nos</span>
+                              <span className="text-[10px] text-slate-500 block">RCC Concrete</span>
+                              <span className="font-bold text-slate-900 font-mono">{fl.concreteVolumeM3.toFixed(2)} m³</span>
                             </div>
                           </div>
                         </div>
@@ -2273,81 +2207,39 @@ Please contact me.`;
               {/* Cumulative Project RCC Summary Table */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="col-span-1 lg:col-span-2 space-y-4">
-                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">📊 Total Project RCC Materials & Recommended Purchase</h4>
-                  <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-                    <table className="min-w-full divide-y divide-slate-200 text-xs">
-                      <thead className="bg-slate-50 text-slate-600 uppercase font-semibold">
-                        <tr>
-                          <th className="py-2.5 px-4 text-left">Material Item</th>
-                          <th className="py-2.5 px-4 text-right">Calculated Quantity</th>
-                          <th className="py-2.5 px-4 text-right">Rec. Purchase</th>
-                          <th className="py-2.5 px-4 text-right">Rate</th>
-                          <th className="py-2.5 px-4 text-right">Amount (₹)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Cement (50kg bags)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalCementExactBags.toFixed(1)} Bags</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.cementBags} Bags</td>
-                          <td className="py-2.5 px-4 text-right">₹{cementPrice}</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.cement).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">{bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'} (Fine Aggregate)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalSandCft.toFixed(1)} CFT ({rcc.totalSandM3.toFixed(2)} m³)</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.sandCft} CFT</td>
-                          <td className="py-2.5 px-4 text-right">₹{sandPrice} / CFT</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.sand).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">20mm Jalli (Coarse Aggregate)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalAggregateCft.toFixed(1)} CFT ({rcc.totalAggregateM3.toFixed(2)} m³)</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.aggregateCft} CFT</td>
-                          <td className="py-2.5 px-4 text-right">₹{aggregatePrice} / CFT</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.aggregate).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">TMT Steel Reinforcement</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalSteelKg.toFixed(1)} kg ({rcc.totalSteelTonnes.toFixed(3)} T)</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.steelKg} kg</td>
-                          <td className="py-2.5 px-4 text-right">₹{steelRate} / kg</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.steel).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Binding Wire</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalBindingWireKg.toFixed(1)} kg</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.bindingWireKg} kg</td>
-                          <td className="py-2.5 px-4 text-right">₹85 / kg</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.bindingWire).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Cover Blocks</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalCoverBlocks} Nos</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{rcc.recommendedPurchase.coverBlocks} Nos</td>
-                          <td className="py-2.5 px-4 text-right">₹3 / piece</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.coverBlocks).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Water (Approx)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalWaterLitres.toLocaleString()} Litres</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right text-slate-500">Site water</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">RCC Concreting Labour</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{rcc.totalConcreteVolumeM3.toFixed(2)} m³</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right">₹{rccLabourRate} / m³</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(rcc.costs.labour).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr className="bg-slate-100 font-extrabold text-slate-900">
-                          <td colSpan={4} className="py-3 px-4 text-right border-t border-slate-300 text-sm">Total Project RCC Cost</td>
-                          <td className="py-3 px-4 text-right border-t border-slate-300 text-sm text-emerald-600">₹{Math.round(rcc.costs.total).toLocaleString('en-IN')}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                      <span>🏗️</span> RCC Structural Takeoff Summary
+                    </h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Reinforced concrete volumes and structural rebar for all Columns, Ring Beams, and Roof Slabs are calculated dynamically from your 3D building model and floor elevations.
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">RCC Concrete Volume</span>
+                        <span className="font-bold font-mono text-slate-900 text-sm">{rcc.totalConcreteVolumeM3.toFixed(2)} m³</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({rcc.totalConcreteVolumeCft.toFixed(1)} CFT)</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">TMT Steel Reinforcement</span>
+                        <span className="font-bold font-mono text-slate-900 text-sm">{rcc.totalSteelKg.toFixed(1)} kg</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({rcc.totalSteelTonnes.toFixed(3)} T)</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">Binding Wire (1.1%)</span>
+                        <span className="font-bold font-mono text-slate-900 text-sm">{rcc.totalBindingWireKg.toFixed(1)} kg</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">RCC Scope Total</span>
+                        <span className="font-bold font-mono text-emerald-600 text-sm">₹{Math.round(rcc.costs.total).toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-lg text-[11px] text-blue-900 flex items-start gap-2 mt-2">
+                      <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                      <div>
+                        <b>Master Dynamic BOQ Unified:</b> All RCC raw materials (Cement, Sand, Jalli, TMT Steel, Binding Wire) are accurately consolidated into the <b>Master 8-Product Dynamic BOQ Schedule</b> below, avoiding repetitive procurement lists and double counting.
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2535,104 +2427,40 @@ Please contact me.`;
               {/* Foundation Materials & Recommended Purchase Table */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="col-span-1 lg:col-span-2 space-y-4">
-                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">📊 Total Foundation Materials & Recommended Purchase</h4>
-                  <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-                    <table className="min-w-full divide-y divide-slate-200 text-xs">
-                      <thead className="bg-slate-50 text-slate-600 uppercase font-semibold">
-                        <tr>
-                          <th className="py-2.5 px-4 text-left">Material / Operation Item</th>
-                          <th className="py-2.5 px-4 text-right">Calculated Quantity</th>
-                          <th className="py-2.5 px-4 text-right">Rec. Purchase</th>
-                          <th className="py-2.5 px-4 text-right">Rate</th>
-                          <th className="py-2.5 px-4 text-right">Amount (₹)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Earth Excavation (Pit digging)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalExcavationVolumeM3.toFixed(2)} m³ ({fnd.totalExcavationVolumeCft.toFixed(1)} CFT)</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right">₹{excavationRate} / m³</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.excavation).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Sand Filling (Base bed compaction)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalSandFillVolumeCft.toFixed(1)} CFT</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-amber-600">{fnd.recommendedPurchase.sandFillCft} CFT</td>
-                          <td className="py-2.5 px-4 text-right">₹{sandFillRate} / CFT</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.sandFill).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">PCC Base Lean Concrete (1:4:8 / 1:3:6)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalPccVolumeM3.toFixed(2)} m³</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right">₹{pccLabourRate} / m³</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.pccLabour).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">RCC Footing Concreting Labour</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalFootingVolumeM3.toFixed(2)} m³</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right">₹{footingLabourRate} / m³</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.footingLabour).toLocaleString('en-IN')}</td>
-                        </tr>
-                        {fnd.totalStubVolumeM3 && fnd.totalStubVolumeM3 > 0 ? (
-                          <tr>
-                            <td className="py-2.5 px-4 font-bold text-slate-900">RCC Column Stub Concreting Labour</td>
-                            <td className="py-2.5 px-4 text-right font-mono">{fnd.totalStubVolumeM3.toFixed(2)} m³ ({(fnd.totalStubVolumeCft ?? 0).toFixed(1)} CFT)</td>
-                            <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                            <td className="py-2.5 px-4 text-right">₹{footingLabourRate} / m³</td>
-                            <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.stubLabour ?? 0).toLocaleString('en-IN')}</td>
-                          </tr>
-                        ) : null}
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Cement (PCC + Footings + Stubs)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalCementExactBags.toFixed(1)} Bags</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.cementBags} Bags</td>
-                          <td className="py-2.5 px-4 text-right">₹{cementPrice}</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.cement).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">{bConfig?.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'} (PCC + Footings + Stubs)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalSandCft.toFixed(1)} CFT</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.sandCft} CFT</td>
-                          <td className="py-2.5 px-4 text-right">₹{sandPrice} / CFT</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.sand).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">20mm/40mm Coarse Aggregate (Jalli)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalAggregateCft.toFixed(1)} CFT</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.aggregateCft} CFT</td>
-                          <td className="py-2.5 px-4 text-right">₹{aggregatePrice} / CFT</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.aggregate).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">TMT Steel (Mesh + Stub Starters & Ties)</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalSteelKg.toFixed(1)} kg</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.steelKg} kg</td>
-                          <td className="py-2.5 px-4 text-right">₹{steelRate} / kg</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.steel).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Binding Wire & Cover Blocks</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.totalBindingWireKg.toFixed(1)} kg • {fnd.totalCoverBlocks} Nos</td>
-                          <td className="py-2.5 px-4 text-right font-mono font-bold text-orange-600">{fnd.recommendedPurchase.bindingWireKg} kg</td>
-                          <td className="py-2.5 px-4 text-right">₹85/kg • ₹3/pc</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.bindingWire + fnd.costs.coverBlocks).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2.5 px-4 font-bold text-slate-900">Plinth / DPC Damp Proof Course</td>
-                          <td className="py-2.5 px-4 text-right font-mono">{fnd.dpcAreaSqM.toFixed(2)} m² ({fnd.dpcAreaSqFt.toFixed(1)} sq.ft)</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-slate-500">—</td>
-                          <td className="py-2.5 px-4 text-right">₹150 / m²</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">₹{Math.round(fnd.costs.dpc).toLocaleString('en-IN')}</td>
-                        </tr>
-                        <tr className="bg-amber-50/80 font-extrabold text-slate-900">
-                          <td colSpan={4} className="py-3 px-4 text-right border-t border-amber-300 text-sm">Total Foundation & Base Cost</td>
-                          <td className="py-3 px-4 text-right border-t border-amber-300 text-sm text-amber-800 font-mono">₹{Math.round(fnd.costs.total).toLocaleString('en-IN')}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-5 space-y-3">
+                    <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-2">
+                      <span>🏛️</span> Substructure & Foundation Takeoff Summary
+                    </h4>
+                    <p className="text-xs text-amber-900 leading-relaxed">
+                      All earthwork pit excavation, sand bedding, plain lean concrete (PCC), and structural reinforced footings with starter dowels are calculated based on your pillar layout and soil bearing depth.
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
+                      <div className="bg-white p-3 rounded-lg border border-amber-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">Excavation Volume</span>
+                        <span className="font-bold font-mono text-slate-900 text-sm">{fnd.totalExcavationVolumeM3.toFixed(2)} m³</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({fnd.totalExcavationVolumeCft.toFixed(1)} CFT)</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-amber-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">PCC Base Volume</span>
+                        <span className="font-bold font-mono text-slate-900 text-sm">{fnd.totalPccVolumeM3.toFixed(2)} m³</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({fnd.totalPccVolumeCft.toFixed(1)} CFT)</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-amber-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">Footing Rebar Steel</span>
+                        <span className="font-bold font-mono text-cyan-700 text-sm">{fnd.totalSteelKg.toFixed(1)} kg</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({(fnd.totalSteelKg / 1000).toFixed(3)} T)</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-amber-200">
+                        <span className="text-[10px] text-slate-400 block font-medium">Substructure Cost</span>
+                        <span className="font-bold font-mono text-emerald-600 text-sm">₹{Math.round(fnd.costs.total).toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-amber-100/70 border border-amber-300 rounded-lg text-[11px] text-amber-950 flex items-start gap-2 mt-2">
+                      <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <div>
+                        <b>Master Dynamic BOQ Unified:</b> All foundation raw materials (Cement, Sand, Jalli, TMT Steel, Binding Wire) are accurately consolidated into the <b>Master 8-Product Dynamic BOQ Schedule</b> below, avoiding repetitive procurement lists and double counting.
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -2700,216 +2528,437 @@ Please contact me.`;
       })()}
       {/* Section 4b Plaster Estimate has been relocated directly after Brick Masonry (Section 2b) */}
 
-      {/* 5. Cost Summary */}
-      <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden border border-gray-800 text-white mt-8">
-        <div className="bg-black/50 px-6 py-4 border-b border-gray-800">
-          <h3 className="text-lg font-bold text-white flex items-center">AI Visual Building Estimate</h3>
-        </div>
-        <div className="p-6">
-          <table className="min-w-full divide-y divide-gray-800 text-sm mb-6">
-            <thead>
-              <tr className="text-gray-400 text-left font-medium tracking-wider text-xs uppercase">
-                <th className="pb-3 pr-4">Item</th>
-                <th className="pb-3 px-4 text-right">Quantity</th>
-                <th className="pb-3 px-4 text-left">Unit</th>
-                <th className="pb-3 px-4 text-right">Rate</th>
-                <th className="pb-3 pl-4 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800 text-gray-200">
-              <tr>
-                <td className="py-3 pr-4">{brickType.supplierBrand || 'A V M Bricks'}</td>
-                <td className="py-3 px-4 text-right">{computedResult.totalBricks.toLocaleString()}</td>
-                <td className="py-3 px-4 text-left">Nos</td>
-                <td className="py-3 px-4 text-right">₹{brickPrice}</td>
-                <td className="py-3 pl-4 text-right font-medium">₹{computedResult.costs.bricks.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Cement</td>
-                <td className="py-3 px-4 text-right">{computedResult.cementBags.toLocaleString()}</td>
-                <td className="py-3 px-4 text-left">Bags</td>
-                <td className="py-3 px-4 text-right">₹{cementPrice}</td>
-                <td className="py-3 pl-4 text-right font-medium">₹{computedResult.costs.cement.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Sand</td>
-                <td className="py-3 px-4 text-right">{sandUnit === 'CFT' ? (computedResult.sandVolume * 35.3147).toFixed(1) : computedResult.sandVolume.toFixed(2)}</td>
-                <td className="py-3 px-4 text-left">{sandUnit}</td>
-                <td className="py-3 px-4 text-right">₹{sandPrice}</td>
-                <td className="py-3 pl-4 text-right font-medium">₹{computedResult.costs.sand.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Mortar Volume</td>
-                <td className="py-3 px-4 text-right">{computedResult.wetMortarVolume.toFixed(2)}</td>
-                <td className="py-3 px-4 text-left">m³</td>
-                <td className="py-3 px-4 text-right">—</td>
-                <td className="py-3 pl-4 text-right font-medium text-gray-400">Included</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Mason Labour</td>
-                <td className="py-3 px-4 text-right">{masonDays}</td>
-                <td className="py-3 px-4 text-left">Days</td>
-                <td className="py-3 px-4 text-right">₹{masonWage}</td>
-                <td className="py-3 pl-4 text-right font-medium">₹{masonCost.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Helper Labour</td>
-                <td className="py-3 px-4 text-right">{helperDays}</td>
-                <td className="py-3 px-4 text-left">Days</td>
-                <td className="py-3 px-4 text-right">₹{helperWage}</td>
-                <td className="py-3 pl-4 text-right font-medium">₹{helperCost.toLocaleString()}</td>
-              </tr>
-              {computedResult.rccProjectEstimate && computedResult.rccProjectEstimate.totalConcreteVolumeM3 > 0 && (
-                <tr className="bg-slate-800/80 font-semibold text-orange-400">
-                  <td className="py-3 pr-4">RCC Structural Construction (All Floors)</td>
-                  <td className="py-3 px-4 text-right">{computedResult.rccProjectEstimate.totalConcreteVolumeCft.toFixed(1)}</td>
-                  <td className="py-3 px-4 text-left">CFT</td>
-                  <td className="py-3 px-4 text-right">—</td>
-                  <td className="py-3 pl-4 text-right font-bold text-orange-400">₹{Math.round(computedResult.rccProjectEstimate.costs.total).toLocaleString('en-IN')}</td>
-                </tr>
-              )}
-              {computedResult.foundationEstimate && (computedResult.foundationEstimate.footingCount ?? 0) > 0 && (
-                <tr className="bg-amber-950/40 font-semibold text-amber-400">
-                  <td className="py-3 pr-4">Ground Floor Foundation / Base (PCC + RCC Footings)</td>
-                  <td className="py-3 px-4 text-right">{computedResult.foundationEstimate.footingCount}</td>
-                  <td className="py-3 px-4 text-left">Units</td>
-                  <td className="py-3 px-4 text-right">—</td>
-                  <td className="py-3 pl-4 text-right font-bold text-amber-400">₹{Math.round(computedResult.foundationEstimate.costs.total).toLocaleString('en-IN')}</td>
-                </tr>
-              )}
-              {computedResult.plasterEstimate && computedResult.plasterEstimate.totalNetPlasterAreaSqFt > 0 && (
-                <tr className="bg-teal-950/40 font-semibold text-teal-300">
-                  <td className="py-3 pr-4">Plaster &amp; Cement Finish (Inner + Outer + RCC Columns &amp; Side Beams)</td>
-                  <td className="py-3 px-4 text-right">{computedResult.plasterEstimate.totalNetPlasterAreaSqFt.toFixed(1)}</td>
-                  <td className="py-3 px-4 text-left">sq.ft</td>
-                  <td className="py-3 px-4 text-right">—</td>
-                  <td className="py-3 pl-4 text-right font-bold text-teal-300">₹{Math.round(computedResult.plasterEstimate.costs.total).toLocaleString('en-IN')}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {/* 5. Dynamic Bill of Quantities (BOQ) & Building Cost Estimation */}
+      {computedResult.buildingBOQ && (() => {
+        const boq = computedResult.buildingBOQ!;
+        const products = boq.products || [];
+        const floorSchedules = boq.floorSchedules || [];
+        const categories = boq.categoryBreakdown || [];
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-8 pt-8 border-t border-gray-800">
-            {/* Optional Extra Costs */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Transport Cost (₹)</label>
-                  <input type="number" value={transportCost} onChange={e => setTransportCost(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm" />
+        // Rate map for the 8 products
+        const getRateValue = (p: BOQProductItem) => {
+          switch (p.id) {
+            case 'cement': return cementPrice;
+            case 'sand': return sandPrice;
+            case 'coarse_aggregate': return aggregatePrice;
+            case 'tmt_steel': return steelRate;
+            case 'binding_wire': return bindingWireRate;
+            case 'bricks': return brickPrice;
+            case 'concrete': return concreteRate;
+            case 'mortar': return mortarRate;
+            default: return p.unitRate;
+          }
+        };
+
+        const getRateField = (p: BOQProductItem) => {
+          switch (p.id) {
+            case 'cement': return 'cementBagPrice';
+            case 'sand': return 'sandPricePerCft';
+            case 'coarse_aggregate': return 'aggregatePricePerCft';
+            case 'tmt_steel': return 'steelRatePerKg';
+            case 'binding_wire': return 'bindingWireRatePerKg';
+            case 'bricks': return 'brickPrice';
+            case 'concrete': return 'concreteRatePerM3';
+            case 'mortar': return 'mortarRatePerM3';
+            default: return '';
+          }
+        };
+
+        return (
+          <div className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-800 text-white mt-8">
+            {/* Header */}
+            <div className="bg-slate-950/80 px-6 py-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                    Official Dynamic BOQ
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    IS 456 &amp; IS 1200 Compliant
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    Zero Double-Counting
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">Contingency / Tax (%)</label>
-                  <input type="number" value={contingencyPercent} onChange={e => setContingencyPercent(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm" />
-                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+                  <Coins className="w-6 h-6 text-orange-500 shrink-0" />
+                  Bill of Quantities (BOQ) &amp; Total Cost Estimation
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Synchronized with 2D plans, 3D structural members, floor counts, opening deductions, and rebar schedules.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsStructuralModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-xs font-bold text-white transition-all shadow-md"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Structural Rates Config
+                </button>
               </div>
             </div>
 
-            {/* Grand Total */}
-            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-400">Brick Masonry Cost</span>
-                <span className="text-lg font-semibold text-gray-300">₹{Math.round(computedResult.costs.total + totalLabourCost).toLocaleString('en-IN')}</span>
-              </div>
-              {computedResult.rccProjectEstimate && computedResult.rccProjectEstimate.costs.total > 0 && (
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-orange-400 font-medium">RCC Structural Cost</span>
-                  <span className="text-lg font-semibold text-orange-400">₹{Math.round(computedResult.rccProjectEstimate.costs.total).toLocaleString('en-IN')}</span>
+            <div className="p-6 space-y-8">
+              {/* 5A: The 8 Construction Products Schedule Table */}
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                    1. Construction Products Schedule (8 Products)
+                  </h4>
+                  <span className="text-xs text-slate-400">
+                    Edit unit rates inline below to recalculate total project estimation instantly
+                  </span>
                 </div>
-              )}
-              {computedResult.foundationEstimate && computedResult.foundationEstimate.costs.total > 0 && (
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-amber-400 font-medium">Foundation / Base Cost</span>
-                  <span className="text-lg font-semibold text-amber-400">₹{Math.round(computedResult.foundationEstimate.costs.total).toLocaleString('en-IN')}</span>
-                </div>
-              )}
-              {computedResult.plasterEstimate && computedResult.plasterEstimate.costs.total > 0 && (
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-teal-400 font-medium">Plaster & Finish Cost</span>
-                  <span className="text-lg font-semibold text-teal-400">₹{Math.round(computedResult.plasterEstimate.costs.total).toLocaleString('en-IN')}</span>
-                </div>
-              )}
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm text-gray-400">Transport & Extras</span>
-                <span className="text-lg font-semibold text-gray-300">₹{Math.round(transportCost + contingencyAmount).toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex flex-col xl:flex-row xl:justify-between xl:items-end pt-4 border-t border-gray-700 gap-2">
-                <div>
-                  <span className="block text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Combined Estimate</span>
-                  <span className="text-2xl sm:text-3xl font-bold text-orange-500">Final Total Cost</span>
-                </div>
-                <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight xl:text-right">
-                  ₹{Math.round(computedResult.costs.total + totalLabourCost + (computedResult.rccProjectEstimate?.costs.total || 0) + (computedResult.foundationEstimate?.costs.total || 0) + (computedResult.plasterEstimate?.costs.total || 0) + transportCost + contingencyAmount).toLocaleString('en-IN')}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Labour Estimate */}
-      <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden mt-8">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center">👷 Labour Estimate</h3>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="col-span-1 lg:col-span-2">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead>
-                  <tr className="text-gray-500 text-left font-medium tracking-wider text-xs uppercase">
-                    <th className="pb-3 pr-4">Labour Type</th>
-                    <th className="pb-3 px-4 text-right">Daily Rate</th>
-                    <th className="pb-3 px-4 text-right">Estimated Days</th>
-                    <th className="pb-3 pl-4 text-right">Estimated Cost</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-700">
-                  <tr>
-                    <td className="py-3 pr-4 font-medium">Mason</td>
-                    <td className="py-3 px-4 text-right">₹{masonWage}</td>
-                    <td className="py-3 px-4 text-right">{masonDays}</td>
-                    <td className="py-3 pl-4 text-right font-semibold text-gray-900">₹{masonCost.toLocaleString()}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 pr-4 font-medium">Helper</td>
-                    <td className="py-3 px-4 text-right">₹{helperWage}</td>
-                    <td className="py-3 px-4 text-right">{helperDays}</td>
-                    <td className="py-3 pl-4 text-right font-semibold text-gray-900">₹{helperCost.toLocaleString()}</td>
-                  </tr>
-                  <tr className="bg-gray-50 font-bold text-gray-900">
-                    <td colSpan={3} className="py-3 px-4 text-right border-t border-gray-200">Total Labour Cost</td>
-                    <td className="py-3 pl-4 text-right border-t border-gray-200">₹{totalLabourCost.toLocaleString()}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                  <table className="min-w-full divide-y divide-slate-800 text-sm">
+                    <thead>
+                      <tr className="bg-slate-900/90 text-slate-400 text-left font-semibold text-xs uppercase tracking-wider">
+                        <th className="py-3 px-3 w-8">#</th>
+                        <th className="py-3 px-4">Product Name &amp; Engineering Scope</th>
+                        <th className="py-3 px-4">Unit</th>
+                        <th className="py-3 px-4 text-right">Est. Quantity</th>
+                        <th className="py-3 px-4 text-right">Unit Rate (₹)</th>
+                        <th className="py-3 px-4 text-right">Total Amount (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80 text-slate-200">
+                      {products.map((p, idx) => {
+                        const isComposite = p.category === 'composite_product';
+                        const rateVal = getRateValue(p);
+                        const rateField = getRateField(p);
+                        const totalCost = Math.round(p.quantity * rateVal);
 
-            {/* Editable Defaults */}
-            <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
-              <h4 className="text-xs font-bold text-blue-900 uppercase tracking-wider mb-4">Labour Settings</h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 flex justify-between">
-                    <span>Mason Productivity</span>
-                    <span className="text-gray-500 font-normal">bricks/day</span>
-                  </label>
-                  <input type="number" value={masonProductivity} onChange={e => setMasonProductivity(Number(e.target.value))} className="mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+                        return (
+                          <tr
+                            key={p.id}
+                            className={isComposite ? 'bg-amber-950/20 hover:bg-amber-950/30' : 'hover:bg-slate-800/50'}
+                          >
+                            <td className="py-3 px-3 text-xs font-mono text-slate-500">{idx + 1}</td>
+                            <td className="py-3 px-4">
+                              <div className="font-bold text-white flex items-center gap-2">
+                                <span>{p.name}</span>
+                                {isComposite && (
+                                  <span className="text-[9px] px-2 py-0.5 rounded-full font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    Composite Mix
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-slate-400 mt-0.5 leading-snug">{p.description}</div>
+                            </td>
+                            <td className="py-3 px-4 text-xs font-semibold text-slate-300 whitespace-nowrap">
+                              {p.unit}
+                              {p.secondaryUnit && (
+                                <span className="block text-[11px] text-slate-500 font-normal">
+                                  ({p.secondaryUnit})
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono font-bold text-slate-200 whitespace-nowrap">
+                              <div>
+                                {p.quantity > 0
+                                  ? p.quantity.toLocaleString(undefined, {
+                                      maximumFractionDigits: p.unit === 'Nos' || p.unit.includes('Bags') ? 0 : 2
+                                    })
+                                  : '—'}
+                              </div>
+                              {p.secondaryQuantity !== undefined && p.secondaryQuantity > 0 && (
+                                <div className="text-[11px] text-slate-400 font-normal">
+                                  {p.secondaryQuantity.toLocaleString(undefined, { maximumFractionDigits: 1 })}{' '}
+                                  {p.secondaryUnit}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="inline-flex items-center justify-end gap-1">
+                                <span className="text-xs text-slate-400 font-bold">₹</span>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  step={p.unit === 'Nos' ? 0.5 : 1}
+                                  value={rateVal}
+                                  onChange={(e) => {
+                                    const val = parseFloat(e.target.value) || 0;
+                                    handleProductRateChange(rateField, val);
+                                  }}
+                                  className="w-24 text-right text-xs font-bold text-white px-2 py-1 rounded bg-slate-800 border border-slate-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                                />
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono font-bold text-white whitespace-nowrap">
+                              ₹{totalCost.toLocaleString('en-IN')}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-900 border-t-2 border-slate-700 font-bold">
+                        <td colSpan={4} className="py-3.5 px-4 text-right uppercase tracking-wider text-xs text-slate-300">
+                          Direct Material Procurement Subtotal (Products 1–6):
+                        </td>
+                        <td colSpan={2} className="py-3.5 px-4 text-right font-mono text-base text-emerald-400">
+                          ₹{boq.materialSubtotal.toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700">Mason Wage (₹)</label>
-                    <input type="number" value={masonWage} onChange={e => setMasonWage(Number(e.target.value))} className="mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700">Helper Wage (₹)</label>
-                    <input type="number" value={helperWage} onChange={e => setHelperWage(Number(e.target.value))} className="mt-1 block w-full px-2 py-1 text-sm border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+
+                {/* Zero Double-Counting Informational Banner */}
+                <div className="mt-3 bg-blue-950/40 border border-blue-800/60 rounded-xl p-3.5 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                  <div className="text-xs text-blue-200 leading-relaxed">
+                    <b>Zero Double-Counting Architecture:</b> Direct Material Procurement subtotal reflects raw products (Cement, Sand, Coarse Aggregate, TMT Steel, Binding Wire, Bricks). Products 7 &amp; 8 (Concrete and Mortar) show composite wet engineering volumes and derived unit rates for site batching/contractor cross-reference and are <b>never double-charged</b> into the total material cost.
                   </div>
                 </div>
               </div>
+
+              {/* 5B: Category-wise Material & Structural Cost */}
+              <div>
+                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  2. Category-wise Material &amp; Structural Breakdown
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categories.map((c) => {
+                    const share = boq.grandTotal > 0 ? Math.round((c.totalCost / boq.grandTotal) * 100) : 0;
+                    return (
+                      <div
+                        key={c.id}
+                        className="bg-slate-950/70 rounded-xl border border-slate-800 p-4 hover:border-slate-700 transition-colors flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-bold text-sm text-white">{c.name}</span>
+                            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                              {share}% of Total
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-snug mb-3">{c.description}</p>
+                          <div className="space-y-1 text-xs text-slate-300">
+                            {c.concreteVolumeM3 > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Concrete Volume:</span>
+                                <span className="font-mono font-semibold">{c.concreteVolumeM3} m³</span>
+                              </div>
+                            )}
+                            {c.steelWeightKg > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Steel Reinforcement:</span>
+                                <span className="font-mono font-semibold">{c.steelWeightKg} kg</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between pt-1 border-t border-slate-800">
+                              <span className="text-slate-400">Material Cost:</span>
+                              <span className="font-mono font-bold text-slate-200">₹{c.materialCost.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Labour &amp; Formwork:</span>
+                              <span className="font-mono font-bold text-slate-400">₹{c.labourCost.toLocaleString('en-IN')}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-3 mt-3 border-t border-slate-800 flex justify-between items-baseline">
+                          <span className="text-xs uppercase tracking-wider font-bold text-slate-400">Category Total:</span>
+                          <span className="text-base font-extrabold text-orange-400 font-mono">
+                            ₹{c.totalCost.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 5C: Floor-wise BOQ Schedule Table */}
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    3. Floor-wise Material &amp; Cost Schedule (Independent Quantities)
+                  </h4>
+                  <span className="text-xs text-slate-400">
+                    Each floor calculates independent concrete, steel, brickwork, and material costs
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/60">
+                  <table className="min-w-full divide-y divide-slate-800 text-xs">
+                    <thead>
+                      <tr className="bg-slate-900/90 text-slate-400 text-left font-semibold uppercase tracking-wider">
+                        <th className="py-2.5 px-3">Floor Level</th>
+                        <th className="py-2.5 px-3 text-right">Cement (Bags)</th>
+                        <th className="py-2.5 px-3 text-right">Sand (CFT)</th>
+                        <th className="py-2.5 px-3 text-right">Aggregate (CFT)</th>
+                        <th className="py-2.5 px-3 text-right">Steel (kg)</th>
+                        <th className="py-2.5 px-3 text-right">Binding Wire (kg)</th>
+                        <th className="py-2.5 px-3 text-right">Bricks (Nos)</th>
+                        <th className="py-2.5 px-3 text-right">Concrete (m³)</th>
+                        <th className="py-2.5 px-3 text-right">Material Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/70 text-slate-200">
+                      {floorSchedules.map((f) => (
+                        <tr key={f.floorId} className="hover:bg-slate-800/40">
+                          <td className="py-2.5 px-3 font-bold text-white whitespace-nowrap">
+                            <span className="flex items-center gap-1.5">
+                              <Layers className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                              {f.floorName}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.cement.bags.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.sand.cft.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.coarseAggregate.cft.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.tmtSteel.kg.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.bindingWire.kg.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.bricks.count > 0 ? f.products.bricks.count.toLocaleString() : '—'}</td>
+                          <td className="py-2.5 px-3 text-right font-mono">{f.products.concrete.m3.toFixed(2)}</td>
+                          <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
+                            ₹{Math.round(f.floorMaterialCost).toLocaleString('en-IN')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-900 font-bold border-t-2 border-slate-700 text-white">
+                        <td className="py-3 px-3 uppercase tracking-wider text-[11px]">Total All Floors:</td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.cement.bags, 0).toLocaleString()}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.sand.cft, 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.coarseAggregate.cft, 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.tmtSteel.kg, 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.bindingWire.kg, 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.bricks.count, 0).toLocaleString()}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono">
+                          {floorSchedules.reduce((sum, f) => sum + f.products.concrete.m3, 0).toFixed(2)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono text-emerald-400">
+                          ₹{boq.materialSubtotal.toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* 5D: Overall Building Cost Takeoff & Financial Summary */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4 border-t border-slate-800">
+                {/* Takeoff Line Items */}
+                <div className="lg:col-span-7 space-y-3">
+                  <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    4. Financial Takeoff &amp; Statutory Allowances
+                  </h4>
+                  <div className="bg-slate-950/70 rounded-xl border border-slate-800 p-4 space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>1. Direct Material Procurement Total (Products 1–6):</span>
+                      <span className="font-mono font-bold text-white text-sm">₹{boq.materialSubtotal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>2. Labour, Formwork &amp; Shuttering Execution:</span>
+                      <span className="font-mono font-bold text-slate-200">₹{boq.labourAndFormworkSubtotal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>3. Site Transport &amp; Material Logistics:</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-slate-500">₹</span>
+                        <input
+                          type="number"
+                          value={transportCost}
+                          onChange={(e) => setTransportCost(Number(e.target.value) || 0)}
+                          className="w-24 text-right text-xs font-bold text-white px-2 py-1 rounded bg-slate-800 border border-slate-700 focus:border-orange-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>4. Material Wastage Allowance ({settings.wastagePercentage || 5}%):</span>
+                      <span className="font-mono font-semibold text-slate-300">₹{boq.wastageAllowance.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>5. Contractor Overheads &amp; Engineering Supervision (5%):</span>
+                      <span className="font-mono font-semibold text-slate-300">₹{boq.overheads.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>6. Contingency &amp; Unforeseen Extra Allowance:</span>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min={0}
+                          max={25}
+                          value={contingencyPercent}
+                          onChange={(e) => setContingencyPercent(Number(e.target.value) || 0)}
+                          className="w-14 text-right text-xs font-bold text-white px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 focus:border-orange-500 focus:outline-none"
+                        />
+                        <span className="text-slate-400">%</span>
+                        <span className="font-mono font-semibold text-slate-300 ml-2">₹{boq.contingency.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-300 pt-2 border-t border-slate-800">
+                      <span>7. GST / Applicable Taxes ({bConfig.customRates?.taxPercent ?? 18}%):</span>
+                      <span className="font-mono font-semibold text-slate-300">₹{boq.taxGst.toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grand Total Summary Card */}
+                <div className="lg:col-span-5 flex flex-col justify-between bg-gradient-to-br from-slate-950 to-slate-900 p-6 rounded-2xl border-2 border-orange-500/40 shadow-xl">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-orange-400">
+                        Total Construction Investment
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        All-Inclusive
+                      </span>
+                    </div>
+                    <span className="text-3xl sm:text-4xl font-black text-white tracking-tight block">
+                      ₹{boq.grandTotal.toLocaleString('en-IN')}
+                    </span>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Grand total includes all 8 materials, labour, shuttering, wastage, overheads, contingency, and GST.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-slate-800 grid grid-cols-2 gap-3">
+                    <div className="bg-slate-900/90 rounded-xl p-3 border border-slate-800">
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block mb-0.5">
+                        Total Built-Up Area
+                      </span>
+                      <span className="text-base font-extrabold font-mono text-white">
+                        {boq.totalBuiltUpAreaSqFt.toLocaleString()} <span className="text-xs font-normal text-slate-400">sq.ft</span>
+                      </span>
+                    </div>
+                    <div className="bg-slate-900/90 rounded-xl p-3 border border-slate-800">
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block mb-0.5">
+                        Rate per Sq.Ft
+                      </span>
+                      <span className="text-base font-extrabold font-mono text-orange-400">
+                        ₹{boq.costPerSqFt.toLocaleString('en-IN')} <span className="text-xs font-normal text-slate-400">/sq.ft</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       <div className="flex justify-center mt-8">
         <button 

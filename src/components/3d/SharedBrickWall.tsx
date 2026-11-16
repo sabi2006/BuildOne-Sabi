@@ -286,7 +286,13 @@ export function SharedBrickWall({
       )}
 
       {brickCount > 0 && (
-        <instancedMesh ref={meshRef} args={[undefined, undefined, brickCount]} castShadow receiveShadow>
+        <instancedMesh 
+          ref={meshRef} 
+          key={`bricks-${wall.id || 'wall'}-${brickCount}-${processedOpenings.length}-${processedOpenings.map(o => `${o.id}_${o.distanceFromStart}`).join('-')}`}
+          args={[undefined, undefined, brickCount]} 
+          castShadow 
+          receiveShadow
+        >
           <boxGeometry args={geometryArgs}>
             {/* Edges are extremely expensive for thousands of instances, so we remove them for performance */}
           </boxGeometry>

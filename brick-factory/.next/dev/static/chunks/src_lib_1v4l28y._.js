@@ -27,6 +27,8 @@ __turbopack_context__.s([
     ()=>DEFAULT_TN_RED_BRICK,
     "applyPillarConfigToAll",
     ()=>applyPillarConfigToAll,
+    "calculateBuildingBOQ",
+    ()=>calculateBuildingBOQ,
     "calculateDynamicPillarFooting",
     ()=>calculateDynamicPillarFooting,
     "calculateFloorRccEstimate",
@@ -1065,12 +1067,14 @@ const splitWallByPillars = (wall, pillars = [], buildingUnit = 'ft', allFloorWal
             // Filter and adjust openings belonging to this segment
             const segOpenings = [];
             (wall.openings || []).forEach((op)=>{
-                const opStart = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                const opStart = convertUnit(rawDist, op.unit || wall.dimensions.unit, buildingUnit);
                 const opW = convertUnit(op.width, op.unit || wall.dimensions.unit, buildingUnit);
                 const opEnd = opStart + opW;
                 if (opEnd > currentPos + 0.01 && opStart < cut.start - 0.01) {
                     segOpenings.push({
                         ...op,
+                        unit: buildingUnit,
                         distanceFromStart: Math.max(0, opStart - currentPos)
                     });
                 }
@@ -1101,12 +1105,14 @@ const splitWallByPillars = (wall, pillars = [], buildingUnit = 'ft', allFloorWal
         };
         const segOpenings = [];
         (wall.openings || []).forEach((op)=>{
-            const opStart = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+            const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+            const opStart = convertUnit(rawDist, op.unit || wall.dimensions.unit, buildingUnit);
             const opW = convertUnit(op.width, op.unit || wall.dimensions.unit, buildingUnit);
             const opEnd = opStart + opW;
             if (opEnd > currentPos + 0.01 && opStart < origLen - 0.01) {
                 segOpenings.push({
                     ...op,
+                    unit: buildingUnit,
                     distanceFromStart: Math.max(0, opStart - currentPos)
                 });
             }
@@ -3181,19 +3187,634 @@ const calculatePlasterEstimate = (project, settings, buildingUnit = 'ft')=>{
         }
     };
 };
+function calculateBuildingBOQ(params) {
+    const bModel = params.buildingModel;
+    const bConfig = bModel?.buildingConfig || __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_BUILDING_CONFIG"];
+    const rates = {
+        ...__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_BUILDING_CONFIG"].customRates || {},
+        ...bConfig.customRates || {},
+        ...params.customRates || {}
+    };
+    const cementRate = rates.cementBagPrice || params.settings?.cementPrice || 450;
+    const sandRate = rates.sandPricePerCft ?? params.settings?.sandPricePerCft ?? 60;
+    const aggregateRate = rates.aggregatePricePerCft ?? params.settings?.aggregatePricePerCft ?? 55;
+    const steelRate = rates.steelRatePerKg || params.settings?.steelRate || 65;
+    const bindingWireRate = rates.bindingWireRatePerKg || 90;
+    const brickRate = rates.brickPrice || params.settings?.brickPrice || 10;
+    const concreteRate = rates.concreteRatePerM3 || 4500;
+    const mortarRate = rates.mortarRatePerM3 || 3800;
+    const grade = bConfig.concreteGrade || 'M20';
+    const mix = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CONCRETE_MIX_DATABASE"][grade] || __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CONCRETE_MIX_DATABASE"].M20;
+    // 1. Concrete Volumes
+    const s = params.structuralSummary;
+    const pccM3 = s ? s.totalPccM3 || 0 : params.foundationEstimate ? params.foundationEstimate.totalPccVolumeM3 || 0 : 0;
+    const footingRccM3 = s ? s.totalFootingRccM3 || 0 : params.foundationEstimate ? params.foundationEstimate.totalFootingRccVolumeM3 || 0 : 0;
+    const columnRccM3 = s ? s.totalColumnRccM3 || 0 : bModel?.pillars ? bModel.pillars.reduce((sum, p)=>sum + calculatePillarMetrics(p).volume, 0) : 0;
+    const beamRccM3 = s ? s.totalBeamRccM3 || 0 : 0;
+    const slabRccM3 = s ? s.totalSlabRccM3 || 0 : 0;
+    const totalRccM3 = footingRccM3 + columnRccM3 + beamRccM3 + slabRccM3;
+    const totalConcreteM3 = totalRccM3 + pccM3;
+    const totalConcreteCft = totalConcreteM3 * 35.3147;
+    // 2. Concrete Constituents
+    const rccCementKg = totalRccM3 * mix.cementKgPerM3;
+    const pccCementKg = pccM3 * 160;
+    const concreteCementBags = Math.ceil((rccCementKg + pccCementKg) / 50);
+    const rccFineAggM3 = totalRccM3 * mix.fineAggKgPerM3 / 1600;
+    const pccFineAggM3 = pccM3 * 640 / 1600;
+    const concreteFineAggM3 = rccFineAggM3 + pccFineAggM3;
+    const concreteFineAggCft = concreteFineAggM3 * 35.3147;
+    const rccCoarseAggM3 = totalRccM3 * mix.coarseAggKgPerM3 / 1500;
+    const pccCoarseAggM3 = pccM3 * 1280 / 1500;
+    const concreteCoarseAggM3 = rccCoarseAggM3 + pccCoarseAggM3;
+    const concreteCoarseAggCft = concreteCoarseAggM3 * 35.3147;
+    // 3. Foundation Sand Bedding
+    let footingBedSandM3 = 0;
+    if (s && s.pillarsCalculations && s.pillarsCalculations.length > 0) {
+        footingBedSandM3 = s.pillarsCalculations.reduce((sum, c)=>sum + c.providedFootingLengthM * c.providedFootingWidthM * 0.1, 0);
+    } else if (params.foundationEstimate) {
+        footingBedSandM3 = params.foundationEstimate.totalSandFillVolumeM3 || params.foundationEstimate.totalSandFillCft / 35.3147 || 0;
+    }
+    const footingBedSandCft = footingBedSandM3 * 35.3147;
+    // 4. Masonry Constituents
+    const flMasonry = params.floorMasonryEstimates;
+    const totalBricks = flMasonry && flMasonry.length > 0 ? flMasonry.reduce((sum, f)=>sum + f.purchaseBrickQuantity, 0) : params.purchaseBrickQuantity || 0;
+    const masonryCementBags = flMasonry && flMasonry.length > 0 ? flMasonry.reduce((sum, f)=>sum + f.cementBags, 0) : params.cementBags || 0;
+    const masonrySandCft = flMasonry && flMasonry.length > 0 ? flMasonry.reduce((sum, f)=>sum + f.sandCft, 0) : (params.sandVolume || 0) * 35.3147;
+    const masonryWetMortarM3 = flMasonry && flMasonry.length > 0 ? flMasonry.reduce((sum, f)=>sum + f.wetMortarVolume, 0) : params.wetMortarVolume || 0;
+    // 5. Plaster Constituents
+    const plaster = params.plasterEstimate;
+    const plasterEnabled = plaster && plaster.enabled !== false;
+    const plasterCementBags = plasterEnabled ? plaster.totalCementBags || 0 : 0;
+    const plasterSandCft = plasterEnabled ? plaster.totalSandCft || 0 : 0;
+    const plasterWetMortarM3 = plasterEnabled ? plaster.totalWetVolumeM3 || 0 : 0;
+    // 6. Steel & Binding Wire
+    const footingSteelKg = s ? s.pillarsCalculations.reduce((sum, c)=>sum + (c.footingSteelKg || 0), 0) : params.foundationEstimate?.totalSteelKg || 0;
+    const columnSteelKg = s ? s.pillarsCalculations.reduce((sum, c)=>sum + (c.totalSteelWeightKg || 0), 0) : 0;
+    const beamSteelKg = s ? (s.floorBeamCalculations || []).reduce((sum, b)=>sum + (b.totalSteelWeightKg || 0), 0) + (s.roofBeamCalculation?.totalSteelWeightKg || 0) : 0;
+    const slabSteelKg = s ? (s.floorSlabCalculations || []).reduce((sum, sl)=>sum + (sl.totalSteelWeightKg || 0), 0) + (s.roofSlabCalculation?.totalSteelWeightKg || 0) : 0;
+    const totalSteelKg = Math.round((footingSteelKg + columnSteelKg + beamSteelKg + slabSteelKg) * 10) / 10;
+    const totalSteelTonnes = Math.round(totalSteelKg / 1000 * 1000) / 1000;
+    const bindingWireKg = Math.round(totalSteelKg * 0.011 * 10) / 10;
+    // 7. Aggregate 8 Construction Products
+    const totalCementBags = concreteCementBags + masonryCementBags + plasterCementBags;
+    const cementAmount = Math.round(totalCementBags * cementRate);
+    const totalSandCft = Math.round((footingBedSandCft + concreteFineAggCft + masonrySandCft + plasterSandCft) * 10) / 10;
+    const totalSandM3 = Math.round(totalSandCft / 35.3147 * 100) / 100;
+    const sandAmount = Math.round(totalSandCft * sandRate);
+    const totalCoarseAggCft = Math.round(concreteCoarseAggCft * 10) / 10;
+    const totalCoarseAggM3 = Math.round(concreteCoarseAggM3 * 100) / 100;
+    const aggregateAmount = Math.round(totalCoarseAggCft * aggregateRate);
+    const steelAmount = Math.round(totalSteelKg * steelRate);
+    const bindingWireAmount = Math.round(bindingWireKg * bindingWireRate);
+    const brickAmount = Math.round(totalBricks * brickRate);
+    const concreteAmount = Math.round(totalConcreteM3 * concreteRate);
+    const derivedConcreteRate = totalConcreteM3 > 0 ? Math.round((concreteCementBags * cementRate + concreteFineAggCft * sandRate + concreteCoarseAggCft * aggregateRate) / totalConcreteM3) : 0;
+    const totalMortarM3 = Math.round((masonryWetMortarM3 + plasterWetMortarM3) * 100) / 100;
+    const totalMortarCft = Math.round(totalMortarM3 * 35.3147 * 10) / 10;
+    const mortarAmount = Math.round(totalMortarM3 * mortarRate);
+    const derivedMortarRate = totalMortarM3 > 0 ? Math.round(((masonryCementBags + plasterCementBags) * cementRate + (masonrySandCft + plasterSandCft) * sandRate) / totalMortarM3) : 0;
+    const products = [
+        {
+            id: 'cement',
+            name: 'Cement',
+            unit: 'Bags',
+            quantity: totalCementBags,
+            unitRate: cementRate,
+            totalAmount: cementAmount,
+            rateKey: 'cementBagPrice',
+            category: 'primary_material',
+            description: '50 kg OPC / PPC bags for Concrete, Masonry & Plaster Mortar',
+            sourceBreakdown: {
+                concrete: concreteCementBags,
+                masonry: masonryCementBags,
+                plaster: plasterCementBags
+            }
+        },
+        {
+            id: 'sand',
+            name: bConfig.fineAggregateType === 'river_sand' ? 'River Sand' : 'Sand (M-Sand)',
+            unit: 'CFT',
+            quantity: totalSandCft,
+            secondaryQuantity: totalSandM3,
+            secondaryUnit: 'm³',
+            unitRate: sandRate,
+            totalAmount: sandAmount,
+            rateKey: 'sandPricePerCft',
+            category: 'primary_material',
+            description: 'Clean washed sand for Concrete, Bedding, Masonry & Plaster',
+            sourceBreakdown: {
+                bedding: Math.round(footingBedSandCft * 10) / 10,
+                concrete: Math.round(concreteFineAggCft * 10) / 10,
+                masonry: Math.round(masonrySandCft * 10) / 10,
+                plaster: Math.round(plasterSandCft * 10) / 10
+            }
+        },
+        {
+            id: 'coarse_aggregate',
+            name: 'Coarse Aggregate (20mm & 40mm)',
+            unit: 'CFT',
+            quantity: totalCoarseAggCft,
+            secondaryQuantity: totalCoarseAggM3,
+            secondaryUnit: 'm³',
+            unitRate: aggregateRate,
+            totalAmount: aggregateAmount,
+            rateKey: 'aggregatePricePerCft',
+            category: 'primary_material',
+            description: 'Graded blue metal granite stone (20mm for RCC, 40mm for PCC)',
+            sourceBreakdown: {
+                rcc: Math.round(rccCoarseAggM3 * 35.3147 * 10) / 10,
+                pcc: Math.round(pccCoarseAggM3 * 35.3147 * 10) / 10
+            }
+        },
+        {
+            id: 'tmt_steel',
+            name: `TMT Steel Bars (${bConfig.steelGrade || 'Fe500'})`,
+            unit: 'kg',
+            quantity: totalSteelKg,
+            secondaryQuantity: totalSteelTonnes,
+            secondaryUnit: 'Tonnes',
+            unitRate: steelRate,
+            totalAmount: steelAmount,
+            rateKey: 'steelRatePerKg',
+            category: 'primary_material',
+            description: 'High-yield deformed thermo-mechanically treated reinforcement bars',
+            sourceBreakdown: {
+                footings: Math.round(footingSteelKg * 10) / 10,
+                columns: Math.round(columnSteelKg * 10) / 10,
+                beams: Math.round(beamSteelKg * 10) / 10,
+                slabs: Math.round(slabSteelKg * 10) / 10
+            }
+        },
+        {
+            id: 'binding_wire',
+            name: 'Binding Wire (18-Gauge)',
+            unit: 'kg',
+            quantity: bindingWireKg,
+            unitRate: bindingWireRate,
+            totalAmount: bindingWireAmount,
+            rateKey: 'bindingWireRatePerKg',
+            category: 'primary_material',
+            description: 'Annealed mild steel wire for tying rebar joints (11 kg / tonne steel)',
+            sourceBreakdown: {
+                total: bindingWireKg
+            }
+        },
+        {
+            id: 'bricks',
+            name: 'Bricks (Red Clay / Modular)',
+            unit: 'Nos',
+            quantity: totalBricks,
+            unitRate: brickRate,
+            totalAmount: brickAmount,
+            rateKey: 'brickPrice',
+            category: 'primary_material',
+            description: 'Chamber burnt red clay bricks including opening deductions & wastage',
+            sourceBreakdown: {
+                masonry: totalBricks
+            }
+        },
+        {
+            id: 'concrete',
+            name: `Concrete (${bConfig.concreteGrade || 'M20'} RCC & PCC)`,
+            unit: 'm³',
+            quantity: Math.round(totalConcreteM3 * 100) / 100,
+            secondaryQuantity: Math.round(totalConcreteCft * 10) / 10,
+            secondaryUnit: 'CFT',
+            unitRate: concreteRate,
+            totalAmount: concreteAmount,
+            derivedRate: derivedConcreteRate,
+            rateKey: 'concreteRatePerM3',
+            category: 'composite_product',
+            description: 'Total concrete volume across Substructure, Columns, Beams & Slabs',
+            sourceBreakdown: {
+                pcc: Math.round(pccM3 * 100) / 100,
+                footings: Math.round(footingRccM3 * 100) / 100,
+                columns: Math.round(columnRccM3 * 100) / 100,
+                beams: Math.round(beamRccM3 * 100) / 100,
+                slabs: Math.round(slabRccM3 * 100) / 100
+            }
+        },
+        {
+            id: 'mortar',
+            name: 'Mortar (Masonry & Plaster Mix)',
+            unit: 'm³',
+            quantity: totalMortarM3,
+            secondaryQuantity: totalMortarCft,
+            secondaryUnit: 'CFT',
+            unitRate: mortarRate,
+            totalAmount: mortarAmount,
+            derivedRate: derivedMortarRate,
+            rateKey: 'mortarRatePerM3',
+            category: 'composite_product',
+            description: 'Wet mixed cement-sand mortar for brickwork joints and wall plastering',
+            sourceBreakdown: {
+                masonry: Math.round(masonryWetMortarM3 * 100) / 100,
+                plaster: Math.round(plasterWetMortarM3 * 100) / 100
+            }
+        }
+    ];
+    // Direct Material Subtotal (Strictly Non-Double-Counted)
+    const materialSubtotal = cementAmount + sandAmount + aggregateAmount + steelAmount + bindingWireAmount + brickAmount;
+    // 8. Floor-by-Floor Schedules
+    const floorSchedules = [];
+    // A. Substructure & Foundation (if active)
+    if (pccM3 > 0 || footingRccM3 > 0 || footingSteelKg > 0) {
+        const fPccCement = Math.ceil(pccM3 * 160 / 50);
+        const fRccCement = Math.ceil(footingRccM3 * mix.cementKgPerM3 / 50);
+        const fCementBags = fPccCement + fRccCement;
+        const fCementCost = fCementBags * cementRate;
+        const fSandCft = Math.round((footingBedSandCft + (pccM3 * 640 / 1600 + footingRccM3 * mix.fineAggKgPerM3 / 1600) * 35.3147) * 10) / 10;
+        const fSandM3 = Math.round(fSandCft / 35.3147 * 100) / 100;
+        const fSandCost = Math.round(fSandCft * sandRate);
+        const fAggCft = Math.round((pccM3 * 1280 / 1500 + footingRccM3 * mix.coarseAggKgPerM3 / 1500) * 35.3147 * 10) / 10;
+        const fAggM3 = Math.round(fAggCft / 35.3147 * 100) / 100;
+        const fAggCost = Math.round(fAggCft * aggregateRate);
+        const fSteelKg = Math.round(footingSteelKg * 10) / 10;
+        const fSteelCost = Math.round(fSteelKg * steelRate);
+        const fWireKg = Math.round(fSteelKg * 0.011 * 10) / 10;
+        const fWireCost = Math.round(fWireKg * bindingWireRate);
+        const fConcreteM3 = Math.round((pccM3 + footingRccM3) * 100) / 100;
+        const fConcreteCft = Math.round(fConcreteM3 * 35.3147 * 10) / 10;
+        const fConcreteCost = Math.round(fConcreteM3 * concreteRate);
+        floorSchedules.push({
+            floorId: 'foundation',
+            floorLevel: -1,
+            floorName: 'Substructure & Foundation',
+            isFoundation: true,
+            products: {
+                cement: {
+                    bags: fCementBags,
+                    cost: fCementCost
+                },
+                sand: {
+                    cft: fSandCft,
+                    m3: fSandM3,
+                    cost: fSandCost
+                },
+                coarseAggregate: {
+                    cft: fAggCft,
+                    m3: fAggM3,
+                    cost: fAggCost
+                },
+                tmtSteel: {
+                    kg: fSteelKg,
+                    tonnes: Math.round(fSteelKg / 1000 * 1000) / 1000,
+                    cost: fSteelCost
+                },
+                bindingWire: {
+                    kg: fWireKg,
+                    cost: fWireCost
+                },
+                bricks: {
+                    count: 0,
+                    cost: 0
+                },
+                concrete: {
+                    m3: fConcreteM3,
+                    cft: fConcreteCft,
+                    cost: fConcreteCost
+                },
+                mortar: {
+                    m3: 0,
+                    cft: 0,
+                    cost: 0
+                }
+            },
+            floorMaterialCost: fCementCost + fSandCost + fAggCost + fSteelCost + fWireCost
+        });
+    }
+    // B. Superstructure Floors
+    const floorsList = bModel?.floors || [];
+    if (floorsList.length > 0) {
+        floorsList.forEach((floor, idx)=>{
+            const flMasonry = params.floorMasonryEstimates?.find((f)=>f.floorId === floor.id || f.floorLevel === floor.level);
+            const flPlaster = plaster?.floors?.find((f)=>f.floorId === floor.id || f.floorLevel === floor.level);
+            const flBeam = s?.floorBeamCalculations?.find((b)=>b.floorId === floor.id || b.floorLevel === floor.level);
+            const flSlab = s?.floorSlabCalculations?.find((sl)=>sl.floorId === floor.id || sl.floorLevel === floor.level);
+            const isGround = idx === 0 || floor.level === 0;
+            const flPillars = floor.pillars && floor.pillars.length > 0 ? floor.pillars : (params.pillars || []).filter((p)=>p.floorId === floor.id || isGround && (!p.floorId || p.floorId === 'ground'));
+            let flColConcreteM3 = 0;
+            let flColSteelKg = 0;
+            flPillars.forEach((p)=>{
+                const pCalc = s?.pillarsCalculations?.find((c)=>c.pillarId === p.id);
+                if (pCalc) {
+                    flColConcreteM3 += pCalc.concreteVolumeM3 || 0;
+                    flColSteelKg += pCalc.totalSteelWeightKg || 0;
+                } else {
+                    flColConcreteM3 += calculatePillarMetrics(p).volume;
+                }
+            });
+            const flBeamConcreteM3 = flBeam ? flBeam.concreteVolumeM3 : 0;
+            const flBeamSteelKg = flBeam ? flBeam.totalSteelWeightKg : 0;
+            const flSlabConcreteM3 = flSlab ? flSlab.concreteVolumeM3 : 0;
+            const flSlabSteelKg = flSlab ? flSlab.totalSteelWeightKg : 0;
+            const flRccM3 = flColConcreteM3 + flBeamConcreteM3 + flSlabConcreteM3;
+            const flConcreteM3 = Math.round(flRccM3 * 100) / 100;
+            const flConcreteCft = Math.round(flConcreteM3 * 35.3147 * 10) / 10;
+            const flConcreteCost = Math.round(flConcreteM3 * concreteRate);
+            const flConcreteCementBags = Math.ceil(flRccM3 * mix.cementKgPerM3 / 50);
+            const flConcreteSandCft = flRccM3 * mix.fineAggKgPerM3 / 1600 * 35.3147;
+            const flConcreteAggCft = Math.round(flRccM3 * mix.coarseAggKgPerM3 / 1500 * 35.3147 * 10) / 10;
+            const flConcreteAggM3 = Math.round(flConcreteAggCft / 35.3147 * 100) / 100;
+            const flBricks = flMasonry ? flMasonry.purchaseBrickQuantity : 0;
+            const flBrickCost = Math.round(flBricks * brickRate);
+            const flMasonryCementBags = flMasonry ? flMasonry.cementBags : 0;
+            const flMasonrySandCft = flMasonry ? flMasonry.sandCft : 0;
+            const flMasonryWetMortarM3 = flMasonry ? flMasonry.wetMortarVolume : 0;
+            const flPlasterCementBags = flPlaster ? flPlaster.totalCementBags : 0;
+            const flPlasterSandCft = flPlaster ? flPlaster.totalSandCft : 0;
+            const flPlasterWetMortarM3 = flPlaster ? flPlaster.totalWetVolumeM3 : 0;
+            const flTotalCementBags = flConcreteCementBags + flMasonryCementBags + flPlasterCementBags;
+            const flCementCost = flTotalCementBags * cementRate;
+            const flTotalSandCft = Math.round((flConcreteSandCft + flMasonrySandCft + flPlasterSandCft) * 10) / 10;
+            const flTotalSandM3 = Math.round(flTotalSandCft / 35.3147 * 100) / 100;
+            const flSandCost = Math.round(flTotalSandCft * sandRate);
+            const flAggCost = Math.round(flConcreteAggCft * aggregateRate);
+            const flTotalSteelKg = Math.round((flColSteelKg + flBeamSteelKg + flSlabSteelKg) * 10) / 10;
+            const flSteelCost = Math.round(flTotalSteelKg * steelRate);
+            const flWireKg = Math.round(flTotalSteelKg * 0.011 * 10) / 10;
+            const flWireCost = Math.round(flWireKg * bindingWireRate);
+            const flTotalMortarM3 = Math.round((flMasonryWetMortarM3 + flPlasterWetMortarM3) * 100) / 100;
+            const flTotalMortarCft = Math.round(flTotalMortarM3 * 35.3147 * 10) / 10;
+            const flMortarCost = Math.round(flTotalMortarM3 * mortarRate);
+            floorSchedules.push({
+                floorId: floor.id,
+                floorLevel: floor.level,
+                floorName: floor.name || `Floor ${floor.level}`,
+                products: {
+                    cement: {
+                        bags: flTotalCementBags,
+                        cost: flCementCost
+                    },
+                    sand: {
+                        cft: flTotalSandCft,
+                        m3: flTotalSandM3,
+                        cost: flSandCost
+                    },
+                    coarseAggregate: {
+                        cft: flConcreteAggCft,
+                        m3: flConcreteAggM3,
+                        cost: flAggCost
+                    },
+                    tmtSteel: {
+                        kg: flTotalSteelKg,
+                        tonnes: Math.round(flTotalSteelKg / 1000 * 1000) / 1000,
+                        cost: flSteelCost
+                    },
+                    bindingWire: {
+                        kg: flWireKg,
+                        cost: flWireCost
+                    },
+                    bricks: {
+                        count: flBricks,
+                        cost: flBrickCost
+                    },
+                    concrete: {
+                        m3: flConcreteM3,
+                        cft: flConcreteCft,
+                        cost: flConcreteCost
+                    },
+                    mortar: {
+                        m3: flTotalMortarM3,
+                        cft: flTotalMortarCft,
+                        cost: flMortarCost
+                    }
+                },
+                floorMaterialCost: flCementCost + flSandCost + flAggCost + flSteelCost + flWireCost + flBrickCost
+            });
+        });
+    } else {
+        // Single floor standalone fallback
+        floorSchedules.push({
+            floorId: 'floor-0',
+            floorLevel: 0,
+            floorName: 'Ground Floor',
+            products: {
+                cement: {
+                    bags: totalCementBags,
+                    cost: cementAmount
+                },
+                sand: {
+                    cft: totalSandCft,
+                    m3: totalSandM3,
+                    cost: sandAmount
+                },
+                coarseAggregate: {
+                    cft: totalCoarseAggCft,
+                    m3: totalCoarseAggM3,
+                    cost: aggregateAmount
+                },
+                tmtSteel: {
+                    kg: totalSteelKg,
+                    tonnes: totalSteelTonnes,
+                    cost: steelAmount
+                },
+                bindingWire: {
+                    kg: bindingWireKg,
+                    cost: bindingWireAmount
+                },
+                bricks: {
+                    count: totalBricks,
+                    cost: brickAmount
+                },
+                concrete: {
+                    m3: Math.round(totalConcreteM3 * 100) / 100,
+                    cft: Math.round(totalConcreteCft * 10) / 10,
+                    cost: concreteAmount
+                },
+                mortar: {
+                    m3: totalMortarM3,
+                    cft: totalMortarCft,
+                    cost: mortarAmount
+                }
+            },
+            floorMaterialCost: materialSubtotal
+        });
+    }
+    // C. Independent Roof Slab (if present and not already folded into topmost floor)
+    if (s?.roofSlabCalculation && !floorsList.some((f)=>f.slab?.enabled && f.level === floorsList.length - 1)) {
+        const rSlab = s.roofSlabCalculation;
+        const rBeam = s.roofBeamCalculation;
+        const rConcM3 = Math.round(((rSlab.concreteVolumeM3 || 0) + (rBeam?.concreteVolumeM3 || 0)) * 100) / 100;
+        const rConcCft = Math.round(rConcM3 * 35.3147 * 10) / 10;
+        const rCementBags = Math.ceil(rConcM3 * mix.cementKgPerM3 / 50);
+        const rSandCft = Math.round(rConcM3 * mix.fineAggKgPerM3 / 1600 * 35.3147 * 10) / 10;
+        const rAggCft = Math.round(rConcM3 * mix.coarseAggKgPerM3 / 1500 * 35.3147 * 10) / 10;
+        const rSteelKg = Math.round(((rSlab.totalSteelWeightKg || 0) + (rBeam?.totalSteelWeightKg || 0)) * 10) / 10;
+        const rWireKg = Math.round(rSteelKg * 0.011 * 10) / 10;
+        const rCementCost = rCementBags * cementRate;
+        const rSandCost = Math.round(rSandCft * sandRate);
+        const rAggCost = Math.round(rAggCft * aggregateRate);
+        const rSteelCost = Math.round(rSteelKg * steelRate);
+        const rWireCost = Math.round(rWireKg * bindingWireRate);
+        floorSchedules.push({
+            floorId: 'roof-level',
+            floorLevel: floorsList.length,
+            floorName: 'Terrace & Roof Level',
+            isRoof: true,
+            products: {
+                cement: {
+                    bags: rCementBags,
+                    cost: rCementCost
+                },
+                sand: {
+                    cft: rSandCft,
+                    m3: Math.round(rSandCft / 35.3147 * 100) / 100,
+                    cost: rSandCost
+                },
+                coarseAggregate: {
+                    cft: rAggCft,
+                    m3: Math.round(rAggCft / 35.3147 * 100) / 100,
+                    cost: rAggCost
+                },
+                tmtSteel: {
+                    kg: rSteelKg,
+                    tonnes: Math.round(rSteelKg / 1000 * 1000) / 1000,
+                    cost: rSteelCost
+                },
+                bindingWire: {
+                    kg: rWireKg,
+                    cost: rWireCost
+                },
+                bricks: {
+                    count: 0,
+                    cost: 0
+                },
+                concrete: {
+                    m3: rConcM3,
+                    cft: rConcCft,
+                    cost: Math.round(rConcM3 * concreteRate)
+                },
+                mortar: {
+                    m3: 0,
+                    cft: 0,
+                    cost: 0
+                }
+            },
+            floorMaterialCost: rCementCost + rSandCost + rAggCost + rSteelCost + rWireCost
+        });
+    }
+    // 9. Category Breakdown
+    const categoryBreakdown = [
+        {
+            id: 'foundation',
+            name: '1. Substructure & Foundation',
+            description: 'Earthwork Excavation, Sand Bedding, PCC Lean Concrete, RCC Footing Pads & Starter Rebar',
+            materialCost: s ? Math.round(s.costs.foundation.sandFill + s.costs.foundation.pcc + s.costs.foundation.rccFooting + s.costs.foundation.steel) : params.foundationEstimate?.costs.total || 0,
+            labourCost: s ? Math.round(s.costs.foundation.excavation + s.costs.foundation.backfill) : params.foundationEstimate?.costs.excavation || 0,
+            totalCost: s ? Math.round(s.costs.foundation.total) : params.foundationEstimate?.costs.total || 0,
+            concreteVolumeM3: Math.round((pccM3 + footingRccM3) * 100) / 100,
+            steelWeightKg: Math.round(footingSteelKg * 10) / 10
+        },
+        {
+            id: 'columns',
+            name: '2. RCC Columns / Pillars',
+            description: 'IS 456 Structural Column Shafts, Longitudinal High-Yield Bars, Lateral Ties & Column Formwork',
+            materialCost: s ? Math.round(s.costs.columns.concrete + s.costs.columns.mainSteel + s.costs.columns.stirrupSteel) : 0,
+            labourCost: s ? Math.round(s.costs.columns.formwork + s.costs.columns.labour) : 0,
+            totalCost: s ? Math.round(s.costs.columns.total) : 0,
+            concreteVolumeM3: Math.round(columnRccM3 * 100) / 100,
+            steelWeightKg: Math.round(columnSteelKg * 10) / 10
+        },
+        {
+            id: 'beams',
+            name: '3. RCC Ring Beams & Floor Beams',
+            description: 'Plinth & Floor Frame Beams, Top Anchor Bars, Bottom Tension Steel, Stirrups & Shuttering',
+            materialCost: s ? Math.round(s.costs.beams.concrete + s.costs.beams.steel) : 0,
+            labourCost: s ? Math.round(s.costs.beams.formwork + s.costs.beams.labour) : 0,
+            totalCost: s ? Math.round(s.costs.beams.total) : 0,
+            concreteVolumeM3: Math.round(beamRccM3 * 100) / 100,
+            steelWeightKg: Math.round(beamSteelKg * 10) / 10
+        },
+        {
+            id: 'slabs',
+            name: '4. RCC Floor Slabs & Roof Slab',
+            description: 'IS 456 Solid Two-Way & One-Way Slabs, Main Bottom Rebar, Distribution Steel & Staging',
+            materialCost: s ? Math.round(s.costs.slabs.concrete + s.costs.slabs.steel) : 0,
+            labourCost: s ? Math.round(s.costs.slabs.formwork + s.costs.slabs.labour) : 0,
+            totalCost: s ? Math.round(s.costs.slabs.total) : 0,
+            concreteVolumeM3: Math.round(slabRccM3 * 100) / 100,
+            steelWeightKg: Math.round(slabSteelKg * 10) / 10
+        },
+        {
+            id: 'masonry',
+            name: '5. Brickwork Superstructure Walls',
+            description: 'External & Internal Brick Infill Walls, 1:5 Mortar Joints, Door & Window Opening Deductions',
+            materialCost: s ? Math.round(s.costs.masonry.bricks + s.costs.masonry.mortarCement + s.costs.masonry.mortarSand) : brickAmount + masonryCementBags * cementRate + Math.round(masonrySandCft * sandRate),
+            labourCost: s ? Math.round(s.costs.masonry.labour) : Math.round(totalBricks / 500 * ((rates.masonWagePerDay || 800) + (rates.helperWagePerDay || 500))),
+            totalCost: s ? Math.round(s.costs.masonry.total) : brickAmount + masonryCementBags * cementRate + Math.round(masonrySandCft * sandRate),
+            concreteVolumeM3: 0,
+            steelWeightKg: 0
+        },
+        {
+            id: 'plaster',
+            name: '6. Wall & Ceiling Plastering',
+            description: '12mm Inner Wall Plaster (1:6), 15mm Outer Sand-Face Plaster (1:4), 6mm RCC Plaster (1:4)',
+            materialCost: s ? Math.round(s.costs.plaster.materials) : plasterCementBags * cementRate + Math.round(plasterSandCft * sandRate),
+            labourCost: s ? Math.round(s.costs.plaster.labour) : plaster?.totalLabourDays ? Math.round(plaster.totalLabourDays * (rates.masonWagePerDay || 800)) : 0,
+            totalCost: s ? Math.round(s.costs.plaster.total) : plasterCementBags * cementRate + Math.round(plasterSandCft * sandRate),
+            concreteVolumeM3: 0,
+            steelWeightKg: 0
+        }
+    ];
+    // 10. Financial Summary & Grand Total
+    const labourAndFormworkSubtotal = categoryBreakdown.reduce((sum, c)=>sum + c.labourCost, 0);
+    const directCostTotal = materialSubtotal + labourAndFormworkSubtotal + (params.settings?.transportCost || 0);
+    const wastagePercent = rates.wastagePercent ?? (params.settings?.wastagePercentage || 5);
+    const overheadPercent = 5;
+    const contingencyPercent = rates.contingencyPercent ?? 5;
+    const taxPercent = rates.taxPercent ?? 18;
+    const wastageAllowance = Math.round(materialSubtotal * (wastagePercent / 100));
+    const overheads = Math.round(directCostTotal * (overheadPercent / 100));
+    const contingency = Math.round(directCostTotal * (contingencyPercent / 100));
+    const taxableBase = directCostTotal + wastageAllowance + overheads + contingency;
+    const taxGst = Math.round(taxableBase * (taxPercent / 100));
+    const grandTotal = taxableBase + taxGst;
+    const builtUpAreaSqFt = s ? s.totalBuiltUpAreaSqFt : bModel ? toSqMeters(bModel.buildingLength * bModel.buildingWidth, bModel.buildingUnit) * 10.7639 * (floorsList.length || 1) : 0;
+    const costPerSqFt = builtUpAreaSqFt > 0 ? Math.round(grandTotal / builtUpAreaSqFt) : 0;
+    return {
+        products,
+        floorSchedules,
+        categoryBreakdown,
+        materialSubtotal,
+        compositeTotals: {
+            totalConcreteM3,
+            totalConcreteCft,
+            totalConcreteCost: concreteAmount,
+            derivedConcreteRatePerM3: derivedConcreteRate,
+            totalMortarM3,
+            totalMortarCft,
+            totalMortarCost: mortarAmount,
+            derivedMortarRatePerM3: derivedMortarRate
+        },
+        labourAndFormworkSubtotal,
+        directCostTotal,
+        wastageAllowance,
+        overheads,
+        contingency,
+        taxGst,
+        grandTotal,
+        totalBuiltUpAreaSqFt: Math.round(builtUpAreaSqFt),
+        costPerSqFt
+    };
+}
 const calculateProject = (project, brick = DEFAULT_TN_RED_BRICK, settings = {})=>{
     let totalGrossArea = 0;
     let totalOpeningArea = 0;
     let totalNetArea = 0;
     let totalNetVolume = 0;
-    // Standard walls
-    project.walls.forEach((wall)=>{
-        const metrics = calculateWallMetrics(wall);
-        totalGrossArea += metrics.grossArea;
-        totalOpeningArea += metrics.openingArea;
-        totalNetArea += metrics.netArea;
-        totalNetVolume += metrics.netVolume;
-    });
+    // Avoid double-counting walls if buildingModel floors already contain them
+    const hasBuildingModelWalls = !!(project.buildingModel && project.buildingModel.floors && project.buildingModel.floors.some((f)=>(f.externalWalls?.length || 0) + (f.internalWalls?.length || 0) > 0));
+    // Standard walls (only when buildingModel floor walls are not present)
+    if (!hasBuildingModelWalls) {
+        project.walls.forEach((wall)=>{
+            const metrics = calculateWallMetrics(wall);
+            totalGrossArea += metrics.grossArea;
+            totalOpeningArea += metrics.openingArea;
+            totalNetArea += metrics.netArea;
+            totalNetVolume += metrics.netVolume;
+        });
+    }
     // Pillars (separated from masonry)
     let totalPillarVolume = 0;
     let deductedMasonryVolume = 0;
@@ -3790,6 +4411,25 @@ const calculateProject = (project, brick = DEFAULT_TN_RED_BRICK, settings = {})=
     }
     // Plaster & Wall Finish Estimate (Additive Layer)
     const plasterEstimate = calculatePlasterEstimate(project, settings, bUnit);
+    // Dynamic Building BOQ Estimation (8 Construction Products Schedule)
+    const buildingBOQ = calculateBuildingBOQ({
+        buildingModel: project.buildingModel,
+        walls: project.walls,
+        pillars: effectivePillars,
+        settings,
+        brick,
+        structuralSummary,
+        floorMasonryEstimates,
+        foundationEstimate,
+        plasterEstimate,
+        totalNetVolume,
+        purchaseBrickQuantity: effectivePurchaseBricks,
+        brickCost: effectiveBrickCost,
+        wetMortarVolume,
+        cementBags,
+        sandVolume,
+        customRates: project.buildingModel?.buildingConfig?.customRates
+    });
     return {
         grossWallArea: totalGrossArea,
         openingArea: totalOpeningArea,
@@ -3824,7 +4464,8 @@ const calculateProject = (project, brick = DEFAULT_TN_RED_BRICK, settings = {})=
         rccProjectEstimate,
         foundationEstimate,
         plasterEstimate,
-        structuralSummary
+        structuralSummary,
+        buildingBOQ
     };
 };
 const DEFAULT_RCC_RING_BEAM = {
@@ -4768,7 +5409,10 @@ const DEFAULT_BUILDING_CONFIG = {
         sandPricePerCft: 55,
         aggregatePricePerCft: 45,
         steelRatePerKg: 65,
+        bindingWireRatePerKg: 90,
         brickPrice: 8.5,
+        concreteRatePerM3: 4500,
+        mortarRatePerM3: 3800,
         sandFillRatePerCft: 45,
         excavationRatePerM3: 250,
         pccLabourRatePerM3: 2500,
@@ -6189,12 +6833,12 @@ function calculateBuildingStructuralSummary(pillars, walls, buildingLengthM, bui
     const plasterLabourDays = Math.ceil(plasterAreaM2 / 10.0);
     const plasterLabourCost = plasterLabourDays * (rates.masonWagePerDay + rates.helperWagePerDay);
     const plasterTotal = plasterMaterialsCost + plasterLabourCost;
-    // 7. Finishes (Flooring & Painting - Handbook Section 13.2, 13.3)
-    const flooringAreaM2 = totalFloorAreaM2 * 0.90;
-    const flooringCost = flooringAreaM2 * 1200; // vitrified tiles with laying & adhesive
-    const paintAreaM2 = netWallAreaM2 * 2.0;
-    const paintingCost = paintAreaM2 * 180; // 2 coats emulsion + primer + putty
-    const finishesTotal = flooringCost + paintingCost;
+    // 7. Architectural Finishes (Disabled per 8-product BOQ specification)
+    const flooringAreaM2 = 0;
+    const flooringCost = 0;
+    const paintAreaM2 = 0;
+    const paintingCost = 0;
+    const finishesTotal = 0;
     // Direct Cost Subtotal (Handbook Section 17)
     const transportCost = rates.transportCost || 0;
     const equipmentCost = rates.equipmentCost || 0;

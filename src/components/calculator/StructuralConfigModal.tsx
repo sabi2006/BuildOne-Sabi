@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   X, 
   Building2, 
@@ -39,8 +39,10 @@ import {
   calculateFloorBeamStructuralDetails,
   FloorSlabStructuralCalculation,
   FloorBeamStructuralCalculation,
-  toMeters
+  toMeters,
+  BOQProductItem
 } from '@/lib/brickCalculator';
+import { CalculatorContext } from './CalculatorContext';
 
 export interface BuildingDetailsConfig {
   length: number;
@@ -70,6 +72,7 @@ export function StructuralConfigModal({
   onClose,
   onSave
 }: StructuralConfigModalProps) {
+  const calcContext = useContext(CalculatorContext);
   const [activeTab, setActiveTab] = useState<'storeys' | 'materials' | 'soil' | 'rates'>('storeys');
   const [localConfig, setLocalConfig] = useState<BuildingConfig>({
     ...DEFAULT_BUILDING_CONFIG,
@@ -276,6 +279,7 @@ export function StructuralConfigModal({
     }));
   };
 
+  const boqSummary = calcContext?.result?.buildingBOQ;
   const rates = localConfig.customRates || (DEFAULT_BUILDING_CONFIG.customRates || {});
 
   return (
@@ -1393,113 +1397,260 @@ export function StructuralConfigModal({
                 </div>
               </div>
 
-              {/* Group 1: Material Procurement Rates */}
-              <div>
-                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
-                  <Coins className="w-4 h-4 text-orange-600" />
-                  Primary Construction Material Rates
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Cement Price (50kg Bag)</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        min={100}
-                        max={1000}
-                        value={rates.cementBagPrice ?? 400}
-                        onChange={(e) => updateRate('cementBagPrice', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/bag</span>
-                    </div>
-                  </div>
+              {/* Group 1: Manual Product Rate Configuration (8 Construction Products) */}
+              {(() => {
+                const getProd = (id: string) => boqSummary?.products?.find((p: BOQProductItem) => p.id === id);
+                const cementP = getProd('cement');
+                const sandP = getProd('sand');
+                const aggP = getProd('coarse_aggregate');
+                const steelP = getProd('tmt_steel');
+                const wireP = getProd('binding_wire');
+                const brickP = getProd('bricks');
+                const concreteP = getProd('concrete');
+                const mortarP = getProd('mortar');
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                      {localConfig.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'} Rate
-                    </label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        min={10}
-                        max={300}
-                        value={rates.sandPricePerCft ?? (localConfig.fineAggregateType === 'river_sand' ? 80 : 55)}
-                        onChange={(e) => updateRate('sandPricePerCft', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/CFT</span>
-                    </div>
-                  </div>
+                const cementRateVal = rates.cementBagPrice ?? 450;
+                const sandRateVal = rates.sandPricePerCft ?? (localConfig.fineAggregateType === 'river_sand' ? 80 : 60);
+                const aggRateVal = rates.aggregatePricePerCft ?? 55;
+                const steelRateVal = rates.steelRatePerKg ?? 65;
+                const wireRateVal = rates.bindingWireRatePerKg ?? 90;
+                const brickRateVal = rates.brickPrice ?? 10;
+                const concreteRateVal = rates.concreteRatePerM3 ?? 4500;
+                const mortarRateVal = rates.mortarRatePerM3 ?? 3800;
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">20mm Aggregate (Jalli)</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        min={10}
-                        max={200}
-                        value={rates.aggregatePricePerCft ?? 45}
-                        onChange={(e) => updateRate('aggregatePricePerCft', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/CFT</span>
-                    </div>
-                  </div>
+                const cementQty = cementP?.quantity ?? 0;
+                const sandQty = sandP?.quantity ?? 0;
+                const aggQty = aggP?.quantity ?? 0;
+                const steelQty = steelP?.quantity ?? 0;
+                const wireQty = wireP?.quantity ?? 0;
+                const brickQty = brickP?.quantity ?? 0;
+                const concreteQty = concreteP?.quantity ?? 0;
+                const mortarQty = mortarP?.quantity ?? 0;
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Reinforcement TMT Steel</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        min={20}
-                        max={200}
-                        value={rates.steelRatePerKg ?? 65}
-                        onChange={(e) => updateRate('steelRatePerKg', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/kg</span>
-                    </div>
-                  </div>
+                const directMaterialTotal = 
+                  Math.round(cementQty * cementRateVal) +
+                  Math.round(sandQty * sandRateVal) +
+                  Math.round(aggQty * aggRateVal) +
+                  Math.round(steelQty * steelRateVal) +
+                  Math.round(wireQty * wireRateVal) +
+                  Math.round(brickQty * brickRateVal);
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Clay / Red Brick Price</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        step={0.5}
-                        min={2}
-                        max={50}
-                        value={rates.brickPrice ?? 8.5}
-                        onChange={(e) => updateRate('brickPrice', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/brick</span>
-                    </div>
-                  </div>
+                const productRows = [
+                  {
+                    id: 'cement',
+                    num: '1',
+                    name: 'Cement',
+                    subtitle: 'PCC, RCC Footings, Columns, Beams, Slabs, Masonry & Plaster',
+                    unit: 'Bags (50kg)',
+                    field: 'cementBagPrice',
+                    rate: cementRateVal,
+                    qty: cementQty,
+                    total: Math.round(cementQty * cementRateVal),
+                    min: 100,
+                    max: 1000,
+                    step: 5,
+                    isComposite: false
+                  },
+                  {
+                    id: 'sand',
+                    num: '2',
+                    name: `Sand (${localConfig.fineAggregateType === 'river_sand' ? 'River Sand' : 'M-Sand'})`,
+                    subtitle: 'Footing bed, RCC concrete mix, brickwork & plaster mortar',
+                    unit: 'CFT',
+                    field: 'sandPricePerCft',
+                    rate: sandRateVal,
+                    qty: sandQty,
+                    total: Math.round(sandQty * sandRateVal),
+                    min: 10,
+                    max: 300,
+                    step: 1,
+                    isComposite: false
+                  },
+                  {
+                    id: 'coarse_aggregate',
+                    num: '3',
+                    name: 'Coarse Aggregate',
+                    subtitle: '20mm Blue Granite (RCC) & 40mm Metal (PCC Lean Base)',
+                    unit: 'CFT',
+                    field: 'aggregatePricePerCft',
+                    rate: aggRateVal,
+                    qty: aggQty,
+                    total: Math.round(aggQty * aggRateVal),
+                    min: 10,
+                    max: 200,
+                    step: 1,
+                    isComposite: false
+                  },
+                  {
+                    id: 'tmt_steel',
+                    num: '4',
+                    name: `TMT Steel Bars (${localConfig.steelGrade || 'Fe500D'})`,
+                    subtitle: 'Footings, column vertical bars & ties, beam cage, slab rebar',
+                    unit: 'kg',
+                    field: 'steelRatePerKg',
+                    rate: steelRateVal,
+                    qty: steelQty,
+                    total: Math.round(steelQty * steelRateVal),
+                    min: 20,
+                    max: 200,
+                    step: 1,
+                    isComposite: false
+                  },
+                  {
+                    id: 'binding_wire',
+                    num: '5',
+                    name: 'Binding Wire',
+                    subtitle: 'Annealed GI/MS wire for tying reinforcement cage (~11 kg/Tonne)',
+                    unit: 'kg',
+                    field: 'bindingWireRatePerKg',
+                    rate: wireRateVal,
+                    qty: wireQty,
+                    total: Math.round(wireQty * wireRateVal),
+                    min: 30,
+                    max: 250,
+                    step: 1,
+                    isComposite: false
+                  },
+                  {
+                    id: 'bricks',
+                    num: '6',
+                    name: 'Bricks',
+                    subtitle: 'Standard clay / modular bricks (openings & pillars deducted)',
+                    unit: 'Nos',
+                    field: 'brickPrice',
+                    rate: brickRateVal,
+                    qty: brickQty,
+                    total: Math.round(brickQty * brickRateVal),
+                    min: 2,
+                    max: 50,
+                    step: 0.5,
+                    isComposite: false
+                  },
+                  {
+                    id: 'concrete',
+                    num: '7',
+                    name: `Concrete (${localConfig.concreteGrade || 'M20'} RCC & PCC)`,
+                    subtitle: 'Total wet concrete volume across all structural elements',
+                    unit: 'm³',
+                    field: 'concreteRatePerM3',
+                    rate: concreteRateVal,
+                    qty: concreteQty,
+                    total: Math.round(concreteQty * concreteRateVal),
+                    min: 1000,
+                    max: 12000,
+                    step: 100,
+                    isComposite: true
+                  },
+                  {
+                    id: 'mortar',
+                    num: '8',
+                    name: 'Mortar (Masonry + Plaster)',
+                    subtitle: 'Combined wet mortar volume for brick joints & wall finishes',
+                    unit: 'm³',
+                    field: 'mortarRatePerM3',
+                    rate: mortarRateVal,
+                    qty: mortarQty,
+                    total: Math.round(mortarQty * mortarRateVal),
+                    min: 1000,
+                    max: 10000,
+                    step: 100,
+                    isComposite: true
+                  }
+                ];
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Foundation Sand Filling</label>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-500">₹</span>
-                      <input
-                        type="number"
-                        min={10}
-                        max={150}
-                        value={rates.sandFillRatePerCft ?? 45}
-                        onChange={(e) => updateRate('sandFillRatePerCft', parseFloat(e.target.value) || 0)}
-                        className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="text-[10px] text-slate-500 shrink-0">/CFT</span>
+                return (
+                  <div className="space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <span className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <Coins className="w-4 h-4 text-orange-600" />
+                        Manual Product Rate Configuration (8 Construction Products)
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        Unit Rate × Live Quantity = Total Material Cost
+                      </span>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                            <th className="py-2.5 px-3">#</th>
+                            <th className="py-2.5 px-3">Product Name &amp; Scope</th>
+                            <th className="py-2.5 px-3">Unit</th>
+                            <th className="py-2.5 px-3 text-right">Unit Rate (₹)</th>
+                            <th className="py-2.5 px-3 text-right">Calculated Qty</th>
+                            <th className="py-2.5 px-3 text-right">Total Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-800">
+                          {productRows.map((p) => (
+                            <tr key={p.id} className={p.isComposite ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-slate-50/80'}>
+                              <td className="py-2.5 px-3 font-mono font-bold text-slate-500">{p.num}</td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                  <span>{p.name}</span>
+                                  {p.isComposite && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase bg-amber-200 text-amber-900">
+                                      Composite Mix
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[10px] text-slate-500">{p.subtitle}</div>
+                              </td>
+                              <td className="py-2.5 px-3 font-semibold text-slate-600">{p.unit}</td>
+                              <td className="py-2.5 px-3 text-right">
+                                <div className="inline-flex items-center gap-1">
+                                  <span className="text-xs font-bold text-slate-500">₹</span>
+                                  <input
+                                    type="number"
+                                    min={p.min}
+                                    max={p.max}
+                                    step={p.step}
+                                    value={p.rate}
+                                    onChange={(e) => updateRate(p.field, parseFloat(e.target.value) || 0)}
+                                    className="w-24 text-right text-xs font-bold text-slate-900 px-2 py-1 rounded border border-slate-300 bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                                  />
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-700">
+                                {p.qty > 0 ? (
+                                  p.qty.toLocaleString(undefined, { maximumFractionDigits: p.unit === 'Nos' || p.unit.includes('Bags') ? 0 : 2 })
+                                ) : (
+                                  <span className="text-slate-400 font-normal italic">—</span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                                {p.total > 0 ? (
+                                  `₹${p.total.toLocaleString('en-IN')}`
+                                ) : (
+                                  <span className="text-slate-400 font-normal italic">—</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-900 text-white font-bold border-t-2 border-slate-300">
+                            <td colSpan={4} className="py-2.5 px-3 text-right uppercase tracking-wider text-[11px]">
+                              Direct Material Procurement Subtotal (Products 1–6):
+                            </td>
+                            <td colSpan={2} className="py-2.5 px-3 text-right font-mono text-sm text-amber-400">
+                              ₹{directMaterialTotal.toLocaleString('en-IN')}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+
+                    <div className="bg-blue-50/70 border border-blue-200 rounded-lg p-2.5 text-[11px] text-blue-900 leading-relaxed flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                      <div>
+                        <b>Zero Double-Counting Architecture:</b> Direct Material Procurement subtotal includes all raw constituents (Cement, Sand, Aggregate, Steel, Binding Wire, Bricks). Items 7 &amp; 8 (Concrete and Mortar) provide composite mix valuations based on engineering proportions for contractor analysis and are not double-counted into the direct material total.
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Group 2: Labour & Workmanship Rates */}
               <div>

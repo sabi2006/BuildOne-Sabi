@@ -3754,12 +3754,25 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
     if (activeTool === 'door' || activeTool === 'window') {
       const coords = getMouseCoords(e);
-      if (!coords) return;
+      if (!coords || !wall.start || !wall.end) return;
       
-      const dist = Math.hypot(coords.x - wall.start.x, coords.y - wall.start.y);
+      const dx = wall.end.x - wall.start.x;
+      const dy = wall.end.y - wall.start.y;
+      const wallLen = Math.hypot(dx, dy);
+      if (wallLen <= 0.01) return;
+
+      // Project click point onto wall centerline
+      const vx = coords.x - wall.start.x;
+      const vy = coords.y - wall.start.y;
+      const projAlong = (vx * dx + vy * dy) / wallLen;
+
       const isDoor = activeTool === 'door';
       const opW = isDoor ? doorWidth : windowWidth;
       const opH = isDoor ? doorHeight : windowHeight;
+
+      // Clamp center so opening remains completely inside wall span
+      const clampedCenter = Math.max(opW / 2, Math.min(wallLen - opW / 2, projAlong));
+      const distFromStart = Math.max(0, clampedCenter - opW / 2);
 
       const newOp: Opening = {
         id: `op-${activeFloorId}-${Date.now()}`,
@@ -3770,7 +3783,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         height: opH,
         count: 1,
         unit: model.buildingUnit,
-        distanceFromStart: dist - (opW / 2), // center on click
+        distanceFromStart: distFromStart,
         sillHeight: isDoor ? 0 : 3
       };
 
@@ -3778,8 +3791,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         if (f.id === activeFloorId) {
           return {
             ...f,
-            externalWalls: f.externalWalls.map(w => w.id === wall.id ? { ...w, openings: [...w.openings, newOp] } : w),
-            internalWalls: f.internalWalls.map(w => w.id === wall.id ? { ...w, openings: [...w.openings, newOp] } : w)
+            externalWalls: f.externalWalls.map(w => w.id === wall.id ? { ...w, openings: [...(w.openings || []), newOp] } : w),
+            internalWalls: f.internalWalls.map(w => w.id === wall.id ? { ...w, openings: [...(w.openings || []), newOp] } : w)
           };
         }
         return f;
@@ -7921,7 +7934,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 })()
               ) : (
                 <>
-                  {/* External Walls with Geometric Segmentation against Pillars */}
+                  {/* External Walls with Geometric Segmentation against Pillars & Opening Voids */}
                   {activeFloor?.externalWalls.map(w => {
                      const floorPillars = (model.pillars || []).filter(p => p.floorId === activeFloorId);
                      const segments = splitWallByPillars(w, floorPillars, model.buildingUnit);
@@ -7935,51 +7948,203 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                           const dx = seg.end.x - seg.start.x;
                           const dy = seg.end.y - seg.start.y;
                           const len = Math.hypot(dx, dy);
-                          const nx = len > 0 ? -dy / len : 0;
-                          const ny = len > 0 ? dx / len : 0;
-                          const offset = (tFeet / 2) + 0.15;
+                          if (len <= 0.01) return null;
+                          const ux = dx / len;
+                          const uy = dy / len;
+                          const nx = -uy;
+                          const ny = ux;
+                          const halfT = tFeet / 2;
+                          const offset = halfT + 0.15;
+
+                          // Vector to building center for door swing direction
+                          const bCenterX = model.buildingLength / 2;
+                          const bCenterY = model.buildingWidth / 2;
+
+                          // Openings on this segment
+                          const segOps = [...(seg.openings || [])].sort((a, b) => (a.distanceFromStart || 0) - (b.distanceFromStart || 0));
+
+                          // Sub-spans of solid brickwork between openings
+                          const masonrySpans: { x1: number; y1: number; x2: number; y2: number }[] = [];
+                          let curDist = 0;
+                          segOps.forEach(op => {
+                            const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                            const opStart = Math.max(0, convertUnit(rawDist, op.unit || model.buildingUnit, model.buildingUnit));
+                            const opW = convertUnit(op.width, op.unit || model.buildingUnit, model.buildingUnit);
+                            const opEnd = Math.min(len, opStart + opW);
+
+                            if (opStart - curDist >= 0.04) {
+                              masonrySpans.push({
+                                x1: seg.start.x + ux * curDist,
+                                y1: seg.start.y + uy * curDist,
+                                x2: seg.start.x + ux * opStart,
+                                y2: seg.start.y + uy * opStart
+                              });
+                            }
+                            curDist = Math.max(curDist, opEnd);
+                          });
+                          if (len - curDist >= 0.04) {
+                            masonrySpans.push({
+                              x1: seg.start.x + ux * curDist,
+                              y1: seg.start.y + uy * curDist,
+                              x2: seg.end.x,
+                              y2: seg.end.y
+                            });
+                          }
+                          if (segOps.length === 0 && masonrySpans.length === 0) {
+                            masonrySpans.push({ x1: seg.start.x, y1: seg.start.y, x2: seg.end.x, y2: seg.end.y });
+                          }
 
                           return (
                             <React.Fragment key={`${w.id}-seg-${sIdx}`}>
                               {/* Selected wall highlight */}
-                              {isSelectedPlaster && (
+                              {isSelectedPlaster && masonrySpans.map((sp, spIdx) => (
                                 <line 
-                                  x1={seg.start.x} y1={seg.start.y} x2={seg.end.x} y2={seg.end.y} 
+                                  key={`plaster-sel-${spIdx}`}
+                                  x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} 
                                   stroke="#14b8a6" strokeWidth={tFeet + 0.4} strokeLinecap="butt" 
                                   opacity="0.55"
                                 />
-                              )}
-                              {/* Brick Wall Core */}
-                              <line 
-                                x1={seg.start.x} y1={seg.start.y} x2={seg.end.x} y2={seg.end.y} 
-                                stroke="#991b1b" strokeWidth={tFeet} strokeLinecap="butt" 
-                                className={activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-500 transition-colors" : ""}
-                              />
-                              {/* 2D Plaster Finish Indicator Lines */}
+                              ))}
+
+                              {/* Brick Wall Core Lines (Segmented cleanly around openings) */}
+                              {masonrySpans.map((sp, spIdx) => (
+                                <line 
+                                  key={`core-span-${spIdx}`}
+                                  x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} 
+                                  stroke="#991b1b" strokeWidth={tFeet} strokeLinecap="butt" 
+                                  className={activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-500 transition-colors" : ""}
+                                />
+                              ))}
+
+                              {/* Architectural 2D Door & Window Renderings */}
+                              {segOps.map((op, oIdx) => {
+                                const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                                const opStart = Math.max(0, convertUnit(rawDist, op.unit || model.buildingUnit, model.buildingUnit));
+                                const opW = convertUnit(op.width, op.unit || model.buildingUnit, model.buildingUnit);
+                                const opEnd = Math.min(len, opStart + opW);
+                                const actualW = Math.max(0.5, opEnd - opStart);
+
+                                const p1 = { x: seg.start.x + ux * opStart, y: seg.start.y + uy * opStart };
+                                const p2 = { x: seg.start.x + ux * opEnd, y: seg.start.y + uy * opEnd };
+                                const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+
+                                const isDoor = op.type === 'door';
+                                const inwardSign = (nx * (bCenterX - mid.x) + ny * (bCenterY - mid.y)) >= 0 ? 1 : -1;
+                                const inNormX = nx * inwardSign;
+                                const inNormY = ny * inwardSign;
+
+                                if (isDoor) {
+                                  const leafEnd = { x: p1.x + inNormX * actualW, y: p1.y + inNormY * actualW };
+                                  return (
+                                    <g key={`door-elem-${op.id || oIdx}`}>
+                                      {/* Door Jambs (brick edge termination) */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p1.x + nx * halfT} y2={p1.y + ny * halfT} stroke="#450a0a" strokeWidth="0.14" strokeLinecap="round" />
+                                      <line x1={p2.x - nx * halfT} y1={p2.y - ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#450a0a" strokeWidth="0.14" strokeLinecap="round" />
+                                      {/* Threshold Dashed Floor Line */}
+                                      <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#94a3b8" strokeWidth="0.12" strokeDasharray="0.3,0.2" />
+                                      {/* Door Swing Quarter Sector Arc */}
+                                      <path 
+                                        d={`M ${p1.x} ${p1.y} L ${leafEnd.x} ${leafEnd.y} A ${actualW} ${actualW} 0 0 1 ${p2.x} ${p2.y} Z`} 
+                                        fill="rgba(37, 99, 235, 0.16)" 
+                                        stroke="#2563eb" 
+                                        strokeWidth="0.12" 
+                                        strokeDasharray="0.4,0.2"
+                                      />
+                                      {/* Timber Door Leaf Panel */}
+                                      <line 
+                                        x1={p1.x} y1={p1.y} 
+                                        x2={leafEnd.x} y2={leafEnd.y} 
+                                        stroke="#1d4ed8" 
+                                        strokeWidth={Math.max(0.18, halfT * 0.45)} 
+                                        strokeLinecap="round" 
+                                      />
+                                      {/* Interactive Clickable Badge */}
+                                      <g 
+                                        className={activeTool === 'delete' ? "cursor-pointer hover:opacity-80" : "cursor-pointer"}
+                                        onClick={(e) => handleOpeningClick(e, w.id, op.id)}
+                                      >
+                                        <circle cx={mid.x} cy={mid.y} r={0.7} fill={activeTool === 'delete' ? "#ef4444" : "#2563eb"} stroke="#ffffff" strokeWidth="0.12" />
+                                        <text 
+                                          x={mid.x} y={mid.y} 
+                                          transform={`scale(1, -1) translate(0, -${2 * mid.y})`}
+                                          fontSize="0.55" 
+                                          fill="#ffffff" 
+                                          textAnchor="middle" 
+                                          dominantBaseline="central" 
+                                          fontWeight="bold"
+                                        >
+                                          D
+                                        </text>
+                                      </g>
+                                    </g>
+                                  );
+                                } else {
+                                  // Window
+                                  return (
+                                    <g key={`win-elem-${op.id || oIdx}`}>
+                                      {/* Glass Opening Area Tint */}
+                                      <polygon 
+                                        points={`${p1.x - nx * halfT},${p1.y - ny * halfT} ${p2.x - nx * halfT},${p2.y - ny * halfT} ${p2.x + nx * halfT},${p2.y + ny * halfT} ${p1.x + nx * halfT},${p1.y + ny * halfT}`} 
+                                        fill="rgba(14, 165, 233, 0.28)" 
+                                        stroke="none" 
+                                      />
+                                      {/* Window Jamb Edge Lines */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p1.x + nx * halfT} y2={p1.y + ny * halfT} stroke="#0f172a" strokeWidth="0.14" strokeLinecap="round" />
+                                      <line x1={p2.x - nx * halfT} y1={p2.y - ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#0f172a" strokeWidth="0.14" strokeLinecap="round" />
+                                      {/* Exterior & Interior Window Frame Sill Lines */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p2.x - nx * halfT} y2={p2.y - ny * halfT} stroke="#334155" strokeWidth="0.15" />
+                                      <line x1={p1.x + nx * halfT} y1={p1.y + ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#334155" strokeWidth="0.15" />
+                                      {/* Double Glazing Center Panes */}
+                                      <line x1={p1.x - nx * 0.1} y1={p1.y - ny * 0.1} x2={p2.x - nx * 0.1} y2={p2.y - ny * 0.1} stroke="#0284c7" strokeWidth="0.14" />
+                                      <line x1={p1.x + nx * 0.1} y1={p1.y + ny * 0.1} x2={p2.x + nx * 0.1} y2={p2.y + ny * 0.1} stroke="#0284c7" strokeWidth="0.14" />
+                                      {/* Interactive Clickable Badge */}
+                                      <g 
+                                        className={activeTool === 'delete' ? "cursor-pointer hover:opacity-80" : "cursor-pointer"}
+                                        onClick={(e) => handleOpeningClick(e, w.id, op.id)}
+                                      >
+                                        <rect x={mid.x - 0.75} y={mid.y - 0.5} width={1.5} height={1.0} rx={0.25} fill={activeTool === 'delete' ? "#ef4444" : "#0891b2"} stroke="#ffffff" strokeWidth="0.12" />
+                                        <text 
+                                          x={mid.x} y={mid.y} 
+                                          transform={`scale(1, -1) translate(0, -${2 * mid.y})`}
+                                          fontSize="0.5" 
+                                          fill="#ffffff" 
+                                          textAnchor="middle" 
+                                          dominantBaseline="central" 
+                                          fontWeight="bold"
+                                        >
+                                          W
+                                        </text>
+                                      </g>
+                                    </g>
+                                  );
+                                }
+                              })}
+
+                              {/* 2D Plaster Finish Indicator Lines (on solid masonry spans) */}
                               {activeMode === 'plaster' && len > 0 && (() => {
                                 const isWallOuterPlaster = (w.plasterOverrides?.outer?.enabled !== undefined ? w.plasterOverrides.outer.enabled : plasterConfig.outer.enabled) && (plasterConfig.scope === 'both' || plasterConfig.scope === 'outer_only') && plasterConfig.enabled !== false;
                                 const isWallInnerPlaster = (w.plasterOverrides?.inner?.enabled !== undefined ? w.plasterOverrides.inner.enabled : plasterConfig.inner.enabled) && (plasterConfig.scope === 'both' || plasterConfig.scope === 'inner_only') && plasterConfig.enabled !== false;
 
                                 return (
                                   <>
-                                    {/* Outer Plaster Line (Sky/Cyan) */}
-                                    {isWallOuterPlaster && (
+                                    {isWallOuterPlaster && masonrySpans.map((sp, spIdx) => (
                                       <line 
-                                        x1={seg.start.x + nx * offset} y1={seg.start.y + ny * offset}
-                                        x2={seg.end.x + nx * offset} y2={seg.end.y + ny * offset}
+                                        key={`outer-plaster-${spIdx}`}
+                                        x1={sp.x1 + nx * offset} y1={sp.y1 + ny * offset}
+                                        x2={sp.x2 + nx * offset} y2={sp.y2 + ny * offset}
                                         stroke="#0284c7" strokeWidth="0.18" strokeDasharray="0.6,0.3"
                                         pointerEvents="none"
                                       />
-                                    )}
-                                    {/* Inner Plaster Line (Teal) */}
-                                    {isWallInnerPlaster && (
+                                    ))}
+                                    {isWallInnerPlaster && masonrySpans.map((sp, spIdx) => (
                                       <line 
-                                        x1={seg.start.x - nx * offset} y1={seg.start.y - ny * offset}
-                                        x2={seg.end.x - nx * offset} y2={seg.end.y - ny * offset}
+                                        key={`inner-plaster-${spIdx}`}
+                                        x1={sp.x1 - nx * offset} y1={sp.y1 - ny * offset}
+                                        x2={sp.x2 - nx * offset} y2={sp.y2 - ny * offset}
                                         stroke="#0d9488" strokeWidth="0.18"
                                         pointerEvents="none"
                                       />
-                                    )}
+                                    ))}
                                   </>
                                 );
                               })()}
@@ -7990,7 +8155,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                      );
                   })}
 
-                  {/* Internal / Custom Walls with Geometric Segmentation against Pillars */}
+                  {/* Internal / Custom Walls with Geometric Segmentation against Pillars & Opening Voids */}
                   {activeFloor?.internalWalls.map(w => {
                      const floorPillars = (model.pillars || []).filter(p => p.floorId === activeFloorId);
                      const segments = splitWallByPillars(w, floorPillars, model.buildingUnit);
@@ -8004,44 +8169,202 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                           const dx = seg.end.x - seg.start.x;
                           const dy = seg.end.y - seg.start.y;
                           const len = Math.hypot(dx, dy);
-                          const nx = len > 0 ? -dy / len : 0;
-                          const ny = len > 0 ? dx / len : 0;
-                          const offset = (tFeet / 2) + 0.15;
+                          if (len <= 0.01) return null;
+                          const ux = dx / len;
+                          const uy = dy / len;
+                          const nx = -uy;
+                          const ny = ux;
+                          const halfT = tFeet / 2;
+                          const offset = halfT + 0.15;
+
+                          // Vector to building center for door swing direction
+                          const bCenterX = model.buildingLength / 2;
+                          const bCenterY = model.buildingWidth / 2;
+
+                          // Openings on this segment
+                          const segOps = [...(seg.openings || [])].sort((a, b) => (a.distanceFromStart || 0) - (b.distanceFromStart || 0));
+
+                          // Sub-spans of solid brickwork between openings
+                          const masonrySpans: { x1: number; y1: number; x2: number; y2: number }[] = [];
+                          let curDist = 0;
+                          segOps.forEach(op => {
+                            const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                            const opStart = Math.max(0, convertUnit(rawDist, op.unit || model.buildingUnit, model.buildingUnit));
+                            const opW = convertUnit(op.width, op.unit || model.buildingUnit, model.buildingUnit);
+                            const opEnd = Math.min(len, opStart + opW);
+
+                            if (opStart - curDist >= 0.04) {
+                              masonrySpans.push({
+                                x1: seg.start.x + ux * curDist,
+                                y1: seg.start.y + uy * curDist,
+                                x2: seg.start.x + ux * opStart,
+                                y2: seg.start.y + uy * opStart
+                              });
+                            }
+                            curDist = Math.max(curDist, opEnd);
+                          });
+                          if (len - curDist >= 0.04) {
+                            masonrySpans.push({
+                              x1: seg.start.x + ux * curDist,
+                              y1: seg.start.y + uy * curDist,
+                              x2: seg.end.x,
+                              y2: seg.end.y
+                            });
+                          }
+                          if (segOps.length === 0 && masonrySpans.length === 0) {
+                            masonrySpans.push({ x1: seg.start.x, y1: seg.start.y, x2: seg.end.x, y2: seg.end.y });
+                          }
 
                           return (
                             <React.Fragment key={`${w.id}-seg-${sIdx}`}>
                               {/* Selected wall highlight */}
-                              {isSelectedPlaster && (
+                              {isSelectedPlaster && masonrySpans.map((sp, spIdx) => (
                                 <line 
-                                  x1={seg.start.x} y1={seg.start.y} x2={seg.end.x} y2={seg.end.y} 
+                                  key={`plaster-sel-${spIdx}`}
+                                  x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} 
                                   stroke="#14b8a6" strokeWidth={tFeet + 0.4} strokeLinecap="butt" 
                                   opacity="0.55"
                                 />
-                              )}
-                              {/* Brick Wall Core */}
-                              <line 
-                                x1={seg.start.x} y1={seg.start.y} x2={seg.end.x} y2={seg.end.y} 
-                                stroke="#b91c1c" strokeWidth={tFeet} strokeLinecap="butt" 
-                                className={activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-400 transition-colors" : ""}
-                              />
+                              ))}
+
+                              {/* Brick Wall Core Lines (Segmented cleanly around openings) */}
+                              {masonrySpans.map((sp, spIdx) => (
+                                <line 
+                                  key={`core-span-${spIdx}`}
+                                  x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} 
+                                  stroke="#b91c1c" strokeWidth={tFeet} strokeLinecap="butt" 
+                                  className={activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-400 transition-colors" : ""}
+                                />
+                              ))}
+
+                              {/* Architectural 2D Door & Window Renderings */}
+                              {segOps.map((op, oIdx) => {
+                                const rawDist = op.distanceFromStart !== undefined ? op.distanceFromStart : 0;
+                                const opStart = Math.max(0, convertUnit(rawDist, op.unit || model.buildingUnit, model.buildingUnit));
+                                const opW = convertUnit(op.width, op.unit || model.buildingUnit, model.buildingUnit);
+                                const opEnd = Math.min(len, opStart + opW);
+                                const actualW = Math.max(0.5, opEnd - opStart);
+
+                                const p1 = { x: seg.start.x + ux * opStart, y: seg.start.y + uy * opStart };
+                                const p2 = { x: seg.start.x + ux * opEnd, y: seg.start.y + uy * opEnd };
+                                const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+
+                                const isDoor = op.type === 'door';
+                                const inwardSign = (nx * (bCenterX - mid.x) + ny * (bCenterY - mid.y)) >= 0 ? 1 : -1;
+                                const inNormX = nx * inwardSign;
+                                const inNormY = ny * inwardSign;
+
+                                if (isDoor) {
+                                  const leafEnd = { x: p1.x + inNormX * actualW, y: p1.y + inNormY * actualW };
+                                  return (
+                                    <g key={`door-elem-${op.id || oIdx}`}>
+                                      {/* Door Jambs (brick edge termination) */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p1.x + nx * halfT} y2={p1.y + ny * halfT} stroke="#450a0a" strokeWidth="0.14" strokeLinecap="round" />
+                                      <line x1={p2.x - nx * halfT} y1={p2.y - ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#450a0a" strokeWidth="0.14" strokeLinecap="round" />
+                                      {/* Threshold Dashed Floor Line */}
+                                      <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#cbd5e1" strokeWidth="0.12" strokeDasharray="0.3,0.2" />
+                                      {/* Door Swing Quarter Sector Arc */}
+                                      <path 
+                                        d={`M ${p1.x} ${p1.y} L ${leafEnd.x} ${leafEnd.y} A ${actualW} ${actualW} 0 0 1 ${p2.x} ${p2.y} Z`} 
+                                        fill="rgba(37, 99, 235, 0.16)" 
+                                        stroke="#2563eb" 
+                                        strokeWidth="0.12" 
+                                        strokeDasharray="0.4,0.2"
+                                      />
+                                      {/* Timber Door Leaf Panel */}
+                                      <line 
+                                        x1={p1.x} y1={p1.y} 
+                                        x2={leafEnd.x} y2={leafEnd.y} 
+                                        stroke="#1d4ed8" 
+                                        strokeWidth={Math.max(0.18, halfT * 0.45)} 
+                                        strokeLinecap="round" 
+                                      />
+                                      {/* Interactive Clickable Badge */}
+                                      <g 
+                                        className={activeTool === 'delete' ? "cursor-pointer hover:opacity-80" : "cursor-pointer"}
+                                        onClick={(e) => handleOpeningClick(e, w.id, op.id)}
+                                      >
+                                        <circle cx={mid.x} cy={mid.y} r={0.7} fill={activeTool === 'delete' ? "#ef4444" : "#2563eb"} stroke="#ffffff" strokeWidth="0.12" />
+                                        <text 
+                                          x={mid.x} y={mid.y} 
+                                          transform={`scale(1, -1) translate(0, -${2 * mid.y})`}
+                                          fontSize="0.55" 
+                                          fill="#ffffff" 
+                                          textAnchor="middle" 
+                                          dominantBaseline="central" 
+                                          fontWeight="bold"
+                                        >
+                                          D
+                                        </text>
+                                      </g>
+                                    </g>
+                                  );
+                                } else {
+                                  // Window
+                                  return (
+                                    <g key={`win-elem-${op.id || oIdx}`}>
+                                      {/* Glass Opening Area Tint */}
+                                      <polygon 
+                                        points={`${p1.x - nx * halfT},${p1.y - ny * halfT} ${p2.x - nx * halfT},${p2.y - ny * halfT} ${p2.x + nx * halfT},${p2.y + ny * halfT} ${p1.x + nx * halfT},${p1.y + ny * halfT}`} 
+                                        fill="rgba(14, 165, 233, 0.28)" 
+                                        stroke="none" 
+                                      />
+                                      {/* Window Jamb Edge Lines */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p1.x + nx * halfT} y2={p1.y + ny * halfT} stroke="#0f172a" strokeWidth="0.14" strokeLinecap="round" />
+                                      <line x1={p2.x - nx * halfT} y1={p2.y - ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#0f172a" strokeWidth="0.14" strokeLinecap="round" />
+                                      {/* Exterior & Interior Window Frame Sill Lines */}
+                                      <line x1={p1.x - nx * halfT} y1={p1.y - ny * halfT} x2={p2.x - nx * halfT} y2={p2.y - ny * halfT} stroke="#334155" strokeWidth="0.15" />
+                                      <line x1={p1.x + nx * halfT} y1={p1.y + ny * halfT} x2={p2.x + nx * halfT} y2={p2.y + ny * halfT} stroke="#334155" strokeWidth="0.15" />
+                                      {/* Double Glazing Center Panes */}
+                                      <line x1={p1.x - nx * 0.1} y1={p1.y - ny * 0.1} x2={p2.x - nx * 0.1} y2={p2.y - ny * 0.1} stroke="#0284c7" strokeWidth="0.14" />
+                                      <line x1={p1.x + nx * 0.1} y1={p1.y + ny * 0.1} x2={p2.x + nx * 0.1} y2={p2.y + ny * 0.1} stroke="#0284c7" strokeWidth="0.14" />
+                                      {/* Interactive Clickable Badge */}
+                                      <g 
+                                        className={activeTool === 'delete' ? "cursor-pointer hover:opacity-80" : "cursor-pointer"}
+                                        onClick={(e) => handleOpeningClick(e, w.id, op.id)}
+                                      >
+                                        <rect x={mid.x - 0.75} y={mid.y - 0.5} width={1.5} height={1.0} rx={0.25} fill={activeTool === 'delete' ? "#ef4444" : "#0891b2"} stroke="#ffffff" strokeWidth="0.12" />
+                                        <text 
+                                          x={mid.x} y={mid.y} 
+                                          transform={`scale(1, -1) translate(0, -${2 * mid.y})`}
+                                          fontSize="0.5" 
+                                          fill="#ffffff" 
+                                          textAnchor="middle" 
+                                          dominantBaseline="central" 
+                                          fontWeight="bold"
+                                        >
+                                          W
+                                        </text>
+                                      </g>
+                                    </g>
+                                  );
+                                }
+                              })}
+
                               {/* 2D Plaster Finish Indicator Lines (Both faces inner teal for internal walls) */}
                               {activeMode === 'plaster' && len > 0 && (() => {
                                 const isWallInnerPlaster = (w.plasterOverrides?.inner?.enabled !== undefined ? w.plasterOverrides.inner.enabled : plasterConfig.inner.enabled) && (plasterConfig.scope === 'both' || plasterConfig.scope === 'inner_only') && plasterConfig.enabled !== false;
 
                                 return isWallInnerPlaster ? (
                                   <>
-                                    <line 
-                                      x1={seg.start.x + nx * offset} y1={seg.start.y + ny * offset}
-                                      x2={seg.end.x + nx * offset} y2={seg.end.y + ny * offset}
-                                      stroke="#0d9488" strokeWidth="0.18"
-                                      pointerEvents="none"
-                                    />
-                                    <line 
-                                      x1={seg.start.x - nx * offset} y1={seg.start.y - ny * offset}
-                                      x2={seg.end.x - nx * offset} y2={seg.end.y - ny * offset}
-                                      stroke="#0d9488" strokeWidth="0.18"
-                                      pointerEvents="none"
-                                    />
+                                    {masonrySpans.map((sp, spIdx) => (
+                                      <line 
+                                        key={`int-plaster-top-${spIdx}`}
+                                        x1={sp.x1 + nx * offset} y1={sp.y1 + ny * offset}
+                                        x2={sp.x2 + nx * offset} y2={sp.y2 + ny * offset}
+                                        stroke="#0d9488" strokeWidth="0.18"
+                                        pointerEvents="none"
+                                      />
+                                    ))}
+                                    {masonrySpans.map((sp, spIdx) => (
+                                      <line 
+                                        key={`int-plaster-bot-${spIdx}`}
+                                        x1={sp.x1 - nx * offset} y1={sp.y1 - ny * offset}
+                                        x2={sp.x2 - nx * offset} y2={sp.y2 - ny * offset}
+                                        stroke="#0d9488" strokeWidth="0.18"
+                                        pointerEvents="none"
+                                      />
+                                    ))}
                                   </>
                                 ) : null;
                               })()}
@@ -8062,30 +8385,6 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       stroke="orange" strokeWidth={internalWallThickness / 12} strokeDasharray="0.5,0.5" 
                   />
               )}
-
-              {/* Openings (Floor Mode Only) */}
-              {activeMode === 'floor' && allWalls.map(w => {
-                const dx = w.end!.x - w.start!.x;
-                const dy = w.end!.y - w.start!.y;
-                const length = Math.hypot(dx, dy);
-                if (length === 0) return null;
-                const nx = dx / length;
-                const ny = dy / length;
-
-                return w.openings?.map(op => {
-                  const dist = op.distanceFromStart || 0;
-                  const cx = w.start!.x + nx * (dist + op.width/2);
-                  const cy = w.start!.y + ny * (dist + op.width/2);
-                  return (
-                    <circle 
-                        key={op.id} cx={cx} cy={cy} r={0.8} 
-                        fill={op.type === 'door' ? '#2563eb' : '#0891b2'} 
-                        onClick={(e) => handleOpeningClick(e, w.id, op.id)}
-                        className={activeTool === 'delete' ? "cursor-pointer hover:fill-red-500" : ""}
-                    />
-                  )
-                });
-              })}
               
               {/* Pillar Live Preview (Floor Mode Only) */}
               {activeMode === 'floor' && activeTool === 'pillar' && currentMouse && (

@@ -142,7 +142,10 @@ export interface StructuralRatesConfig {
   sandPricePerCft?: number;
   aggregatePricePerCft?: number;
   steelRatePerKg?: number;
+  bindingWireRatePerKg?: number;
   brickPrice?: number;
+  concreteRatePerM3?: number;
+  mortarRatePerM3?: number;
   sandFillRatePerCft?: number;
   excavationRatePerM3?: number;
   pccLabourRatePerM3?: number;
@@ -221,7 +224,10 @@ export const DEFAULT_BUILDING_CONFIG: BuildingConfig = {
     sandPricePerCft: 55,
     aggregatePricePerCft: 45,
     steelRatePerKg: 65,
+    bindingWireRatePerKg: 90,
     brickPrice: 8.5,
+    concreteRatePerM3: 4500,
+    mortarRatePerM3: 3800,
     sandFillRatePerCft: 45,
     excavationRatePerM3: 250,
     pccLabourRatePerM3: 2500,
@@ -2391,12 +2397,12 @@ export function calculateBuildingStructuralSummary(
   const plasterLabourCost = plasterLabourDays * (rates.masonWagePerDay + rates.helperWagePerDay);
   const plasterTotal = plasterMaterialsCost + plasterLabourCost;
 
-  // 7. Finishes (Flooring & Painting - Handbook Section 13.2, 13.3)
-  const flooringAreaM2 = totalFloorAreaM2 * 0.90;
-  const flooringCost = flooringAreaM2 * 1200; // vitrified tiles with laying & adhesive
-  const paintAreaM2 = netWallAreaM2 * 2.0;
-  const paintingCost = paintAreaM2 * 180; // 2 coats emulsion + primer + putty
-  const finishesTotal = flooringCost + paintingCost;
+  // 7. Architectural Finishes (Disabled per 8-product BOQ specification)
+  const flooringAreaM2 = 0;
+  const flooringCost = 0;
+  const paintAreaM2 = 0;
+  const paintingCost = 0;
+  const finishesTotal = 0;
 
   // Direct Cost Subtotal (Handbook Section 17)
   const transportCost = rates.transportCost || 0;

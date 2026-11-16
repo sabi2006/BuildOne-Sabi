@@ -564,6 +564,7 @@ function CustomWallMeshWrapper({
         return (
           <group key={seg.id} position={[midX, yOffset, -midY]} rotation={[0, -angle, 0]}>
             <SharedBrickWall 
+              key={`${seg.id}-brickwall-${renderWall.dimensions.length}-${(renderWall.openings || []).map(o => `${o.id}_${o.distanceFromStart}`).join('_')}`}
               wall={renderWall} 
               brickType={brickType} 
               settings={settings} 
@@ -3390,7 +3391,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                       {/* External Walls with Clean Segmentation around Pillars (Infill between RCC Frame) */}
                       {showBrickInfill && floor.externalWalls.map(w => (
                         <CustomWallMeshWrapper 
-                          key={w.id} wall={w} yOffset={yOffset} isInternal={false} debugMode={debugMode || structuralView} 
+                          key={`${w.id}-${(w.openings || []).length}-${(w.openings || []).map(o => `${o.id}_${o.distanceFromStart}`).join('_')}`}
+                          wall={w} yOffset={yOffset} isInternal={false} debugMode={debugMode || structuralView} 
                           fadeFront={(viewMode === 'open-top' || viewMode === 'cutaway')}
                           pillars={floorPillars}
                           allFloorWalls={floorAllWalls}
@@ -3406,7 +3408,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                       {/* Internal Walls with Clean Segmentation around Pillars (Infill between RCC Frame) */}
                       {showBrickInfill && showInternal && floor.internalWalls.map(w => (
                         <CustomWallMeshWrapper 
-                          key={w.id} wall={w} yOffset={yOffset} isInternal={true} debugMode={debugMode || structuralView} fadeFront={false} 
+                          key={`${w.id}-${(w.openings || []).length}-${(w.openings || []).map(o => `${o.id}_${o.distanceFromStart}`).join('_')}`}
+                          wall={w} yOffset={yOffset} isInternal={true} debugMode={debugMode || structuralView} fadeFront={false} 
                           pillars={floorPillars}
                           allFloorWalls={floorAllWalls}
                           showInnerPlaster={showInnerPlaster}

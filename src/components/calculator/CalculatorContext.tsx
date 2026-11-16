@@ -108,7 +108,7 @@ const createDefaultWall = (): Wall => ({
   openings: []
 });
 
-const CalculatorContext = createContext<CalculatorState | undefined>(undefined);
+export const CalculatorContext = createContext<CalculatorState | undefined>(undefined);
 
 export function CalculatorProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTab] = useState<TabMode>('standard');
