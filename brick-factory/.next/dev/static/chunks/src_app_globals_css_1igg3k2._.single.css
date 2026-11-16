@@ -3042,6 +3042,16 @@
     background-color: var(--color-amber-800);
   }
 
+  .bg-amber-900\/80 {
+    background-color: #7b3306cc;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .bg-amber-900\/80 {
+      background-color: color-mix(in oklab, var(--color-amber-900) 80%, transparent);
+    }
+  }
+
   .bg-amber-950 {
     background-color: var(--color-amber-950);
   }

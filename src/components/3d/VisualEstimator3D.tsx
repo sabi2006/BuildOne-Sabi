@@ -2129,6 +2129,54 @@ function CameraController({
   );
 }
 
+interface SelectedBeamInfo {
+  id: string;
+  floorId: string;
+  floorName: string;
+  isPlinth?: boolean;
+  isWallBeam?: boolean;
+  startPillarId?: string;
+  endPillarId?: string;
+  lengthM: number;
+  lengthFt: number;
+  widthIn: number;
+  depthIn: number;
+  widthM: number;
+  depthM: number;
+  concreteVolumeM3: number;
+  concreteVolumeCft: number;
+  reinf?: Partial<RCCReinforcementConfig>;
+  beamSizingRule?: string;
+  concreteGrade?: string;
+  steelGrade?: string;
+}
+
+interface SelectedSlabInfo {
+  id: string;
+  floorId: string;
+  floorName: string;
+  isRoof: boolean;
+  roofType?: string;
+  waterTankLitres?: number;
+  widthM: number;
+  depthM: number;
+  widthFt: number;
+  depthFt: number;
+  thicknessIn: number;
+  thicknessMm: number;
+  thicknessM: number;
+  concreteVolumeM3: number;
+  concreteVolumeCft: number;
+  aspectRatio: number;
+  slabType: 'One-Way' | 'Two-Way';
+  liveLoadKnM2: number;
+  deadLoadKnM2: number;
+  totalLoadKnM2: number;
+  reinf?: Partial<RCCReinforcementConfig>;
+  concreteGrade?: string;
+  steelGrade?: string;
+}
+
 export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const { brickType, settings, setActiveTab, result, projectName } = useCalculator();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -2158,6 +2206,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const [showSoilBed, setShowSoilBed] = useState(true);
   const [selectedPillar, setSelectedPillar] = useState<Pillar | null>(null);
   const [selectedFooting, setSelectedFooting] = useState<FoundationFooting | null>(null);
+  const [selectedBeam, setSelectedBeam] = useState<SelectedBeamInfo | null>(null);
+  const [selectedSlab, setSelectedSlab] = useState<SelectedSlabInfo | null>(null);
   const [structuralView, setStructuralView] = useState(false);
   const [showHint, setShowHint] = useState(true);
   const [showSceneElements, setShowSceneElements] = useState(false);
@@ -2961,11 +3011,180 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
           );
         })()}
 
+        {/* Selected RCC Ring Beam / Plinth Beam Floating Inspector in 3D */}
+        {selectedBeam && (() => {
+          const topDia = selectedBeam.reinf?.beamTopBarDiaMm || 12;
+          const botDia = selectedBeam.reinf?.beamBottomBarDiaMm || 12;
+          const stirrupDia = selectedBeam.reinf?.beamStirrupDiaMm || 8;
+          const stirrupSpacingM = (selectedBeam.reinf?.beamStirrupSpacingMm || 150) * 0.001;
+          const coverM = (selectedBeam.reinf?.beamCoverMm || 25) * 0.001;
+
+          const topWeight = 2 * selectedBeam.lengthM * ((topDia * topDia) / 162);
+          const botCount = selectedBeam.reinf?.beamBottomBarCount || 3;
+          const botWeight = botCount * selectedBeam.lengthM * ((botDia * botDia) / 162);
+
+          const stirrupPerimM = 2 * (Math.max(0.05, selectedBeam.widthM - 2 * coverM) + Math.max(0.05, selectedBeam.depthM - 2 * coverM)) + 0.1;
+          const stirrupCount = Math.max(2, Math.floor(selectedBeam.lengthM / stirrupSpacingM) + 1);
+          const stirrupWeight = stirrupCount * stirrupPerimM * ((stirrupDia * stirrupDia) / 162);
+          const totalBeamSteelKg = topWeight + botWeight + stirrupWeight;
+
+          return (
+            <div className="absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto">
+              <div className="flex justify-between items-center border-b border-slate-700 pb-1.5">
+                <div>
+                  <span className="font-bold text-amber-400 text-sm">{selectedBeam.isPlinth ? 'RCC Plinth Tie Beam' : 'RCC Ring Beam'}</span>
+                  <span className="ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-amber-900/80 text-amber-200 border border-amber-700">
+                    {selectedBeam.isPlinth ? 'FOUNDATION TIE' : 'FRAME BEAM'}
+                  </span>
+                </div>
+                <button onClick={() => setSelectedBeam(null)} className="text-slate-400 hover:text-white p-0.5"><X className="w-4 h-4" /></button>
+              </div>
+
+              {/* Beam Dimensions & Floor */}
+              <div className="space-y-1 text-slate-300">
+                <div><span className="text-slate-400">Beam ID: </span><span className="font-mono text-cyan-200">{selectedBeam.id}</span></div>
+                <div><span className="text-slate-400">Floor Level: </span><span className="font-semibold text-white">{selectedBeam.floorName}</span></div>
+                <div><span className="text-slate-400">Section Dimensions: </span><span className="font-mono font-bold text-amber-300">{selectedBeam.widthIn}" × {selectedBeam.depthIn}" ({Math.round(selectedBeam.widthM * 1000)} × {Math.round(selectedBeam.depthM * 1000)} mm)</span></div>
+                <div><span className="text-slate-400">Span Length: </span><span className="font-mono text-emerald-300 font-bold">{selectedBeam.lengthFt.toFixed(2)} ft ({selectedBeam.lengthM.toFixed(2)} m)</span></div>
+                <div><span className="text-slate-400">Design Rule: </span><span className="font-mono text-cyan-300">{selectedBeam.beamSizingRule}</span></div>
+              </div>
+
+              {/* IS 456 Structural & Quantity Details */}
+              <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300">
+                <div className="text-[11px] font-bold text-orange-300 flex items-center justify-between">
+                  <span>Structural Analysis & Concrete</span>
+                  <span className="text-[9px] font-mono text-slate-400">IS 456:2000</span>
+                </div>
+                <div><span className="text-slate-400">Concrete Grade: </span><span className="font-mono text-white font-semibold">{selectedBeam.concreteGrade || 'M20'}</span></div>
+                <div><span className="text-slate-400">Steel Grade: </span><span className="font-mono text-white font-semibold">{selectedBeam.steelGrade || 'Fe500'}</span></div>
+                <div>
+                  <span className="text-slate-400">Concrete Volume: </span>
+                  <span className="font-mono text-cyan-300 font-bold">{selectedBeam.concreteVolumeCft.toFixed(1)} CFT ({selectedBeam.concreteVolumeM3.toFixed(2)} m³)</span>
+                </div>
+              </div>
+
+              {/* Reinforcement Details */}
+              <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300">
+                <div className="text-[11px] font-bold text-cyan-300">Reinforcement Details</div>
+                <div>
+                  <span className="text-slate-400">Top Main Steel: </span>
+                  <span className="font-mono text-white font-bold">2 Nos × {topDia}mm TMT</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Bottom Main Steel: </span>
+                  <span className="font-mono text-white font-bold">{botCount} Nos × {botDia}mm TMT</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Shear Stirrups: </span>
+                  <span className="font-mono text-white">{stirrupDia}mm @ {Math.round(stirrupSpacingM * 1000)}mm c/c</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Clear Cover: </span>
+                  <span className="font-mono text-white">{Math.round(coverM * 1000)} mm</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Beam Steel Weight: </span>
+                  <span className="font-mono text-emerald-300 font-bold">{totalBeamSteelKg.toFixed(1)} kg</span>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Selected RCC Floor Slab / Roof Slab Floating Inspector in 3D */}
+        {selectedSlab && (() => {
+          const mainDia = selectedSlab.reinf?.slabMainBarDiaMm || 10;
+          const distDia = selectedSlab.reinf?.slabDistBarDiaMm || 8;
+          const mainSpacingM = (selectedSlab.reinf?.slabMainBarSpacingMm || 150) * 0.001;
+          const distSpacingM = (selectedSlab.reinf?.slabDistBarSpacingMm || 150) * 0.001;
+          const coverM = (selectedSlab.reinf?.slabCoverMm || 20) * 0.001;
+
+          const usableWidthM = Math.max(0.1, selectedSlab.widthM - 2 * coverM);
+          const usableDepthM = Math.max(0.1, selectedSlab.depthM - 2 * coverM);
+          const mainCount = Math.max(2, Math.floor(usableDepthM / mainSpacingM) + 1);
+          const distCount = Math.max(2, Math.floor(usableWidthM / distSpacingM) + 1);
+
+          const mainSteelKg = mainCount * usableWidthM * ((mainDia * mainDia) / 162);
+          const distSteelKg = distCount * usableDepthM * ((distDia * distDia) / 162);
+          const totalSlabSteelKg = mainSteelKg + distSteelKg;
+
+          return (
+            <div className="absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto">
+              <div className="flex justify-between items-center border-b border-slate-700 pb-1.5">
+                <div>
+                  <span className="font-bold text-cyan-400 text-sm">{selectedSlab.isRoof ? 'RCC Roof Slab & Terrace' : 'RCC Floor Slab'}</span>
+                  <span className="ml-2 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-blue-900/80 text-blue-200 border border-blue-700">
+                    {selectedSlab.slabType} SLAB
+                  </span>
+                </div>
+                <button onClick={() => setSelectedSlab(null)} className="text-slate-400 hover:text-white p-0.5"><X className="w-4 h-4" /></button>
+              </div>
+
+              {/* Slab Dimensions & Floor */}
+              <div className="space-y-1 text-slate-300">
+                <div><span className="text-slate-400">Slab ID: </span><span className="font-mono text-cyan-200">{selectedSlab.id}</span></div>
+                <div><span className="text-slate-400">Floor Level: </span><span className="font-semibold text-white">{selectedSlab.floorName}</span></div>
+                <div><span className="text-slate-400">Thickness: </span><span className="font-mono font-bold text-amber-300">{selectedSlab.thicknessIn.toFixed(1)}" ({Math.round(selectedSlab.thicknessMm)} mm)</span></div>
+                <div><span className="text-slate-400">Plan Dimensions: </span><span className="font-mono text-white font-semibold">{selectedSlab.widthFt.toFixed(1)}' × {selectedSlab.depthFt.toFixed(1)}' ({selectedSlab.widthM.toFixed(2)}m × {selectedSlab.depthM.toFixed(2)}m)</span></div>
+                <div><span className="text-slate-400">Surface Area: </span><span className="font-mono text-emerald-300 font-bold">{(selectedSlab.widthFt * selectedSlab.depthFt).toFixed(1)} sq.ft ({(selectedSlab.widthM * selectedSlab.depthM).toFixed(2)} m²)</span></div>
+                <div><span className="text-slate-400">Aspect Ratio (Ly/Lx): </span><span className="font-mono text-cyan-300">{selectedSlab.aspectRatio.toFixed(2)} ({selectedSlab.slabType} Action)</span></div>
+              </div>
+
+              {/* IS 456 Loading & Concrete */}
+              <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300">
+                <div className="text-[11px] font-bold text-orange-300 flex items-center justify-between">
+                  <span>Structural Load & Analysis</span>
+                  <span className="text-[9px] font-mono text-slate-400">IS 456 / IS 875</span>
+                </div>
+                <div><span className="text-slate-400">Self-Weight (Dead Load): </span><span className="font-mono text-white">{(selectedSlab.thicknessM * 25).toFixed(2)} kN/m²</span></div>
+                <div><span className="text-slate-400">{selectedSlab.isRoof ? 'Weathering Course: ' : 'Floor Finish: '}</span><span className="font-mono text-white">{selectedSlab.isRoof ? '1.50 kN/m²' : '1.00 kN/m²'}</span></div>
+                <div><span className="text-slate-400">Occupancy Live Load: </span><span className="font-mono text-emerald-300 font-semibold">{selectedSlab.liveLoadKnM2.toFixed(2)} kN/m²</span></div>
+                {selectedSlab.isRoof && selectedSlab.waterTankLitres && selectedSlab.waterTankLitres > 0 && (
+                  <div><span className="text-slate-400">Overhead Water Tank: </span><span className="font-mono text-amber-300">{selectedSlab.waterTankLitres} Litres ({(selectedSlab.waterTankLitres * 0.00981).toFixed(1)} kN)</span></div>
+                )}
+                <div><span className="text-slate-400">Factored Design Load (Wu): </span><span className="font-mono text-amber-300 font-bold">{(selectedSlab.totalLoadKnM2 * 1.5).toFixed(2)} kN/m² (1.5 × P)</span></div>
+                <div>
+                  <span className="text-slate-400">Concrete Volume: </span>
+                  <span className="font-mono text-cyan-300 font-bold">{selectedSlab.concreteVolumeCft.toFixed(1)} CFT ({selectedSlab.concreteVolumeM3.toFixed(2)} m³)</span>
+                </div>
+                <div><span className="text-slate-400">Concrete Grade: </span><span className="font-mono text-white">{selectedSlab.concreteGrade || 'M20'}</span></div>
+              </div>
+
+              {/* Reinforcement Details */}
+              <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300">
+                <div className="text-[11px] font-bold text-cyan-300">Reinforcement Details (IS 456)</div>
+                <div>
+                  <span className="text-slate-400">Main Reinforcement: </span>
+                  <span className="font-mono text-white font-bold">{mainDia}mm TMT @ {Math.round(mainSpacingM * 1000)}mm c/c</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Distribution Steel: </span>
+                  <span className="font-mono text-white font-bold">{distDia}mm TMT @ {Math.round(distSpacingM * 1000)}mm c/c</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Clear Cover: </span>
+                  <span className="font-mono text-white">{Math.round(coverM * 1000)} mm</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Slab Steel Weight: </span>
+                  <span className="font-mono text-emerald-300 font-bold">{totalSlabSteelKg.toFixed(1)} kg</span>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         <WebGLErrorBoundary>
           <Canvas 
             shadows 
             camera={{ fov: 45 }} 
             gl={{ powerPreference: 'default', failIfMajorPerformanceCaveat: false, preserveDrawingBuffer: true, antialias: true }}
+            onPointerMissed={() => {
+              setSelectedPillar(null);
+              setSelectedFooting(null);
+              setSelectedBeam(null);
+              setSelectedSlab(null);
+            }}
           >
             <CameraController viewMode={viewMode} viewPreset={viewPreset} controlsRef={controlsRef} />
             <color attach="background" args={['#020617']} />
@@ -3002,7 +3221,14 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 isConcreteSolid={isConcreteSolid}
                 isGhosted={isGhosted}
                 selectedFooting={selectedFooting}
-                onSelectFooting={setSelectedFooting}
+                onSelectFooting={(f) => {
+                  setSelectedFooting(f);
+                  if (f) {
+                    setSelectedPillar(null);
+                    setSelectedBeam(null);
+                    setSelectedSlab(null);
+                  }
+                }}
                 reinf={settings.rccReinforcement}
               />
 
@@ -3239,117 +3465,234 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                 ? Math.max(beamThickM / 2, (Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2)
                                 : Math.min((Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2, beamThickM / 2);
 
-                              const extSX = sX - ux * extStartM;
-                              const extSY = sY - uy * extStartM;
-                              const extEX = eX + ux * extEndM;
-                              const extEY = eY + uy * extEndM;
+                              let extSX = sX - ux * extStartM;
+                              let extSY = sY - uy * extStartM;
+                              let extEX = eX + ux * extEndM;
+                              let extEY = eY + uy * extEndM;
 
-                              const fullBeamLenM = len + extStartM + extEndM;
+                              // Ensure beam endpoints strictly terminate within pillar boundaries and building envelope (never protrude into empty air)
+                              const matchGfStart = startPillar ? findMatchingGfPillar(startPillar) : null;
+                              const matchGfEnd = endPillar ? findMatchingGfPillar(endPillar) : null;
+                              const effStartPos = startPillar
+                                ? ((matchGfStart && !startPillar.isStoreyOverride)
+                                    ? getEffectivePillarPosition(matchGfStart, gfAllWalls, model.buildingUnit)
+                                    : getEffectivePillarPosition(startPillar, floorAllWalls, model.buildingUnit))
+                                : { x: beam.start.x, y: beam.start.y };
+                              const effEndPos = endPillar
+                                ? ((matchGfEnd && !endPillar.isStoreyOverride)
+                                    ? getEffectivePillarPosition(matchGfEnd, gfAllWalls, model.buildingUnit)
+                                    : getEffectivePillarPosition(endPillar, floorAllWalls, model.buildingUnit))
+                                : { x: beam.end.x, y: beam.end.y };
+
+                              const pStartX = toM(effStartPos.x);
+                              const pStartY = toM(effStartPos.y);
+                              const pEndX = toM(effEndPos.x);
+                              const pEndY = toM(effEndPos.y);
+
+                              // Clamp start endpoint so it never extends past the far face of start pillar
+                              if (ux > 0.001) extSX = Math.max(extSX, pStartX - startPW / 2);
+                              else if (ux < -0.001) extSX = Math.min(extSX, pStartX + startPW / 2);
+                              if (uy > 0.001) extSY = Math.max(extSY, pStartY - startPD / 2);
+                              else if (uy < -0.001) extSY = Math.min(extSY, pStartY + startPD / 2);
+
+                              // Clamp end endpoint so it never extends past the far face of end pillar
+                              if (ux > 0.001) extEX = Math.min(extEX, pEndX + endPW / 2);
+                              else if (ux < -0.001) extEX = Math.max(extEX, pEndX - endPW / 2);
+                              if (uy > 0.001) extEY = Math.min(extEY, pEndY + endPD / 2);
+                              else if (uy < -0.001) extEY = Math.max(extEY, pEndY - endPD / 2);
+
+                              // Also clamp strictly to the floor structural outer perimeter
+                              extSX = Math.max(floorBounds.minX, Math.min(floorBounds.maxX, extSX));
+                              extEX = Math.max(floorBounds.minX, Math.min(floorBounds.maxX, extEX));
+                              extSY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, extSY));
+                              extEY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, extEY));
+
+                              const fullBeamLenM = Math.hypot(extEX - extSX, extEY - extSY);
                               const extMidX = (extSX + extEX) / 2;
                               const extMidY = (extSY + extEY) / 2;
-                              const localPlasterX = (extStartM - extEndM) / 2;
+                              const effExtStartM = Math.hypot(sX - extSX, sY - extSY);
+                              const effExtEndM = Math.hypot(extEX - eX, extEY - eY);
+                              const localPlasterX = (effExtStartM - effExtEndM) / 2;
 
                               return (
                                 <React.Fragment key={`frame-beam-${floor.id}-${beam.id}`}>
                                   {/* 0. Ground Floor RCC Plinth Beam (Base Tie Beam under Brick Infill) */}
-                                  {i === 0 && (showFullRingBeam || showRingBeamRebar) && (
-                                    <group position={[extMidX, yOffset - actualBeamHeightM / 2, -extMidY]} rotation={[0, -ang, 0]}>
-                                      {showFullRingBeam && (
-                                        <mesh name="rccPlinthBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[fullBeamLenM, actualBeamHeightM, beamThickM]} />
-                                          <meshStandardMaterial 
-                                            color="#64748b" 
-                                            roughness={isBeamXRay ? 0.3 : 0.85} 
-                                            metalness={isBeamXRay ? 0.1 : 0.05} 
-                                            transparent={isConcreteTransparent} 
-                                            opacity={concreteOpacity} 
-                                            depthWrite={isConcreteDepthWrite} 
-                                            depthTest={true} 
-                                            wireframe={isWireframe}
+                                  {i === 0 && (showFullRingBeam || showRingBeamRebar) && (() => {
+                                    const plinthId = `plinth-${floor.id}-${beam.id}`;
+                                    const isPlinthSelected = selectedBeam?.id === plinthId;
+                                    return (
+                                      <group position={[extMidX, yOffset - actualBeamHeightM / 2, -extMidY]} rotation={[0, -ang, 0]}>
+                                        {showFullRingBeam && (
+                                          <mesh 
+                                            name="rccPlinthBeamMesh" 
+                                            castShadow={isConcreteSolid} 
+                                            receiveShadow={isConcreteSolid} 
+                                            renderOrder={isBeamXRay ? 2 : 1}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (isPlinthSelected) {
+                                                setSelectedBeam(null);
+                                              } else {
+                                                setSelectedBeam({
+                                                  id: plinthId,
+                                                  floorId: floor.id,
+                                                  floorName: floor.name || `Floor ${i}`,
+                                                  isPlinth: true,
+                                                  startPillarId: beam.startPillarId,
+                                                  endPillarId: beam.endPillarId,
+                                                  lengthM: fullBeamLenM,
+                                                  lengthFt: fullBeamLenM * 3.28084,
+                                                  widthIn: Math.round(beamThickM * 39.3701),
+                                                  depthIn: Math.round(actualBeamHeightM * 39.3701),
+                                                  widthM: beamThickM,
+                                                  depthM: actualBeamHeightM,
+                                                  concreteVolumeM3: fullBeamLenM * beamThickM * actualBeamHeightM,
+                                                  concreteVolumeCft: (fullBeamLenM * beamThickM * actualBeamHeightM) * 35.3147,
+                                                  reinf: floorBeamReinf,
+                                                  beamSizingRule: 'Plinth Tie Beam (Ground Tie)',
+                                                  concreteGrade: (model as any).concreteGrade || 'M20',
+                                                  steelGrade: (model as any).steelGrade || 'Fe500'
+                                                });
+                                                setSelectedPillar(null);
+                                                setSelectedFooting(null);
+                                                setSelectedSlab(null);
+                                              }
+                                            }}
+                                          >
+                                            <boxGeometry args={[fullBeamLenM, actualBeamHeightM, beamThickM]} />
+                                            <meshStandardMaterial 
+                                              color={isPlinthSelected ? "#0284c7" : "#64748b"} 
+                                              roughness={isBeamXRay ? 0.3 : 0.85} 
+                                              metalness={isBeamXRay ? 0.1 : 0.05} 
+                                              transparent={isConcreteTransparent} 
+                                              opacity={concreteOpacity} 
+                                              depthWrite={isConcreteDepthWrite} 
+                                              depthTest={true} 
+                                              wireframe={isWireframe}
+                                            />
+                                          </mesh>
+                                        )}
+                                        {isRebarActive && showRingBeamRebar && (
+                                          <RingBeamRebarCage 
+                                            lenM={fullBeamLenM} 
+                                            heightM={actualBeamHeightM} 
+                                            widthM={beamThickM} 
+                                            reinf={floorBeamReinf} 
                                           />
-                                        </mesh>
-                                      )}
-                                      {isRebarActive && showRingBeamRebar && (
-                                        <RingBeamRebarCage 
-                                          lenM={fullBeamLenM} 
-                                          heightM={actualBeamHeightM} 
-                                          widthM={beamThickM} 
-                                          reinf={floorBeamReinf} 
-                                        />
-                                      )}
-                                    </group>
-                                  )}
+                                        )}
+                                      </group>
+                                    );
+                                  })()}
 
                                   {/* 1. RCC Full Ring Beam (sitting flush directly at structural junction) */}
-                                  {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (
-                                    <group position={[extMidX, junction.fullRingBeamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
-                                      {showFullRingBeam && (
-                                        <mesh name="rccFullRingBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[fullBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
-                                          <meshStandardMaterial 
-                                            color="#64748b" 
-                                            roughness={isBeamXRay ? 0.3 : 0.85} 
-                                            metalness={isBeamXRay ? 0.1 : 0.05} 
-                                            transparent={isConcreteTransparent} 
-                                            opacity={concreteOpacity} 
-                                            depthWrite={isConcreteDepthWrite} 
-                                            depthTest={true} 
-                                            wireframe={isWireframe}
+                                  {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (() => {
+                                    const ringId = `ring-${floor.id}-${beam.id}`;
+                                    const isRingSelected = selectedBeam?.id === ringId;
+                                    return (
+                                      <group position={[extMidX, junction.fullRingBeamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
+                                        {showFullRingBeam && (
+                                          <mesh 
+                                            name="rccFullRingBeamMesh" 
+                                            castShadow={isConcreteSolid} 
+                                            receiveShadow={isConcreteSolid} 
+                                            renderOrder={isBeamXRay ? 2 : 1}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (isRingSelected) {
+                                                setSelectedBeam(null);
+                                              } else {
+                                                setSelectedBeam({
+                                                  id: ringId,
+                                                  floorId: floor.id,
+                                                  floorName: floor.name || `Floor ${i}`,
+                                                  isPlinth: false,
+                                                  startPillarId: beam.startPillarId,
+                                                  endPillarId: beam.endPillarId,
+                                                  lengthM: fullBeamLenM,
+                                                  lengthFt: fullBeamLenM * 3.28084,
+                                                  widthIn: Math.round(beamThickM * 39.3701),
+                                                  depthIn: Math.round(junction.fullRingBeamHeight * 39.3701),
+                                                  widthM: beamThickM,
+                                                  depthM: junction.fullRingBeamHeight,
+                                                  concreteVolumeM3: fullBeamLenM * beamThickM * junction.fullRingBeamHeight,
+                                                  concreteVolumeCft: (fullBeamLenM * beamThickM * junction.fullRingBeamHeight) * 35.3147,
+                                                  reinf: floorBeamReinf,
+                                                  beamSizingRule: isTopFloor ? 'Span / 15 Rule (Roof Ring Beam)' : 'Span / 12 Rule (Floor Ring Beam)',
+                                                  concreteGrade: (model as any).concreteGrade || 'M20',
+                                                  steelGrade: (model as any).steelGrade || 'Fe500'
+                                                });
+                                                setSelectedPillar(null);
+                                                setSelectedFooting(null);
+                                                setSelectedSlab(null);
+                                              }
+                                            }}
+                                          >
+                                            <boxGeometry args={[fullBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
+                                            <meshStandardMaterial 
+                                              color={isRingSelected ? "#0284c7" : "#64748b"} 
+                                              roughness={isBeamXRay ? 0.3 : 0.85} 
+                                              metalness={isBeamXRay ? 0.1 : 0.05} 
+                                              transparent={isConcreteTransparent} 
+                                              opacity={concreteOpacity} 
+                                              depthWrite={isConcreteDepthWrite} 
+                                              depthTest={true} 
+                                              wireframe={isWireframe}
+                                            />
+                                          </mesh>
+                                        )}
+
+                                        {/* Exposed Rebar Cage for Ring Beam */}
+                                        {isRebarActive && showRingBeamRebar && (
+                                          <RingBeamRebarCage 
+                                            lenM={fullBeamLenM} 
+                                            heightM={junction.fullRingBeamHeight} 
+                                            widthM={beamThickM} 
+                                            reinf={floorBeamReinf} 
                                           />
-                                        </mesh>
-                                      )}
+                                        )}
 
-                                      {/* Exposed Rebar Cage for Ring Beam */}
-                                      {isRebarActive && showRingBeamRebar && (
-                                        <RingBeamRebarCage 
-                                          lenM={fullBeamLenM} 
-                                          heightM={junction.fullRingBeamHeight} 
-                                          widthM={beamThickM} 
-                                          reinf={floorBeamReinf} 
-                                        />
-                                      )}
-
-                                      {/* 3D RCC Side Beam Plaster: Real Physical Layer strictly on Exposed Side Face A (+Z) and Side Face B (-Z) */}
-                                      {showFullRingBeam && isSideBeamPlasterVisible && (
-                                        <group name="rccSideBeamPlasterGroup">
-                                          <mesh 
-                                            name="rccBeamPlasterMesh"
-                                            position={[localPlasterX, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
-                                            castShadow={!plasterXRay} 
-                                            receiveShadow={!plasterXRay}
-                                            renderOrder={plasterXRay ? 10 : 0}
-                                          >
-                                            <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
-                                            <meshStandardMaterial 
-                                              color="#bfc7d2" 
-                                              roughness={0.90} 
-                                              metalness={0.02} 
-                                              transparent={plasterXRay} 
-                                              opacity={plasterXRay ? 0.35 : 1.0} 
-                                              depthWrite={!plasterXRay} 
-                                            />
-                                          </mesh>
-                                          <mesh 
-                                            name="rccBeamPlasterMesh"
-                                            position={[localPlasterX, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
-                                            castShadow={!plasterXRay} 
-                                            receiveShadow={!plasterXRay}
-                                            renderOrder={plasterXRay ? 10 : 0}
-                                          >
-                                            <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
-                                            <meshStandardMaterial 
-                                              color="#bfc7d2" 
-                                              roughness={0.90} 
-                                              metalness={0.02} 
-                                              transparent={plasterXRay} 
-                                              opacity={plasterXRay ? 0.35 : 1.0} 
-                                              depthWrite={!plasterXRay} 
-                                            />
-                                          </mesh>
-                                        </group>
-                                      )}
-                                    </group>
-                                  )}
+                                        {/* 3D RCC Side Beam Plaster: Real Physical Layer strictly on Exposed Side Face A (+Z) and Side Face B (-Z) */}
+                                        {showFullRingBeam && isSideBeamPlasterVisible && (
+                                          <group name="rccSideBeamPlasterGroup">
+                                            <mesh 
+                                              name="rccBeamPlasterMesh"
+                                              position={[localPlasterX, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
+                                              castShadow={!plasterXRay} 
+                                              receiveShadow={!plasterXRay}
+                                              renderOrder={plasterXRay ? 10 : 0}
+                                            >
+                                              <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
+                                              <meshStandardMaterial 
+                                                color="#bfc7d2" 
+                                                roughness={0.90} 
+                                                metalness={0.02} 
+                                                transparent={plasterXRay} 
+                                                opacity={plasterXRay ? 0.35 : 1.0} 
+                                                depthWrite={!plasterXRay} 
+                                              />
+                                            </mesh>
+                                            <mesh 
+                                              name="rccBeamPlasterMesh"
+                                              position={[localPlasterX, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
+                                              castShadow={!plasterXRay} 
+                                              receiveShadow={!plasterXRay}
+                                              renderOrder={plasterXRay ? 10 : 0}
+                                            >
+                                              <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
+                                              <meshStandardMaterial 
+                                                color="#bfc7d2" 
+                                                roughness={0.90} 
+                                                metalness={0.02} 
+                                                transparent={plasterXRay} 
+                                                opacity={plasterXRay ? 0.35 : 1.0} 
+                                                depthWrite={!plasterXRay} 
+                                              />
+                                            </mesh>
+                                          </group>
+                                        )}
+                                      </group>
+                                    );
+                                  })()}
                                 </React.Fragment>
                               );
                             })}
@@ -3431,74 +3774,158 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const wUy = (eY - sY) / len;
                               const extStartWall = pStartW / 2;
                               const extEndWall = pEndW / 2;
-                              const wallExtSX = sX - wUx * extStartWall;
-                              const wallExtSY = sY - wUy * extStartWall;
-                              const wallExtEX = eX + wUx * extEndWall;
-                              const wallExtEY = eY + wUy * extEndWall;
-                              const fullWallBeamLenM = len + extStartWall + extEndWall;
+                              let wallExtSX = sX - wUx * extStartWall;
+                              let wallExtSY = sY - wUy * extStartWall;
+                              let wallExtEX = eX + wUx * extEndWall;
+                              let wallExtEY = eY + wUy * extEndWall;
+
+                              // Ensure wall-sitting beam endpoints stay strictly within building perimeter
+                              wallExtSX = Math.max(floorBounds.minX, Math.min(floorBounds.maxX, wallExtSX));
+                              wallExtEX = Math.max(floorBounds.minX, Math.min(floorBounds.maxX, wallExtEX));
+                              wallExtSY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, wallExtSY));
+                              wallExtEY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, wallExtEY));
+
+                              const fullWallBeamLenM = Math.hypot(wallExtEX - wallExtSX, wallExtEY - wallExtSY);
                               const wallBeamMidX = (wallExtSX + wallExtEX) / 2;
                               const wallBeamMidY = (wallExtSY + wallExtEY) / 2;
-                              const localWallPlasterX = (extStartWall - extEndWall) / 2;
+                              const effExtStartWall = Math.hypot(sX - wallExtSX, sY - wallExtSY);
+                              const effExtEndWall = Math.hypot(wallExtEX - eX, wallExtEY - eY);
+                              const localWallPlasterX = (effExtStartWall - effExtEndWall) / 2;
 
                               return (
                                 <React.Fragment key={`wall-beam-group-${w.id}`}>
                                   {/* 0. Ground Floor RCC Plinth Beam for wall span */}
-                                  {i === 0 && (showFullRingBeam || showRingBeamRebar) && (
-                                    <group position={[wallBeamMidX, yOffset - actualBeamHeightM / 2, -wallBeamMidY]} rotation={[0, -ang, 0]}>
-                                      {showFullRingBeam && (
-                                        <mesh name="rccPlinthBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={isBeamXRay ? 2 : 1}>
-                                          <boxGeometry args={[fullWallBeamLenM, actualBeamHeightM, beamThickM]} />
-                                          <meshStandardMaterial 
-                                            color="#64748b" 
-                                            roughness={isBeamXRay ? 0.3 : 0.85} 
-                                            metalness={isBeamXRay ? 0.1 : 0.05} 
-                                            transparent={isConcreteTransparent} 
-                                            opacity={concreteOpacity} 
-                                            depthWrite={isConcreteDepthWrite} 
-                                            depthTest={true} 
-                                            wireframe={isWireframe}
+                                  {i === 0 && (showFullRingBeam || showRingBeamRebar) && (() => {
+                                    const wallPlinthId = `wall-plinth-${floor.id}-${w.id}`;
+                                    const isWallPlinthSelected = selectedBeam?.id === wallPlinthId;
+                                    return (
+                                      <group position={[wallBeamMidX, yOffset - actualBeamHeightM / 2, -wallBeamMidY]} rotation={[0, -ang, 0]}>
+                                        {showFullRingBeam && (
+                                          <mesh 
+                                            name="rccPlinthBeamMesh" 
+                                            castShadow={isConcreteSolid} 
+                                            receiveShadow={isConcreteSolid} 
+                                            renderOrder={isBeamXRay ? 2 : 1}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (isWallPlinthSelected) {
+                                                setSelectedBeam(null);
+                                              } else {
+                                                setSelectedBeam({
+                                                  id: wallPlinthId,
+                                                  floorId: floor.id,
+                                                  floorName: floor.name || `Floor ${i}`,
+                                                  isPlinth: true,
+                                                  isWallBeam: true,
+                                                  lengthM: fullWallBeamLenM,
+                                                  lengthFt: fullWallBeamLenM * 3.28084,
+                                                  widthIn: Math.round(beamThickM * 39.3701),
+                                                  depthIn: Math.round(actualBeamHeightM * 39.3701),
+                                                  widthM: beamThickM,
+                                                  depthM: actualBeamHeightM,
+                                                  concreteVolumeM3: fullWallBeamLenM * beamThickM * actualBeamHeightM,
+                                                  concreteVolumeCft: (fullWallBeamLenM * beamThickM * actualBeamHeightM) * 35.3147,
+                                                  reinf: floorBeamReinf,
+                                                  beamSizingRule: 'Plinth Wall Tie Beam',
+                                                  concreteGrade: (model as any).concreteGrade || 'M20',
+                                                  steelGrade: (model as any).steelGrade || 'Fe500'
+                                                });
+                                                setSelectedPillar(null);
+                                                setSelectedFooting(null);
+                                                setSelectedSlab(null);
+                                              }
+                                            }}
+                                          >
+                                            <boxGeometry args={[fullWallBeamLenM, actualBeamHeightM, beamThickM]} />
+                                            <meshStandardMaterial 
+                                              color={isWallPlinthSelected ? "#0284c7" : "#64748b"} 
+                                              roughness={isBeamXRay ? 0.3 : 0.85} 
+                                              metalness={isBeamXRay ? 0.1 : 0.05} 
+                                              transparent={isConcreteTransparent} 
+                                              opacity={concreteOpacity} 
+                                              depthWrite={isConcreteDepthWrite} 
+                                              depthTest={true} 
+                                              wireframe={isWireframe}
+                                            />
+                                          </mesh>
+                                        )}
+                                        {isRebarActive && showRingBeamRebar && (
+                                          <RingBeamRebarCage 
+                                            lenM={fullWallBeamLenM} 
+                                            heightM={actualBeamHeightM} 
+                                            widthM={beamThickM} 
+                                            reinf={floorBeamReinf} 
                                           />
-                                        </mesh>
-                                      )}
-                                      {isRebarActive && showRingBeamRebar && (
-                                        <RingBeamRebarCage 
-                                          lenM={fullWallBeamLenM} 
-                                          heightM={actualBeamHeightM} 
-                                          widthM={beamThickM} 
-                                          reinf={floorBeamReinf} 
-                                        />
-                                      )}
-                                    </group>
-                                  )}
+                                        )}
+                                      </group>
+                                    );
+                                  })()}
 
                                   {/* 1. RCC Full Ring Beam for wall span */}
-                                  {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (
-                                    <group position={[wallBeamMidX, junction.fullRingBeamCenterY, -wallBeamMidY]} rotation={[0, -ang, 0]}>
-                                      {showFullRingBeam && (
-                                        <mesh name="rccFullRingBeamMesh" castShadow={isConcreteSolid} receiveShadow={isConcreteSolid} renderOrder={1}>
-                                          <boxGeometry args={[fullWallBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
-                                          <meshStandardMaterial 
-                                            color="#64748b" 
-                                            roughness={isBeamXRay ? 0.3 : 0.85} 
-                                            metalness={isBeamXRay ? 0.1 : 0.05} 
-                                            transparent={isConcreteTransparent} 
-                                            opacity={concreteOpacity} 
-                                            depthWrite={isConcreteDepthWrite} 
-                                            depthTest={true} 
-                                            wireframe={isWireframe}
-                                          />
-                                        </mesh>
-                                      )}
+                                  {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (() => {
+                                    const wallRingId = `wall-ring-${floor.id}-${w.id}`;
+                                    const isWallRingSelected = selectedBeam?.id === wallRingId;
+                                    return (
+                                      <group position={[wallBeamMidX, junction.fullRingBeamCenterY, -wallBeamMidY]} rotation={[0, -ang, 0]}>
+                                        {showFullRingBeam && (
+                                          <mesh 
+                                            name="rccFullRingBeamMesh" 
+                                            castShadow={isConcreteSolid} 
+                                            receiveShadow={isConcreteSolid} 
+                                            renderOrder={1}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (isWallRingSelected) {
+                                                setSelectedBeam(null);
+                                              } else {
+                                                setSelectedBeam({
+                                                  id: wallRingId,
+                                                  floorId: floor.id,
+                                                  floorName: floor.name || `Floor ${i}`,
+                                                  isPlinth: false,
+                                                  isWallBeam: true,
+                                                  lengthM: fullWallBeamLenM,
+                                                  lengthFt: fullWallBeamLenM * 3.28084,
+                                                  widthIn: Math.round(beamThickM * 39.3701),
+                                                  depthIn: Math.round(junction.fullRingBeamHeight * 39.3701),
+                                                  widthM: beamThickM,
+                                                  depthM: junction.fullRingBeamHeight,
+                                                  concreteVolumeM3: fullWallBeamLenM * beamThickM * junction.fullRingBeamHeight,
+                                                  concreteVolumeCft: (fullWallBeamLenM * beamThickM * junction.fullRingBeamHeight) * 35.3147,
+                                                  reinf: floorBeamReinf,
+                                                  beamSizingRule: isTopFloor ? 'Span / 15 Rule (Roof Ring Beam)' : 'Span / 12 Rule (Floor Ring Beam)',
+                                                  concreteGrade: (model as any).concreteGrade || 'M20',
+                                                  steelGrade: (model as any).steelGrade || 'Fe500'
+                                                });
+                                                setSelectedPillar(null);
+                                                setSelectedFooting(null);
+                                                setSelectedSlab(null);
+                                              }
+                                            }}
+                                          >
+                                            <boxGeometry args={[fullWallBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
+                                            <meshStandardMaterial 
+                                              color={isWallRingSelected ? "#0284c7" : "#64748b"} 
+                                              roughness={isBeamXRay ? 0.3 : 0.85} 
+                                              metalness={isBeamXRay ? 0.1 : 0.05} 
+                                              transparent={isConcreteTransparent} 
+                                              opacity={concreteOpacity} 
+                                              depthWrite={isConcreteDepthWrite} 
+                                              depthTest={true} 
+                                              wireframe={isWireframe}
+                                            />
+                                          </mesh>
+                                        )}
 
-                                      {/* Exposed Rebar Cage for Wall Ring Beam */}
-                                      {isRebarActive && showRingBeamRebar && (
-                                        <RingBeamRebarCage 
-                                          lenM={fullWallBeamLenM} 
-                                          heightM={junction.fullRingBeamHeight} 
-                                          widthM={beamThickM} 
-                                          reinf={floorBeamReinf} 
-                                        />
-                                      )}
+                                        {/* Exposed Rebar Cage for Wall Ring Beam */}
+                                        {isRebarActive && showRingBeamRebar && (
+                                          <RingBeamRebarCage 
+                                            lenM={fullWallBeamLenM} 
+                                            heightM={junction.fullRingBeamHeight} 
+                                            widthM={beamThickM} 
+                                            reinf={floorBeamReinf} 
+                                          />
+                                        )}
 
                                       {/* 3D RCC Side Beam Plaster */}
                                       {showFullRingBeam && isSideBeamPlasterVisible && (
@@ -3540,8 +3967,9 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                         </group>
                                       )}
                                     </group>
-                                  )}
-                                </React.Fragment>
+                                  );
+                                })()}
+                              </React.Fragment>
                               );
                             })}
                           </>
@@ -3557,32 +3985,81 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                           <>
                             {structuralSlabs.map(slab => {
                               const slabUniqueId = `rcc-slab-${floor.id}`;
+                              // Align slab top surface flush with ring beam top surface (junction.topStructuralLineY)
+                              // so that floor slab and ring beams form one continuous flat surface.
+                              // This raises both the concrete slab and the steel rebar mesh inside it to the monolithic top level.
+                              const slabCenterY = (junction.topStructuralLineY - slab.thicknessM / 2) + (slab.elevationOffsetY || 0);
                               return (
                                 <group 
                                   key={slabUniqueId}
-                                  position={[slab.centerX, (junction.fullRingBeamCenterY ?? junction.slabCenterY) + (slab.elevationOffsetY || 0), -slab.centerY]}
+                                  position={[slab.centerX, slabCenterY, -slab.centerY]}
                                 >
                                   {/* Solid / Translucent Concrete Slab */}
-                                  {isSlabEnabled && (
-                                    <mesh 
-                                      name="rccFullRoofMesh" 
-                                      castShadow={isConcreteSolid} 
-                                      receiveShadow={isConcreteSolid} 
-                                      renderOrder={isRebarActive ? 2 : 1}
-                                    >
-                                      <boxGeometry args={[slab.widthM, slab.thicknessM, slab.depthM]} />
-                                      <meshStandardMaterial 
-                                        color={RCC_CONCRETE_MATERIAL_CONFIG.color} 
-                                        roughness={isRebarActive ? 0.3 : RCC_CONCRETE_MATERIAL_CONFIG.roughness} 
-                                        metalness={isRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness} 
-                                        transparent={isConcreteTransparent} 
-                                        opacity={concreteOpacity} 
-                                        depthWrite={isConcreteDepthWrite} 
-                                        depthTest={true} 
-                                        wireframe={isWireframe}
-                                      />
-                                    </mesh>
-                                  )}
+                                  {isSlabEnabled && (() => {
+                                    const isThisSlabSelected = selectedSlab?.id === slabUniqueId;
+                                    return (
+                                      <mesh 
+                                        name="rccFullRoofMesh" 
+                                        castShadow={isConcreteSolid} 
+                                        receiveShadow={isConcreteSolid} 
+                                        renderOrder={isRebarActive ? 2 : 1}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (isThisSlabSelected) {
+                                            setSelectedSlab(null);
+                                          } else {
+                                            const aspect = Math.max(slab.widthM, slab.depthM) / Math.max(0.01, Math.min(slab.widthM, slab.depthM));
+                                            const liveLoad = isTopFloor 
+                                              ? ((model as any).roofType === 'non_accessible' ? 0.75 : 1.5)
+                                              : ((model as any).buildingOccupancy === 'commercial' ? 4.0 : 2.0);
+                                            const deadLoad = slab.thicknessM * 25 + (isTopFloor ? 1.5 : 1.0);
+                                            const totalLoad = deadLoad + liveLoad;
+
+                                            setSelectedSlab({
+                                              id: slabUniqueId,
+                                              floorId: floor.id,
+                                              floorName: floor.name || `Floor ${i}`,
+                                              isRoof: isTopFloor,
+                                              roofType: (model as any).roofType || 'Accessible Terrace',
+                                              waterTankLitres: (model as any).waterTankCapacityLitres,
+                                              widthM: slab.widthM,
+                                              depthM: slab.depthM,
+                                              widthFt: slab.widthM * 3.28084,
+                                              depthFt: slab.depthM * 3.28084,
+                                              thicknessIn: slab.thicknessM * 39.3701,
+                                              thicknessMm: slab.thicknessM * 1000,
+                                              thicknessM: slab.thicknessM,
+                                              concreteVolumeM3: slab.widthM * slab.depthM * slab.thicknessM,
+                                              concreteVolumeCft: (slab.widthM * slab.depthM * slab.thicknessM) * 35.3147,
+                                              aspectRatio: aspect,
+                                              slabType: aspect >= 2.0 ? 'One-Way' : 'Two-Way',
+                                              liveLoadKnM2: liveLoad,
+                                              deadLoadKnM2: deadLoad,
+                                              totalLoadKnM2: totalLoad,
+                                              reinf: floorSlabReinf,
+                                              concreteGrade: (model as any).concreteGrade || 'M20',
+                                              steelGrade: (model as any).steelGrade || 'Fe500'
+                                            });
+                                            setSelectedPillar(null);
+                                            setSelectedFooting(null);
+                                            setSelectedBeam(null);
+                                          }
+                                        }}
+                                      >
+                                        <boxGeometry args={[slab.widthM, slab.thicknessM, slab.depthM]} />
+                                        <meshStandardMaterial 
+                                          color={isThisSlabSelected ? "#0284c7" : RCC_CONCRETE_MATERIAL_CONFIG.color} 
+                                          roughness={isRebarActive ? 0.3 : RCC_CONCRETE_MATERIAL_CONFIG.roughness} 
+                                          metalness={isRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness} 
+                                          transparent={isConcreteTransparent} 
+                                          opacity={concreteOpacity} 
+                                          depthWrite={isConcreteDepthWrite} 
+                                          depthTest={true} 
+                                          wireframe={isWireframe}
+                                        />
+                                      </mesh>
+                                    );
+                                  })()}
 
                                   {/* 2-Direction Horizontal Rebar Mesh inside Slab */}
                                   {isRebarActive && showRoofSlabRebar && (
@@ -3656,6 +4133,9 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedPillar(isPillarSelected ? null : p);
+                              setSelectedBeam(null);
+                              setSelectedSlab(null);
+                              setSelectedFooting(null);
                             }}
                           >
                             {/* 1. Monolithic Solid Pillar Column (Continuous structural column from floor base to top structural line, zero joint gaps) */}

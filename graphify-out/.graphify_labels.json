@@ -10,7 +10,6 @@
   "16": "Call method",
   "17": "RCC Ring Beam Regression Test Report",
   "18": "4. Complete Civil Engineering Mathematical Formulas",
-  "19": "Scroll Story 3D Visualization",
   "22": "PREREQUISITES",
   "23": "spec-judge.md",
   "25": "NPM Build & Dev Scripts",
@@ -18,7 +17,6 @@
   "28": "Tech Stack",
   "29": "PROCESS",
   "30": "spec-test.md",
-  "31": "3. Verification of Requirements",
   "32": "spec-system-prompt-loader.md",
   "34": "spec-impl.md",
   "35": "PostCSS & Tailwind Setup",
@@ -37,6 +35,5 @@
   "56": "4.1 Brick Masonry & Mortar Formulas",
   "57": "4.4 Steel Reinforcement Formulas & Physical Derivation",
   "58": "4.5 Tributary Area & Column Load Distribution",
-  "59": "4.3 RCC Concrete Volumetric Formulas & Aggregates",
-  "61": "2. Milestone-by-Milestone Architectural Changes"
+  "59": "4.3 RCC Concrete Volumetric Formulas & Aggregates"
 }
