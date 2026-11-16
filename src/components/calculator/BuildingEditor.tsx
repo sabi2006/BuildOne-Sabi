@@ -52,7 +52,8 @@ import {
   calculateBuildingStructuralSummary,
   calculateFloorSlabStructuralDetails,
   calculateFloorBeamStructuralDetails,
-  getConcreteMixRatios
+  getConcreteMixRatios,
+  recalculateBuildingPillarSizing
 } from '@/lib/brickCalculator';
 import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -68,7 +69,7 @@ interface BuildingEditorProps {
 type Tool = 'wall' | 'door' | 'window' | 'delete' | 'none' | 'pillar' | 'beam' | 'fullRingBeam' | 'foundation' | 'slab' | 'roof' | 'clear';
 
 export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorProps) {
-  const { setBuildingModel, buildingModel, updateBuildingConfig, updateSettings, brickType, settings, result, projectName } = useCalculator();
+  const { setBuildingModel, buildingModel, updateBuildingConfig, updateSettings, brickType, settings, result, projectName, toastMessage, triggerToast } = useCalculator();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isStructuralModalOpen, setIsStructuralModalOpen] = useState(false);
   
@@ -1945,6 +1946,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       return Math.hypot(px - targetX, py - targetY) < 0.3;
     };
 
+    let removalToastData: { count: number; w: number; d: number; changed: boolean; prevW: number; prevD: number } | null = null;
+
     setModel(prev => {
       const updatedFloors = prev.floors.map(fl => {
         if (floorsToRemoveFrom.has(fl.id)) {
@@ -1977,13 +1980,45 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         };
       }
 
-      return {
+      const rawRemovedModel: BuildingModel = {
         ...prev,
         floors: updatedFloors,
         pillars: updatedPillars,
         foundation: updatedFoundation
       };
+
+      // Recalculate remaining pillars based on redistributed weight and building height
+      const recalc = recalculateBuildingPillarSizing(rawRemovedModel, settings, 'pillar_removed');
+      removalToastData = {
+        count: recalc.totalPillarsCount,
+        w: recalc.appliedWidthIn,
+        d: recalc.appliedDepthIn,
+        changed: recalc.changed,
+        prevW: recalc.previousWidthIn,
+        prevD: recalc.previousDepthIn
+      };
+
+      return recalc.updatedModel;
     });
+
+    if (removalToastData) {
+      const { count, w, d, changed } = removalToastData;
+      const storeyCount = model.floors.length || 1;
+      const storeyLabel = storeyCount === 1 ? 'Single Storey (G+0)' : `Multi-Storey (G+${storeyCount - 1})`;
+      if (changed) {
+        triggerToast(
+          "Pillar Removed & Load Redistributed",
+          `Weight redistributed across ${count} remaining pillars. Section increased to ${w}"×${d}" for ${storeyLabel} (IS 456).`,
+          "warning"
+        );
+      } else {
+        triggerToast(
+          "Pillar Removed & Load Balanced",
+          `Pillar removed. Building weight balanced equally across ${count} remaining pillars (${w}"×${d}") for ${storeyLabel}.`,
+          "info"
+        );
+      }
+    }
 
     setSelectedPillarId(null);
     setPillarRemovalModal(null);
@@ -2022,11 +2057,17 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
             }
             return fl;
           });
-          return {
+          const rawClearedModel: BuildingModel = {
             ...prev,
             pillars: updatedPillars,
             floors: updatedFloors
           };
+
+          if (updatedPillars.length > 0) {
+            const recalc = recalculateBuildingPillarSizing(rawClearedModel, settings, 'pillar_removed');
+            return recalc.updatedModel;
+          }
+          return rawClearedModel;
         });
         setSelectedPillarId(null);
         setClearConfirmModal(null);
@@ -3100,9 +3141,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         const colId = gp.verticalColumnId || `col-${pIdx + 1}`;
         const prevMatching = existingFloorPillars.find(p => p.verticalColumnId === colId || p.id === `pillar-${flId}-${pIdx + 1}`);
 
-        const customW = prevMatching?.isCustomSize ? prevMatching.width : (floor.pillarWidth || gp.width);
-        const customD = prevMatching?.isCustomSize ? prevMatching.depth : (floor.pillarDepth || gp.depth);
-        const isCustom = prevMatching?.isCustomSize || floor.pillarWidth !== undefined || floor.pillarDepth !== undefined;
+        const isFloorCountChanging = targetCount !== model.floors.length;
+        const isCustom = !isFloorCountChanging && Boolean(prevMatching?.isCustomSize || floor.pillarWidth !== undefined || floor.pillarDepth !== undefined);
+        const customW = isCustom ? (prevMatching?.width || floor.pillarWidth || gp.width) : gp.width;
+        const customD = isCustom ? (prevMatching?.depth || floor.pillarDepth || gp.depth) : gp.depth;
 
         return {
           ...gp,
@@ -3565,6 +3607,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       };
 
       // If continue is all, add to all floors at the exact same location
+      let addedToastData: { count: number; w: number; d: number; changed: boolean } | null = null;
+
       setModel(prev => {
         const targetFloors = pillarContinue === 'all' 
           ? prev.floors 
@@ -3643,7 +3687,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
           };
         }
 
-        return {
+        const rawAddedModel: BuildingModel = {
           ...prev,
           pillars: [...(prev.pillars || []), ...newPillarsToAdd],
           floors: prev.floors.map(fl => {
@@ -3654,7 +3698,28 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
           }),
           foundation: updatedFoundation
         };
+
+        const recalc = recalculateBuildingPillarSizing(rawAddedModel, settings, 'pillar_added');
+        addedToastData = {
+          count: recalc.totalPillarsCount,
+          w: recalc.appliedWidthIn,
+          d: recalc.appliedDepthIn,
+          changed: recalc.changed
+        };
+
+        return recalc.updatedModel;
       });
+
+      if (addedToastData) {
+        const { count, w, d } = addedToastData;
+        const storeyCount = model.floors.length || 1;
+        const storeyLabel = storeyCount === 1 ? 'Single Storey (G+0)' : `Multi-Storey (G+${storeyCount - 1})`;
+        triggerToast(
+          "Pillar Added & Weight Distributed",
+          `Building weight equally distributed across ${count} pillars (re-sized to ${w}"×${d}") for ${storeyLabel}.`,
+          "success"
+        );
+      }
 
       setPillarName(`P${(model.pillars?.length || 0) + 2}`);
     }
@@ -9213,6 +9278,19 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
           >
             <X className="w-3.5 h-3.5" />
           </button>
+        </div>
+      )}
+
+      {/* Context Notification Toast (e.g. IS 456 Auto-Sizing Applied) */}
+      {toastMessage && (
+        <div className="fixed top-16 right-6 z-50 flex items-center gap-2.5 bg-slate-900/95 text-white px-4 py-3 rounded-xl shadow-2xl border border-orange-500 backdrop-blur-md animate-in slide-in-from-top-2 fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div>
+            <p className="text-xs font-bold text-slate-100">{toastMessage.title}</p>
+            {toastMessage.subtitle && (
+              <p className="text-[10px] text-slate-400">{toastMessage.subtitle}</p>
+            )}
+          </div>
         </div>
       )}
     </div>

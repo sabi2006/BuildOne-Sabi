@@ -5721,3 +5721,278 @@ export function applyPillarConfigToAll(
   };
 }
 
+export interface PillarRecalculationResult {
+  updatedModel: BuildingModel;
+  appliedWidthIn: number;
+  appliedDepthIn: number;
+  previousWidthIn: number;
+  previousDepthIn: number;
+  totalPillarsCount: number;
+  changed: boolean;
+  minStoreyWidthIn: number;
+  minStoreyDepthIn: number;
+  reason: 'pillar_removed' | 'pillar_added' | 'general';
+}
+
+/**
+ * Automatically recalculate and balance pillar cross-sections and reinforcement
+ * across building floors whenever pillars are added or removed.
+ * 
+ * When pillars are removed: Load per pillar increases -> Thickness increases based on building height.
+ * When pillars are added: Building weight is equally distributed across pillars -> Sizing normalizes.
+ */
+export function recalculateBuildingPillarSizing(
+  model: BuildingModel,
+  settings?: CalculatorSettings,
+  reason: 'pillar_removed' | 'pillar_added' | 'general' = 'general'
+): PillarRecalculationResult {
+  const allPillars: Pillar[] = (model.floors && model.floors.length > 0)
+    ? model.floors.flatMap(f => f.pillars || [])
+    : (model.pillars || []);
+
+  const previousWidthIn = allPillars[0]?.width || 9;
+  const previousDepthIn = allPillars[0]?.depth || 9;
+
+  if (allPillars.length === 0) {
+    return {
+      updatedModel: model,
+      appliedWidthIn: previousWidthIn,
+      appliedDepthIn: previousDepthIn,
+      previousWidthIn,
+      previousDepthIn,
+      totalPillarsCount: 0,
+      changed: false,
+      minStoreyWidthIn: 9,
+      minStoreyDepthIn: 9,
+      reason
+    };
+  }
+
+  const numFloors = model.floors?.length || model.buildingConfig?.floorCount || 1;
+  const bConfig: BuildingConfig = {
+    ...DEFAULT_BUILDING_CONFIG,
+    ...(model.buildingConfig || {}),
+    floorCount: numFloors,
+    floorHeight: model.floors?.[0]?.height || model.buildingConfig?.floorHeight || 10,
+    floorHeightUnit: model.floors?.[0]?.unit || model.buildingConfig?.floorHeightUnit || 'ft'
+  };
+
+  const fineAggRate = bConfig.fineAggregateType === 'river_sand' 
+    ? 80 
+    : (settings?.sandPricePerCft !== undefined ? settings.sandPricePerCft : 55);
+
+  const cr = bConfig.customRates || {};
+  const structuralRates = {
+    cementBagPrice: cr.cementBagPrice || settings?.cementPrice || 400,
+    sandPricePerCft: cr.sandPricePerCft || fineAggRate,
+    aggregatePricePerCft: cr.aggregatePricePerCft ?? (settings?.aggregatePricePerCft !== undefined ? settings.aggregatePricePerCft : 45),
+    steelRatePerKg: cr.steelRatePerKg || settings?.steelRate || 65,
+    brickPrice: cr.brickPrice || settings?.brickPrice || 8.5,
+    excavationRatePerM3: cr.excavationRatePerM3 || settings?.excavationRatePerM3 || 250,
+    pccRatePerM3: cr.pccLabourRatePerM3 || 3200,
+    footingLabourRatePerM3: cr.footingLabourRatePerM3 || settings?.footingLabourRatePerM3 || 3500,
+    columnLabourRatePerM3: cr.columnLabourRatePerM3 || settings?.rccLabourRate || 3500,
+    beamLabourRatePerM3: cr.columnLabourRatePerM3 || settings?.rccLabourRate || 3500,
+    slabLabourRatePerM3: cr.columnLabourRatePerM3 || settings?.rccLabourRate || 3500,
+    masonWagePerDay: cr.masonWagePerDay || 900,
+    helperWagePerDay: cr.helperWagePerDay || 600,
+    formworkRatePerM2: cr.formworkRatePerM2 || 350,
+    wastagePercent: cr.wastagePercent ?? (settings?.wastagePercentage || 5),
+    overheadPercent: 5,
+    contingencyPercent: cr.contingencyPercent ?? 5,
+    taxPercent: cr.taxPercent ?? 18,
+    transportCost: settings?.transportCost || 0,
+    equipmentCost: 0
+  };
+
+  const bLengthM = toMeters(model.buildingLength || 30, model.buildingUnit || 'ft');
+  const bWidthM = toMeters(model.buildingWidth || 30, model.buildingUnit || 'ft');
+  const allWallsForStructural = (model.floors || []).flatMap(f => [...(f.externalWalls || []), ...(f.internalWalls || [])]);
+
+  const floorsWithBeams = (model.floors || []).map(fl => {
+    const flPillars = fl.pillars || [];
+    const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
+    const flBeams = getEffectiveFloorBeams(flPillars, flWalls, model.buildingUnit || 'ft');
+    return {
+      ...fl,
+      detectedBeams: flBeams
+    };
+  });
+
+  const structuralSummary = calculateBuildingStructuralSummary(
+    allPillars,
+    allWallsForStructural,
+    bLengthM,
+    bWidthM,
+    bConfig,
+    structuralRates,
+    floorsWithBeams,
+    model.roofSlab
+  );
+
+  const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
+
+  // Find the maximum calculated section for each continuous vertical column shaft
+  const shaftColumnSizes = new Map<string, { width: number; depth: number }>();
+  allPillars.forEach(p => {
+    if (p.isStoreyOverride) return;
+    const calc = calcMap.get(p.id);
+    const autoW = calc ? Math.round(calc.providedWidthMm * (1 / 25.4)) : (p.width || 9);
+    const autoD = calc ? Math.round(calc.providedDepthMm * (1 / 25.4)) : (p.depth || 9);
+    const w = (p.isCustomSize && p.width) ? p.width : autoW;
+    const d = (p.isCustomSize && p.depth) ? p.depth : autoD;
+
+    const px = p.position?.x ?? p.x ?? 0;
+    const py = p.position?.y ?? p.y ?? 0;
+    const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+
+    const current = shaftColumnSizes.get(key);
+    if (!current) {
+      shaftColumnSizes.set(key, { width: w, depth: d });
+    } else {
+      shaftColumnSizes.set(key, {
+        width: Math.max(current.width, w),
+        depth: Math.max(current.depth, d)
+      });
+    }
+  });
+
+  // Minimum section by IS 456 storey guidelines
+  const minStoreyWidthIn = numFloors >= 6 ? 15 : (numFloors >= 4 ? 12 : 9);
+  const minStoreyDepthIn = numFloors >= 6 ? 18 : (numFloors >= 4 ? 18 : (numFloors === 3 ? 15 : (numFloors === 2 ? 12 : 9)));
+
+  let appliedW = minStoreyWidthIn;
+  let appliedD = minStoreyDepthIn;
+
+  const updatedEffectivePillars = allPillars.map(p => {
+    const calc = calcMap.get(p.id);
+    const px = p.position?.x ?? p.x ?? 0;
+    const py = p.position?.y ?? p.y ?? 0;
+    const key = p.verticalColumnId || `${Math.round(px * 10)}_${Math.round(py * 10)}`;
+    const shaft = shaftColumnSizes.get(key);
+
+    const updatedP = { ...p };
+
+    if (calc) {
+      updatedP.structuralRole = calc.role;
+      if (!p.isStoreyOverride && !p.isCustomSize) {
+        const autoW = shaft ? shaft.width : Math.round(calc.providedWidthMm * (1 / 25.4));
+        const autoD = shaft ? shaft.depth : Math.round(calc.providedDepthMm * (1 / 25.4));
+        updatedP.width = autoW;
+        updatedP.depth = autoD;
+        updatedP.unit = 'in';
+
+        if (autoW > appliedW || (autoW === appliedW && autoD > appliedD)) {
+          appliedW = autoW;
+          appliedD = autoD;
+        }
+      }
+
+      const provW_m = toMeters(updatedP.width, updatedP.unit || 'in');
+      const provD_m = updatedP.shape === 'circular' ? provW_m : toMeters(updatedP.depth, updatedP.unit || 'in');
+      const provAreaMm2 = (provW_m * 1000) * (provD_m * 1000);
+
+      if (provAreaMm2 < calc.requiredGrossAreaAgMm2) {
+        const reqW_in = Math.ceil(Math.sqrt(calc.requiredGrossAreaAgMm2) * (1 / 25.4));
+        updatedP.structuralWarning = `Section ${updatedP.width}"×${updatedP.depth}" (${Math.round(provAreaMm2)} mm²) is below IS 456 required area (${Math.round(calc.requiredGrossAreaAgMm2)} mm²) for ${calc.factoredUltimateLoadKn.toFixed(0)} kN load. Recommend minimum ${reqW_in}"×${reqW_in}".`;
+      } else {
+        updatedP.structuralWarning = undefined;
+      }
+
+      updatedP.rebarConfig = {
+        pillarMainBarCount: calc.providedBarCount,
+        pillarMainBarDiaMm: calc.providedBarDiaMm,
+        pillarStirrupDiaMm: calc.stirrupDiaMm,
+        pillarStirrupSpacingMm: calc.stirrupSpacingMm,
+        pillarCoverMm: 40,
+        mainSteelWeightKg: calc.mainSteelWeightKg,
+        stirrupSteelWeightKg: calc.stirrupWeightKg
+      };
+
+      updatedP.structuralData = {
+        role: calc.role,
+        tributaryAreaM2: calc.tributaryAreaM2,
+        tributaryAreaSqFt: calc.tributaryAreaSqFt,
+        serviceLoadKn: calc.totalServiceLoadKn,
+        factoredLoadKn: calc.factoredUltimateLoadKn,
+        capacityKn: calc.axialCapacityPuzKn,
+        capacityUtilization: calc.capacityUtilizationRatio,
+        slendernessRatio: calc.slendernessRatioLambda,
+        isShortColumn: calc.isShortColumn,
+        requiredAgMm2: calc.requiredGrossAreaAgMm2,
+        providedAgMm2: provAreaMm2,
+        steelPercentage: calc.steelPercentageP,
+        warning: updatedP.structuralWarning
+      };
+
+      updatedP.calculatedFooting = {
+        lengthM: calc.providedFootingLengthM,
+        widthM: calc.providedFootingWidthM,
+        depthM: calc.providedFootingDepthM,
+        areaM2: calc.requiredFootingAreaM2,
+        serviceLoadKn: calc.serviceFootingLoadKn,
+        excavationM3: calc.footingExcavationM3,
+        pccM3: calc.footingPccM3,
+        rccM3: calc.footingRccM3,
+        steelKg: calc.footingSteelKg
+      };
+    }
+
+    return updatedP;
+  });
+
+  // Synchronize pillars on each floor
+  const updatedFloors = (model.floors || []).map((fl, fIdx) => {
+    const isGround = fIdx === 0 || fl.level === 0 || fl.id === 'floor-0';
+    const flPillars = updatedEffectivePillars.filter(p => p.floorId === fl.id || (isGround && (!p.floorId || p.floorId === 'ground')));
+    return {
+      ...fl,
+      pillars: flPillars
+    };
+  });
+
+  // Synchronize Foundation Footings stubs and sizes with updated pillar dimensions
+  let updatedFoundation = model.foundation;
+  if (updatedFoundation && updatedFoundation.footings) {
+    const groundPillars = updatedEffectivePillars.filter(p => p.floorId === 'floor-0' || p.floorId === 'ground' || !p.floorId);
+    updatedFoundation = {
+      ...updatedFoundation,
+      footings: updatedFoundation.footings.map(f => {
+        const matched = groundPillars.find(p => p.id === f.pillarId || (p.name && f.pillarName && p.name === f.pillarName));
+        if (matched) {
+          return {
+            ...f,
+            columnStubWidth: matched.width,
+            columnStubDepth: matched.depth,
+            columnStubUnit: matched.unit || 'in'
+          };
+        }
+        return f;
+      })
+    };
+  }
+
+  const updatedModel: BuildingModel = {
+    ...model,
+    pillars: updatedEffectivePillars,
+    floors: updatedFloors,
+    foundation: updatedFoundation,
+    structuralSummary
+  };
+
+  const changed = (appliedW !== previousWidthIn || appliedD !== previousDepthIn);
+
+  return {
+    updatedModel,
+    appliedWidthIn: appliedW,
+    appliedDepthIn: appliedD,
+    previousWidthIn,
+    previousDepthIn,
+    totalPillarsCount: updatedEffectivePillars.length,
+    changed,
+    minStoreyWidthIn,
+    minStoreyDepthIn,
+    reason
+  };
+}
+

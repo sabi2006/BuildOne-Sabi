@@ -716,10 +716,19 @@ export function calculateFloorSlabStructuralDetails(
   const D_prelimMm = d_prelimMm + nominalCoverMm + assumedBarDiaMm / 2;
 
   // Practical minimum slab thickness:
-  // Residential: 125 mm (5")
-  // Commercial / Industrial: 150 mm (6")
-  // Roof slab: 125 mm (5")
-  const minThicknessMm = (config.buildingType === 'commercial' || config.buildingType === 'industrial') ? 150 : 125;
+  // Scales with building height (total storeys) and occupancy for vibration control & diaphragm stiffness
+  let minThicknessMm = 125; // 5" (default for G+0/G+1 residential)
+  if (config.buildingType === 'commercial' || config.buildingType === 'industrial') {
+    minThicknessMm = 150; // 6" commercial
+  } else if (isRoof) {
+    minThicknessMm = 125; // 5" roof slab
+  } else if (config.floorCount >= 4) {
+    minThicknessMm = 150; // 6" for G+3+ intermediate floor slabs
+  } else if (config.floorCount >= 3) {
+    minThicknessMm = 140; // 5.5" (140 mm) for G+2 intermediate floor slabs
+  } else {
+    minThicknessMm = 125; // 5" (125 mm) for G+0 / G+1
+  }
   const recommendedThicknessMm = Math.max(minThicknessMm, Math.ceil(D_prelimMm / 5) * 5);
 
   const isCustomThickness = Boolean(overrides?.isCustomThickness && overrides.customThicknessMm);
@@ -974,12 +983,16 @@ export function calculateFloorBeamStructuralDetails(
   const fy = STEEL_YIELD_STRENGTH[config.steelGrade] || 500;
   const notes: string[] = [];
 
-  // Width: standard wall thickness (230 mm / 9 in)
+  // Width: standard wall thickness (230 mm / 9 in), upsized for taller multi-storey buildings
   const defaultWidthMm = Math.max(200, Math.round(wallThicknessM * 1000));
-  const beamWidthMm = overrides?.customWidthMm || defaultWidthMm;
+  let recommendedWidthMm = defaultWidthMm;
+  if (config.floorCount >= 4 && floorLevel === 0) {
+    recommendedWidthMm = Math.max(300, recommendedWidthMm); // 12" width for G+3+ ground floor frame
+  }
+  const beamWidthMm = overrides?.customWidthMm || recommendedWidthMm;
   const beamWidthIn = Math.round((beamWidthMm / 25.4) * 10) / 10;
 
-  // Depth determination
+  // Depth determination based on building height and floor level
   let recommendedDepthMm = 300;
   if (config.beamSizingMode === 'uniform') {
     recommendedDepthMm = 300; // 12 in uniform
@@ -990,8 +1003,17 @@ export function calculateFloorBeamStructuralDetails(
     if (recommendedDepthMm > 350) recommendedDepthMm = 350;
   } else {
     // Intermediate floor beam: carries upper floor masonry wall + slab reactions (span / 12)
+    // Scale minimum depth with building height and floor level
+    let minFloorBeamDepthMm = 300; // 12" min
+    if (config.floorCount >= 4 && floorLevel <= 1) {
+      minFloorBeamDepthMm = 450; // 18" on lower storeys of G+3+
+    } else if (config.floorCount >= 3 && floorLevel === 0) {
+      minFloorBeamDepthMm = 380; // 15" on ground floor of G+2
+    } else if (config.floorCount >= 3) {
+      minFloorBeamDepthMm = 350; // 14" on intermediate floor of G+2
+    }
     const rawFloorDepth = (spanM * 1000) / 12;
-    recommendedDepthMm = Math.min(600, Math.max(300, Math.ceil(rawFloorDepth / 25) * 25));
+    recommendedDepthMm = Math.min(650, Math.max(minFloorBeamDepthMm, Math.ceil(rawFloorDepth / 25) * 25));
   }
 
   const isCustomSize = Boolean(overrides?.isCustomSize && overrides.customDepthMm);
@@ -1209,6 +1231,7 @@ export const STANDARD_COLUMN_SIZES_MM: Array<{ b: number; d: number; label: stri
   { b: 230, d: 450, label: '9" × 18" (230×450 mm)' },
   { b: 300, d: 450, label: '12" × 18" (300×450 mm)' },
   { b: 380, d: 380, label: '15" × 15" (380×380 mm)' },
+  { b: 380, d: 450, label: '15" × 18" (380×450 mm)' },
   { b: 300, d: 600, label: '12" × 24" (300×600 mm)' },
   { b: 450, d: 450, label: '18" × 18" (450×450 mm)' }
 ];
@@ -1274,15 +1297,14 @@ export function calculatePillarStructuralDetails(
     : gridY_m;
 
   // Half-bay spans (Handbook Section 3.3: (left half-bay + right half-bay) * (front half-bay + rear half-bay))
-  const halfLeft = Math.max(0.5, Math.min(leftDist, 8.0) / 2);
-  const halfRight = Math.max(0.5, Math.min(rightDist, 8.0) / 2);
-  const halfFront = Math.max(0.5, Math.min(frontDist, 8.0) / 2);
-  const halfRear = Math.max(0.5, Math.min(rearDist, 8.0) / 2);
+  const halfLeft = Math.max(0.5, leftDist / 2);
+  const halfRight = Math.max(0.5, rightDist / 2);
+  const halfFront = Math.max(0.5, frontDist / 2);
+  const halfRear = Math.max(0.5, rearDist / 2);
 
-  const tributaryLengthM = halfLeft + halfRight;
-  const tributaryWidthM = halfFront + halfRear;
-  const tributaryAreaM2 = Math.max(1.0, tributaryLengthM * tributaryWidthM);
-  const tributaryAreaSqFt = tributaryAreaM2 * 10.7639;
+  const rawTributaryLengthM = halfLeft + halfRight;
+  const rawTributaryWidthM = halfFront + halfRear;
+  const geometricTributaryAreaM2 = Math.max(1.0, rawTributaryLengthM * rawTributaryWidthM);
 
   // Determine structural role
   const isLeftEdge = gridX_m <= 0.35;
@@ -1296,6 +1318,27 @@ export function calculatePillarStructuralDetails(
   } else if (isLeftEdge || isRightEdge || isTopEdge || isBottomEdge) {
     role = 'edge';
   }
+
+  // Equal building weight distribution across total active pillars
+  // When pillars are removed, remaining pillars carry a larger proportional share of total floor & wall weight.
+  // When pillars are added, weight is divided among more pillars.
+  const totalPillarsCount = Math.max(1, allPillarsCoords.length);
+  const totalFloorAreaM2 = buildingLengthM * buildingWidthM;
+  const equalDistributedAreaM2 = totalFloorAreaM2 / totalPillarsCount;
+
+  // Role weighting factor (with <= 4 pillars, every pillar carries full 1/N equal share of total building weight)
+  const roleFactor = totalPillarsCount <= 4
+    ? 1.0
+    : (role === 'interior' ? 1.25 : (role === 'edge' ? 1.0 : 0.75));
+
+  const weightedDistributedAreaM2 = equalDistributedAreaM2 * roleFactor;
+
+  // The actual tributary area is the maximum of geometric span area and the distributed building area
+  const tributaryAreaM2 = Math.max(1.0, Math.max(geometricTributaryAreaM2, weightedDistributedAreaM2));
+  const tributaryAreaSqFt = tributaryAreaM2 * 10.7639;
+
+  const tributaryLengthM = Math.max(rawTributaryLengthM, Math.sqrt(tributaryAreaM2));
+  const tributaryWidthM = Math.max(rawTributaryWidthM, Math.sqrt(tributaryAreaM2));
 
   // 2. Unit Loads as per Handbook Section 3.1 & IS 875 Parts 1 & 2
   const concreteUnitWeightKnM3 = 25.0; // RCC
@@ -1327,10 +1370,11 @@ export function calculatePillarStructuralDetails(
   const floorLlKn = tributaryAreaM2 * floorLiveLoadIntensityKnM2;
   const floorCeilKn = tributaryAreaM2 * ceilingServicesIntensityKnM2;
 
-  // Wall load transferred to column (tributary wall lengths from connected walls)
+  // Wall load transferred to column (tributary wall lengths from connected walls or distributed wall perimeter)
+  const avgWallLengthPerPillar = (2 * (buildingLengthM + buildingWidthM)) / totalPillarsCount;
   const tributaryWallLengthM = allWallsLengthsConnectedM > 0
-    ? allWallsLengthsConnectedM / 2
-    : (tributaryLengthM + tributaryWidthM) * 0.75;
+    ? Math.max(allWallsLengthsConnectedM / 2, avgWallLengthPerPillar)
+    : Math.max((tributaryLengthM + tributaryWidthM) * 0.75, avgWallLengthPerPillar);
   const wallThicknessM = 0.23; // 9" wall
   const wallLoadKn = tributaryWallLengthM * floorHeightM * wallThicknessM * masonryUnitWeightKnM3;
 
@@ -1374,10 +1418,45 @@ export function calculatePillarStructuralDetails(
   const denominator = (0.4 * fck * 0.99) + (0.67 * fy * 0.01);
   const requiredGrossAreaAgMm2 = (factoredUltimateLoadKn * 1000) / denominator;
 
-  // Determine standard column section
+  // Storey-based minimum column section requirements (IS 456 Cl. 39.3 / SP 34 / NBC 2016)
+  // Multi-storey columns require minimum dimensions for lateral stiffness, slenderness and beam-column joint anchorage:
+  // G+0 (1 Storey):  Min 9"×9"   (230×230 mm)
+  // G+1 (2 Storeys): Min 9"×12"  (230×300 mm)
+  // G+2 (3 Storeys): Min 9"×15"  (230×380 mm)
+  // G+3 (4 Storeys): Min 12"×15" (300×380 mm) or 12"×18" (300×450 mm)
+  // G+4 (5 Storeys): Min 12"×18" (300×450 mm)
+  // G+5+ (6+ Storeys): Min 15"×18" (380×450 mm)
+  let minColWidthMm = 230;
+  let minColDepthMm = 230;
+  if (numFloors >= 6) {
+    minColWidthMm = 380;
+    minColDepthMm = 450;
+  } else if (numFloors === 5) {
+    minColWidthMm = 300;
+    minColDepthMm = 450;
+  } else if (numFloors === 4) {
+    minColWidthMm = 300;
+    minColDepthMm = 380;
+  } else if (numFloors === 3) {
+    minColWidthMm = 230;
+    minColDepthMm = 380;
+  } else if (numFloors === 2) {
+    minColWidthMm = 230;
+    minColDepthMm = 300;
+  } else {
+    minColWidthMm = 230;
+    minColDepthMm = 230;
+  }
+  const minStoreyAreaMm2 = minColWidthMm * minColDepthMm;
+  const targetRequiredGrossAreaAgMm2 = Math.max(requiredGrossAreaAgMm2, minStoreyAreaMm2);
+
+  // Determine standard column section satisfying both load capacity and storey-height requirements
   let selectedSection = STANDARD_COLUMN_SIZES_MM[0];
   for (const std of STANDARD_COLUMN_SIZES_MM) {
-    if (std.b * std.d >= requiredGrossAreaAgMm2) {
+    const stdArea = std.b * std.d;
+    const stdMinDim = Math.min(std.b, std.d);
+    const stdMaxDim = Math.max(std.b, std.d);
+    if (stdArea >= targetRequiredGrossAreaAgMm2 && stdMinDim >= minColWidthMm && stdMaxDim >= minColDepthMm) {
       selectedSection = std;
       break;
     }
@@ -1809,8 +1888,8 @@ export function calculateBuildingStructuralSummary(
       wallLenConnected,
       config,
       {
-        customWidthMm: (p.width && (p.isCustomSize || p.width !== 9)) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
-        customDepthMm: (p.depth && (p.isCustomSize || p.depth !== 9)) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
+        customWidthMm: (p.isCustomSize && p.width) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
+        customDepthMm: (p.isCustomSize && p.depth) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
         floorHeights: floorHeightsM,
         isGroundLevel: isGround,
         supportedFloors,

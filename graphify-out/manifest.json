@@ -120,9 +120,9 @@
     "semantic_hash": "74bdf5ee815a19345224ce987c4158e3"
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1794762749.0671275,
-    "seen": 1794762902.226089,
-    "ast_hash": "b6703ca931a4dc4e3c54dc828bbf7703",
+    "mtime": 1794815386.131947,
+    "seen": 1794832644.4573247,
+    "ast_hash": "ffe61e5c57539fb2b9d33ee571f16f23",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -132,15 +132,15 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794734191.4644473,
-    "seen": 1794736561.7054577,
-    "ast_hash": "7562653a91bb33b14fc656f9b9795fec",
+    "mtime": 1794823139.7711778,
+    "seen": 1794832644.4573276,
+    "ast_hash": "91212cf15346ddcd4a49e5b6f4947040",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
-    "mtime": 1794755428.4353397,
-    "seen": 1794756248.522776,
-    "ast_hash": "0247e5da0c7e11fd407a1f3611bc75da",
+    "mtime": 1794815349.5975616,
+    "seen": 1794832644.457329,
+    "ast_hash": "604afdaac63a411b33ff59a6db41d9ab",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorSettings.tsx": {
@@ -198,8 +198,8 @@
     "semantic_hash": "8c2b640aeeb62b60044e141e237a1a5b"
   },
   "src/components/calculator/VisualEstimatorResults.tsx": {
-    "mtime": 1794755588.8013752,
-    "seen": 1794756248.5227883,
+    "mtime": 1794813597.5170345,
+    "seen": 1794832644.4573438,
     "ast_hash": "9a28f8ec3a3b65eede2e942c50288712",
     "semantic_hash": ""
   },
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1794756043.981773,
-    "seen": 1794756248.5227983,
-    "ast_hash": "ca229bf27fce6f7a16e8dd27be6c4052",
+    "mtime": 1794822744.332905,
+    "seen": 1794832644.4573555,
+    "ast_hash": "cdaeae4566ddaea95d58d54e8310c657",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1794735352.9179523,
-    "seen": 1794736561.7054884,
-    "ast_hash": "28b830298c5b4ded1f4df6533236cd3f",
+    "mtime": 1794822668.9418955,
+    "seen": 1794832644.4573622,
+    "ast_hash": "bb7cb10604a5ba7e54d490ffe8b7cb5d",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {
@@ -546,8 +546,8 @@
     "semantic_hash": ""
   },
   "src/lib/slabBeamRoofSteel.test.ts": {
-    "mtime": 1794736432.3190167,
-    "seen": 1794736561.7054858,
+    "mtime": 1794813597.5446527,
+    "seen": 1794832644.4573598,
     "ast_hash": "208626fe738b65b3ae92efb057fcce43",
     "semantic_hash": ""
   },

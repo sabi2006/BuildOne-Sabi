@@ -2178,10 +2178,12 @@ interface SelectedSlabInfo {
 }
 
 export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
-  const { brickType, settings, setActiveTab, result, projectName } = useCalculator();
+  const { brickType, settings, setActiveTab, result, projectName, toastMessage: contextToastMessage } = useCalculator();
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ title: string; subtitle?: string } | null>(null);
+
+  const activeToast = toastMessage || contextToastMessage;
 
   const triggerToast = (title: string, subtitle?: string) => {
     setToastMessage({ title, subtitle });
@@ -3458,11 +3460,11 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               // Extension into start and end pillar joints so corners meet flush with zero exposed column notches
                               // At an exterior corner, beam extends by beamThickM / 2 to meet the building's exterior boundary flush with transverse beams and corner columns
                               // At an intermediate joint, beam extends into the pillar core so the connection is solid and continuous
-                              const extStartM = (startPillar?.alignment === 'outside_corner')
-                                ? Math.max(beamThickM / 2, (Math.abs(ux) * startPW + Math.abs(uy) * startPD) / 2)
+                              const extStartM = (startPillar?.alignment === 'outside_corner' || !startPillar)
+                                ? (beamThickM / 2)
                                 : Math.min((Math.abs(ux) * startPW + Math.abs(uy) * startPD) / 2, beamThickM / 2);
-                              const extEndM = (endPillar?.alignment === 'outside_corner')
-                                ? Math.max(beamThickM / 2, (Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2)
+                              const extEndM = (endPillar?.alignment === 'outside_corner' || !endPillar)
+                                ? (beamThickM / 2)
                                 : Math.min((Math.abs(ux) * endPW + Math.abs(uy) * endPD) / 2, beamThickM / 2);
 
                               let extSX = sX - ux * extStartM;
@@ -4373,13 +4375,13 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
           })()}
 
           {/* Floating Toast Notification */}
-          {toastMessage && (
+          {activeToast && (
             <div className="absolute top-14 left-3 z-40 bg-slate-900/95 text-white px-4 py-2.5 rounded-xl border border-orange-500 shadow-2xl flex items-center space-x-2.5 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <div>
-                <p className="text-xs font-bold text-slate-100">{toastMessage.title}</p>
-                {toastMessage.subtitle && (
-                  <p className="text-[10px] text-slate-400">{toastMessage.subtitle}</p>
+                <p className="text-xs font-bold text-slate-100">{activeToast.title}</p>
+                {activeToast.subtitle && (
+                  <p className="text-[10px] text-slate-400">{activeToast.subtitle}</p>
                 )}
               </div>
             </div>

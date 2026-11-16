@@ -69,6 +69,17 @@ function CalculatorProvider({ children }) {
     const [hasCalculated, setHasCalculated] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [buildingModel, setBuildingModel] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [buildingConfig, setBuildingConfig] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$structuralCalculationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_BUILDING_CONFIG"]);
+    const [toastMessage, setToastMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const triggerToast = (title, subtitle, type = 'info')=>{
+        setToastMessage({
+            title,
+            subtitle,
+            type
+        });
+        setTimeout(()=>{
+            setToastMessage((prev)=>prev?.title === title ? null : prev);
+        }, 4500);
+    };
     const result = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "CalculatorProvider.useMemo[result]": ()=>{
             // Single Source of Truth Synchronization
@@ -152,6 +163,24 @@ function CalculatorProvider({ children }) {
                     height: h
                 }));
             // 2. Adjust floor count if changed
+            const isFloorCountChanged = updates.floorCount !== undefined && updates.floorCount !== cur;
+            if (isFloorCountChanged) {
+                allPillars = allPillars.map((p)=>({
+                        ...p,
+                        isCustomSize: false
+                    }));
+                updatedFloors = updatedFloors.map((fl)=>({
+                        ...fl,
+                        slab: fl.slab ? {
+                            ...fl.slab,
+                            isCustomSize: false
+                        } : fl.slab,
+                        ringBeam: fl.ringBeam ? {
+                            ...fl.ringBeam,
+                            isCustomSize: false
+                        } : fl.ringBeam
+                    }));
+            }
             if (target !== cur) {
                 if (target > cur) {
                     const groundFloor = updatedFloors[0];
@@ -664,6 +693,22 @@ function CalculatorProvider({ children }) {
                     taxPercent: cr.taxPercent
                 } : {}
             }));
+        // Trigger IS 456 Auto-Sizing Notification Toast
+        setTimeout(()=>{
+            setBuildingModel((currentModel)=>{
+                if (!currentModel) return currentModel;
+                const targetFloors = currentModel.floors?.length || updates.floorCount || 1;
+                const p0 = currentModel.pillars?.[0] || currentModel.floors?.[0]?.pillars?.[0];
+                const b0 = currentModel.floors?.[0]?.ringBeam;
+                const s0 = currentModel.floors?.[0]?.slab;
+                const colStr = p0 ? `${p0.width}"×${p0.depth}"` : '9"×12"';
+                const beamStr = b0 ? `${b0.width}"×${b0.depth}"` : '9"×12"';
+                const slabStr = s0 ? `${s0.thickness}"` : '5"';
+                const storeyName = targetFloors === 1 ? 'G+0 (1 Storey)' : targetFloors === 2 ? 'G+1 (2 Storeys)' : targetFloors === 3 ? 'G+2 (3 Storeys)' : `G+${targetFloors - 1} (${targetFloors} Storeys)`;
+                triggerToast('IS 456 Auto-Sizing Applied', `${storeyName}: Pillars ${colStr}, Beams ${beamStr}, Slabs ${slabStr}`, 'success');
+                return currentModel;
+            });
+        }, 50);
     };
     const calculate = ()=>{
         setHasCalculated(true);
@@ -762,6 +807,8 @@ function CalculatorProvider({ children }) {
             hasCalculated,
             buildingModel,
             buildingConfig,
+            toastMessage,
+            triggerToast,
             setActiveTab,
             setMode,
             setDifficulty,
@@ -785,11 +832,11 @@ function CalculatorProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/components/calculator/CalculatorContext.tsx",
-        lineNumber: 657,
+        lineNumber: 699,
         columnNumber: 5
     }, this);
 }
-_s(CalculatorProvider, "hBV0McPwL2Bd8qxiWYd/Fqsa+jI=");
+_s(CalculatorProvider, "vIxY144zowb0gsGOF265uCXAoiY=");
 _c = CalculatorProvider;
 function useCalculator() {
     _s1();

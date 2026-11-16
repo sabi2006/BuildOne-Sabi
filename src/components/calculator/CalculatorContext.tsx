@@ -45,8 +45,10 @@ interface CalculatorState {
   
   buildingModel: BuildingModel | null;
   buildingConfig: BuildingConfig;
+  toastMessage: { title: string; subtitle?: string; type?: 'info' | 'success' | 'warning' } | null;
   
   // Actions
+  triggerToast: (title: string, subtitle?: string, type?: 'info' | 'success' | 'warning') => void;
   setActiveTab: (tab: TabMode) => void;
   setMode: (mode: CalculatorMode) => void;
   setDifficulty: (diff: DifficultyLevel) => void;
@@ -121,6 +123,14 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
   const [hasCalculated, setHasCalculated] = useState(false);
   const [buildingModel, setBuildingModel] = useState<BuildingModel | null>(null);
   const [buildingConfig, setBuildingConfig] = useState<BuildingConfig>(DEFAULT_BUILDING_CONFIG);
+  const [toastMessage, setToastMessage] = useState<{ title: string; subtitle?: string; type?: 'info' | 'success' | 'warning' } | null>(null);
+
+  const triggerToast = (title: string, subtitle?: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    setToastMessage({ title, subtitle, type });
+    setTimeout(() => {
+      setToastMessage(prev => (prev?.title === title ? null : prev));
+    }, 4500);
+  };
 
   const result = useMemo(() => {
     // Single Source of Truth Synchronization
@@ -182,6 +192,16 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
       allPillars = allPillars.map(p => ({ ...p, height: h }));
 
       // 2. Adjust floor count if changed
+      const isFloorCountChanged = updates.floorCount !== undefined && updates.floorCount !== cur;
+      if (isFloorCountChanged) {
+        allPillars = allPillars.map(p => ({ ...p, isCustomSize: false }));
+        updatedFloors = updatedFloors.map(fl => ({
+          ...fl,
+          slab: fl.slab ? { ...fl.slab, isCustomSize: false } : fl.slab,
+          ringBeam: fl.ringBeam ? { ...fl.ringBeam, isCustomSize: false } : fl.ringBeam
+        }));
+      }
+
       if (target !== cur) {
         if (target > cur) {
           const groundFloor = updatedFloors[0];
@@ -578,6 +598,28 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
       ...(cr.contingencyPercent !== undefined ? { contingencyPercent: cr.contingencyPercent } : {}),
       ...(cr.taxPercent !== undefined ? { taxPercent: cr.taxPercent } : {})
     }));
+
+    // Trigger IS 456 Auto-Sizing Notification Toast
+    setTimeout(() => {
+      setBuildingModel(currentModel => {
+        if (!currentModel) return currentModel;
+        const targetFloors = currentModel.floors?.length || updates.floorCount || 1;
+        const p0 = currentModel.pillars?.[0] || currentModel.floors?.[0]?.pillars?.[0];
+        const b0 = currentModel.floors?.[0]?.ringBeam;
+        const s0 = currentModel.floors?.[0]?.slab;
+        const colStr = p0 ? `${p0.width}"×${p0.depth}"` : '9"×12"';
+        const beamStr = b0 ? `${b0.width}"×${b0.depth}"` : '9"×12"';
+        const slabStr = s0 ? `${s0.thickness}"` : '5"';
+        const storeyName = targetFloors === 1 ? 'G+0 (1 Storey)' : targetFloors === 2 ? 'G+1 (2 Storeys)' : targetFloors === 3 ? 'G+2 (3 Storeys)' : `G+${targetFloors - 1} (${targetFloors} Storeys)`;
+
+        triggerToast(
+          'IS 456 Auto-Sizing Applied',
+          `${storeyName}: Pillars ${colStr}, Beams ${beamStr}, Slabs ${slabStr}`,
+          'success'
+        );
+        return currentModel;
+      });
+    }, 50);
   };
 
   const calculate = () => {
@@ -655,8 +697,8 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
 
   return (
     <CalculatorContext.Provider value={{
-      activeTab, mode, difficulty, projectName, globalUnit, walls, pillars, brickType, settings, result, hasCalculated, buildingModel, buildingConfig,
-      setActiveTab, setMode, setDifficulty, setProjectName, setGlobalUnit, setWalls, setPillars, addWall, updateWall, removeWall,
+      activeTab, mode, difficulty, projectName, globalUnit, walls, pillars, brickType, settings, result, hasCalculated, buildingModel, buildingConfig, toastMessage,
+      triggerToast, setActiveTab, setMode, setDifficulty, setProjectName, setGlobalUnit, setWalls, setPillars, addWall, updateWall, removeWall,
       addOpening, removeOpening, setBrickType, updateSettings, updateBuildingConfig, setBuildingModel, loadProject, calculate, reset
     }}>
       {children}
