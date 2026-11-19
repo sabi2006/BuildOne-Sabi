@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794849551.492989,
-    "seen": 1794850058.0439901,
-    "ast_hash": "ec48439ec63667ad30f3a1ac4e4637ab",
+    "mtime": 1794893564.1003387,
+    "seen": 1794893641.1906886,
+    "ast_hash": "328ef01f388445aa743a9490e9008a1e",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1794849270.939893,
-    "seen": 1794850058.0440137,
-    "ast_hash": "18cf20e2a1c48a6d3be68906f025a291",
+    "mtime": 1794893531.3681805,
+    "seen": 1794893641.1907141,
+    "ast_hash": "b0829cb6e70cd1afe268714296b745f0",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1794839978.367713,
-    "seen": 1794840444.5416925,
-    "ast_hash": "3c4911f05fef28cd5e1c9dcf2f7685a6",
+    "mtime": 1794893516.6488278,
+    "seen": 1794893641.190721,
+    "ast_hash": "b2b882d33a8b2d587ad02d897853244d",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {

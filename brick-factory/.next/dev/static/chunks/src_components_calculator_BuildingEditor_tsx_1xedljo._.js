@@ -12285,24 +12285,44 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 label: '9"×12"'
                                                             },
                                                             {
-                                                                w: 10,
-                                                                d: 10,
-                                                                label: '10"×10"'
-                                                            },
-                                                            {
                                                                 w: 12,
                                                                 d: 12,
                                                                 label: '12"×12"'
                                                             },
                                                             {
-                                                                w: 8,
-                                                                d: 10,
-                                                                label: '8"×10"'
-                                                            },
-                                                            {
                                                                 w: 12,
                                                                 d: 15,
                                                                 label: '12"×15"'
+                                                            },
+                                                            {
+                                                                w: 12,
+                                                                d: 18,
+                                                                label: '12"×18"'
+                                                            },
+                                                            {
+                                                                w: 15,
+                                                                d: 18,
+                                                                label: '15"×18"'
+                                                            },
+                                                            {
+                                                                w: 18,
+                                                                d: 18,
+                                                                label: '18"×18"'
+                                                            },
+                                                            {
+                                                                w: 21,
+                                                                d: 21,
+                                                                label: '21"×21"'
+                                                            },
+                                                            {
+                                                                w: 24,
+                                                                d: 24,
+                                                                label: '24"×24"'
+                                                            },
+                                                            {
+                                                                w: 30,
+                                                                d: 30,
+                                                                label: '30"×30"'
                                                             }
                                                         ].map((preset)=>{
                                                             const isCurrent = floorPillarWidth === preset.w && floorPillarDepth === preset.d;
@@ -12313,7 +12333,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 children: preset.label
                                                             }, preset.label, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 6569,
+                                                                lineNumber: 6573,
                                                                 columnNumber: 27
                                                             }, this);
                                                         })
@@ -12338,7 +12358,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 children: "Floor Width (in)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 6590,
+                                                                lineNumber: 6594,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12350,13 +12370,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 className: "block w-full px-2 py-0.5 text-xs bg-white border border-orange-300 rounded font-bold text-gray-900 focus:ring-orange-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 6591,
+                                                                lineNumber: 6595,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6589,
+                                                        lineNumber: 6593,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12366,7 +12386,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 children: "Floor Depth (in)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 6601,
+                                                                lineNumber: 6605,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12378,19 +12398,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 className: "block w-full px-2 py-0.5 text-xs bg-white border border-orange-300 rounded font-bold text-gray-900 focus:ring-orange-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 6602,
+                                                                lineNumber: 6606,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6600,
+                                                        lineNumber: 6604,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6588,
+                                                lineNumber: 6592,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12406,12 +12426,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 6619,
+                                                    lineNumber: 6623,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6613,
+                                                lineNumber: 6617,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -12419,7 +12439,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Customizes this floor independently (e.g. Ground Floor 12×12, First Floor 10×10)."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6621,
+                                                lineNumber: 6625,
                                                 columnNumber: 19
                                             }, this)
                                         ]
@@ -12436,7 +12456,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: selectedPillarId ? `Edit ${pillarName || 'Column'}` : "Selected Pillar Properties"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6627,
+                                                lineNumber: 6631,
                                                 columnNumber: 19
                                             }, this),
                                             selectedPillarId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -12452,26 +12472,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "w-3 h-3 mr-1 text-red-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6640,
+                                                        lineNumber: 6644,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Remove"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6641,
+                                                        lineNumber: 6645,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6631,
+                                                lineNumber: 6635,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6626,
+                                        lineNumber: 6630,
                                         columnNumber: 17
                                     }, this),
                                     selectedPillarId && (()=>{
@@ -12487,13 +12507,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "w-3.5 h-3.5 text-amber-700"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 6653,
+                                                            lineNumber: 6657,
                                                             columnNumber: 37
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2d$open$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Unlock$3e$__["Unlock"], {
                                                             className: "w-3.5 h-3.5 text-gray-400"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 6653,
+                                                            lineNumber: 6657,
                                                             columnNumber: 87
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12503,7 +12523,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: isLocked ? 'Position Locked 🔒' : 'Position Unlocked'
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 6655,
+                                                                    lineNumber: 6659,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12511,19 +12531,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: isLocked ? 'Protected from Grid regeneration' : 'Can be relocated by Auto Grid'
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 6656,
+                                                                    lineNumber: 6660,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 6654,
+                                                            lineNumber: 6658,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 6652,
+                                                    lineNumber: 6656,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12535,13 +12555,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "h-4 w-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 6661,
+                                                    lineNumber: 6665,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 6651,
+                                            lineNumber: 6655,
                                             columnNumber: 21
                                         }, this);
                                     })(),
@@ -12552,7 +12572,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Concrete Grade"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6674,
+                                                lineNumber: 6678,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -12567,7 +12587,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "M15 (1:2:4)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6680,
+                                                        lineNumber: 6684,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12575,7 +12595,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "M20 (1:1.5:3 - Standard)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6681,
+                                                        lineNumber: 6685,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12583,7 +12603,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "M25 (1:1:2 - Heavy Duty)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6682,
+                                                        lineNumber: 6686,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12591,7 +12611,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "M30 (1:0.75:1.5 - High Strength)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6683,
+                                                        lineNumber: 6687,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12599,19 +12619,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "M35 (1:0.65:1.3 - Multi-Storey)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6684,
+                                                        lineNumber: 6688,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6675,
+                                                lineNumber: 6679,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6673,
+                                        lineNumber: 6677,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12621,7 +12641,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Name / ID"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6690,
+                                                lineNumber: 6694,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12637,13 +12657,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6691,
+                                                lineNumber: 6695,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6689,
+                                        lineNumber: 6693,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12653,7 +12673,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Shape"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6704,
+                                                lineNumber: 6708,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -12674,7 +12694,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Square"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6714,
+                                                        lineNumber: 6718,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12682,7 +12702,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Rectangle"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6715,
+                                                        lineNumber: 6719,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -12690,19 +12710,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Circular"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6716,
+                                                        lineNumber: 6720,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6705,
+                                                lineNumber: 6709,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6703,
+                                        lineNumber: 6707,
                                         columnNumber: 17
                                     }, this),
                                     selectedPillarId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12715,7 +12735,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Cross-Section Presets"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6724,
+                                                        lineNumber: 6728,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -12728,13 +12748,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6725,
+                                                        lineNumber: 6729,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6723,
+                                                lineNumber: 6727,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12751,24 +12771,44 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         label: '9"×12"'
                                                     },
                                                     {
-                                                        w: 10,
-                                                        d: 10,
-                                                        label: '10"×10"'
-                                                    },
-                                                    {
                                                         w: 12,
                                                         d: 12,
                                                         label: '12"×12"'
                                                     },
                                                     {
-                                                        w: 8,
-                                                        d: 10,
-                                                        label: '8"×10"'
-                                                    },
-                                                    {
                                                         w: 12,
                                                         d: 15,
                                                         label: '12"×15"'
+                                                    },
+                                                    {
+                                                        w: 12,
+                                                        d: 18,
+                                                        label: '12"×18"'
+                                                    },
+                                                    {
+                                                        w: 15,
+                                                        d: 18,
+                                                        label: '15"×18"'
+                                                    },
+                                                    {
+                                                        w: 18,
+                                                        d: 18,
+                                                        label: '18"×18"'
+                                                    },
+                                                    {
+                                                        w: 21,
+                                                        d: 21,
+                                                        label: '21"×21"'
+                                                    },
+                                                    {
+                                                        w: 24,
+                                                        d: 24,
+                                                        label: '24"×24"'
+                                                    },
+                                                    {
+                                                        w: 30,
+                                                        d: 30,
+                                                        label: '30"×30"'
                                                     }
                                                 ].map((pPreset)=>{
                                                     const isSel = pillarWidth === pPreset.w && (pillarShape === 'circular' || pillarDepth === pPreset.d);
@@ -12790,19 +12830,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: pPreset.label
                                                     }, `sel-${pPreset.label}`, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6740,
+                                                        lineNumber: 6748,
                                                         columnNumber: 27
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6729,
+                                                lineNumber: 6733,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6722,
+                                        lineNumber: 6726,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12815,7 +12855,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Width (in)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6772,
+                                                        lineNumber: 6780,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12833,13 +12873,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 font-bold"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6773,
+                                                        lineNumber: 6781,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6771,
+                                                lineNumber: 6779,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12849,7 +12889,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Depth (in)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6785,
+                                                        lineNumber: 6793,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12867,19 +12907,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500 font-bold disabled:bg-gray-100"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6786,
+                                                        lineNumber: 6794,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6784,
+                                                lineNumber: 6792,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6770,
+                                        lineNumber: 6778,
                                         columnNumber: 17
                                     }, this),
                                     !isGroundFloor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12892,7 +12932,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Storey Override"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6803,
+                                                        lineNumber: 6811,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12900,13 +12940,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Decouple from continuous shaft"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6804,
+                                                        lineNumber: 6812,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6802,
+                                                lineNumber: 6810,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -12942,13 +12982,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "rounded text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6806,
+                                                lineNumber: 6814,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6801,
+                                        lineNumber: 6809,
                                         columnNumber: 19
                                     }, this),
                                     selectedPillarId && (()=>{
@@ -12963,7 +13003,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "⚠️"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 6844,
+                                                    lineNumber: 6852,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -12973,26 +13013,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Structural Capacity Notice"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 6846,
+                                                            lineNumber: 6854,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             children: warning
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 6847,
+                                                            lineNumber: 6855,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 6845,
+                                                    lineNumber: 6853,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 6843,
+                                            lineNumber: 6851,
                                             columnNumber: 21
                                         }, this);
                                     })(),
@@ -13007,7 +13047,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6854,
+                                                lineNumber: 6862,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13023,13 +13063,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6855,
+                                                lineNumber: 6863,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6853,
+                                        lineNumber: 6861,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13039,7 +13079,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Placement Snap"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6868,
+                                                lineNumber: 6876,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -13058,7 +13098,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Corner Snap"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6878,
+                                                        lineNumber: 6886,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13066,7 +13106,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Wall Joint"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6879,
+                                                        lineNumber: 6887,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13074,7 +13114,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "End of Wall"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6880,
+                                                        lineNumber: 6888,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13082,7 +13122,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Central Structural Support"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6881,
+                                                        lineNumber: 6889,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13090,7 +13130,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Mid-Wall"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6882,
+                                                        lineNumber: 6890,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13098,19 +13138,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Custom Position"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6883,
+                                                        lineNumber: 6891,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6869,
+                                                lineNumber: 6877,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6867,
+                                        lineNumber: 6875,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13120,7 +13160,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Corner Alignment"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6888,
+                                                lineNumber: 6896,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -13139,7 +13179,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Outside Corner (Recommended)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6898,
+                                                        lineNumber: 6906,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13147,7 +13187,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Centre on Wall Junction"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6899,
+                                                        lineNumber: 6907,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13155,7 +13195,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Inside Corner (Room)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6900,
+                                                        lineNumber: 6908,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13163,7 +13203,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Flush with Exterior Face"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6901,
+                                                        lineNumber: 6909,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13171,7 +13211,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Flush with Interior Face"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6902,
+                                                        lineNumber: 6910,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -13179,19 +13219,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Custom Offset"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6903,
+                                                        lineNumber: 6911,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6889,
+                                                lineNumber: 6897,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6887,
+                                        lineNumber: 6895,
                                         columnNumber: 17
                                     }, this),
                                     selectedPillarId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13208,7 +13248,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6911,
+                                                        lineNumber: 6919,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13228,13 +13268,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-orange-950 bg-white border border-orange-300 rounded focus:ring-orange-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6912,
+                                                        lineNumber: 6920,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6910,
+                                                lineNumber: 6918,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13248,7 +13288,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6925,
+                                                        lineNumber: 6933,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13268,19 +13308,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-orange-950 bg-white border border-orange-300 rounded focus:ring-orange-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6926,
+                                                        lineNumber: 6934,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6924,
+                                                lineNumber: 6932,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6909,
+                                        lineNumber: 6917,
                                         columnNumber: 19
                                     }, this),
                                     pillarAlignment === 'custom_offset' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13297,7 +13337,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6944,
+                                                        lineNumber: 6952,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13313,13 +13353,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-1.5 py-0.5 text-xs border rounded"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6945,
+                                                        lineNumber: 6953,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6943,
+                                                lineNumber: 6951,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13333,7 +13373,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6957,
+                                                        lineNumber: 6965,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13349,19 +13389,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-1.5 py-0.5 text-xs border rounded"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6958,
+                                                        lineNumber: 6966,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6956,
+                                                lineNumber: 6964,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6942,
+                                        lineNumber: 6950,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13383,20 +13423,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "rounded text-orange-600 focus:ring-orange-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6974,
+                                                        lineNumber: 6982,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Include in Estimate"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6984,
+                                                        lineNumber: 6992,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6973,
+                                                lineNumber: 6981,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -13415,20 +13455,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "rounded text-blue-600 focus:ring-blue-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6987,
+                                                        lineNumber: 6995,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Exposed Rebar Preview"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 6997,
+                                                        lineNumber: 7005,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6986,
+                                                lineNumber: 6994,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -13447,26 +13487,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "rounded text-purple-600 focus:ring-purple-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7000,
+                                                        lineNumber: 7008,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "RCC Tie Beam Preview"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7010,
+                                                        lineNumber: 7018,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 6999,
+                                                lineNumber: 7007,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 6972,
+                                        lineNumber: 6980,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13481,25 +13521,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "w-3.5 h-3.5 text-orange-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7018,
+                                                            lineNumber: 7026,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Apply to All Pillars"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7019,
+                                                            lineNumber: 7027,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7017,
+                                                    lineNumber: 7025,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7016,
+                                                lineNumber: 7024,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13510,7 +13550,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Apply Scope:"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7024,
+                                                        lineNumber: 7032,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13528,7 +13568,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                         className: "text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                        lineNumber: 7027,
+                                                                        lineNumber: 7035,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13536,13 +13576,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                         children: "Current Floor"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                        lineNumber: 7035,
+                                                                        lineNumber: 7043,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7026,
+                                                                lineNumber: 7034,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -13557,7 +13597,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                         className: "text-orange-600 focus:ring-orange-500 h-3.5 w-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                        lineNumber: 7038,
+                                                                        lineNumber: 7046,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13565,25 +13605,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                         children: "All Floors"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                        lineNumber: 7046,
+                                                                        lineNumber: 7054,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7037,
+                                                                lineNumber: 7045,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7025,
+                                                        lineNumber: 7033,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7023,
+                                                lineNumber: 7031,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13596,20 +13636,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7057,
+                                                        lineNumber: 7065,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Apply to All Pillars"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7058,
+                                                        lineNumber: 7066,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7051,
+                                                lineNumber: 7059,
                                                 columnNumber: 19
                                             }, this),
                                             applyAllSuccessNotice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13619,7 +13659,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7063,
+                                                        lineNumber: 7071,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13627,19 +13667,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: applyAllSuccessNotice
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7064,
+                                                        lineNumber: 7072,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7062,
+                                                lineNumber: 7070,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7015,
+                                        lineNumber: 7023,
                                         columnNumber: 17
                                     }, this)
                                 ]
@@ -13653,7 +13693,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: "Slabs & Beams"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7072,
+                                lineNumber: 7080,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13667,7 +13707,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7080,
+                                        lineNumber: 7088,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -13675,13 +13715,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "RCC Ring Beam"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7080,
+                                        lineNumber: 7088,
                                         columnNumber: 46
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7076,
+                                lineNumber: 7084,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'beam' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13695,7 +13735,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "RCC Ring Beam Config"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7085,
+                                                lineNumber: 7093,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13703,13 +13743,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: beamEnabled && !fullBeamEnabled ? "Active (Top Open)" : "Inactive"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7086,
+                                                lineNumber: 7094,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7084,
+                                        lineNumber: 7092,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -13722,20 +13762,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "rounded text-purple-600 focus:ring-purple-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7092,
+                                                lineNumber: 7100,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Enable RCC Ring Beam"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7098,
+                                                lineNumber: 7106,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7091,
+                                        lineNumber: 7099,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13745,7 +13785,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Height (ft)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7102,
+                                                lineNumber: 7110,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13758,7 +13798,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-purple-500 font-semibold text-purple-900"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7103,
+                                                lineNumber: 7111,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13766,13 +13806,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Additive perimeter beam above 10ft brick wall (Top remains open)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7112,
+                                                lineNumber: 7120,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7101,
+                                        lineNumber: 7109,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13785,7 +13825,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Width (in)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7117,
+                                                        lineNumber: 7125,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13797,13 +13837,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-purple-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7118,
+                                                        lineNumber: 7126,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7116,
+                                                lineNumber: 7124,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13813,7 +13853,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "Depth (in)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7128,
+                                                        lineNumber: 7136,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -13825,19 +13865,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-purple-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7129,
+                                                        lineNumber: 7137,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7127,
+                                                lineNumber: 7135,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7115,
+                                        lineNumber: 7123,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13847,12 +13887,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Structural Height:"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7141,
+                                                lineNumber: 7149,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7141,
+                                                lineNumber: 7149,
                                                 columnNumber: 44
                                             }, this),
                                             "Brick Wall = ",
@@ -13860,12 +13900,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "10 ft"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7142,
+                                                lineNumber: 7150,
                                                 columnNumber: 32
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7142,
+                                                lineNumber: 7150,
                                                 columnNumber: 44
                                             }, this),
                                             "RCC Beam = ",
@@ -13877,13 +13917,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7143,
+                                                lineNumber: 7151,
                                                 columnNumber: 30
                                             }, this),
                                             " (Perimeter only, Top = OPEN)",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7143,
+                                                lineNumber: 7151,
                                                 columnNumber: 82
                                             }, this),
                                             "Total Wall+Beam = ",
@@ -13894,19 +13934,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7144,
+                                                lineNumber: 7152,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7140,
+                                        lineNumber: 7148,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7083,
+                                lineNumber: 7091,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -13920,7 +13960,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7153,
+                                        lineNumber: 7161,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -13928,13 +13968,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "RCC Full Ring Beam"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7153,
+                                        lineNumber: 7161,
                                         columnNumber: 43
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7149,
+                                lineNumber: 7157,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'fullRingBeam' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13948,7 +13988,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "RCC Full Ring Beam"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7158,
+                                                lineNumber: 7166,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -13956,13 +13996,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: fullBeamEnabled ? "Active (Top Closed)" : "Inactive"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7159,
+                                                lineNumber: 7167,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7157,
+                                        lineNumber: 7165,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -13975,20 +14015,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "rounded text-indigo-600 focus:ring-indigo-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7165,
+                                                lineNumber: 7173,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Enable RCC Full Ring Beam"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7171,
+                                                lineNumber: 7179,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7164,
+                                        lineNumber: 7172,
                                         columnNumber: 17
                                     }, this),
                                     fullBeamEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -13998,7 +14038,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Thickness (ft)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7176,
+                                                lineNumber: 7184,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14011,7 +14051,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-indigo-500 font-bold text-indigo-900"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7177,
+                                                lineNumber: 7185,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14019,13 +14059,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Solid concrete top completely closing floor opening"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7186,
+                                                lineNumber: 7194,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7175,
+                                        lineNumber: 7183,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14035,12 +14075,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Floor Structural Top:"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7191,
+                                                lineNumber: 7199,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7191,
+                                                lineNumber: 7199,
                                                 columnNumber: 47
                                             }, this),
                                             "• Brick Wall: ",
@@ -14048,12 +14088,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "10 ft"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7192,
+                                                lineNumber: 7200,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7192,
+                                                lineNumber: 7200,
                                                 columnNumber: 45
                                             }, this),
                                             "• RCC Full Ring Beam: ",
@@ -14061,12 +14101,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: fullBeamEnabled ? `+${fullBeamThickness} ft (Continuous Joint)` : 'OFF'
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7193,
+                                                lineNumber: 7201,
                                                 columnNumber: 41
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7193,
+                                                lineNumber: 7201,
                                                 columnNumber: 121
                                             }, this),
                                             "• Normal Ring Beam: ",
@@ -14074,12 +14114,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: beamEnabled ? `Active (+${beamHeight} ft)` : 'OFF'
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7194,
+                                                lineNumber: 7202,
                                                 columnNumber: 39
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7194,
+                                                lineNumber: 7202,
                                                 columnNumber: 98
                                             }, this),
                                             "• Total Floor Height: ",
@@ -14090,19 +14130,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7195,
+                                                lineNumber: 7203,
                                                 columnNumber: 41
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7190,
+                                        lineNumber: 7198,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7156,
+                                lineNumber: 7164,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -14116,7 +14156,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7205,
+                                        lineNumber: 7213,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -14124,13 +14164,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Floor RCC Slab"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7205,
+                                        lineNumber: 7213,
                                         columnNumber: 46
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7201,
+                                lineNumber: 7209,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'slab' && (()=>{
@@ -14160,7 +14200,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7225,
+                                                    lineNumber: 7233,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14168,13 +14208,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: isEnabled ? "ACTIVE" : "OFF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7228,
+                                                    lineNumber: 7236,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7224,
+                                            lineNumber: 7232,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -14189,7 +14229,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "rounded text-sky-600 focus:ring-sky-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7234,
+                                                    lineNumber: 7242,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14199,13 +14239,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7240,
+                                                    lineNumber: 7248,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7233,
+                                            lineNumber: 7241,
                                             columnNumber: 19
                                         }, this),
                                         isEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -14220,7 +14260,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Thickness (in)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7247,
+                                                                    lineNumber: 7255,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14236,13 +14276,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500 font-bold text-sky-900"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7248,
+                                                                    lineNumber: 7256,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7246,
+                                                            lineNumber: 7254,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14256,7 +14296,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7259,
+                                                                    lineNumber: 7267,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14272,19 +14312,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7260,
+                                                                    lineNumber: 7268,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7258,
+                                                            lineNumber: 7266,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7245,
+                                                    lineNumber: 7253,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14300,25 +14340,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 className: "rounded text-sky-600 focus:ring-sky-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7274,
+                                                                lineNumber: 7282,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: "Custom Plan Dimensions"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7280,
+                                                                lineNumber: 7288,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7273,
+                                                        lineNumber: 7281,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7272,
+                                                    lineNumber: 7280,
                                                     columnNumber: 23
                                                 }, this),
                                                 isCustom && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14335,7 +14375,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7287,
+                                                                    lineNumber: 7295,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14349,13 +14389,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-sky-950 bg-white border border-sky-300 rounded focus:ring-sky-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7288,
+                                                                    lineNumber: 7296,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7286,
+                                                            lineNumber: 7294,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14369,7 +14409,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7297,
+                                                                    lineNumber: 7305,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14383,19 +14423,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-sky-950 bg-white border border-sky-300 rounded focus:ring-sky-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7298,
+                                                                    lineNumber: 7306,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7296,
+                                                            lineNumber: 7304,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7285,
+                                                    lineNumber: 7293,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14409,7 +14449,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7310,
+                                                            lineNumber: 7318,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14423,13 +14463,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-sky-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7311,
+                                                            lineNumber: 7319,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7309,
+                                                    lineNumber: 7317,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14445,7 +14485,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7322,
+                                                                    lineNumber: 7330,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14457,13 +14497,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7323,
+                                                                    lineNumber: 7331,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7321,
+                                                            lineNumber: 7329,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14476,7 +14516,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7325,
+                                                                    lineNumber: 7333,
                                                                     columnNumber: 38
                                                                 }, this),
                                                                 " (",
@@ -14485,7 +14525,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7325,
+                                                            lineNumber: 7333,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14498,32 +14538,32 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7326,
+                                                                    lineNumber: 7334,
                                                                     columnNumber: 42
                                                                 }, this),
                                                                 " (IS 456 ~0.8%)"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7326,
+                                                            lineNumber: 7334,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7320,
+                                                    lineNumber: 7328,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7244,
+                                            lineNumber: 7252,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7223,
+                                    lineNumber: 7231,
                                     columnNumber: 17
                                 }, this);
                             })(),
@@ -14538,7 +14578,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4 text-amber-700"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7339,
+                                        lineNumber: 7347,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -14546,13 +14586,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Roof RCC Slab"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7339,
+                                        lineNumber: 7347,
                                         columnNumber: 58
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7335,
+                                lineNumber: 7343,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'roof' && (()=>{
@@ -14579,7 +14619,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Independent Roof Slab"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7359,
+                                                    lineNumber: 7367,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14587,13 +14627,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: isEnabled ? "ACTIVE" : "OFF"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7362,
+                                                    lineNumber: 7370,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7358,
+                                            lineNumber: 7366,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -14608,20 +14648,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "rounded text-amber-600 focus:ring-amber-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7368,
+                                                    lineNumber: 7376,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Enable Independent Roof Slab"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7374,
+                                                    lineNumber: 7382,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7367,
+                                            lineNumber: 7375,
                                             columnNumber: 19
                                         }, this),
                                         isEnabled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -14636,7 +14676,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Thickness (in)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7381,
+                                                                    lineNumber: 7389,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14652,13 +14692,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500 font-bold text-amber-900"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7382,
+                                                                    lineNumber: 7390,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7380,
+                                                            lineNumber: 7388,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14672,7 +14712,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7393,
+                                                                    lineNumber: 7401,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14688,19 +14728,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7394,
+                                                                    lineNumber: 7402,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7392,
+                                                            lineNumber: 7400,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7379,
+                                                    lineNumber: 7387,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14716,25 +14756,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 className: "rounded text-amber-600 focus:ring-amber-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7408,
+                                                                lineNumber: 7416,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: "Custom Roof Dimensions"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7414,
+                                                                lineNumber: 7422,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7407,
+                                                        lineNumber: 7415,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7406,
+                                                    lineNumber: 7414,
                                                     columnNumber: 23
                                                 }, this),
                                                 isCustom && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14751,7 +14791,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7421,
+                                                                    lineNumber: 7429,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14765,13 +14805,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-amber-950 bg-white border border-amber-300 rounded focus:ring-amber-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7422,
+                                                                    lineNumber: 7430,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7420,
+                                                            lineNumber: 7428,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14785,7 +14825,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7431,
+                                                                    lineNumber: 7439,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14799,19 +14839,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "block w-full px-1.5 py-0.5 text-xs font-mono font-bold text-amber-950 bg-white border border-amber-300 rounded focus:ring-amber-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7432,
+                                                                    lineNumber: 7440,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7430,
+                                                            lineNumber: 7438,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7419,
+                                                    lineNumber: 7427,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14825,7 +14865,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7444,
+                                                            lineNumber: 7452,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -14839,13 +14879,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-amber-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7445,
+                                                            lineNumber: 7453,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7443,
+                                                    lineNumber: 7451,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14858,7 +14898,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Roof Slab Area:"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7456,
+                                                                    lineNumber: 7464,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -14870,13 +14910,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7457,
+                                                                    lineNumber: 7465,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7455,
+                                                            lineNumber: 7463,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14889,7 +14929,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7459,
+                                                                    lineNumber: 7467,
                                                                     columnNumber: 38
                                                                 }, this),
                                                                 " (",
@@ -14898,7 +14938,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7459,
+                                                            lineNumber: 7467,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14911,13 +14951,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7460,
+                                                                    lineNumber: 7468,
                                                                     columnNumber: 42
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7460,
+                                                            lineNumber: 7468,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14925,25 +14965,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Placed at topmost building elevation."
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7461,
+                                                            lineNumber: 7469,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7454,
+                                                    lineNumber: 7462,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7378,
+                                            lineNumber: 7386,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7357,
+                                    lineNumber: 7365,
                                     columnNumber: 17
                                 }, this);
                             })(),
@@ -14952,7 +14992,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: "Modify & Clean"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7470,
+                                lineNumber: 7478,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -14966,7 +15006,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7481,
+                                        lineNumber: 7489,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -14974,13 +15014,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Delete"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7481,
+                                        lineNumber: 7489,
                                         columnNumber: 46
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7474,
+                                lineNumber: 7482,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'delete' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -14993,20 +15033,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "w-3.5 h-3.5 text-red-600 shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7486,
+                                                lineNumber: 7494,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Single Delete: Click any wall, pillar, or opening to delete."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7487,
+                                                lineNumber: 7495,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7485,
+                                        lineNumber: 7493,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15021,26 +15061,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7494,
+                                                lineNumber: 7502,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Or Clean All / Bulk Remove ▾"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7495,
+                                                lineNumber: 7503,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7489,
+                                        lineNumber: 7497,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7484,
+                                lineNumber: 7492,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15054,7 +15094,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4 text-rose-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7513,
+                                        lineNumber: 7521,
                                         columnNumber: 15
                                     }, this),
                                     " ",
@@ -15062,13 +15102,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Clean Graph / Remove All"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 7513,
+                                        lineNumber: 7521,
                                         columnNumber: 60
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7501,
+                                lineNumber: 7509,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'clear' && (()=>{
@@ -15100,20 +15140,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "w-3.5 h-3.5 text-rose-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7534,
+                                                            lineNumber: 7542,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Clean Graph Options"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7535,
+                                                            lineNumber: 7543,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7533,
+                                                    lineNumber: 7541,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15124,13 +15164,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Wizard ↗"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7537,
+                                                    lineNumber: 7545,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7532,
+                                            lineNumber: 7540,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15140,7 +15180,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Target Scope:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7549,
+                                                    lineNumber: 7557,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15153,7 +15193,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: activeFloor?.name || 'This Floor'
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7553,
+                                                            lineNumber: 7561,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15167,19 +15207,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7565,
+                                                            lineNumber: 7573,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7552,
+                                                    lineNumber: 7560,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7548,
+                                            lineNumber: 7556,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15195,20 +15235,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "w-3.5 h-3.5 text-blue-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7584,
+                                                                    lineNumber: 7592,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Pillars / Columns"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7585,
+                                                                    lineNumber: 7593,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7583,
+                                                            lineNumber: 7591,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15219,13 +15259,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7587,
+                                                            lineNumber: 7595,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7582,
+                                                    lineNumber: 7590,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15237,7 +15277,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Remove All Pillars"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7596,
+                                                            lineNumber: 7604,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15249,19 +15289,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7597,
+                                                            lineNumber: 7605,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7591,
+                                                    lineNumber: 7599,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7581,
+                                            lineNumber: 7589,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15277,20 +15317,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "w-3.5 h-3.5 text-amber-700"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7607,
+                                                                    lineNumber: 7615,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Bricks / Walls"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7608,
+                                                                    lineNumber: 7616,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7606,
+                                                            lineNumber: 7614,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15298,13 +15338,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: clearScope === 'current' ? `${activeIntWalls} int / ${activeExtWalls} ext` : `${totalIntWalls} int / ${totalExtWalls} ext`
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7610,
+                                                            lineNumber: 7618,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7605,
+                                                    lineNumber: 7613,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15317,7 +15357,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Clear Partition Walls"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7620,
+                                                            lineNumber: 7628,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15325,13 +15365,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: clearScope === 'current' ? activeIntWalls : totalIntWalls
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7621,
+                                                            lineNumber: 7629,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7614,
+                                                    lineNumber: 7622,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15344,20 +15384,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Reset Outer Rectangle"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7631,
+                                                            lineNumber: 7639,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__["RotateCcw"], {
                                                             className: "w-3 h-3 text-gray-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7632,
+                                                            lineNumber: 7640,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7625,
+                                                    lineNumber: 7633,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15370,26 +15410,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Clear ALL Walls (Blank)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7640,
+                                                            lineNumber: 7648,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                                             className: "w-3 h-3 text-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7641,
+                                                            lineNumber: 7649,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7634,
+                                                    lineNumber: 7642,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7604,
+                                            lineNumber: 7612,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15405,20 +15445,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "w-3.5 h-3.5 text-amber-700"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7649,
+                                                                    lineNumber: 7657,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Foundation Footings"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7650,
+                                                                    lineNumber: 7658,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7648,
+                                                            lineNumber: 7656,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15429,13 +15469,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7652,
+                                                            lineNumber: 7660,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7647,
+                                                    lineNumber: 7655,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15447,26 +15487,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Clear Foundation Footings"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7661,
+                                                            lineNumber: 7669,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                                             className: "w-3 h-3 text-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7662,
+                                                            lineNumber: 7670,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7656,
+                                                    lineNumber: 7664,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7646,
+                                            lineNumber: 7654,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15481,25 +15521,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 className: "w-3.5 h-3.5 text-sky-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7670,
+                                                                lineNumber: 7678,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: "Slabs & Ring Beams"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7671,
+                                                                lineNumber: 7679,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7669,
+                                                        lineNumber: 7677,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7668,
+                                                    lineNumber: 7676,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15511,7 +15551,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Turn Off Slabs & Beams"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7679,
+                                                            lineNumber: 7687,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15523,19 +15563,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7680,
+                                                            lineNumber: 7688,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7674,
+                                                    lineNumber: 7682,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7667,
+                                            lineNumber: 7675,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15551,20 +15591,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     className: "w-3.5 h-3.5 text-teal-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7690,
+                                                                    lineNumber: 7698,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Doors & Windows"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 7691,
+                                                                    lineNumber: 7699,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7689,
+                                                            lineNumber: 7697,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15575,13 +15615,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7693,
+                                                            lineNumber: 7701,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7688,
+                                                    lineNumber: 7696,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -15593,26 +15633,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Clear Doors & Windows"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7702,
+                                                            lineNumber: 7710,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                                             className: "w-3 h-3 text-gray-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 7703,
+                                                            lineNumber: 7711,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7697,
+                                                    lineNumber: 7705,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7687,
+                                            lineNumber: 7695,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15629,31 +15669,31 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7715,
+                                                        lineNumber: 7723,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Wipe Entire Graph (Reset)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7716,
+                                                        lineNumber: 7724,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7709,
+                                                lineNumber: 7717,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7708,
+                                            lineNumber: 7716,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7531,
+                                    lineNumber: 7539,
                                     columnNumber: 17
                                 }, this);
                             })(),
@@ -15673,7 +15713,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7723,
+                                lineNumber: 7731,
                                 columnNumber: 13
                             }, this),
                             activeTool === 'pillar' && pillarPreview.message && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15681,7 +15721,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: pillarPreview.message
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7736,
+                                lineNumber: 7744,
                                 columnNumber: 16
                             }, this)
                         ]
@@ -15702,14 +15742,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             className: "w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7755,
+                                            lineNumber: 7763,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: activeMode === 'foundation' ? 'Base / Foundation View' : activeMode === 'plaster' ? 'Plaster Finish View' : `${activeFloor?.name || 'Floor'} 2D CAD`
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7756,
+                                            lineNumber: 7764,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15717,7 +15757,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: "|"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7761,
+                                            lineNumber: 7769,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15725,18 +15765,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: activeMode === 'foundation' ? isPlacingFooting ? 'Click canvas to place footing' : 'Footing Editor' : activeMode === 'plaster' ? 'Surface Coatings' : activeTool === 'wall' ? 'Draw Wall (Click start & end)' : activeTool === 'pillar' ? 'Place RCC Pillar' : activeTool === 'door' ? 'Insert Door' : activeTool === 'window' ? 'Insert Window' : activeTool === 'slab' ? 'Floor Slab' : activeTool === 'roof' ? 'Roof Slab' : activeTool === 'delete' ? 'Delete Item' : activeTool === 'clear' ? 'Clean Graph' : 'Select Tool'
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7762,
+                                            lineNumber: 7770,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7754,
+                                    lineNumber: 7762,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7753,
+                                lineNumber: 7761,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -15749,7 +15789,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: "📍 Pointer:"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7779,
+                                            lineNumber: 7787,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15760,7 +15800,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7780,
+                                            lineNumber: 7788,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15771,7 +15811,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7783,
+                                            lineNumber: 7791,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -15779,18 +15819,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: "1ft Snap"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7786,
+                                            lineNumber: 7794,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7778,
+                                    lineNumber: 7786,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7777,
+                                lineNumber: 7785,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -15812,7 +15852,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             fill: "#f0fdf4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7803,
+                                            lineNumber: 7811,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -15826,7 +15866,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             strokeDasharray: "2,2"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7806,
+                                            lineNumber: 7814,
                                             columnNumber: 15
                                         }, this),
                                         Array.from({
@@ -15844,7 +15884,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeWidth: i % 5 === 0 ? "0.2" : "0.1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7813,
+                                                        lineNumber: 7821,
                                                         columnNumber: 21
                                                     }, this),
                                                     i % 5 === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -15858,7 +15898,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7815,
+                                                        lineNumber: 7823,
                                                         columnNumber: 23
                                                     }, this),
                                                     i % 5 === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -15872,13 +15912,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7819,
+                                                        lineNumber: 7827,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, `gx-${i}`, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7812,
+                                                lineNumber: 7820,
                                                 columnNumber: 19
                                             }, this);
                                         }),
@@ -15897,7 +15937,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeWidth: i % 5 === 0 ? "0.2" : "0.1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7830,
+                                                        lineNumber: 7838,
                                                         columnNumber: 21
                                                     }, this),
                                                     i % 5 === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -15912,7 +15952,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7832,
+                                                        lineNumber: 7840,
                                                         columnNumber: 23
                                                     }, this),
                                                     i % 5 === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -15927,13 +15967,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7836,
+                                                        lineNumber: 7844,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, `gy-${i}`, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7829,
+                                                lineNumber: 7837,
                                                 columnNumber: 19
                                             }, this);
                                         }),
@@ -15958,7 +15998,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeDasharray: "1.5,1.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7853,
+                                                        lineNumber: 7861,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -15981,13 +16021,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7863,
+                                                        lineNumber: 7871,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7852,
+                                                lineNumber: 7860,
                                                 columnNumber: 19
                                             }, this);
                                         })(),
@@ -16012,7 +16052,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeDasharray: "2,2"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7889,
+                                                        lineNumber: 7897,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -16036,13 +16076,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7899,
+                                                        lineNumber: 7907,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 7888,
+                                                lineNumber: 7896,
                                                 columnNumber: 19
                                             }, this);
                                         })(),
@@ -16066,7 +16106,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     pointerEvents: "none"
                                                 }, `foundation-ref-wall-${w.id}`, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 7924,
+                                                    lineNumber: 7932,
                                                     columnNumber: 23
                                                 }, this);
                                             });
@@ -16146,7 +16186,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                             opacity: "0.55"
                                                                         }, `plaster-sel-${spIdx}`, false, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8001,
+                                                                            lineNumber: 8009,
                                                                             columnNumber: 33
                                                                         }, this)),
                                                                     masonrySpans.map((sp, spIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16160,7 +16200,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                             className: activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-500 transition-colors" : ""
                                                                         }, `core-span-${spIdx}`, false, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8011,
+                                                                            lineNumber: 8019,
                                                                             columnNumber: 33
                                                                         }, this)),
                                                                     segOps.map((op, oIdx)=>{
@@ -16202,7 +16242,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8041,
+                                                                                        lineNumber: 8049,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16215,7 +16255,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8042,
+                                                                                        lineNumber: 8050,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16228,7 +16268,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeDasharray: "0.3,0.2"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8044,
+                                                                                        lineNumber: 8052,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -16239,7 +16279,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeDasharray: "0.4,0.2"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8046,
+                                                                                        lineNumber: 8054,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16252,7 +16292,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8054,
+                                                                                        lineNumber: 8062,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -16268,7 +16308,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 strokeWidth: "0.12"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8066,
+                                                                                                lineNumber: 8074,
                                                                                                 columnNumber: 41
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -16283,19 +16323,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 children: "D"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8067,
+                                                                                                lineNumber: 8075,
                                                                                                 columnNumber: 41
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8062,
+                                                                                        lineNumber: 8070,
                                                                                         columnNumber: 39
                                                                                     }, this)
                                                                                 ]
                                                                             }, `door-elem-${op.id || oIdx}`, true, {
                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                lineNumber: 8039,
+                                                                                lineNumber: 8047,
                                                                                 columnNumber: 37
                                                                             }, this);
                                                                         } else {
@@ -16308,7 +16348,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         stroke: "none"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8086,
+                                                                                        lineNumber: 8094,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16321,7 +16361,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8092,
+                                                                                        lineNumber: 8100,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16334,7 +16374,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8093,
+                                                                                        lineNumber: 8101,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16346,7 +16386,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.15"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8095,
+                                                                                        lineNumber: 8103,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16358,7 +16398,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.15"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8096,
+                                                                                        lineNumber: 8104,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16370,7 +16410,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.14"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8098,
+                                                                                        lineNumber: 8106,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16382,7 +16422,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.14"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8099,
+                                                                                        lineNumber: 8107,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -16400,7 +16440,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 strokeWidth: "0.12"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8105,
+                                                                                                lineNumber: 8113,
                                                                                                 columnNumber: 41
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -16415,19 +16455,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 children: "W"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8106,
+                                                                                                lineNumber: 8114,
                                                                                                 columnNumber: 41
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8101,
+                                                                                        lineNumber: 8109,
                                                                                         columnNumber: 39
                                                                                     }, this)
                                                                                 ]
                                                                             }, `win-elem-${op.id || oIdx}`, true, {
                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                lineNumber: 8084,
+                                                                                lineNumber: 8092,
                                                                                 columnNumber: 37
                                                                             }, this);
                                                                         }
@@ -16448,7 +16488,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         pointerEvents: "none"
                                                                                     }, `outer-plaster-${spIdx}`, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8131,
+                                                                                        lineNumber: 8139,
                                                                                         columnNumber: 39
                                                                                     }, this)),
                                                                                 isWallInnerPlaster && masonrySpans.map((sp, spIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16461,26 +16501,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         pointerEvents: "none"
                                                                                     }, `inner-plaster-${spIdx}`, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8140,
+                                                                                        lineNumber: 8148,
                                                                                         columnNumber: 39
                                                                                     }, this))
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8129,
+                                                                            lineNumber: 8137,
                                                                             columnNumber: 35
                                                                         }, this);
                                                                     })()
                                                                 ]
                                                             }, `${w.id}-seg-${sIdx}`, true, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 7998,
+                                                                lineNumber: 8006,
                                                                 columnNumber: 29
                                                             }, this);
                                                         })
                                                     }, w.id, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 7946,
+                                                        lineNumber: 7954,
                                                         columnNumber: 22
                                                     }, this);
                                                 }),
@@ -16558,7 +16598,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                             opacity: "0.55"
                                                                         }, `plaster-sel-${spIdx}`, false, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8222,
+                                                                            lineNumber: 8230,
                                                                             columnNumber: 33
                                                                         }, this)),
                                                                     masonrySpans.map((sp, spIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16572,7 +16612,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                             className: activeTool !== 'wall' || activeMode === 'plaster' ? "hover:stroke-red-400 transition-colors" : ""
                                                                         }, `core-span-${spIdx}`, false, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8232,
+                                                                            lineNumber: 8240,
                                                                             columnNumber: 33
                                                                         }, this)),
                                                                     segOps.map((op, oIdx)=>{
@@ -16614,7 +16654,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8262,
+                                                                                        lineNumber: 8270,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16627,7 +16667,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8263,
+                                                                                        lineNumber: 8271,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16640,7 +16680,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeDasharray: "0.3,0.2"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8265,
+                                                                                        lineNumber: 8273,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -16651,7 +16691,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeDasharray: "0.4,0.2"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8267,
+                                                                                        lineNumber: 8275,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16664,7 +16704,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8275,
+                                                                                        lineNumber: 8283,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -16680,7 +16720,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 strokeWidth: "0.12"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8287,
+                                                                                                lineNumber: 8295,
                                                                                                 columnNumber: 41
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -16695,19 +16735,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 children: "D"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8288,
+                                                                                                lineNumber: 8296,
                                                                                                 columnNumber: 41
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8283,
+                                                                                        lineNumber: 8291,
                                                                                         columnNumber: 39
                                                                                     }, this)
                                                                                 ]
                                                                             }, `door-elem-${op.id || oIdx}`, true, {
                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                lineNumber: 8260,
+                                                                                lineNumber: 8268,
                                                                                 columnNumber: 37
                                                                             }, this);
                                                                         } else {
@@ -16720,7 +16760,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         stroke: "none"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8307,
+                                                                                        lineNumber: 8315,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16733,7 +16773,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8313,
+                                                                                        lineNumber: 8321,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16746,7 +16786,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeLinecap: "round"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8314,
+                                                                                        lineNumber: 8322,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16758,7 +16798,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.15"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8316,
+                                                                                        lineNumber: 8324,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16770,7 +16810,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.15"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8317,
+                                                                                        lineNumber: 8325,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16782,7 +16822,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.14"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8319,
+                                                                                        lineNumber: 8327,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16794,7 +16834,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         strokeWidth: "0.14"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8320,
+                                                                                        lineNumber: 8328,
                                                                                         columnNumber: 39
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -16812,7 +16852,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 strokeWidth: "0.12"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8326,
+                                                                                                lineNumber: 8334,
                                                                                                 columnNumber: 41
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -16827,19 +16867,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                                 children: "W"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                                lineNumber: 8327,
+                                                                                                lineNumber: 8335,
                                                                                                 columnNumber: 41
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8322,
+                                                                                        lineNumber: 8330,
                                                                                         columnNumber: 39
                                                                                     }, this)
                                                                                 ]
                                                                             }, `win-elem-${op.id || oIdx}`, true, {
                                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                lineNumber: 8305,
+                                                                                lineNumber: 8313,
                                                                                 columnNumber: 37
                                                                             }, this);
                                                                         }
@@ -16858,7 +16898,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         pointerEvents: "none"
                                                                                     }, `int-plaster-top-${spIdx}`, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8351,
+                                                                                        lineNumber: 8359,
                                                                                         columnNumber: 39
                                                                                     }, this)),
                                                                                 masonrySpans.map((sp, spIdx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16871,33 +16911,33 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                                         pointerEvents: "none"
                                                                                     }, `int-plaster-bot-${spIdx}`, false, {
                                                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                                        lineNumber: 8360,
+                                                                                        lineNumber: 8368,
                                                                                         columnNumber: 39
                                                                                     }, this))
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                            lineNumber: 8349,
+                                                                            lineNumber: 8357,
                                                                             columnNumber: 35
                                                                         }, this) : null;
                                                                     })()
                                                                 ]
                                                             }, `${w.id}-seg-${sIdx}`, true, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8219,
+                                                                lineNumber: 8227,
                                                                 columnNumber: 29
                                                             }, this);
                                                         })
                                                     }, w.id, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8167,
+                                                        lineNumber: 8175,
                                                         columnNumber: 22
                                                     }, this);
                                                 })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 7936,
+                                            lineNumber: 7944,
                                             columnNumber: 17
                                         }, this),
                                         activeMode === 'floor' && activeTool === 'wall' && drawingStart && currentMouse && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -16910,7 +16950,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             strokeDasharray: "0.5,0.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8382,
+                                            lineNumber: 8390,
                                             columnNumber: 19
                                         }, this),
                                         activeMode === 'floor' && activeTool === 'pillar' && currentMouse && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -16943,7 +16983,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             strokeWidth: "0.2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8413,
+                                                            lineNumber: 8421,
                                                             columnNumber: 30
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
                                                             x: effPos.x - drawW / 2,
@@ -16955,7 +16995,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             strokeWidth: "0.2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8415,
+                                                            lineNumber: 8423,
                                                             columnNumber: 30
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -16965,19 +17005,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             fill: strokeColor
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8418,
+                                                            lineNumber: 8426,
                                                             columnNumber: 28
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8411,
+                                                    lineNumber: 8419,
                                                     columnNumber: 26
                                                 }, this);
                                             })()
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8391,
+                                            lineNumber: 8399,
                                             columnNumber: 18
                                         }, this),
                                         activeMode === 'foundation' && (model.foundation?.footings || []).map((f)=>{
@@ -17013,7 +17053,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "group-hover:stroke-amber-400 transition-colors"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8450,
+                                                        lineNumber: 8458,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -17028,7 +17068,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "hover:stroke-amber-600 transition-colors"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8463,
+                                                        lineNumber: 8471,
                                                         columnNumber: 21
                                                     }, this),
                                                     hasPillar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -17044,7 +17084,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 strokeWidth: "0.14"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8477,
+                                                                lineNumber: 8485,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -17056,7 +17096,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 strokeWidth: "0.06"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8487,
+                                                                lineNumber: 8495,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -17068,7 +17108,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 strokeWidth: "0.06"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8495,
+                                                                lineNumber: 8503,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17084,13 +17124,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 children: "P"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8504,
+                                                                lineNumber: 8512,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8476,
+                                                        lineNumber: 8484,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17114,13 +17154,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8520,
+                                                        lineNumber: 8528,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, `footing-svg-${f.id}`, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 8440,
+                                                lineNumber: 8448,
                                                 columnNumber: 19
                                             }, this);
                                         }),
@@ -17148,7 +17188,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeDasharray: "0.6,0.3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8550,
+                                                        lineNumber: 8558,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -17163,7 +17203,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeDasharray: "0.5,0.2"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8562,
+                                                        lineNumber: 8570,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -17175,7 +17215,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeWidth: "0.12"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8574,
+                                                        lineNumber: 8582,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -17187,7 +17227,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeWidth: "0.12"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8575,
+                                                        lineNumber: 8583,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -17197,7 +17237,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         fill: "#ea580c"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8576,
+                                                        lineNumber: 8584,
                                                         columnNumber: 21
                                                     }, this),
                                                     autoCreateStub && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -17211,7 +17251,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         strokeWidth: "0.1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8579,
+                                                        lineNumber: 8587,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17234,13 +17274,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8591,
+                                                        lineNumber: 8599,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 8548,
+                                                lineNumber: 8556,
                                                 columnNumber: 19
                                             }, this);
                                         })(),
@@ -17283,7 +17323,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 opacity: isBeamTool ? "0.35" : "0.2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8639,
+                                                                lineNumber: 8647,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -17296,7 +17336,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 strokeDasharray: isBeamTool ? undefined : "0.6,0.3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8648,
+                                                                lineNumber: 8656,
                                                                 columnNumber: 27
                                                             }, this),
                                                             isBeamTool && len > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17312,19 +17352,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                 children: `${beamWidthIn}" beam (${b.length.toFixed(1)} ${model.buildingUnit})`
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                lineNumber: 8657,
+                                                                lineNumber: 8665,
                                                                 columnNumber: 29
                                                             }, this)
                                                         ]
                                                     }, `2d-beam-${b.id}`, true, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8637,
+                                                        lineNumber: 8645,
                                                         columnNumber: 25
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 8624,
+                                                lineNumber: 8632,
                                                 columnNumber: 19
                                             }, this);
                                         })(),
@@ -17347,7 +17387,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             strokeWidth: "0.18"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8690,
+                                                            lineNumber: 8698,
                                                             columnNumber: 27
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
                                                             x: effPos.x - drawW / 2,
@@ -17359,7 +17399,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             strokeWidth: "0.18"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8692,
+                                                            lineNumber: 8700,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17375,13 +17415,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: p.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8694,
+                                                            lineNumber: 8702,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, `foundation-pillar-ref-${p.id}`, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8688,
+                                                    lineNumber: 8696,
                                                     columnNumber: 23
                                                 }, this);
                                             });
@@ -17467,7 +17507,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "animate-pulse"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8785,
+                                                        lineNumber: 8793,
                                                         columnNumber: 25
                                                     }, this),
                                                     p.shape === 'circular' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -17480,7 +17520,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: isDeleteMode ? "hover:fill-red-700 transition-colors" : "hover:fill-slate-600 transition-colors"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8796,
+                                                        lineNumber: 8804,
                                                         columnNumber: 25
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
                                                         x: effPos.x - drawW / 2,
@@ -17493,7 +17533,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: isDeleteMode ? "hover:fill-red-700 transition-colors" : "hover:fill-slate-600 transition-colors"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8804,
+                                                        lineNumber: 8812,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17509,7 +17549,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: p.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8814,
+                                                        lineNumber: 8822,
                                                         columnNumber: 23
                                                     }, this),
                                                     isLocked && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -17522,25 +17562,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         children: "🔒"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8828,
+                                                        lineNumber: 8836,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, p.id, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 8723,
+                                                lineNumber: 8731,
                                                 columnNumber: 21
                                             }, this);
                                         })
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 7801,
+                                    lineNumber: 7809,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 7792,
+                                lineNumber: 7800,
                                 columnNumber: 11
                             }, this),
                             activeMode === 'floor' && selectedPillarId && (()=>{
@@ -17573,7 +17613,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "w-2.5 h-2.5 rounded-full bg-orange-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8865,
+                                                            lineNumber: 8873,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17584,13 +17624,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8866,
+                                                            lineNumber: 8874,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8864,
+                                                    lineNumber: 8872,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -17600,18 +17640,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                        lineNumber: 8868,
+                                                        lineNumber: 8876,
                                                         columnNumber: 145
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8868,
+                                                    lineNumber: 8876,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8863,
+                                            lineNumber: 8871,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17624,7 +17664,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Pillar ID: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8872,
+                                                            lineNumber: 8880,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17632,13 +17672,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: p.id
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8872,
+                                                            lineNumber: 8880,
                                                             columnNumber: 75
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8872,
+                                                    lineNumber: 8880,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17648,7 +17688,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Floor: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8873,
+                                                            lineNumber: 8881,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17656,13 +17696,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: floorObj?.name || 'Current Floor'
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8873,
+                                                            lineNumber: 8881,
                                                             columnNumber: 71
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8873,
+                                                    lineNumber: 8881,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17672,7 +17712,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Coordinates (2D): "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8874,
+                                                            lineNumber: 8882,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17689,13 +17729,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8874,
+                                                            lineNumber: 8882,
                                                             columnNumber: 82
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8874,
+                                                    lineNumber: 8882,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17705,7 +17745,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "3D World: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8875,
+                                                            lineNumber: 8883,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17721,13 +17761,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8875,
+                                                            lineNumber: 8883,
                                                             columnNumber: 74
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8875,
+                                                    lineNumber: 8883,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17737,7 +17777,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Dimensions: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8876,
+                                                            lineNumber: 8884,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17757,13 +17797,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8876,
+                                                            lineNumber: 8884,
                                                             columnNumber: 76
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8876,
+                                                    lineNumber: 8884,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17773,7 +17813,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Alignment: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8877,
+                                                            lineNumber: 8885,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17781,13 +17821,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: p.alignment?.replace('_', ' ') || 'Outside Corner'
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8877,
+                                                            lineNumber: 8885,
                                                             columnNumber: 75
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8877,
+                                                    lineNumber: 8885,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17797,7 +17837,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Structure: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8878,
+                                                            lineNumber: 8886,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17805,13 +17845,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Floor-Isolated RCC Member"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8878,
+                                                            lineNumber: 8886,
                                                             columnNumber: 75
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8878,
+                                                    lineNumber: 8886,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17821,7 +17861,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Verification: "
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8879,
+                                                            lineNumber: 8887,
                                                             columnNumber: 24
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17829,19 +17869,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: validation.isValid ? "100% Coords Aligned (Drift: 0.000)" : validation.errors[0] || "Checking"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8879,
+                                                            lineNumber: 8887,
                                                             columnNumber: 78
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8879,
+                                                    lineNumber: 8887,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8871,
+                                            lineNumber: 8879,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17883,7 +17923,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Sync All Floors"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8883,
+                                                    lineNumber: 8891,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -17897,33 +17937,33 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "w-3 h-3 mr-1"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 8926,
+                                                            lineNumber: 8934,
                                                             columnNumber: 21
                                                         }, this),
                                                         " Remove"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 8919,
+                                                    lineNumber: 8927,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8882,
+                                            lineNumber: 8890,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8862,
+                                    lineNumber: 8870,
                                     columnNumber: 15
                                 }, this);
                             })()
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 7744,
+                        lineNumber: 7752,
                         columnNumber: 9
                     }, this)
                 ]
@@ -17940,7 +17980,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                         children: "Step 1 of 2: Configure walls, columns, footings, and slabs. Click Generate to produce full 3D building."
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 8936,
+                        lineNumber: 8944,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -17951,7 +17991,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: "Generate 3D Building Preview"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 8943,
+                                lineNumber: 8951,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -17959,19 +17999,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: "→"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 8944,
+                                lineNumber: 8952,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 8939,
+                        lineNumber: 8947,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 8935,
+                lineNumber: 8943,
                 columnNumber: 7
             }, this),
             confirmModal.isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -17984,7 +18024,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                             children: confirmModal.targetMode === 'manual' ? 'Switch to Manual Layout' : 'Switch to Auto Outer Layout'
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8952,
+                            lineNumber: 8960,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -17992,7 +18032,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                             children: confirmModal.targetMode === 'manual' ? 'Manual Layout will remove the automatic outer wall layout. Do you want to continue?' : 'Switching to Auto Outer Layout will restore the automatic rectangular outer wall layout based on Length and Width. Do you want to continue?'
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8955,
+                            lineNumber: 8963,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18007,7 +18047,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8961,
+                                    lineNumber: 8969,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18016,24 +18056,24 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: confirmModal.targetMode === 'manual' ? 'Switch to Manual Layout' : 'Switch to Auto Layout'
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8967,
+                                    lineNumber: 8975,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8960,
+                            lineNumber: 8968,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 8951,
+                    lineNumber: 8959,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 8950,
+                lineNumber: 8958,
                 columnNumber: 9
             }, this),
             confirmDeletePillarFor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18048,7 +18088,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     className: "w-5 h-5"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8983,
+                                    lineNumber: 8991,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
@@ -18060,13 +18100,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8984,
+                                    lineNumber: 8992,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8982,
+                            lineNumber: 8990,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -18077,18 +18117,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: confirmDeletePillarFor.pillarName || confirmDeletePillarFor.id
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8989,
+                                    lineNumber: 8997,
                                     columnNumber: 86
                                 }, this),
                                 "?",
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8990,
+                                    lineNumber: 8998,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8990,
+                                    lineNumber: 8998,
                                     columnNumber: 21
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -18097,20 +18137,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         "• Column stub concrete and starter rebar cage will be removed.",
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 8992,
+                                            lineNumber: 9000,
                                             columnNumber: 79
                                         }, this),
                                         "• Footing, PCC base, and Ground Floor pillar will remain intact."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8991,
+                                    lineNumber: 8999,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8988,
+                            lineNumber: 8996,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18123,7 +18163,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 8997,
+                                    lineNumber: 9005,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18133,24 +18173,24 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Delete"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9004,
+                                    lineNumber: 9012,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 8996,
+                            lineNumber: 9004,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 8981,
+                    lineNumber: 8989,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 8980,
+                lineNumber: 8988,
                 columnNumber: 9
             }, this),
             showApplyAllConfirm && (()=>{
@@ -18172,7 +18212,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-5 h-5 text-orange-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9029,
+                                        lineNumber: 9037,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
@@ -18184,13 +18224,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9030,
+                                        lineNumber: 9038,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9028,
+                                lineNumber: 9036,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -18201,14 +18241,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: scopeTitle
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9036,
+                                        lineNumber: 9044,
                                         columnNumber: 77
                                     }, this),
                                     ":"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9035,
+                                lineNumber: 9043,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18222,70 +18262,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: "Shape:"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9041,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "font-bold capitalize",
-                                                children: pillarShape
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9042,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9040,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex justify-between text-gray-700",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-gray-500",
-                                                children: "Dimensions:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9045,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "font-bold",
-                                                children: [
-                                                    pillarWidth,
-                                                    '" × ',
-                                                    pillarShape === 'circular' ? pillarWidth : pillarDepth,
-                                                    '" × ',
-                                                    pillarHeight,
-                                                    " ",
-                                                    model.buildingUnit
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9046,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9044,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex justify-between text-gray-700",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "text-gray-500",
-                                                children: "Alignment:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
                                                 lineNumber: 9049,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "font-bold capitalize",
-                                                children: pillarAlignment.replace(/_/g, ' ')
+                                                children: pillarShape
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
                                                 lineNumber: 9050,
@@ -18302,16 +18284,24 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-gray-500",
-                                                children: "Placement Snap:"
+                                                children: "Dimensions:"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
                                                 lineNumber: 9053,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                className: "font-bold capitalize",
-                                                children: pillarPlacement.replace(/_/g, ' ')
-                                            }, void 0, false, {
+                                                className: "font-bold",
+                                                children: [
+                                                    pillarWidth,
+                                                    '" × ',
+                                                    pillarShape === 'circular' ? pillarWidth : pillarDepth,
+                                                    '" × ',
+                                                    pillarHeight,
+                                                    " ",
+                                                    model.buildingUnit
+                                                ]
+                                            }, void 0, true, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
                                                 lineNumber: 9054,
                                                 columnNumber: 19
@@ -18321,11 +18311,61 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
                                         lineNumber: 9052,
                                         columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between text-gray-700",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-gray-500",
+                                                children: "Alignment:"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                                lineNumber: 9057,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-bold capitalize",
+                                                children: pillarAlignment.replace(/_/g, ' ')
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                                lineNumber: 9058,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                        lineNumber: 9056,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between text-gray-700",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-gray-500",
+                                                children: "Placement Snap:"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                                lineNumber: 9061,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-bold capitalize",
+                                                children: pillarPlacement.replace(/_/g, ' ')
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                                lineNumber: 9062,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
+                                        lineNumber: 9060,
+                                        columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9039,
+                                lineNumber: 9047,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18340,34 +18380,34 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 children: targetCount
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9060,
+                                                lineNumber: 9068,
                                                 columnNumber: 21
                                             }, this),
                                             " RCC pillars will be updated."
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9059,
+                                        lineNumber: 9067,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: "• All pillar (X, Z) positions and unique IDs will remain strictly unchanged."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9062,
+                                        lineNumber: 9070,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: "• Foundation links, rebar cages, and estimates will update automatically."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9063,
+                                        lineNumber: 9071,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9058,
+                                lineNumber: 9066,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18380,7 +18420,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Cancel"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9067,
+                                        lineNumber: 9075,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18390,24 +18430,24 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         children: "Apply to All Pillars"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9074,
+                                        lineNumber: 9082,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9066,
+                                lineNumber: 9074,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9027,
+                        lineNumber: 9035,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 9026,
+                    lineNumber: 9034,
                     columnNumber: 11
                 }, this);
             })(),
@@ -18428,12 +18468,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9094,
+                                                lineNumber: 9102,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9093,
+                                            lineNumber: 9101,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18446,7 +18486,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9097,
+                                                    lineNumber: 9105,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -18466,19 +18506,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9098,
+                                                    lineNumber: 9106,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9096,
+                                            lineNumber: 9104,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9092,
+                                    lineNumber: 9100,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18488,18 +18528,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9107,
+                                        lineNumber: 9115,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9103,
+                                    lineNumber: 9111,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9091,
+                            lineNumber: 9099,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18509,7 +18549,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Select which floors should have this pillar removed:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9112,
+                                    lineNumber: 9120,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18530,7 +18570,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9118,
+                                            lineNumber: 9126,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18547,13 +18587,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9130,
+                                            lineNumber: 9138,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9117,
+                                    lineNumber: 9125,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18587,7 +18627,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-red-600 focus:ring-red-500 cursor-pointer"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9158,
+                                                            lineNumber: 9166,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -18595,7 +18635,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: fl.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9173,
+                                                            lineNumber: 9181,
                                                             columnNumber: 25
                                                         }, this),
                                                         isCurrent && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -18603,13 +18643,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Active"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9175,
+                                                            lineNumber: 9183,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9157,
+                                                    lineNumber: 9165,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -18620,19 +18660,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9178,
+                                                    lineNumber: 9186,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, fl.id, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9150,
+                                            lineNumber: 9158,
                                             columnNumber: 21
                                         }, this);
                                     })
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9145,
+                                    lineNumber: 9153,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18646,14 +18686,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: pillarRemovalModal.selectedFloorIds.length
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9185,
+                                                    lineNumber: 9193,
                                                     columnNumber: 38
                                                 }, this),
                                                 " floor(s)"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9185,
+                                            lineNumber: 9193,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -18664,26 +18704,26 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: model.floors.length - pillarRemovalModal.selectedFloorIds.length
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9186,
+                                                    lineNumber: 9194,
                                                     columnNumber: 37
                                                 }, this),
                                                 " floor(s)"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9186,
+                                            lineNumber: 9194,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9184,
+                                    lineNumber: 9192,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9111,
+                            lineNumber: 9119,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18696,7 +18736,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9191,
+                                    lineNumber: 9199,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18709,37 +18749,37 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9204,
+                                            lineNumber: 9212,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Confirm Removal"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9205,
+                                            lineNumber: 9213,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9198,
+                                    lineNumber: 9206,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9190,
+                            lineNumber: 9198,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 9090,
+                    lineNumber: 9098,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9089,
+                lineNumber: 9097,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$StructuralConfigModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StructuralConfigModal"], {
@@ -18756,7 +18796,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                 onSave: handleUpdateStructuralConfig
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9213,
+                lineNumber: 9221,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$SaveProjectModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SaveProjectModal"], {
@@ -18769,7 +18809,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                 defaultName: projectName || 'My Construction Plan'
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9228,
+                lineNumber: 9236,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$calculator$2f$ProjectHistoryModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ProjectHistoryModal"], {
@@ -18778,7 +18818,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                 onLoadModel: (loadedModel)=>setModel(loadedModel)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9239,
+                lineNumber: 9247,
                 columnNumber: 7
             }, this),
             isClearModalOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18798,12 +18838,12 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                lineNumber: 9252,
+                                                lineNumber: 9260,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9251,
+                                            lineNumber: 9259,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18813,7 +18853,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Clean Graph / Bulk Remove Elements"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9255,
+                                                    lineNumber: 9263,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -18821,19 +18861,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Select components to remove from the 2D graph and 3D building."
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9256,
+                                                    lineNumber: 9264,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9254,
+                                            lineNumber: 9262,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9250,
+                                    lineNumber: 9258,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -18844,18 +18884,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9264,
+                                        lineNumber: 9272,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9259,
+                                    lineNumber: 9267,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9249,
+                            lineNumber: 9257,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18865,7 +18905,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Cleaning Scope:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9270,
+                                    lineNumber: 9278,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18882,7 +18922,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "h-4 w-4 text-rose-600 focus:ring-rose-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9280,
+                                                    lineNumber: 9288,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18895,7 +18935,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9288,
+                                                            lineNumber: 9296,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18903,19 +18943,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "Only remove items on active floor"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9289,
+                                                            lineNumber: 9297,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9287,
+                                                    lineNumber: 9295,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9274,
+                                            lineNumber: 9282,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -18929,7 +18969,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "h-4 w-4 text-rose-600 focus:ring-rose-500"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9299,
+                                                    lineNumber: 9307,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18939,7 +18979,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             children: "All Floors"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9307,
+                                                            lineNumber: 9315,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18951,31 +18991,31 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9308,
+                                                            lineNumber: 9316,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9306,
+                                                    lineNumber: 9314,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9293,
+                                            lineNumber: 9301,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9273,
+                                    lineNumber: 9281,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9269,
+                            lineNumber: 9277,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -18989,7 +19029,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: "Select Elements to Remove:"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9317,
+                                            lineNumber: 9325,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19009,7 +19049,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Select All Items"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9321,
+                                                    lineNumber: 9329,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19017,7 +19057,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "|"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9335,
+                                                    lineNumber: 9343,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -19034,19 +19074,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "Deselect All"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9336,
+                                                    lineNumber: 9344,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9320,
+                                            lineNumber: 9328,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9316,
+                                    lineNumber: 9324,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19068,14 +19108,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9357,
+                                                            lineNumber: 9365,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$square$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Square$3e$__["Square"], {
                                                             className: "w-4 h-4 text-blue-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9363,
+                                                            lineNumber: 9371,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19085,7 +19125,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Pillars (RCC Columns)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9365,
+                                                                    lineNumber: 9373,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19093,19 +19133,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: clearScope === 'current' ? `${(model.pillars || []).filter((p)=>p.floorId === activeFloorId).length} pillar(s) on ${activeFloor?.name}` : `${(model.pillars || []).length} pillar(s) total across building`
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9366,
+                                                                    lineNumber: 9374,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9364,
+                                                            lineNumber: 9372,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9356,
+                                                    lineNumber: 9364,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19113,13 +19153,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: clearScope === 'current' ? (model.pillars || []).filter((p)=>p.floorId === activeFloorId).length : (model.pillars || []).length
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9373,
+                                                    lineNumber: 9381,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9355,
+                                            lineNumber: 9363,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -19138,14 +19178,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9383,
+                                                            lineNumber: 9391,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$hammer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Hammer$3e$__["Hammer"], {
                                                             className: "w-4 h-4 text-amber-700"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9389,
+                                                            lineNumber: 9397,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19155,7 +19195,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Internal Partition Walls (Bricks)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9391,
+                                                                    lineNumber: 9399,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19163,19 +19203,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Interior dividing walls (preserves outer perimeter)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9392,
+                                                                    lineNumber: 9400,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9390,
+                                                            lineNumber: 9398,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9382,
+                                                    lineNumber: 9390,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19183,13 +19223,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: clearScope === 'current' ? activeFloor?.internalWalls?.length || 0 : model.floors.reduce((acc, fl)=>acc + (fl.internalWalls?.length || 0), 0)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9395,
+                                                    lineNumber: 9403,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9381,
+                                            lineNumber: 9389,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -19208,14 +19248,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9405,
+                                                            lineNumber: 9413,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mouse$2d$pointer$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MousePointer2$3e$__["MousePointer2"], {
                                                             className: "w-4 h-4 text-rose-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9411,
+                                                            lineNumber: 9419,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19225,7 +19265,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "External Boundary Walls"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9413,
+                                                                    lineNumber: 9421,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19233,19 +19273,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Outer perimeter walls (wipes walls completely)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9414,
+                                                                    lineNumber: 9422,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9412,
+                                                            lineNumber: 9420,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9404,
+                                                    lineNumber: 9412,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19253,13 +19293,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: clearScope === 'current' ? activeFloor?.externalWalls?.length || 0 : model.floors.reduce((acc, fl)=>acc + (fl.externalWalls?.length || 0), 0)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9417,
+                                                    lineNumber: 9425,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9403,
+                                            lineNumber: 9411,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -19278,14 +19318,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9427,
+                                                            lineNumber: 9435,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$land$2d$plot$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LandPlot$3e$__["LandPlot"], {
                                                             className: "w-4 h-4 text-amber-700"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9433,
+                                                            lineNumber: 9441,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19295,7 +19335,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Foundation Footings & Base"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9435,
+                                                                    lineNumber: 9443,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19303,19 +19343,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "RCC footings and base excavation below ground"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9436,
+                                                                    lineNumber: 9444,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9434,
+                                                            lineNumber: 9442,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9426,
+                                                    lineNumber: 9434,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19323,13 +19363,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: model.foundation?.footings?.length || 0
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9439,
+                                                    lineNumber: 9447,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9425,
+                                            lineNumber: 9433,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -19348,14 +19388,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9447,
+                                                            lineNumber: 9455,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__["Layers"], {
                                                             className: "w-4 h-4 text-sky-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9453,
+                                                            lineNumber: 9461,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19365,7 +19405,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Slabs & RCC Ring Beams"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9455,
+                                                                    lineNumber: 9463,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19373,19 +19413,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Turn off floor slabs, roof slabs, and perimeter beams"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9456,
+                                                                    lineNumber: 9464,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9454,
+                                                            lineNumber: 9462,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9446,
+                                                    lineNumber: 9454,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19393,13 +19433,13 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     children: "RCC"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9459,
+                                                    lineNumber: 9467,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9445,
+                                            lineNumber: 9453,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -19418,14 +19458,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                             className: "h-4 w-4 rounded text-rose-600 focus:ring-rose-500"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9465,
+                                                            lineNumber: 9473,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$door$2d$open$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__DoorOpen$3e$__["DoorOpen"], {
                                                             className: "w-4 h-4 text-teal-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9471,
+                                                            lineNumber: 9479,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19435,7 +19475,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Doors & Windows (Openings)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9473,
+                                                                    lineNumber: 9481,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19443,19 +19483,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                                     children: "Remove all door and window openings from walls"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                                    lineNumber: 9474,
+                                                                    lineNumber: 9482,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                            lineNumber: 9472,
+                                                            lineNumber: 9480,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9464,
+                                                    lineNumber: 9472,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -19469,25 +19509,25 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     }, 0)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9477,
+                                                    lineNumber: 9485,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9463,
+                                            lineNumber: 9471,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9353,
+                                    lineNumber: 9361,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9315,
+                            lineNumber: 9323,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19508,20 +19548,20 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             className: "w-3.5 h-3.5 text-red-500"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9500,
+                                            lineNumber: 9508,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Wipe Entire Graph (Reset)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9501,
+                                            lineNumber: 9509,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9491,
+                                    lineNumber: 9499,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19534,7 +19574,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: "Cancel"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9505,
+                                            lineNumber: 9513,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -19546,43 +19586,43 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9517,
+                                                    lineNumber: 9525,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Clean Selected"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                                    lineNumber: 9518,
+                                                    lineNumber: 9526,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9512,
+                                            lineNumber: 9520,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9504,
+                                    lineNumber: 9512,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9490,
+                            lineNumber: 9498,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 9248,
+                    lineNumber: 9256,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9247,
+                lineNumber: 9255,
                 columnNumber: 9
             }, this),
             clearConfirmModal?.isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19599,18 +19639,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                         className: "w-6 h-6"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9535,
+                                        lineNumber: 9543,
                                         columnNumber: 52
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$info$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Info$3e$__["Info"], {
                                         className: "w-6 h-6"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                        lineNumber: 9535,
+                                        lineNumber: 9543,
                                         columnNumber: 92
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9531,
+                                    lineNumber: 9539,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19621,7 +19661,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: clearConfirmModal.title
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9538,
+                                            lineNumber: 9546,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -19629,19 +19669,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             children: clearConfirmModal.description
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9539,
+                                            lineNumber: 9547,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9537,
+                                    lineNumber: 9545,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9530,
+                            lineNumber: 9538,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19654,7 +19694,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9543,
+                                    lineNumber: 9551,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -19666,37 +19706,37 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9560,
+                                            lineNumber: 9568,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: clearConfirmModal.confirmLabel || "Confirm Delete"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                            lineNumber: 9561,
+                                            lineNumber: 9569,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                    lineNumber: 9550,
+                                    lineNumber: 9558,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9542,
+                            lineNumber: 9550,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                    lineNumber: 9529,
+                    lineNumber: 9537,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9528,
+                lineNumber: 9536,
                 columnNumber: 9
             }, this),
             clearToast && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19706,14 +19746,14 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                         className: "w-4 h-4 text-emerald-400 shrink-0"
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9571,
+                        lineNumber: 9579,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         children: clearToast
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9572,
+                        lineNumber: 9580,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -19724,18 +19764,18 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                             className: "w-3.5 h-3.5"
                         }, void 0, false, {
                             fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                            lineNumber: 9578,
+                            lineNumber: 9586,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9573,
+                        lineNumber: 9581,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9570,
+                lineNumber: 9578,
                 columnNumber: 9
             }, this),
             toastMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19745,7 +19785,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                         className: "w-4 h-4 text-emerald-400 shrink-0"
                     }, void 0, false, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9586,
+                        lineNumber: 9594,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -19755,7 +19795,7 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: toastMessage.title
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9588,
+                                lineNumber: 9596,
                                 columnNumber: 13
                             }, this),
                             toastMessage.subtitle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -19763,19 +19803,19 @@ function BuildingEditor({ initialDetails, onGenerate }) {
                                 children: toastMessage.subtitle
                             }, void 0, false, {
                                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                                lineNumber: 9590,
+                                lineNumber: 9598,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                        lineNumber: 9587,
+                        lineNumber: 9595,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/calculator/BuildingEditor.tsx",
-                lineNumber: 9585,
+                lineNumber: 9593,
                 columnNumber: 9
             }, this)
         ]
