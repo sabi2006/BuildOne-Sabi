@@ -6559,10 +6559,14 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       {[
                         { w: 9, d: 9, label: '9"×9"' },
                         { w: 9, d: 12, label: '9"×12"' },
-                        { w: 10, d: 10, label: '10"×10"' },
                         { w: 12, d: 12, label: '12"×12"' },
-                        { w: 8, d: 10, label: '8"×10"' },
-                        { w: 12, d: 15, label: '12"×15"' }
+                        { w: 12, d: 15, label: '12"×15"' },
+                        { w: 12, d: 18, label: '12"×18"' },
+                        { w: 15, d: 18, label: '15"×18"' },
+                        { w: 18, d: 18, label: '18"×18"' },
+                        { w: 21, d: 21, label: '21"×21"' },
+                        { w: 24, d: 24, label: '24"×24"' },
+                        { w: 30, d: 30, label: '30"×30"' }
                       ].map(preset => {
                         const isCurrent = floorPillarWidth === preset.w && floorPillarDepth === preset.d;
                         return (
@@ -6730,10 +6734,14 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       {[
                         { w: 9, d: 9, label: '9"×9"' },
                         { w: 9, d: 12, label: '9"×12"' },
-                        { w: 10, d: 10, label: '10"×10"' },
                         { w: 12, d: 12, label: '12"×12"' },
-                        { w: 8, d: 10, label: '8"×10"' },
-                        { w: 12, d: 15, label: '12"×15"' }
+                        { w: 12, d: 15, label: '12"×15"' },
+                        { w: 12, d: 18, label: '12"×18"' },
+                        { w: 15, d: 18, label: '15"×18"' },
+                        { w: 18, d: 18, label: '18"×18"' },
+                        { w: 21, d: 21, label: '21"×21"' },
+                        { w: 24, d: 24, label: '24"×24"' },
+                        { w: 30, d: 30, label: '30"×30"' }
                       ].map(pPreset => {
                         const isSel = pillarWidth === pPreset.w && (pillarShape === 'circular' || pillarDepth === pPreset.d);
                         return (

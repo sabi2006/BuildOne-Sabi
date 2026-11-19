@@ -361,7 +361,7 @@ export interface ColumnStructuralCalculation {
   providedBarDiaMm: number;
   providedAscMm2: number;
   steelPercentageP: number; // (Asc / Ag) * 100
-  barArrangement: '4_bars_corner' | '6_bars_face' | '8_bars_face';
+  barArrangement: '4_bars_corner' | '6_bars_face' | '8_bars_face' | '12_bars_face' | '16_bars_face';
   mainBarCuttingLengthM: number;
   mainSteelWeightKg: number;
   
@@ -1235,11 +1235,23 @@ export const STANDARD_COLUMN_SIZES_MM: Array<{ b: number; d: number; label: stri
   { b: 230, d: 380, label: '9" × 15" (230×380 mm)' },
   { b: 300, d: 300, label: '12" × 12" (300×300 mm)' },
   { b: 230, d: 450, label: '9" × 18" (230×450 mm)' },
+  { b: 300, d: 380, label: '12" × 15" (300×380 mm)' },
   { b: 300, d: 450, label: '12" × 18" (300×450 mm)' },
   { b: 380, d: 380, label: '15" × 15" (380×380 mm)' },
   { b: 380, d: 450, label: '15" × 18" (380×450 mm)' },
   { b: 300, d: 600, label: '12" × 24" (300×600 mm)' },
-  { b: 450, d: 450, label: '18" × 18" (450×450 mm)' }
+  { b: 450, d: 450, label: '18" × 18" (450×450 mm)' },
+  { b: 380, d: 600, label: '15" × 24" (380×600 mm)' },
+  { b: 450, d: 530, label: '18" × 21" (450×530 mm)' },
+  { b: 450, d: 600, label: '18" × 24" (450×600 mm)' },
+  { b: 530, d: 530, label: '21" × 21" (530×530 mm)' },
+  { b: 530, d: 600, label: '21" × 24" (530×600 mm)' },
+  { b: 600, d: 600, label: '24" × 24" (600×600 mm)' },
+  { b: 600, d: 750, label: '24" × 30" (600×750 mm)' },
+  { b: 680, d: 680, label: '27" × 27" (680×680 mm)' },
+  { b: 750, d: 750, label: '30" × 30" (750×750 mm)' },
+  { b: 750, d: 900, label: '30" × 36" (750×900 mm)' },
+  { b: 900, d: 900, label: '36" × 36" (900×900 mm)' }
 ];
 
 /**
@@ -1457,7 +1469,7 @@ export function calculatePillarStructuralDetails(
   const targetRequiredGrossAreaAgMm2 = Math.max(requiredGrossAreaAgMm2, minStoreyAreaMm2);
 
   // Determine standard column section satisfying both load capacity and storey-height requirements
-  let selectedSection = STANDARD_COLUMN_SIZES_MM[0];
+  let selectedSection: { b: number; d: number; label: string } | null = null;
   for (const std of STANDARD_COLUMN_SIZES_MM) {
     const stdArea = std.b * std.d;
     const stdMinDim = Math.min(std.b, std.d);
@@ -1466,7 +1478,25 @@ export function calculatePillarStructuralDetails(
       selectedSection = std;
       break;
     }
-    selectedSection = std; // fallback to largest if heavy load
+  }
+
+  // If load exceeds all predefined standard sections, dynamically compute dimension rounded to nearest inch
+  if (!selectedSection) {
+    let reqSideIn = Math.max(
+      Math.ceil(minColWidthMm * (1 / 25.4)),
+      Math.ceil(minColDepthMm * (1 / 25.4)),
+      Math.ceil(Math.sqrt(targetRequiredGrossAreaAgMm2) * (1 / 25.4))
+    );
+    let reqSideMm = Math.round(reqSideIn * 25.4);
+    while ((reqSideMm * reqSideMm) < targetRequiredGrossAreaAgMm2) {
+      reqSideIn += 1;
+      reqSideMm = Math.round(reqSideIn * 25.4);
+    }
+    selectedSection = {
+      b: reqSideMm,
+      d: reqSideMm,
+      label: `${reqSideIn}" × ${reqSideIn}" (${reqSideMm}×${reqSideMm} mm)`
+    };
   }
 
   // Allow custom override if provided
@@ -1493,35 +1523,47 @@ export function calculatePillarStructuralDetails(
   const requiredAscMm2 = Math.min(maxAscMm2, Math.max(minAscMm2, calculatedAscMm2));
 
   // Determine bar diameter and count
-  let providedBarDiaMm = overrides?.customBarDiaMm || (providedDepthMm >= 380 ? 20 : 16);
+  let providedBarDiaMm = overrides?.customBarDiaMm || (providedDepthMm >= 450 ? 25 : (providedDepthMm >= 380 ? 20 : 16));
   let barArea = (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4;
   let rawBarCount = Math.ceil(requiredAscMm2 / barArea);
   
-  // Arrange in symmetric 4, 6, or 8 bars
+  // Arrange in symmetric 4, 6, 8, 12, or 16 bars
   let providedBarCount: number;
-  let barArrangement: '4_bars_corner' | '6_bars_face' | '8_bars_face';
+  let barArrangement: '4_bars_corner' | '6_bars_face' | '8_bars_face' | '12_bars_face' | '16_bars_face';
 
   if (overrides?.customBarCount) {
     providedBarCount = overrides.customBarCount;
     barArrangement = providedBarCount === 4 
       ? '4_bars_corner' 
-      : (providedBarCount === 6 ? '6_bars_face' : '8_bars_face');
+      : (providedBarCount === 6 ? '6_bars_face' : (providedBarCount <= 8 ? '8_bars_face' : (providedBarCount <= 12 ? '12_bars_face' : '16_bars_face')));
   } else if (rawBarCount <= 4 && providedDepthMm <= 230) {
     providedBarCount = 4;
     barArrangement = '4_bars_corner';
   } else if (rawBarCount <= 6 && providedDepthMm <= 380) {
     providedBarCount = 6;
     barArrangement = '6_bars_face';
-  } else {
+  } else if (rawBarCount <= 8 && providedDepthMm <= 450) {
     providedBarCount = 8;
     barArrangement = '8_bars_face';
+  } else if (rawBarCount <= 12 && providedDepthMm <= 600) {
+    providedBarCount = 12;
+    barArrangement = '12_bars_face';
+  } else {
+    providedBarCount = Math.max(16, Math.ceil(rawBarCount / 4) * 4);
+    barArrangement = '16_bars_face';
   }
 
-  // If provided bars still don't satisfy Asc, upsize diameter
-  while ((providedBarCount * (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarDiaMm < 25) {
+  // If provided bars still don't satisfy Asc, upsize diameter up to 32mm
+  while ((providedBarCount * (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarDiaMm < 32) {
     if (providedBarDiaMm === 16) providedBarDiaMm = 20;
     else if (providedBarDiaMm === 20) providedBarDiaMm = 25;
+    else if (providedBarDiaMm === 25) providedBarDiaMm = 32;
     else break;
+  }
+
+  // If still insufficient with 32mm, increase bar count in increments of 4
+  while ((providedBarCount * (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarCount < 32) {
+    providedBarCount += 4;
   }
 
   const providedAscMm2 = providedBarCount * ((Math.PI * providedBarDiaMm * providedBarDiaMm) / 4);

@@ -5421,10 +5421,8 @@ export const calculateProject = (
       const calc = calcMap.get(p.id);
       const autoW = calc ? Math.round(calc.providedWidthMm * (1 / 25.4)) : (p.width || 9);
       const autoD = calc ? Math.round(calc.providedDepthMm * (1 / 25.4)) : (p.depth || 9);
-      const userW = (p.width && p.width > 0) ? p.width : autoW;
-      const userD = (p.depth && p.depth > 0) ? (p.shape === 'circular' ? userW : p.depth) : autoD;
-      const w = p.isCustomSize ? p.width : Math.max(userW, autoW);
-      const d = p.isCustomSize ? p.depth : Math.max(userD, autoD);
+      const w = (p.isCustomSize && p.width) ? p.width : autoW;
+      const d = (p.isCustomSize && p.depth) ? (p.shape === 'circular' ? p.width : p.depth) : autoD;
 
       const px = p.position?.x ?? p.x ?? 0;
       const py = p.position?.y ?? p.y ?? 0;
