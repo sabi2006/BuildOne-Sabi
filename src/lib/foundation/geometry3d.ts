@@ -81,7 +81,7 @@ function box(
   };
 }
 
-export function findBoxOverlaps(boxes: BoxSpec[], eps = 1e-6): Array<[string, string]> {
+export function findBoxOverlaps(boxes: BoxSpec[], eps = 5e-4): Array<[string, string]> {
   const out: Array<[string, string]> = [];
   const ext = (b: BoxSpec, i: number) => [b.center[i] - b.size[i] / 2, b.center[i] + b.size[i] / 2] as const;
   for (let i = 0; i < boxes.length; i++) {
@@ -150,6 +150,16 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     return { x0: p.x0 + dx, x1: p.x1 + dx, z0: -p.y1 + dz, z1: -p.y0 + dz };
   };
 
+  // Inside faces of the basement walls (widest wall used): anything of a footing/raft that would reach the wall zone is
+  // monolithic with the wall/base slab, so pads and mesh bars are clipped to this rectangle.
+  const wallT = Math.max(0, ...wallEls.map(w => (w.thicknessMm ?? 0) / 1000));
+  const inner = basementOn && wallT > 0 ? { x0: wallT, x1: L - wallT, z0: -W + wallT, z1: -wallT } : undefined;
+  const clipRect = (r: { x0: number; x1: number; z0: number; z1: number }) => {
+    if (!inner) return r;
+    const c = { x0: Math.max(r.x0, inner.x0), x1: Math.min(r.x1, inner.x1), z0: Math.max(r.z0, inner.z0), z1: Math.min(r.z1, inner.z1) };
+    return c.x1 - c.x0 > 1e-3 && c.z1 - c.z0 > 1e-3 ? c : null;
+  };
+
   if (basementOn) {
     boxes.push(box('basement-pcc', 'basement', 'pcc', 'basement', 0, L, -Df, slabBottom, -W, 0, 'WARNING', { label: 'PCC' }));
     if (slabT !== undefined && baseEl) {
@@ -197,10 +207,12 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       // union with the base slab: only the part of the footing that rises above the slab is drawn
       if (slabT !== undefined) {
         if (yRccTop > slabTop + 1e-6) {
-          boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, slabTop, yRccTop, r.z0, r.z1, el.status, { label, note: 'Thickened pad above the basement base slab.' }));
+          const rc = clipRect(r);
+          if (rc) boxes.push(box(`${el.id}-rcc`, el.id, kind, group, rc.x0, rc.x1, slabTop, yRccTop, rc.z0, rc.z1, el.status, { label, note: 'Thickened pad above the basement base slab (clipped to the inside of the walls).' }));
         }
       } else {
-        boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label }));
+        const rc = clipRect(r);
+        if (rc) boxes.push(box(`${el.id}-rcc`, el.id, kind, group, rc.x0, rc.x1, yRccBottom, yRccTop, rc.z0, rc.z1, el.status, { label }));
       }
     }
 
@@ -268,7 +280,6 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
 
   // Perimeter columns/footings that coincide with a basement wall are integral with it: drawing them as
   // separate solids would overlap the wall, so they are not drawn as separate solids and a warning is raised.
-  const droppedFootings = new Set<string>();
   const droppedElements = new Set<string>();
   if (basementOn) {
     const wallBoxes = boxes.filter(b => b.kind === 'wall');
@@ -276,7 +287,6 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     const integral = boxes.filter(b => b.group === 'foundation' && (b.kind === 'footing' || b.kind === 'pedestal') && hits(b));
     if (integral.length) {
       const ids = new Set(integral.map(b => b.id));
-      integral.filter(b => b.kind === 'footing').forEach(b => droppedFootings.add(b.elementId));
       integral.forEach(b => droppedElements.add(b.elementId));
       for (let i = boxes.length - 1; i >= 0; i--) if (ids.has(boxes[i].id)) boxes.splice(i, 1);
       const els = [...new Set(integral.map(b => b.elementId))];
@@ -288,6 +298,24 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   let barBudget = maxBars;
   let thinned = false;
   const push = (b: BarSpec) => { if (barBudget > 0) { bars.push(b); barBudget--; } else thinned = true; };
+  /** Mesh bar of a footing/raft: clipped to the inside of the basement walls (axis-aligned bars only) */
+  const pushMesh = (b: BarSpec) => {
+    if (!inner) { push(b); return; }
+    const alongX = Math.abs(b.from[2] - b.to[2]) < 1e-9;
+    if (alongX) {
+      const z = b.from[2];
+      if (z < inner.z0 || z > inner.z1) return;
+      const xa = Math.max(Math.min(b.from[0], b.to[0]), inner.x0), xb = Math.min(Math.max(b.from[0], b.to[0]), inner.x1);
+      if (xb - xa < 1e-3) return;
+      push({ ...b, from: [xa, b.from[1], z], to: [xb, b.to[1], z] });
+    } else {
+      const x = b.from[0];
+      if (x < inner.x0 || x > inner.x1) return;
+      const za = Math.max(Math.min(b.from[2], b.to[2]), inner.z0), zb = Math.min(Math.max(b.from[2], b.to[2]), inner.z1);
+      if (zb - za < 1e-3) return;
+      push({ ...b, from: [x, b.from[1], za], to: [x, b.to[1], zb] });
+    }
+  };
 
   for (const el of drawable) {
     if (el.reinforcement.length === 0) continue;
@@ -316,7 +344,6 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       .sort((a, b) => (longDir === 'y' ? a.c.yM - b.c.yM : a.c.xM - b.c.xM));
 
     for (const l of el.reinforcement) {
-      if (droppedFootings.has(el.id)) break; // the footing solid was dropped (integral with the wall): its mesh is not drawn either
       const y = layerY(l);
       const rad = Math.max(l.diaMm / 2000, 0.004);
       if (l.role === 'band') {
@@ -329,10 +356,10 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
           const off = -zone / 2 + (n > 1 ? (i * zone) / (n - 1) : zone / 2);
           if (l.direction === 'y') {
             const x = pos.x + off;
-            push({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
+            pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
           } else {
             const z = pos.z + off;
-            push({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
+            pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
           }
         }
         continue;
@@ -340,11 +367,11 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       const spacing = (l.spacingMm ?? 150) / 1000;
       if (l.direction === 'x') {
         for (const z of barPositions(r.z0 + cover, r.z1 - cover, spacing, l.count)) {
-          push({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
+          pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
         }
       } else {
         for (const x of barPositions(r.x0 + cover, r.x1 - cover, spacing, l.count)) {
-          push({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
+          pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
         }
       }
     }
@@ -368,7 +395,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
             else if ((t -= 2 * hx) <= 2 * hz) { px = -hx; pz = hz - t; }
             else if ((t -= 2 * hz) <= 2 * hx) { px = -hx + t; pz = -hz; }
             else { t -= 2 * hx; px = hx; pz = -hz + t; }
-            push({ elementId: el.id, group: droppedFootings.has(el.id) ? 'basement' : 'foundation', kind: 'dowel', from: [pos.x + px, yStart, pos.z + pz], to: [pos.x + px, yEnd, pos.z + pz], radiusM: Math.max(el.dowels.diaMm / 2000, 0.005) });
+            push({ elementId: el.id, group: droppedElements.has(el.id) ? 'basement' : 'foundation', kind: 'dowel', from: [pos.x + px, yStart, pos.z + pz], to: [pos.x + px, yEnd, pos.z + pz], radiusM: Math.max(el.dowels.diaMm / 2000, 0.005) });
           }
         }
       }

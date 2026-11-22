@@ -71,8 +71,10 @@ export function buildFoundationBasementQuantities(
   const notes: string[] = [];
 
   const els = design.foundation?.elements ?? [];
-  const designed = els.filter(e => e.quantities && e.depthMm);
-  const skipped = els.filter(e => !(e.quantities && e.depthMm));
+  // a FAIL element (for example overlapping footings) is not a valid design to cost
+  const usable = (e: typeof els[number]) => !!(e.quantities && e.depthMm) && e.status !== 'FAIL';
+  const designed = els.filter(usable);
+  const skipped = els.filter(e => !usable(e));
   const foundationComplete = els.length > 0 && skipped.length === 0;
   if (skipped.length) {
     warnings.push(`Foundation elements not designed (${skipped.map(e => e.id).join(', ')}): the legacy foundation quantities are kept; the detailed design is not used for the foundation BOQ.`);
@@ -89,6 +91,7 @@ export function buildFoundationBasementQuantities(
     warnings.push('Basement is only partly designed (walls or base slab missing): the basement is NOT included in the BOQ, so the estimate has no basement cost. Complete the soil/water inputs.');
   }
   const slabT = slabDesigned ? baseEl!.thicknessMm! / 1000 : undefined;
+  const wallT = Math.max(0, ...wallEls.map(w => (w.thicknessMm ?? 0) / 1000));
   const slabTop = slabT !== undefined ? -Df + pcc + slabT : -Df + pcc;
 
   const integral = new Set<string>();
@@ -110,8 +113,12 @@ export function buildFoundationBasementQuantities(
     let elForm: number;
     if (basementOn && slabT !== undefined) {
       const above = Math.max(0, D - slabT);
-      elRcc = sx * sy * above;
-      elForm = 2 * (sx + sy) * above;
+      // pad above the slab, clipped to the inside faces of the walls (the rest is monolithic with wall and slab)
+      const p = e.plan;
+      const cx = p ? Math.max(0, Math.min(p.x1, L - wallT) - Math.max(p.x0, wallT)) : sx;
+      const cy = p ? Math.max(0, Math.min(p.y1, B - wallT) - Math.max(p.y0, wallT)) : sy;
+      elRcc = cx * cy * above;
+      elForm = cx > 0 && cy > 0 ? 2 * (cx + cy) * above : 0;
     } else {
       elRcc = e.quantities!.concreteM3;
       elForm = e.quantities!.formworkM2;
@@ -163,6 +170,7 @@ export function buildFoundationBasementQuantities(
     if (drainage === 'sump_and_pump' || drainage === 'perimeter_drain_and_sump') sumpCount = 1;
     notes.push('Basement excavation, backfill ring and PCC are computed for the whole footprint; basement internal floors/roof slabs, columns and beams are not designed and not included.');
     notes.push('Sand bedding under the PCC is not part of the detailed design and is not carried.');
+    notes.push('Footing/raft concrete beyond the inside faces of the basement walls is not counted separately: it is monolithic with the walls and base slab.');
   }
   if (!basementOn) notes.push('Sand bedding under the PCC is not part of the detailed design; the legacy sand bed quantity is dropped while the detailed foundation is used.');
 

@@ -202,6 +202,16 @@ describe('Isolated footing – parametric behaviour', () => {
   });
 });
 
+describe('Pressure checks keep demand <= capacity semantics', () => {
+  it('no_tension reports the required minimum (0) against the actual minimum pressure', () => {
+    const e = designIsolatedFooting({ ...col('c', 0, 0, 800), momentYKnM: 150 }, params());
+    const c = e.checks.find(x => x.id === 'no_tension')!;
+    expect(c.demand).toBe(0);
+    expect(c.capacity!).toBeGreaterThanOrEqual(0);
+    expect(c.status).toBe('PASS');
+  });
+});
+
 describe('Combined footing', () => {
   const a = col('a', 0, 0, 800), b = col('b', 3, 0, 1200);
   const e = designCombinedFooting(a, b, params({ sbcKnM2: 150 }));
@@ -259,6 +269,29 @@ describe('Raft foundation', () => {
   it('never reports PASS (rigid strip method only)', () => {
     expect(r.status).toBe('WARNING');
     expect(r.checks.find(c => c.id === 'raft_method')!.status).toBe('WARNING');
+  });
+
+  it('enlarges toward the building footprint when the minimum plan is too small, and not without a footprint', () => {
+    const cols: FoundationColumnInput[] = [col('a', 4, 4, 1500), col('b', 8, 4, 1500), col('c', 4, 7, 1500), col('d', 8, 7, 1500)];
+    const prm = params({ sbcKnM2: 130, requestedType: 'raft' });
+    const noFp = designRaftFoundation(cols, prm);
+    expect(noFp.status).toBe('FAIL');                       // minimum plan 5.4 x 4.4 m cannot carry 6000 kN at this SBC
+    const fp = { x0: 0, x1: 12, y0: 0, y1: 11 };
+    const grown = designRaftFoundation(cols, { ...prm, options: { buildingFootprint: fp } });
+    expect(grown.status).not.toBe('FAIL');
+    expect(grown.sizeXM!).toBeGreaterThan(noFp.sizeXM!);
+    expect(grown.plan!.x0).toBeGreaterThanOrEqual(fp.x0 - 1e-6);
+    expect(grown.plan!.x1).toBeLessThanOrEqual(fp.x1 + 1e-6);
+    expect(grown.plan!.y0).toBeGreaterThanOrEqual(fp.y0 - 1e-6);
+    expect(grown.plan!.y1).toBeLessThanOrEqual(fp.y1 + 1e-6);
+    expect(grown.maxServicePressureKnM2!).toBeLessThanOrEqual(grown.availablePressureKnM2!);
+  });
+
+  it('even the whole footprint cannot save a too-weak soil: FAIL, not an invented section', () => {
+    const cols: FoundationColumnInput[] = [col('a', 4, 4, 1500), col('b', 8, 4, 1500), col('c', 4, 7, 1500), col('d', 8, 7, 1500)];
+    const r = designRaftFoundation(cols, { ...params({ sbcKnM2: 60, requestedType: 'raft' }), options: { buildingFootprint: { x0: 0, x1: 12, y0: 0, y1: 11 } } });
+    expect(r.status).toBe('FAIL');
+    expect(r.depthMm).toBeUndefined();
   });
 
   it('FAILs when even a full raft exceeds the available pressure', () => {

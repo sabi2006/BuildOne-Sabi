@@ -258,7 +258,8 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     clearCoverMm: details.clearCoverMm,
     pccThicknessMm: details.pccThicknessMm,
     pile: details.investigation.pile,
-    options: { buildingPlanAreaM2: planArea },
+    // plan origin is the building corner (as in the host and the 3D view), so the footprint is [0, L] × [0, B]
+    options: { buildingPlanAreaM2: planArea, buildingFootprint: { x0: 0, x1: args.buildingLengthM, y0: 0, y1: args.buildingWidthM } },
   };
   const inputs: FoundationColumnInput[] = columns.map(c => ({
     id: c.id, name: c.name, xM: c.xM, yM: c.yM, widthMm: c.widthMm, depthMm: c.depthMm, serviceLoadKn: c.serviceKn, factoredLoadKn: c.factoredKn,

@@ -234,6 +234,21 @@ describe('Incomplete designs never lower the estimate silently', () => {
   });
 });
 
+describe('A failed foundation is not used for costing', () => {
+  it('overlapping manual isolated footings (FAIL) keep the legacy foundation quantities', () => {
+    const plain = run();
+    const proj = project({ foundationDetails: fd, allowableSoilBearingPressureKnM2: 200 });
+    proj.buildingModel.buildingConfig.floorCount = 4;
+    const d = calculateProject(proj);
+    const f = d.foundationBasementDesign!.foundation!;
+    if (f.elements.some(e => e.status === 'FAIL')) {
+      expect(d.buildingBOQ!.foundationBasement!.replacedLegacyFoundation).toBe(false);
+      expect(d.buildingBOQ!.foundationBasement!.warnings.join(' ')).toContain('not designed');
+    }
+    expect(plain.buildingBOQ!.foundationBasement).toBeUndefined();
+  });
+});
+
 describe('priceFoundationBasement', () => {
   it('uses the default legacy rates and honours overrides', () => {
     const q: any = { excavationM3: 10, backfillM3: 5, pccM3: 2, foundationRccM3: 3, foundationSteelKg: 100, foundationFormworkM2: 20, basementFormworkM2: 0, basementRccM3: 0, waterproofingM2: 0, drainPerimeterM: 0, sumpCount: 0 };

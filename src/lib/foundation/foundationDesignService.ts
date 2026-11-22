@@ -67,6 +67,8 @@ export interface FoundationDesignOptions {
   pileSpacingFactor?: number;
   /** Distance from pile edge to pile cap edge, mm (default 150) */
   pileCapEdgeMm?: number;
+  /** Building footprint rectangle (m, same frame as the column coordinates). A raft may grow up to it when the soil needs a larger plan. */
+  buildingFootprint?: { x0: number; x1: number; y0: number; y1: number };
   /** Building plan area, m². Enables the auto-selection footing-coverage rule. If omitted the rule is not applied (selection uses overlap and sizing failures only). */
   buildingPlanAreaM2?: number;
 }
@@ -179,6 +181,7 @@ interface Resolved {
   workingSpaceMm: number; pccProjectionMm: number; raftProjectionM: number; minFootingDepthMm: number;
   raftCoverageRatio: number; minEdgeBeyondColumnMm: number; pileSafetyFactor: number;
   pileSpacingFactor: number; pileCapEdgeMm: number; buildingPlanAreaM2?: number;
+  buildingFootprint?: { x0: number; x1: number; y0: number; y1: number };
 }
 const resolveOptions = (o?: FoundationDesignOptions): Resolved => ({
   workingSpaceMm: o?.workingSpaceMm ?? 300,
@@ -191,6 +194,7 @@ const resolveOptions = (o?: FoundationDesignOptions): Resolved => ({
   pileSpacingFactor: o?.pileSpacingFactor ?? 2.5,
   pileCapEdgeMm: o?.pileCapEdgeMm ?? 150,
   buildingPlanAreaM2: o?.buildingPlanAreaM2,
+  buildingFootprint: o?.buildingFootprint,
 });
 
 const MAX_DEPTH_MM = 2500;
@@ -432,7 +436,7 @@ export function designIsolatedFooting(
       const cks: DesignCheck[] = [];
       cks.push({ id: 'bearing_pressure', label: 'Max service base pressure ≤ available pressure', clause: 'IS 6403',
         status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²' });
-      if (momentsUsed) cks.push({ id: 'no_tension', label: 'Base pressure stays compressive (no uplift)', status: qmin >= 0 ? 'PASS' : 'FAIL', demand: round(qmin, 2), capacity: 0, unit: 'kN/m²' });
+      if (momentsUsed) cks.push({ id: 'no_tension', label: 'Minimum base pressure ≥ 0 (no uplift)', status: qmin >= 0 ? 'PASS' : 'FAIL', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' });
       cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(mx, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
       cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(my, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
       cks.push({ id: 'min_steel', label: 'Minimum reinforcement 0.12%', clause: 'IS 456 Cl. 26.5.2.1, 34.5', status: 'PASS',
@@ -677,16 +681,48 @@ function gridSpans(vals: number[], tolM = 0.3): number[] {
   return spans;
 }
 
+/**
+ * Raft over the columns. The plan starts as the column bounding box plus the projection; if the soil cannot carry
+ * that, the raft is enlarged in 0.25 m steps, up to the building footprint when it is known (never beyond it).
+ */
 export function designRaftFoundation(
   columns: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options)
 ): FoundationElementResult {
+  if (columns.length === 0) return unverified('RAFT-1', 'raft', 'raft', columns, p, 'No columns.');
+  let proj = opt.raftProjectionM;
+  let el = designRaftWithProjection(columns, p, opt, proj);
+  const fp = opt.buildingFootprint;
+  if (el.status === 'FAIL' && fp) {
+    let prev = el.plan ? { ...el.plan } : undefined;
+    for (let it = 0; it < 80 && el.status === 'FAIL'; it++) {
+      proj += 0.25;
+      const next = designRaftWithProjection(columns, p, opt, proj);
+      const grew = !prev || !next.plan || next.plan.x0 < prev.x0 - 1e-6 || next.plan.x1 > prev.x1 + 1e-6 || next.plan.y0 < prev.y0 - 1e-6 || next.plan.y1 > prev.y1 + 1e-6;
+      if (!grew) break; // already at the footprint
+      prev = next.plan ? { ...next.plan } : prev;
+      el = next;
+    }
+    if (el.status !== 'FAIL') el.assumptions.push(`Raft enlarged beyond the minimum plan (projection ${round(proj, 2)} m) toward the building footprint to keep the contact pressure within the available pressure.`);
+  }
+  return el;
+}
+
+function designRaftWithProjection(
+  columns: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved, proj: number
+): FoundationElementResult {
   const id = 'RAFT-1';
-  if (columns.length === 0) return unverified(id, 'raft', 'raft', columns, p, 'No columns.');
-  const proj = opt.raftProjectionM;
-  const x0 = Math.min(...columns.map(c => c.xM - c.widthMm / 2000)) - proj;
-  const x1 = Math.max(...columns.map(c => c.xM + c.widthMm / 2000)) + proj;
-  const y0 = Math.min(...columns.map(c => c.yM - c.depthMm / 2000)) - proj;
-  const y1 = Math.max(...columns.map(c => c.yM + c.depthMm / 2000)) + proj;
+  const colMinX = Math.min(...columns.map(c => c.xM - c.widthMm / 2000));
+  const colMaxX = Math.max(...columns.map(c => c.xM + c.widthMm / 2000));
+  const colMinY = Math.min(...columns.map(c => c.yM - c.depthMm / 2000));
+  const colMaxY = Math.max(...columns.map(c => c.yM + c.depthMm / 2000));
+  let x0 = colMinX - proj, x1 = colMaxX + proj, y0 = colMinY - proj, y1 = colMaxY + proj;
+  const fp = opt.buildingFootprint;
+  if (fp) {
+    // never extend past the building footprint (but always keep every column inside)
+    x0 = Math.min(colMinX, Math.max(x0, fp.x0)); x1 = Math.max(colMaxX, Math.min(x1, fp.x1));
+    y0 = Math.min(colMinY, Math.max(y0, fp.y0)); y1 = Math.max(colMaxY, Math.min(y1, fp.y1));
+  }
+  const projMax = Math.max(colMinX - x0, x1 - colMaxX, colMinY - y0, y1 - colMaxY);
   const L = x1 - x0, B = y1 - y0, A = L * B;
   const S = columns.reduce((s, c) => s + c.serviceLoadKn, 0);
   const Su = columns.reduce((s, c) => s + c.factoredLoadKn, 0);
@@ -724,7 +760,7 @@ export function designRaftFoundation(
       // IS 456 Table 12 envelope coefficients (support 1/10, span 1/12), one-way strip, conservative
       const mSupX = (qu * lx * lx) / 10, mSpanX = (qu * lx * lx) / 12;
       const mSupY = (qu * ly * ly) / 10, mSpanY = (qu * ly * ly) / 12;
-      const mCant = (qu * proj * proj) / 2;
+      const mCant = (qu * projMax * projMax) / 2;
       const mBotX = mSupX, mBotY = mSupY;
       const mTopX = Math.max(mSpanX, mCant), mTopY = Math.max(mSpanY, mCant);
       if (Math.max(mBotX, mBotY, mTopX, mTopY) > lim) break;
@@ -786,7 +822,7 @@ export function designRaftFoundation(
       };
       const cks: DesignCheck[] = [
         { id: 'contact_pressure', label: 'Max contact pressure ≤ available pressure (rigid raft)', clause: 'IS 2950 (Part 1)', status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²' },
-        { id: 'no_tension', label: 'Contact pressure remains compressive', status: 'PASS', demand: round(qmin, 2), capacity: 0, unit: 'kN/m²' },
+        { id: 'no_tension', label: 'Minimum contact pressure ≥ 0', status: 'PASS', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' },
         { id: 'flexure', label: 'Flexure (strip method, IS 456 Table 12 envelope coefficients)', clause: 'IS 456 Annex G, Table 12', status: 'PASS',
           demand: round(Math.max(mBotX, mBotY, mTopX, mTopY), 2), capacity: round(lim, 2), unit: 'kN·m/m' },
         { id: 'shear', label: 'One-way shear at d from column face', clause: 'IS 456 Cl. 40.2', status: 'PASS', demand: round(tvOne, 3), capacity: round(tcOne, 3), unit: 'N/mm²' },
@@ -798,7 +834,7 @@ export function designRaftFoundation(
       ];
       e.checks = cks;
       e.status = overallStatus(cks);
-      e.assumptions = [...COMMON_ASSUMPTIONS, `Raft plan = column bounding box + ${proj} m projection.`, 'Raft treated as rigid: linear contact pressure from load eccentricity.', 'Moment coefficients 1/10 (support) and 1/12 (span) are applied in each direction independently (conservative).'];
+      e.assumptions = [...COMMON_ASSUMPTIONS, `Raft plan = column bounding box + up to ${round(projMax, 2)} m projection${fp ? ' (limited to the building footprint)' : ''}.`, 'Raft treated as rigid: linear contact pressure from load eccentricity.', 'Moment coefficients 1/10 (support) and 1/12 (span) are applied in each direction independently (conservative).'];
       e.warnings = cks.filter(c => c.status !== 'PASS' && c.note).map(c => `${c.label}: ${c.note}`);
       return e;
     }
@@ -953,6 +989,22 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
         else if (g.length === 2) elements.push(designCombinedFooting(g[0], g[1], params, opt));
         else elements.push(unverified(`CF-${g.map(c => c.name ?? c.id).join('+')}`, 'combined_footing', 'combined', g, params,
           `${g.length} columns have overlapping footings: combined footing design is only implemented for two columns. Use a raft.`));
+      }
+      // Auto mode: a combined footing that is larger than the isolated pair can now overlap a neighbouring footing.
+      // Escalate to a raft rather than return a layout that overlaps.
+      if (params.selectionMode === 'auto') {
+        let residual = false;
+        for (let i = 0; i < elements.length && !residual; i++) {
+          for (let j = i + 1; j < elements.length; j++) {
+            const a = elements[i], b = elements[j];
+            if (a.plan && b.plan && overlaps(a.plan, b.plan)) { residual = true; break; }
+          }
+        }
+        if (residual) {
+          selected = 'raft';
+          reasons.push('The combined footings overlap a neighbouring footing: raft selected.');
+          elements = [designRaftFoundation(cols, params, opt)];
+        }
       }
       break;
     }

@@ -268,16 +268,24 @@ describe('Basement with columns on the wall line', () => {
     expect(g.boxes.filter(b => b.kind === 'wall').length).toBe(4);
   });
 
-  it('does not draw mesh bars for footings that were dropped, and nothing sticks out of the footprint', () => {
-    const dropped = new Set(d.foundation!.elements.map(e => e.id).filter(id => !g.boxes.some(b => b.kind === 'footing' && b.elementId === id)));
-    expect(dropped.size).toBeGreaterThan(0);
-    expect(g.bars.filter(b => b.kind === 'mesh' && dropped.has(b.elementId)).length).toBe(0);
-    const orphanDowels = g.bars.filter(b => b.kind === 'dowel' && dropped.has(b.elementId));
+  it('clips mesh bars to the inside of the walls, hides dowels with their wall, and nothing sticks out of the footprint', () => {
+    const wallT = Math.max(...d.basement!.elements.filter(e => e.elementType === 'basement_wall').map(e => e.thicknessMm! / 1000));
+    for (const b of g.bars.filter(x => x.kind === 'mesh')) {
+      for (const p of [b.from, b.to]) {
+        expect(p[0]).toBeGreaterThanOrEqual(wallT - 1e-6);
+        expect(p[0]).toBeLessThanOrEqual(L - wallT + 1e-6);
+        expect(p[2]).toBeLessThanOrEqual(-wallT + 1e-6);
+        expect(p[2]).toBeGreaterThanOrEqual(-W + wallT - 1e-6);
+      }
+    }
+    const integral = new Set(g.integralElementIds);
+    expect(integral.size).toBeGreaterThan(0);
+    const orphanDowels = g.bars.filter(b => b.kind === 'dowel' && integral.has(b.elementId));
     expect(orphanDowels.length).toBeGreaterThan(0);
     expect(orphanDowels.every(b => b.group === 'basement')).toBe(true); // embedded in the wall: hidden with it
     for (const b of g.bars) {
       for (const p of [b.from, b.to]) {
-        if (b.kind === 'dowel') continue; // dowels stand inside the column outline
+        if (b.kind === 'dowel') continue;
         expect(p[0]).toBeGreaterThanOrEqual(-1e-6);
         expect(p[0]).toBeLessThanOrEqual(L + 1e-6);
         expect(p[2]).toBeLessThanOrEqual(1e-6);
