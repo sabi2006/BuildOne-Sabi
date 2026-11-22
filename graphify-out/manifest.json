@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1786891693.5199492,
-    "seen": 1794669588.8764825,
-    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "mtime": 1795325884.5189114,
+    "seen": 1795327050.9051301,
+    "ast_hash": "ffb31ba6167db159c640f1d3821e0501",
     "semantic_hash": ""
   },
   "CONSTRUCTION_CALCULATION_MANUAL.md": {
@@ -372,9 +372,9 @@
     "semantic_hash": ""
   },
   "PROJECT_FULL_DETAILS.txt": {
-    "mtime": 1791432459.4131136,
-    "seen": 1794669588.876495,
-    "ast_hash": "7348cc2c3abfb66362f7a4afdc75f707",
+    "mtime": 1794894404.2603846,
+    "seen": 1795327050.9051678,
+    "ast_hash": "e632fda738b8c9f50e3517f5fc689ee8",
     "semantic_hash": ""
   },
   "README.md": {
@@ -549,6 +549,12 @@
     "mtime": 1794813597.5446527,
     "seen": 1794832644.4573598,
     "ast_hash": "208626fe738b65b3ae92efb057fcce43",
+    "semantic_hash": ""
+  },
+  ".claude/settings.json": {
+    "mtime": 1795325884.5209186,
+    "seen": 1795327050.9049916,
+    "ast_hash": "d7d9d7669fbba6e4e17518be9e971fe6",
     "semantic_hash": ""
   },
   "package-lock.json": {
