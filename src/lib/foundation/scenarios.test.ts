@@ -256,6 +256,31 @@ describe('Scenario 7-10: basements', () => {
   });
 });
 
+describe('Foundation under a basement is not penalised by excavated soil', () => {
+  it('same building, SBC and 3 m founding depth: designed with a basement, fails as a backfilled foundation', () => {
+    const withB = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
+    const noB = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', foundationDepthM: 3, allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
+    const dB = invariants(withB, 'void-yes'), dN = invariants(noB, 'void-no');
+    expect(dN.foundation!.status).toBe('FAIL');
+    expect(dB.foundation!.status).not.toBe('FAIL');
+    expect(dB.foundation!.elements[0].depthMm).toBeDefined();
+  });
+  it('available pressure = SBC − 25 D − wall weight (hand derivation from the design itself)', () => {
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 150 }, 3, GRID9), 'void-hand');
+    const el = d.foundation!.elements[0];
+    const walls = d.basement!.elements.filter(e => e.elementType === 'basement_wall');
+    const wallWeight = (walls.reduce((s, w) => s + w.quantities!.concreteM3, 0) * 25) / (d.summary.plan.lengthM * d.summary.plan.widthM);
+    expect(el.availablePressureKnM2!).toBeCloseTo(150 - 25 * (el.depthMm! / 1000) - wallWeight, 1);
+    expect(el.assumptions.join(' ')).toContain('Basement void');
+  });
+  it('a foundation without a basement keeps the soil overburden deduction', () => {
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationDepthM: 3, allowableSoilBearingPressureKnM2: 250 }, 2, INNER4), 'no-void');
+    const el = d.foundation!.elements[0];
+    const D = el.depthMm! / 1000;
+    expect(el.availablePressureKnM2!).toBeCloseTo(250 - (18 * (3 - D) + 25 * D), 1);
+  });
+});
+
 describe('Scenario 11-14: changing inputs recalculates', () => {
   it('11: SBC changes the foundation size monotonically', () => {
     const sizes = [300, 200, 150, 100].map(sbc => invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), allowableSoilBearingPressureKnM2: sbc }), `sbc${sbc}`).foundation!.totals.concreteM3);

@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1795331827.9938326,
-    "seen": 1795332235.8777473,
-    "ast_hash": "cc2a064f2aeb6ecb1073e624d2bda907",
+    "mtime": 1795334338.6890202,
+    "seen": 1795334549.1246576,
+    "ast_hash": "fcf82f987efcb2b02faa231d62a06f3c",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -594,15 +594,15 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.test.ts": {
-    "mtime": 1795333113.103564,
-    "seen": 1795333326.645879,
-    "ast_hash": "72b01576ac1e2671e378d6d391d883f4",
+    "mtime": 1795334199.384243,
+    "seen": 1795334549.124695,
+    "ast_hash": "fbfd832dde9934b89d2935203b0ccaf2",
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795333077.6079378,
-    "seen": 1795333326.64588,
-    "ast_hash": "83a045bf552aa87f21940125a3118ecc",
+    "mtime": 1795334122.5890565,
+    "seen": 1795334549.124696,
+    "ast_hash": "ec5de0312a827678b197e171b983f57b",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.ts": {
-    "mtime": 1795333077.646396,
-    "seen": 1795333326.6458845,
-    "ast_hash": "ef6f3f4a4fa1a17b14fe788c0f3f8718",
+    "mtime": 1795334143.3912387,
+    "seen": 1795334549.1247008,
+    "ast_hash": "c2356c4772108f560b92a3661ec0bafe",
     "semantic_hash": ""
   },
   "src/lib/foundation/rcDesign.ts": {
@@ -654,9 +654,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/scenarios.test.ts": {
-    "mtime": 1795333113.1025648,
-    "seen": 1795333326.645887,
-    "ast_hash": "32ca62de1100731d35b79c40731d5c96",
+    "mtime": 1795334199.384243,
+    "seen": 1795334549.1247027,
+    "ast_hash": "e19d28bf43d6ed30789522a72db9508b",
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationReport.test.tsx": {

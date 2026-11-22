@@ -91,6 +91,11 @@ export interface FoundationDesignParams {
   /** Column longitudinal bar diameter used for dowel/starter checks (default 16) */
   columnBarDiaMm?: number;
   pile?: PileInvestigationData;
+  /**
+   * Present when a basement is excavated: the soil above the basement floor is removed (an empty void), so it is not
+   * an overburden. `wallWeightKnM2` is the weight of the basement walls spread over the footprint.
+   */
+  basement?: { depthM: number; wallWeightKnM2: number };
   options?: FoundationDesignOptions;
 }
 
@@ -215,10 +220,26 @@ const worst = (statuses: DesignStatus[]): DesignStatus => {
   return 'PASS';
 };
 
-/** Net pressure available for column loads at footing thickness Dm (m). */
-function availablePressure(p: FoundationDesignParams, Dm: number): { qAvail: number; overburden: number } {
+/**
+ * Pressure available for column loads at footing thickness Dm (m).
+ *  - No basement: the footing and the backfill above it load the soil (gross), or replace removed soil (net).
+ *  - Basement: the soil above the basement floor is excavated to a void. The base is loaded by the footing/raft
+ *    concrete, any backfill between the footing top and the basement floor, and the basement walls.
+ *      gross SBC:  P/A <= SBC - 25 Dm - γs max(0, Df - bd - Dm) - walls
+ *      net SBC:    P/A <= SBC + γs Df - 25 Dm - γs max(0, Df - bd - Dm) - walls
+ * Internal basement floors, beams and columns are not part of `walls`: their weight reaches the base through the
+ * column loads supplied by the caller.
+ */
+export function availablePressure(p: FoundationDesignParams, Dm: number): { qAvail: number; overburden: number } {
   const gs = p.soilUnitWeightKnM3;
-  const overburden = gs * Math.max(0, p.foundationDepthM - Dm) + RCC_UNIT_WEIGHT * Dm;
+  const Df = p.foundationDepthM;
+  if (p.basement) {
+    const backfill = gs * Math.max(0, Df - p.basement.depthM - Dm);
+    const overburden = RCC_UNIT_WEIGHT * Dm + backfill + p.basement.wallWeightKnM2;
+    const qAvail = p.sbcBasis === 'net' ? p.sbcKnM2 + gs * Df - overburden : p.sbcKnM2 - overburden;
+    return { qAvail, overburden };
+  }
+  const overburden = gs * Math.max(0, Df - Dm) + RCC_UNIT_WEIGHT * Dm;
   const qAvail = p.sbcBasis === 'net'
     ? p.sbcKnM2 - (RCC_UNIT_WEIGHT - gs) * Dm
     : p.sbcKnM2 - overburden;
@@ -1030,6 +1051,11 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
         }
       }
     }
+  }
+
+  if (params.basement) {
+    const note = `Basement void: soil above the basement floor is excavated, so the available pressure deducts only the footing/raft concrete, any backfill below the basement floor and the basement walls (${round(params.basement.wallWeightKnM2, 2)} kN/m²), not the soil overburden. Weight of internal basement floors, beams and columns comes only through the column loads.`;
+    elements.forEach(e => e.assumptions.push(note));
   }
 
   // tidy floating-point noise in reported geometry

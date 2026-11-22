@@ -122,6 +122,16 @@ export function maxGridSpanM(points: Array<{ x: number; y: number }>, tolM = 0.3
   return all.length ? Math.max(...all) : undefined;
 }
 
+/** Weight of the designed basement walls spread over the footprint, kN/m² (0 with a warning if the walls are not designed) */
+function basementWallWeightKnM2(b: BasementDesignResult | undefined, planAreaM2: number, warnings: string[]): number {
+  const walls = (b?.elements ?? []).filter(e => e.elementType === 'basement_wall' && e.quantities);
+  if (walls.length === 0 || !(planAreaM2 > 0)) {
+    warnings.push('Basement walls are not designed: their weight is not deducted from the foundation pressure, which is unconservative. Complete the soil/water inputs.');
+    return 0;
+  }
+  return (walls.reduce((s, e) => s + e.quantities!.concreteM3, 0) * RCC_UNIT_WEIGHT) / planAreaM2;
+}
+
 export function computeFoundationBasementDesign(args: IntegrationArgs): FoundationBasementIntegration {
   const { summary, config, options } = args;
   const warnings: string[] = [];
@@ -237,40 +247,6 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     });
   }
 
-  // ---------- foundation ----------
-  const foundationDepthM = Math.max(config.foundationDepthM, details.minFoundingLevelM ?? 0, basementOn ? basementCfg.depthM : 0);
-  if (basementOn && basementCfg.depthM > config.foundationDepthM) {
-    warnings.push(`Founding level taken at the basement base (${basementCfg.depthM} m).`);
-  }
-  const gwDepth = details.groundwaterDepthM ?? basementCfg.groundwaterDepthM;
-  const params: FoundationDesignParams = {
-    requestedType: config.foundationType as FoundationSystem,
-    selectionMode: details.selectionMode,
-    sbcKnM2: config.allowableSoilBearingPressureKnM2,
-    sbcBasis: details.sbcBasis ?? 'gross',
-    sbcSource: details.investigation.sbcSource,
-    soilUnitWeightKnM3: details.soilUnitWeightKnM3,
-    foundationDepthM,
-    groundwaterDepthM: gwDepth,
-    allowableSettlementMm: details.allowableSettlementMm,
-    concreteGrade: details.concreteGrade ?? config.concreteGrade,
-    steelGrade: details.steelGrade ?? config.steelGrade,
-    clearCoverMm: details.clearCoverMm,
-    pccThicknessMm: details.pccThicknessMm,
-    pile: details.investigation.pile,
-    // plan origin is the building corner (as in the host and the 3D view), so the footprint is [0, L] × [0, B]
-    options: { buildingPlanAreaM2: planArea, buildingFootprint: { x0: 0, x1: args.buildingLengthM, y0: 0, y1: args.buildingWidthM } },
-  };
-  const inputs: FoundationColumnInput[] = columns.map(c => ({
-    id: c.id, name: c.name, xM: c.xM, yM: c.yM, widthMm: c.widthMm, depthMm: c.depthMm, serviceLoadKn: c.serviceKn, factoredLoadKn: c.factoredKn,
-  }));
-  let foundation: FoundationDesignResult | undefined;
-  try {
-    foundation = designFoundation(inputs, params);
-  } catch (e) {
-    warnings.push(`Foundation design failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`);
-  }
-
   // ---------- basement ----------
   let basement: BasementDesignResult | undefined;
   if (basementOn) {
@@ -293,6 +269,43 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       warnings.push(`Basement design failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`);
     }
     warnings.push('Basement plan is taken as the building footprint (outside face of walls).');
+  }
+
+  // ---------- foundation ----------
+  const foundationDepthM = Math.max(config.foundationDepthM, details.minFoundingLevelM ?? 0, basementOn ? basementCfg.depthM : 0);
+  if (basementOn && basementCfg.depthM > config.foundationDepthM) {
+    warnings.push(`Founding level taken at the basement base (${basementCfg.depthM} m).`);
+  }
+  const gwDepth = details.groundwaterDepthM ?? basementCfg.groundwaterDepthM;
+  const params: FoundationDesignParams = {
+    requestedType: config.foundationType as FoundationSystem,
+    selectionMode: details.selectionMode,
+    sbcKnM2: config.allowableSoilBearingPressureKnM2,
+    sbcBasis: details.sbcBasis ?? 'gross',
+    sbcSource: details.investigation.sbcSource,
+    soilUnitWeightKnM3: details.soilUnitWeightKnM3,
+    foundationDepthM,
+    groundwaterDepthM: gwDepth,
+    allowableSettlementMm: details.allowableSettlementMm,
+    concreteGrade: details.concreteGrade ?? config.concreteGrade,
+    steelGrade: details.steelGrade ?? config.steelGrade,
+    clearCoverMm: details.clearCoverMm,
+    pccThicknessMm: details.pccThicknessMm,
+    pile: details.investigation.pile,
+    basement: basementOn
+      ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
+      : undefined,
+    // plan origin is the building corner (as in the host and the 3D view), so the footprint is [0, L] × [0, B]
+    options: { buildingPlanAreaM2: planArea, buildingFootprint: { x0: 0, x1: args.buildingLengthM, y0: 0, y1: args.buildingWidthM } },
+  };
+  const inputs: FoundationColumnInput[] = columns.map(c => ({
+    id: c.id, name: c.name, xM: c.xM, yM: c.yM, widthMm: c.widthMm, depthMm: c.depthMm, serviceLoadKn: c.serviceKn, factoredLoadKn: c.factoredKn,
+  }));
+  let foundation: FoundationDesignResult | undefined;
+  try {
+    foundation = designFoundation(inputs, params);
+  } catch (e) {
+    warnings.push(`Foundation design failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // ---------- BBS ----------

@@ -2312,6 +2312,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   }, [detailedDesign, groundPillars, groundFloorWalls, model.buildingUnit, model.buildingLength, model.buildingWidth]);
   // When the detailed foundation is drawn it replaces the legacy footing meshes (they would overlap)
   const useDetailedFoundation = !!detailedGeometry && showDetailedFoundation && detailedGeometry.boxes.some(b => b.group === 'foundation');
+  // The legacy footings and soil bed are sized from the plain founding depth and know nothing about a basement: with the
+  // basement drawn they would cut through it, so they are hidden whenever the basement is shown.
+  const basementShown = !!detailedGeometry && showBasement && detailedGeometry.boxes.some(b => b.group === 'basement');
+  const hideLegacyFoundation = useDetailedFoundation || basementShown;
 
   const debugInfo = useMemo(() => {
     let ew = 0, iw = 0;
@@ -3261,8 +3265,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 model={model}
                 groundPillars={groundPillars}
                 floorAllWalls={groundFloorWalls}
-                showFoundation={showFoundation && !useDetailedFoundation}
-                showFootingRebar={showFootingRebar && !useDetailedFoundation}
+                showFoundation={showFoundation && !hideLegacyFoundation}
+                showFootingRebar={showFootingRebar && !hideLegacyFoundation}
                 showSoilBed={showSoilBed}
                 showLabels={showPillarLabels}
                 isConcreteSolid={isConcreteSolid}

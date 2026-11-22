@@ -1,5 +1,5 @@
 import {
-  designFoundation, designIsolatedFooting, designCombinedFooting, designRaftFoundation, designPileFoundation,
+  designFoundation, availablePressure, designIsolatedFooting, designCombinedFooting, designRaftFoundation, designPileFoundation,
   overallStatus, criticalPerimeter,
   FoundationColumnInput, FoundationDesignParams,
 } from './foundationDesignService';
@@ -199,6 +199,50 @@ describe('Isolated footing – parametric behaviour', () => {
     expect(high.checks.find(c => c.id === 'groundwater')!.status).toBe('WARNING');
     const unk = designIsolatedFooting(col('c', 0, 0, 800), params({ groundwaterDepthM: undefined }));
     expect(unk.checks.find(c => c.id === 'groundwater')!.status).toBe('NOT_VERIFIED');
+  });
+});
+
+describe('Available pressure: backfilled footing vs basement void (hand derivations)', () => {
+  // SBC 150, γs 18, founding depth 3 m, footing thickness 0.5 m
+  const base = params({ sbcKnM2: 150, foundationDepthM: 3 });
+
+  it('no basement (gross): SBC − [γs (Df − D) + 25 D] = 150 − (45 + 12.5) = 92.5', () => {
+    expect(availablePressure(base, 0.5).qAvail).toBeCloseTo(92.5, 6);
+  });
+
+  it('basement void (gross): the soil above the basement floor is gone: SBC − 25 D − walls = 150 − 12.5 − 5 = 132.5', () => {
+    const p = { ...base, basement: { depthM: 3, wallWeightKnM2: 5 } };
+    expect(availablePressure(p, 0.5).qAvail).toBeCloseTo(132.5, 6);
+    expect(availablePressure(p, 0.5).qAvail).toBeGreaterThan(availablePressure(base, 0.5).qAvail);
+  });
+
+  it('basement void (net): SBC + γs Df − 25 D − walls = 150 + 54 − 17.5 = 186.5', () => {
+    const p = { ...base, sbcBasis: 'net' as const, basement: { depthM: 3, wallWeightKnM2: 5 } };
+    expect(availablePressure(p, 0.5).qAvail).toBeCloseTo(186.5, 6);
+  });
+
+  it('footing deeper than the basement floor keeps the backfill between them: γs (Df − bd − D) = 18 × 0.5 = 9', () => {
+    const p = { ...base, foundationDepthM: 4, basement: { depthM: 3, wallWeightKnM2: 5 } };
+    // overburden = 12.5 + 9 + 5 = 26.5 -> 150 − 26.5 = 123.5
+    expect(availablePressure(p, 0.5).qAvail).toBeCloseTo(123.5, 6);
+  });
+
+  it('a heavier basement wall reduces the available pressure', () => {
+    const light = availablePressure({ ...base, basement: { depthM: 3, wallWeightKnM2: 2 } }, 0.5).qAvail;
+    const heavy = availablePressure({ ...base, basement: { depthM: 3, wallWeightKnM2: 12 } }, 0.5).qAvail;
+    expect(heavy).toBeLessThan(light);
+  });
+
+  it('the designed element reports the basement basis in its assumptions and uses the void pressure', () => {
+    const withB = designIsolatedFooting(col('c', 0, 0, 1000), { ...base, basement: { depthM: 3, wallWeightKnM2: 5 } });
+    const without = designIsolatedFooting(col('c', 0, 0, 1000), base);
+    expect(withB.availablePressureKnM2!).toBeGreaterThan(without.availablePressureKnM2!);
+    expect(withB.sizeXM!).toBeLessThanOrEqual(without.sizeXM!);
+  });
+
+  it('designFoundation adds the explanation to every element', () => {
+    const r = designFoundation([col('a', 0, 0, 800), col('b', 8, 0, 800)], { ...base, selectionMode: 'manual', basement: { depthM: 3, wallWeightKnM2: 5 } });
+    expect(r.elements.every(e => e.assumptions.some(t => t.includes('Basement void')))).toBe(true);
   });
 });
 
