@@ -45,6 +45,8 @@ import {
 } from '@/lib/brickCalculator';
 import * as THREE from 'three';
 import { cn } from '@/lib/utils';
+import { FoundationBasement3D } from './FoundationBasement3D';
+import { buildFoundation3DModel } from '@/lib/foundation/geometry3d';
 import { AlertTriangle, Info, ZoomIn, ZoomOut, RotateCcw, Hammer, ShieldAlert, X, LandPlot, Save, FolderClock, CheckCircle2, Layers, Paintbrush, Eye, Building2, Footprints, LayoutGrid } from 'lucide-react';
 import { useCalculator } from '../calculator/CalculatorContext';
 import { SharedBrickWall } from './SharedBrickWall';
@@ -2207,6 +2209,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const [showFullRoof, setShowFullRoof] = useState(model.fullRoof?.enabled ?? true);
   const [showFoundation, setShowFoundation] = useState(true);
   const [showSoilBed, setShowSoilBed] = useState(true);
+  const [showDetailedFoundation, setShowDetailedFoundation] = useState(true);
+  const [showBasement, setShowBasement] = useState(true);
   const [selectedPillar, setSelectedPillar] = useState<Pillar | null>(null);
   const [selectedFooting, setSelectedFooting] = useState<FoundationFooting | null>(null);
   const [selectedBeam, setSelectedBeam] = useState<SelectedBeamInfo | null>(null);
@@ -2282,6 +2286,32 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
     if (!groundFloor) return [];
     return [...groundFloor.externalWalls, ...groundFloor.internalWalls];
   }, [groundFloor]);
+
+  // Detailed foundation & basement design (from the design engines) turned into 3D geometry.
+  // Columns are located from the same 3D pillar positions the rest of the scene uses, so footings align with them.
+  const detailedDesign = model.foundationBasementDesign;
+  const detailedGeometry = useMemo(() => {
+    if (!detailedDesign) return null;
+    try {
+      const unit = model.buildingUnit || 'ft';
+      const positions: Record<string, { x: number; z: number }> = {};
+      groundPillars.forEach(pl => {
+        const eff = getEffectivePillarPosition(pl, groundFloorWalls, unit);
+        positions[pl.id] = { x: toMeters(eff.x, unit), z: -toMeters(eff.y, unit) };
+      });
+      return buildFoundation3DModel({
+        design: detailedDesign,
+        columnPositions: positions,
+        buildingLengthM: toMeters(model.buildingLength, unit),
+        buildingWidthM: toMeters(model.buildingWidth, unit),
+      });
+    } catch (err) {
+      console.warn('Detailed foundation geometry failed:', err);
+      return null;
+    }
+  }, [detailedDesign, groundPillars, groundFloorWalls, model.buildingUnit, model.buildingLength, model.buildingWidth]);
+  // When the detailed foundation is drawn it replaces the legacy footing meshes (they would overlap)
+  const useDetailedFoundation = !!detailedGeometry && showDetailedFoundation && detailedGeometry.boxes.some(b => b.group === 'foundation');
 
   const debugInfo = useMemo(() => {
     let ew = 0, iw = 0;
@@ -2705,6 +2735,20 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 <input type="checkbox" checked={showSoilBed} onChange={(e) => setShowSoilBed(e.target.checked)} className="rounded text-yellow-700 focus:ring-yellow-600" />
                 <span>Show Soil Bed / Excavation Pit</span>
               </label>
+              {detailedGeometry && (
+                <>
+                  <label className="flex items-center space-x-2 cursor-pointer text-sky-900 font-semibold bg-sky-50/90 px-1.5 py-0.5 rounded border border-sky-300/70">
+                    <input type="checkbox" checked={showDetailedFoundation} onChange={(e) => setShowDetailedFoundation(e.target.checked)} className="rounded text-sky-600 focus:ring-sky-500" />
+                    <span>Show Designed Foundation (engine)</span>
+                  </label>
+                  {detailedGeometry.boxes.some(b => b.group === 'basement') && (
+                    <label className="flex items-center space-x-2 cursor-pointer text-sky-900 font-semibold bg-sky-50/90 px-1.5 py-0.5 rounded border border-sky-300/70">
+                      <input type="checkbox" checked={showBasement} onChange={(e) => setShowBasement(e.target.checked)} className="rounded text-sky-600 focus:ring-sky-500" />
+                      <span>Show Basement (walls / base slab)</span>
+                    </label>
+                  )}
+                </>
+              )}
               <label className="flex items-center space-x-2 cursor-pointer text-slate-800 hover:text-slate-950 py-0.5">
                 <input type="checkbox" checked={showPillarLabels} onChange={(e) => setShowPillarLabels(e.target.checked)} className="rounded text-orange-600 focus:ring-orange-500" />
                 <span>Show Column Labels</span>
@@ -3217,8 +3261,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 model={model}
                 groundPillars={groundPillars}
                 floorAllWalls={groundFloorWalls}
-                showFoundation={showFoundation}
-                showFootingRebar={showFootingRebar}
+                showFoundation={showFoundation && !useDetailedFoundation}
+                showFootingRebar={showFootingRebar && !useDetailedFoundation}
                 showSoilBed={showSoilBed}
                 showLabels={showPillarLabels}
                 isConcreteSolid={isConcreteSolid}
@@ -3234,6 +3278,19 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 }}
                 reinf={settings.rccReinforcement}
               />
+
+              {/* Detailed foundation & basement from the design engines (below ground only; never moves floors) */}
+              {detailedGeometry && (
+                <FoundationBasement3D
+                  geometry={detailedGeometry}
+                  showFoundation={showDetailedFoundation}
+                  showBasement={showBasement}
+                  showRebar={showFootingRebar}
+                  showLabels={showPillarLabels}
+                  isConcreteSolid={isConcreteSolid}
+                  isGhosted={isGhosted}
+                />
+              )}
 
               {model.floors.map((floor, i) => {
                   const junction = floorJunctions[i] || getRingBeamJunction(floor, model, 0);

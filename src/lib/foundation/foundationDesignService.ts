@@ -980,6 +980,14 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
     }
   }
 
+  // tidy floating-point noise in reported geometry
+  const r4 = (v: number) => Math.round(v * 10000) / 10000;
+  elements.forEach(e => {
+    if (e.sizeXM !== undefined) e.sizeXM = r4(e.sizeXM);
+    if (e.sizeYM !== undefined) e.sizeYM = r4(e.sizeYM);
+    if (e.plan) e.plan = { x0: r4(e.plan.x0), x1: r4(e.plan.x1), y0: r4(e.plan.y0), y1: r4(e.plan.y1) };
+  });
+
   const q = elements.filter(e => e.quantities);
   const sum = (f: (e: FoundationElementResult) => number) => round(q.reduce((s, e) => s + f(e), 0), 3);
   elements.forEach(e => e.warnings.forEach(w => { if (!warnings.includes(w) && e.status === 'FAIL') warnings.push(`${e.id}: ${w}`); }));

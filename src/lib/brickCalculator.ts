@@ -15,6 +15,7 @@ import {
   CONCRETE_MIX_DATABASE,
   StructuralRatesConfig
 } from './structuralCalculationService';
+import { computeFoundationBasementDesign, isDetailedDesignRequested, type FoundationBasementIntegration } from './foundation/integration';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
   switch (grade) {
@@ -2253,6 +2254,8 @@ export interface CalculationResult {
   foundationEstimate?: FoundationEstimate;
   plasterEstimate?: PlasterEstimate;
   structuralSummary?: BuildingStructuralSummary;
+  /** Detailed foundation/basement design + BBS (present only once the foundation panel is used or a basement is enabled) */
+  foundationBasementDesign?: FoundationBasementIntegration;
   buildingBOQ?: BuildingBOQSummary;
 }
 
@@ -5345,6 +5348,7 @@ export const calculateProject = (
   // Full RCC Project Estimate (Multi-Floor Pillars + Ring Beams + Full RCC Top)
   // Structural Load & Engineering Calculation (Handbook & IS 456 Integration)
   let structuralSummary: BuildingStructuralSummary | undefined;
+  let foundationBasementDesign: FoundationBasementIntegration | undefined;
   if (project.buildingModel) {
     const bModel = project.buildingModel;
     const bConfig: BuildingConfig = {
@@ -5410,6 +5414,24 @@ export const calculateProject = (
     );
 
     bModel.structuralSummary = structuralSummary;
+
+    // Detailed foundation & basement design (opt-in; isolated from the existing calculations so a failure never breaks them)
+    if (isDetailedDesignRequested(bConfig)) {
+      try {
+        foundationBasementDesign = computeFoundationBasementDesign({
+          summary: structuralSummary,
+          config: bConfig,
+          pillars: effectivePillars.map(p => ({ id: p.id, floorId: p.floorId })),
+          floors: (bModel.floors || []).map(f => ({ id: f.id })),
+          buildingLengthM: bLengthM,
+          buildingWidthM: bWidthM,
+          options: { manualFootingCount: (bModel.foundation?.footings || []).filter(f => f.isManual).length },
+        });
+      } catch (err) {
+        console.warn('Foundation & basement design failed:', err);
+      }
+    }
+    bModel.foundationBasementDesign = foundationBasementDesign;
 
     // Mutate/enrich pillars with calculated structural data for 3D visualization and inspector
     const calcMap = new Map(structuralSummary.pillarsCalculations.map(c => [c.pillarId, c]));
@@ -5711,6 +5733,7 @@ export const calculateProject = (
     foundationEstimate,
     plasterEstimate,
     structuralSummary,
+    foundationBasementDesign,
     buildingBOQ
   };
 };
@@ -5866,6 +5889,7 @@ export interface BuildingModel {
   layoutMode?: 'auto' | 'manual';
   buildingConfig?: BuildingConfig;
   structuralSummary?: BuildingStructuralSummary;
+  foundationBasementDesign?: FoundationBasementIntegration;
 }
 
 export interface FullCostEstimate {
