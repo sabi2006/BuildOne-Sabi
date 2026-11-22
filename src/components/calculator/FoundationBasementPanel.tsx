@@ -1,0 +1,356 @@
+'use client';
+
+import React from 'react';
+import { AlertTriangle } from 'lucide-react';
+import type { BuildingConfig, ConcreteGrade, SteelGrade } from '../../lib/structuralCalculationService';
+import {
+  resolveFoundationDetails,
+  resolveBasementConfig,
+  type FoundationDetailsConfig,
+  type BasementConfig,
+} from '../../lib/foundation/types';
+
+interface Props {
+  config: BuildingConfig;
+  onChange: (patch: Partial<BuildingConfig>) => void;
+}
+
+const CONCRETE_GRADES: ConcreteGrade[] = ['M15', 'M20', 'M25', 'M30', 'M35'];
+const STEEL_GRADES: SteelGrade[] = ['Fe415', 'Fe500', 'Fe550'];
+
+const inputCls = 'w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 bg-white';
+const labelCls = 'block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1';
+const hintCls = 'text-[10px] text-slate-500 mt-0.5 block';
+
+/** Parse a number input; empty string means "not provided" (undefined). */
+const num = (v: string): number | undefined => {
+  if (v.trim() === '') return undefined;
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+function NumField({
+  label, value, onChange, unit, hint, step = 0.1, min,
+}: {
+  label: string; value: number | undefined; onChange: (v: number | undefined) => void;
+  unit?: string; hint?: string; step?: number; min?: number;
+}) {
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      <div className="flex items-center gap-2">
+        <input
+          type="number" step={step} min={min}
+          value={value ?? ''}
+          placeholder="not provided"
+          onChange={(e) => onChange(num(e.target.value))}
+          className={inputCls}
+        />
+        {unit && <span className="text-[11px] text-slate-600 shrink-0">{unit}</span>}
+      </div>
+      {hint && <span className={hintCls}>{hint}</span>}
+    </div>
+  );
+}
+
+function SelectField<T extends string>({
+  label, value, onChange, options, hint,
+}: {
+  label: string; value: T; onChange: (v: T) => void;
+  options: { id: T; label: string }[]; hint?: string;
+}) {
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value as T)} className={inputCls}>
+        {options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+      </select>
+      {hint && <span className={hintCls}>{hint}</span>}
+    </div>
+  );
+}
+
+function Section({ title, defaultOpen, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  return (
+    <details open={defaultOpen} className="rounded-xl border border-slate-300 bg-white group">
+      <summary className="cursor-pointer select-none px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-800">
+        {title}
+      </summary>
+      <div className="px-4 pb-4 pt-1 space-y-4">{children}</div>
+    </details>
+  );
+}
+
+export function FoundationBasementPanel({ config, onChange }: Props) {
+  const fd = resolveFoundationDetails(config.foundationDetails);
+  const bs = resolveBasementConfig(config.basement);
+
+  const setFd = (patch: Partial<FoundationDetailsConfig>) =>
+    onChange({ foundationDetails: { ...fd, ...patch } });
+  const setInv = (patch: Partial<FoundationDetailsConfig['investigation']>) =>
+    setFd({ investigation: { ...fd.investigation, ...patch } });
+  const setBs = (patch: Partial<BasementConfig>) =>
+    onChange({ basement: { ...bs, ...patch } });
+
+  const isPile = config.foundationType === 'pile';
+  const sbcAssumed = fd.investigation.sbcSource === 'assumed_preliminary';
+
+  return (
+    <div className="space-y-3">
+      {/* ------------------------ FOUNDATION ------------------------ */}
+      <Section title="Foundation Configuration (Advanced)" defaultOpen>
+        {sbcAssumed && (
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-300 rounded-lg p-2.5 text-[11px] text-amber-950">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <span>
+              SBC is marked <b>assumed / preliminary</b>. Foundation results will carry a WARNING until the SBC is
+              confirmed from a geotechnical investigation report.
+            </span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SelectField
+            label="Foundation Selection"
+            value={fd.selectionMode}
+            onChange={(v) => setFd({ selectionMode: v })}
+            options={[
+              { id: 'manual', label: 'Use foundation type chosen above' },
+              { id: 'auto', label: 'Automatic Selection (engine decides)' },
+            ]}
+            hint="Auto picks isolated / combined / raft from loads and SBC"
+          />
+          <SelectField
+            label="SBC Source"
+            value={fd.investigation.sbcSource}
+            onChange={(v) => setInv({ sbcSource: v })}
+            options={[
+              { id: 'geotechnical_report', label: 'Geotechnical investigation report' },
+              { id: 'assumed_preliminary', label: 'Assumed (preliminary only)' },
+            ]}
+            hint="Soil type alone does not determine SBC"
+          />
+          <SelectField
+            label="SBC Basis"
+            value={fd.sbcBasis ?? 'gross'}
+            onChange={(v) => setFd({ sbcBasis: v })}
+            options={[
+              { id: 'gross', label: 'Gross allowable (overburden deducted)' },
+              { id: 'net', label: 'Net allowable (used as given)' },
+            ]}
+            hint="Check your report: net vs gross SBC changes footing size"
+          />
+          <div className="sm:col-span-2">
+            <label className={labelCls}>Custom Soil Description (optional)</label>
+            <input
+              type="text" value={fd.customSoilDescription ?? ''}
+              placeholder="e.g. Murrum over weathered rock"
+              onChange={(e) => setFd({ customSoilDescription: e.target.value || undefined })}
+              className={inputCls}
+            />
+            <span className={hintCls}>Use with the SBC and soil parameters below when no catalog class fits</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <NumField label="Soil Unit Weight" unit="kN/m³" value={fd.soilUnitWeightKnM3} step={0.5} min={10}
+            onChange={(v) => setFd({ soilUnitWeightKnM3: v ?? 18 })} />
+          <NumField label="Groundwater Depth" unit="m" value={fd.groundwaterDepthM} min={0}
+            hint="Below ground level; blank = unknown"
+            onChange={(v) => setFd({ groundwaterDepthM: v })} />
+          <NumField label="Min. Founding Level" unit="m" value={fd.minFoundingLevelM} min={0}
+            hint="Lower bound on foundation depth"
+            onChange={(v) => setFd({ minFoundingLevelM: v })} />
+          <NumField label="Cohesion c" unit="kN/m²" value={fd.cohesionKnM2} min={0}
+            onChange={(v) => setFd({ cohesionKnM2: v })} />
+          <NumField label="Friction Angle φ" unit="deg" value={fd.frictionAngleDeg} min={0} step={0.5}
+            onChange={(v) => setFd({ frictionAngleDeg: v })} />
+          <NumField label="Allowable Settlement" unit="mm" value={fd.allowableSettlementMm} min={0} step={5}
+            hint="Blank = settlement check not verified"
+            onChange={(v) => setFd({ allowableSettlementMm: v })} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <SelectField
+            label="Foundation Concrete"
+            value={(fd.concreteGrade ?? config.concreteGrade) as ConcreteGrade}
+            onChange={(v) => setFd({ concreteGrade: v })}
+            options={CONCRETE_GRADES.map(g => ({ id: g, label: g }))}
+            hint="Defaults to building grade"
+          />
+          <SelectField
+            label="Foundation Steel"
+            value={(fd.steelGrade ?? config.steelGrade) as SteelGrade}
+            onChange={(v) => setFd({ steelGrade: v })}
+            options={STEEL_GRADES.map(g => ({ id: g, label: g }))}
+            hint="Defaults to building grade"
+          />
+          <SelectField
+            label="Design Preference"
+            value={fd.designPreference}
+            onChange={(v) => setFd({ designPreference: v })}
+            options={[
+              { id: 'economy', label: 'Economy' },
+              { id: 'balanced', label: 'Balanced' },
+              { id: 'conservative', label: 'Conservative' },
+            ]}
+          />
+          <NumField label="Clear Cover" unit="mm" value={fd.clearCoverMm} step={5} min={20}
+            onChange={(v) => setFd({ clearCoverMm: v ?? 50 })} />
+          <NumField label="PCC Thickness" unit="mm" value={fd.pccThicknessMm} step={10} min={50}
+            onChange={(v) => setFd({ pccThicknessMm: v ?? 100 })} />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Soil Investigation Report Ref.</label>
+            <input type="text" value={fd.investigation.reportReference ?? ''}
+              onChange={(e) => setInv({ reportReference: e.target.value || undefined })}
+              className={inputCls} />
+          </div>
+          <NumField label="Boreholes" value={fd.investigation.boreholeCount} step={1} min={0}
+            onChange={(v) => setInv({ boreholeCount: v })} />
+          <NumField label="SPT N-value" value={fd.investigation.sptNValue} step={1} min={0}
+            onChange={(v) => setInv({ sptNValue: v })} />
+        </div>
+
+        {isPile && (
+          <div className="rounded-lg border border-slate-300 bg-slate-50 p-3 space-y-3">
+            <div className="text-[11px] text-slate-700">
+              <b>Pile data (IS 2911):</b> pile design is shown as <b>NOT VERIFIED</b> unless capacity can be
+              derived from the borehole values below or a verified pile capacity is entered. Pile sizes are never
+              generated from soil type alone.
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <NumField label="Pile Diameter" unit="mm" step={50} value={fd.investigation.pile?.pileDiameterMm}
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, pileDiameterMm: v } })} />
+              <NumField label="Pile Length" unit="m" value={fd.investigation.pile?.pileLengthM}
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, pileLengthM: v } })} />
+              <NumField label="Verified Pile Capacity" unit="kN" step={10} value={fd.investigation.pile?.verifiedPileCapacityKn}
+                hint="e.g. from a pile load test"
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, verifiedPileCapacityKn: v } })} />
+              <NumField label="Unit Skin Friction" unit="kN/m²" value={fd.investigation.pile?.unitSkinFrictionKnM2}
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, unitSkinFrictionKnM2: v } })} />
+              <NumField label="Unit End Bearing" unit="kN/m²" value={fd.investigation.pile?.unitEndBearingKnM2}
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, unitEndBearingKnM2: v } })} />
+            </div>
+          </div>
+        )}
+      </Section>
+
+      {/* ------------------------- BASEMENT ------------------------- */}
+      <Section title="Basement Configuration" defaultOpen={bs.enabled}>
+        <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <input type="checkbox" checked={bs.enabled}
+            onChange={(e) => setBs({ enabled: e.target.checked })}
+            className="h-4 w-4" />
+          Enable Basement
+        </label>
+
+        {!bs.enabled && (
+          <div className="text-[11px] text-slate-500">
+            Basement disabled: no basement structural elements are generated, calculated or costed.
+          </div>
+        )}
+
+        {bs.enabled && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <NumField label="Basement Levels" value={bs.levels} step={1} min={1}
+                onChange={(v) => setBs({ levels: Math.max(1, Math.round(v ?? 1)) })} />
+              <NumField label="Basement Depth" unit="m" value={bs.depthM} min={1}
+                hint="Base level below ground, all levels"
+                onChange={(v) => setBs({ depthM: v ?? 3 })} />
+              <NumField label="Clear Height (per level)" unit="m" value={bs.clearHeightM} min={2}
+                onChange={(v) => setBs({ clearHeightM: v ?? 2.7 })} />
+              <SelectField label="Wall Thickness" value={bs.wallThicknessMode}
+                onChange={(v) => setBs({ wallThicknessMode: v })}
+                options={[{ id: 'auto', label: 'Automatic (from design)' }, { id: 'manual', label: 'Manual' }]} />
+              {bs.wallThicknessMode === 'manual' && (
+                <NumField label="Wall Thickness" unit="mm" value={bs.wallThicknessMm} step={25} min={150}
+                  hint="Manual value is never overwritten silently"
+                  onChange={(v) => setBs({ wallThicknessMm: v })} />
+              )}
+              <SelectField label="Wall Type" value={bs.wallType}
+                onChange={(v) => setBs({ wallType: v })}
+                options={[
+                  { id: 'rcc_retaining', label: 'RCC retaining wall' },
+                  { id: 'rcc_with_masonry_lining', label: 'RCC with masonry lining' },
+                  { id: 'diaphragm_wall', label: 'Diaphragm wall' },
+                ]} />
+              <SelectField label="Floor Slab Type" value={bs.floorSlabType}
+                onChange={(v) => setBs({ floorSlabType: v })}
+                options={[
+                  { id: 'raft_slab', label: 'Raft slab' },
+                  { id: 'on_grade_slab', label: 'Slab on grade' },
+                  { id: 'suspended_slab', label: 'Suspended slab' },
+                ]} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <NumField label="Groundwater Depth" unit="m" value={bs.groundwaterDepthM} min={0}
+                hint="Below ground level; blank = uplift check not verified"
+                onChange={(v) => setBs({ groundwaterDepthM: v })} />
+              <NumField label="Soil Unit Weight" unit="kN/m³" value={bs.soilUnitWeightKnM3} step={0.5} min={10}
+                onChange={(v) => setBs({ soilUnitWeightKnM3: v ?? 18 })} />
+              <NumField label="Friction Angle φ" unit="deg" value={bs.frictionAngleDeg} step={0.5} min={0}
+                hint="Needed for earth pressure; blank = not verified"
+                onChange={(v) => setBs({ frictionAngleDeg: v })} />
+              <SelectField label="Earth Pressure" value={bs.earthPressureCondition}
+                onChange={(v) => setBs({ earthPressureCondition: v })}
+                options={[
+                  { id: 'at_rest', label: 'At-rest (wall restrained by slabs)' },
+                  { id: 'active', label: 'Active (free to deflect)' },
+                ]} />
+              <NumField label="Backfill Height" unit="m" value={bs.backfillHeightM} min={0}
+                onChange={(v) => setBs({ backfillHeightM: v ?? 0 })} />
+              <NumField label="Surface Surcharge" unit="kN/m²" value={bs.surchargeKnM2} step={1} min={0}
+                onChange={(v) => setBs({ surchargeKnM2: v ?? 0 })} />
+              <SelectField label="Adjacent / Boundary" value={bs.adjacentCondition}
+                onChange={(v) => setBs({ adjacentCondition: v })}
+                options={[
+                  { id: 'none', label: 'None' },
+                  { id: 'adjacent_building', label: 'Adjacent building' },
+                  { id: 'road_boundary', label: 'Road boundary' },
+                  { id: 'property_boundary', label: 'Property boundary' },
+                ]} />
+              {bs.adjacentCondition === 'adjacent_building' && (
+                <NumField label="Adjacent Building Surcharge" unit="kN/m²" value={bs.adjacentSurchargeKnM2} step={1} min={0}
+                  onChange={(v) => setBs({ adjacentSurchargeKnM2: v })} />
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SelectField label="Waterproofing" value={bs.waterproofing}
+                onChange={(v) => setBs({ waterproofing: v })}
+                options={[
+                  { id: 'none', label: 'None' },
+                  { id: 'cementitious_coating', label: 'Cementitious coating' },
+                  { id: 'integral_crystalline', label: 'Integral crystalline' },
+                  { id: 'bituminous_membrane', label: 'Bituminous membrane' },
+                  { id: 'pvc_membrane', label: 'PVC membrane' },
+                ]} />
+              <SelectField label="Drainage" value={bs.drainage}
+                onChange={(v) => setBs({ drainage: v })}
+                options={[
+                  { id: 'none', label: 'None' },
+                  { id: 'perimeter_drain', label: 'Perimeter drain' },
+                  { id: 'sump_and_pump', label: 'Sump and pump' },
+                  { id: 'perimeter_drain_and_sump', label: 'Perimeter drain + sump' },
+                ]} />
+              <SelectField label="Basement Concrete"
+                value={(bs.concreteGrade ?? config.concreteGrade) as ConcreteGrade}
+                onChange={(v) => setBs({ concreteGrade: v })}
+                options={CONCRETE_GRADES.map(g => ({ id: g, label: g }))}
+                hint="Water-retaining members should not use a weak grade; verify against IS 456" />
+              <SelectField label="Basement Steel"
+                value={(bs.steelGrade ?? config.steelGrade) as SteelGrade}
+                onChange={(v) => setBs({ steelGrade: v })}
+                options={STEEL_GRADES.map(g => ({ id: g, label: g }))} />
+            </div>
+          </>
+        )}
+      </Section>
+    </div>
+  );
+}

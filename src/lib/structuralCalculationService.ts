@@ -13,6 +13,8 @@
  * and licensed structural engineer review.
  */
 
+import type { FoundationDetailsConfig, BasementConfig } from './foundation/types';
+
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
 
 export function toMeters(val: number, unit?: Unit): number {
@@ -192,6 +194,10 @@ export interface BuildingConfig {
     isCustomBeam?: boolean;
   }>;
   customRates?: StructuralRatesConfig;
+  /** Extended geotechnical/foundation inputs (optional; defaults via resolveFoundationDetails) */
+  foundationDetails?: FoundationDetailsConfig;
+  /** Basement configuration (optional; absent or enabled=false means no basement) */
+  basement?: BasementConfig;
 }
 
 export const DEFAULT_BUILDING_CONFIG: BuildingConfig = {

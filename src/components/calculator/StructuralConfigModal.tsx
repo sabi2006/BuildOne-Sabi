@@ -43,6 +43,7 @@ import {
   BOQProductItem
 } from '@/lib/brickCalculator';
 import { CalculatorContext } from './CalculatorContext';
+import { FoundationBasementPanel } from './FoundationBasementPanel';
 
 export interface BuildingDetailsConfig {
   length: number;
@@ -1384,6 +1385,12 @@ export function StructuralConfigModal({
                   ))}
                 </div>
               </div>
+
+              {/* Foundation & Basement advanced inputs */}
+              <FoundationBasementPanel
+                config={localConfig}
+                onChange={(patch) => setLocalConfig(prev => ({ ...prev, ...patch }))}
+              />
             </div>
           )}
 
