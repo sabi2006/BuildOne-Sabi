@@ -23,6 +23,30 @@ export type SbcSource = 'geotechnical_report' | 'assumed_preliminary';
 /** Whether the entered SBC is the gross allowable pressure at founding level, or the net (excess over overburden) */
 export type SbcBasis = 'gross' | 'net';
 
+/**
+ * Optional wind and earthquake loads for the frame analysis (only used when the column load source is 'frame').
+ * Everything here is user input: the application does not derive a wind speed, a seismic zone or a soil class.
+ */
+export interface LateralLoadConfig {
+  seismic?: {
+    enabled: boolean;
+    /** IS 1893 seismic zone */
+    zone: 'II' | 'III' | 'IV' | 'V';
+    importanceFactor: number;
+    responseReduction: number;
+    soil: 'rock' | 'medium' | 'soft';
+    /** true: masonry infill frame (Ta = 0.09h/√d); false: bare frame (Ta = 0.075h^0.75) */
+    infilledFrame: boolean;
+  };
+  wind?: {
+    enabled: boolean;
+    /** Net design wind pressure, kN/m², from the user's own IS 875 (Part 3) calculation */
+    designPressureKnM2: number;
+  };
+  /** Allowed increase of the soil pressure for service combinations with wind/earthquake (1 = none, the default) */
+  sbcIncreaseFactor?: number;
+}
+
 /** Optional borehole-derived data. Pile design stays NOT_VERIFIED without it. */
 export interface PileInvestigationData {
   /** Reference to the soil investigation report (IS 1892) */
@@ -55,8 +79,10 @@ export interface FoundationDetailsConfig {
 
   /** Depth of groundwater table below ground level, metres. Undefined = unknown. */
   groundwaterDepthM?: number;
-  /** Column load source (default 'tributary'). 'frame' runs a 3D gravity frame analysis for axial loads, shears and moments. */
+  /** Column load source (default 'frame'). 'frame' runs a 3D gravity frame analysis for axial loads, shears and moments. */
   columnLoadSource?: ColumnLoadSource;
+  /** Wind / earthquake loads (default: none). Needs columnLoadSource 'frame'. */
+  lateral?: LateralLoadConfig;
   /** 'gross' (default, conservative): overburden is deducted from SBC. 'net': SBC used as given. */
   sbcBasis?: SbcBasis;
   soilUnitWeightKnM3: number;
@@ -122,6 +148,9 @@ export interface BasementConfig {
 export const DEFAULT_FOUNDATION_DETAILS: FoundationDetailsConfig = {
   selectionMode: 'manual',
   soilUnitWeightKnM3: 18,
+  // the gravity frame analysis is the default load source (it falls back to the tributary estimate, with a warning,
+  // if a frame cannot be formed from the model)
+  columnLoadSource: 'frame',
   investigation: { sbcSource: 'assumed_preliminary' },
   clearCoverMm: 50,
   pccThicknessMm: 100,

@@ -25,7 +25,7 @@ const project = (cfg: Partial<BuildingConfig> = {}, pts: Array<[number, number]>
     buildingModel: { buildingConfig: config, buildingLength: 40, buildingWidth: 30, buildingUnit: 'ft', floors, roofSlab: { ...DEFAULT_RCC_SLAB, enabled: true } } as any,
   } as any;
 };
-const fd = { selectionMode: 'manual', groundwaterDepthM: 8 } as any;
+const fd = { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any;
 const basement = (o: Record<string, unknown> = {}) => ({
   enabled: true, levels: 1, depthM: 3, clearHeightM: 2.7, frictionAngleDeg: 30, soilUnitWeightKnM3: 18, backfillHeightM: 3, surchargeKnM2: 10, ...o,
 }) as any;

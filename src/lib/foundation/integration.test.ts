@@ -56,7 +56,7 @@ describe('Detailed design is opt-in and isolated', () => {
 
   it('existing structural summary and superstructure BOQ are identical with and without the detailed design', () => {
     const plain = calculateProject(makeProject());
-    const withDesign = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }));
+    const withDesign = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }));
     expect(withDesign.foundationBasementDesign).toBeDefined();
     // the summary echoes the input config (which now contains foundationDetails); everything calculated must match
     const strip = (x: any) => { const { buildingConfig, ...rest } = x; void buildingConfig; return rest; };
@@ -71,7 +71,7 @@ describe('Detailed design is opt-in and isolated', () => {
   });
 
   it('the design is stored on the building model so it persists with the project', () => {
-    const proj = makeProject({ foundationDetails: { selectionMode: 'manual' } as any });
+    const proj = makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any });
     const r = calculateProject(proj);
     expect(proj.buildingModel.foundationBasementDesign).toBeDefined();
     expect(proj.buildingModel.foundationBasementDesign.status).toBe(r.foundationBasementDesign!.status);
@@ -81,7 +81,7 @@ describe('Detailed design is opt-in and isolated', () => {
 });
 
 describe('Load path: roof → storeys → ground columns → foundation', () => {
-  const proj = makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 3);
+  const proj = makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 3);
   const r = calculateProject(proj);
   const d = r.foundationBasementDesign!;
   const s = r.structuralSummary!;
@@ -122,9 +122,9 @@ describe('Load path: roof → storeys → ground columns → foundation', () => 
   });
 
   it('more storeys means a larger ground column load (not a fixed per-floor multiple of one floor)', () => {
-    const g1 = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 1)).foundationBasementDesign!;
+    const g1 = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 1)).foundationBasementDesign!;
     const g3 = d;
-    const g4 = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 4)).foundationBasementDesign!;
+    const g4 = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 4)).foundationBasementDesign!;
     expect(g3.loadPath.totalServiceKn).toBeGreaterThan(g1.loadPath.totalServiceKn);
     expect(g4.loadPath.totalServiceKn).toBeGreaterThan(g3.loadPath.totalServiceKn);
   });
@@ -144,7 +144,7 @@ describe('Load path: roof → storeys → ground columns → foundation', () => 
 
 describe('Foundation design driven by the real building', () => {
   it('designs a foundation element for every ground column using actual loads and sizes', () => {
-    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 3));
+    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 3));
     const f = r.foundationBasementDesign!.foundation!;
     expect(f.elements.length).toBeGreaterThan(0);
     expect(f.totals.columns).toBe(4);
@@ -156,30 +156,30 @@ describe('Foundation design driven by the real building', () => {
   });
 
   it('a weaker SBC enlarges the foundation (recalculation on input change)', () => {
-    const strong = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any, allowableSoilBearingPressureKnM2: 250 }, 3)).foundationBasementDesign!;
-    const weak = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any, allowableSoilBearingPressureKnM2: 120 }, 3)).foundationBasementDesign!;
+    const strong = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any, allowableSoilBearingPressureKnM2: 250 }, 3)).foundationBasementDesign!;
+    const weak = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any, allowableSoilBearingPressureKnM2: 120 }, 3)).foundationBasementDesign!;
     expect(weak.foundation!.totals.concreteM3).toBeGreaterThan(strong.foundation!.totals.concreteM3);
   });
 
   it('a higher concrete grade is carried into the design', () => {
-    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', concreteGrade: 'M30' } as any }, 3)).foundationBasementDesign!;
+    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', concreteGrade: 'M30' } as any }, 3)).foundationBasementDesign!;
     expect(r.foundation!.elements.every(e => e.concreteGrade === 'M30')).toBe(true);
   });
 
   it('BBS steel is produced and tallies with the element rows', () => {
-    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 3)).foundationBasementDesign!;
+    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 3)).foundationBasementDesign!;
     expect(r.bbs!.totals.steelKg).toBeGreaterThan(0);
     expect(r.summary.steelKg).toBe(r.bbs!.totals.steelKg);
   });
 
   it('the legacy footings estimate and BOQ are unchanged by the new design', () => {
     const a = calculateProject(makeProject());
-    const b = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }));
+    const b = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }));
     expect(JSON.stringify(b.foundationEstimate)).toBe(JSON.stringify(a.foundationEstimate));
   });
 
   it('manual legacy footings are counted and preserved with a warning', () => {
-    const proj = makeProject({ foundationDetails: { selectionMode: 'manual' } as any }, 3, {
+    const proj = makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any }, 3, {
       foundation: { enabled: true, footings: [{ id: 'mf1', isManual: true }] },
     });
     const r = calculateProject(proj).foundationBasementDesign!;
@@ -190,12 +190,12 @@ describe('Foundation design driven by the real building', () => {
 
 describe('Basement integration', () => {
   const cfg = {
-    foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 6 } as any,
+    foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 6 } as any,
     basement: { enabled: true, levels: 1, depthM: 3, clearHeightM: 2.7, frictionAngleDeg: 30, soilUnitWeightKnM3: 18, backfillHeightM: 3, surchargeKnM2: 10 } as any,
   };
 
   it('disabled basement generates no basement design', () => {
-    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any, basement: { ...cfg.basement, enabled: false } })).foundationBasementDesign!;
+    const r = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary' } as any, basement: { ...cfg.basement, enabled: false } })).foundationBasementDesign!;
     expect(r.basement).toBeUndefined();
   });
 
@@ -225,7 +225,7 @@ describe('Basement integration', () => {
     const shallow = calculateProject(makeProject(cfg)).foundationBasementDesign!;
     const deep = calculateProject(makeProject({ ...cfg, basement: { ...cfg.basement, depthM: 5, backfillHeightM: 5 } })).foundationBasementDesign!;
     expect(deep.basement!.elements[0].pressure!.bottomKnM2).toBeGreaterThan(shallow.basement!.elements[0].pressure!.bottomKnM2);
-    const wet = calculateProject(makeProject({ ...cfg, foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 0.5 } as any })).foundationBasementDesign!;
+    const wet = calculateProject(makeProject({ ...cfg, foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 0.5 } as any })).foundationBasementDesign!;
     expect(wet.basement!.stability.upliftKn).toBeGreaterThan(0);
   });
 
@@ -246,7 +246,7 @@ describe('Helpers', () => {
 
   it('isDetailedDesignRequested depends on the panel being used or a basement enabled', () => {
     expect(isDetailedDesignRequested({})).toBe(false);
-    expect(isDetailedDesignRequested({ foundationDetails: { selectionMode: 'auto' } as any })).toBe(true);
+    expect(isDetailedDesignRequested({ foundationDetails: { selectionMode: 'auto', columnLoadSource: 'tributary' } as any })).toBe(true);
     expect(isDetailedDesignRequested({ basement: { enabled: false } as any })).toBe(false);
     expect(isDetailedDesignRequested({ basement: { enabled: true } as any })).toBe(true);
   });

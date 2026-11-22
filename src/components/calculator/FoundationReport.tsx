@@ -250,6 +250,23 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
                 <KV k="Equilibrium error" v={`${fmt(design.loadPath.frame.totals?.equilibriumErrorKn, 6)} kN`} />
                 <KV k="Slab load reaching beams" v={`${fmt((design.loadPath.frame.totals?.slabLoadCapturedRatio ?? 0) * 100, 0)} %`} />
               </div>
+              {design.loadPath.frame.lateral && (
+                <div className="mb-2 border border-sky-200 bg-white rounded p-2" data-testid="lateral-summary">
+                  <div className="text-[11px] font-bold text-slate-900 mb-1">Wind / earthquake loads (equivalent static)</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {design.loadPath.frame.lateral.seismic && (<>
+                      <KV k={`Earthquake: zone ${design.loadPath.frame.lateral.seismic.params.zone}`} v={`Ah ${fmt(design.loadPath.frame.lateral.seismic.X.Ah, 4)} / ${fmt(design.loadPath.frame.lateral.seismic.Z.Ah, 4)}`} />
+                      <KV k="Period T (X / plan y)" v={`${fmt(design.loadPath.frame.lateral.seismic.X.periodS, 3)} / ${fmt(design.loadPath.frame.lateral.seismic.Z.periodS, 3)} s`} />
+                      <KV k="Seismic weight" v={`${fmt(design.loadPath.frame.lateral.seismic.totalWeightKn, 0)} kN`} />
+                      <KV k="Base shear (X / plan y)" v={`${fmt(design.loadPath.frame.lateral.seismic.X.baseShearKn, 1)} / ${fmt(design.loadPath.frame.lateral.seismic.Z.baseShearKn, 1)} kN`} />
+                    </>)}
+                    {design.loadPath.frame.lateral.wind && (<>
+                      <KV k="Wind pressure (user input)" v={`${fmt(design.loadPath.frame.lateral.wind.pressureKnM2, 2)} kN/m²`} />
+                      <KV k="Wind force (X / plan y)" v={`${fmt(design.loadPath.frame.lateral.wind.X.totalKn, 1)} / ${fmt(design.loadPath.frame.lateral.wind.Z.totalKn, 1)} kN`} />
+                    </>)}
+                  </div>
+                </div>
+              )}
               <List title="Model assumptions" items={design.loadPath.frame.assumptions} />
               <List title="Frame warnings" items={design.loadPath.frame.warnings} tone="amber" />
             </div>

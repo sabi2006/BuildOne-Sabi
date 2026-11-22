@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1795336303.612913,
-    "seen": 1795336834.650775,
-    "ast_hash": "0e4b802cffb1a9028a276704cae13e43",
+    "mtime": 1795336860.0839794,
+    "seen": 1795338109.1349127,
+    "ast_hash": "e2dd8bb29d81ed1e5e7cc5f1c09df93f",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {
-    "mtime": 1795336380.4868007,
-    "seen": 1795336834.6507177,
-    "ast_hash": "50ba7893e09d1eff301eb48157adcf51",
+    "mtime": 1795337735.8396628,
+    "seen": 1795338109.134876,
+    "ast_hash": "7efc4ea5da5513052ae51bf2228463c5",
     "semantic_hash": ""
   },
   "src/lib/foundation/basementDesignService.test.ts": {
@@ -600,15 +600,15 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795336215.1589818,
-    "seen": 1795336834.650806,
-    "ast_hash": "62a302338f99ee8057328216c4d6326d",
+    "mtime": 1795337860.0957103,
+    "seen": 1795338109.1349323,
+    "ast_hash": "067b9fd2ab7c74ef75f3a36167db8a79",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
-    "mtime": 1795333194.289906,
-    "seen": 1795333326.6458812,
-    "ast_hash": "44dc2f9315522167b7c7a542b56a4ad7",
+    "mtime": 1795336901.8396509,
+    "seen": 1795338109.1349394,
+    "ast_hash": "bbbaa25417c25dc24d23772b8e6627ca",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.ts": {
@@ -618,15 +618,15 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.test.ts": {
-    "mtime": 1795332708.5303595,
-    "seen": 1795333326.6458833,
-    "ast_hash": "3b908336c94e113678d42376656583ce",
+    "mtime": 1795336901.8376694,
+    "seen": 1795338109.134943,
+    "ast_hash": "0a7ee3722b9b8ddd9595c83da9223bf5",
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.ts": {
-    "mtime": 1795336494.802627,
-    "seen": 1795336834.6508245,
-    "ast_hash": "fba985c97825ad052c12ecab9a8ce5f6",
+    "mtime": 1795337671.1431744,
+    "seen": 1795338109.1349447,
+    "ast_hash": "eb1a124466ba3c6f5ce011956403e6be",
     "semantic_hash": ""
   },
   "src/lib/foundation/rcDesign.ts": {
@@ -636,15 +636,15 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/types.ts": {
-    "mtime": 1795336215.1574936,
-    "seen": 1795336834.6508317,
-    "ast_hash": "358fada95acf3499b3f5eed1fe726a3c",
+    "mtime": 1795337671.023185,
+    "seen": 1795338109.134957,
+    "ast_hash": "9510e77db0cf0445e7b9748098be4c4b",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.test.ts": {
-    "mtime": 1795333113.103564,
-    "seen": 1795333326.6458764,
-    "ast_hash": "b9e8fc08e3df153abe378117e70b647d",
+    "mtime": 1795336901.838648,
+    "seen": 1795338109.134923,
+    "ast_hash": "3fa3ed471a614bd4de71eee240d3b195",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.ts": {
@@ -654,33 +654,33 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/scenarios.test.ts": {
-    "mtime": 1795334199.384243,
-    "seen": 1795334549.1247027,
-    "ast_hash": "e19d28bf43d6ed30789522a72db9508b",
+    "mtime": 1795336901.840665,
+    "seen": 1795338109.1349552,
+    "ast_hash": "4361b3cf4bb6b7f64254a669bb1ee686",
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationReport.test.tsx": {
-    "mtime": 1795336400.3934197,
-    "seen": 1795336834.6507213,
-    "ast_hash": "bace3062f92fd2f8aaa9f918275e7cb4",
+    "mtime": 1795337843.8772867,
+    "seen": 1795338109.1348794,
+    "ast_hash": "2e5ecf4e868f0105f78ee085536dec65",
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationReport.tsx": {
-    "mtime": 1795336380.487306,
-    "seen": 1795336834.650724,
-    "ast_hash": "ef5790c50b423d716ae7c371e3ab1f13",
+    "mtime": 1795337717.176354,
+    "seen": 1795338109.1348813,
+    "ast_hash": "6e3290ed2c397575b91b2ae1564b12af",
     "semantic_hash": ""
   },
   "src/lib/foundation/buildingFrame.test.ts": {
-    "mtime": 1795336513.4701219,
-    "seen": 1795336834.6507986,
-    "ast_hash": "25505e4d05e683cfacaa9440b53912e5",
+    "mtime": 1795337391.790806,
+    "seen": 1795338109.1349266,
+    "ast_hash": "6db02b0942b902bf58f9580e91951e1d",
     "semantic_hash": ""
   },
   "src/lib/foundation/buildingFrame.ts": {
-    "mtime": 1795336494.7794068,
-    "seen": 1795336834.650801,
-    "ast_hash": "fda5a9ff11a3c5caf7ef2bfe6a042006",
+    "mtime": 1795337336.3297634,
+    "seen": 1795338109.1349285,
+    "ast_hash": "4e476aa89ddac3b2df11b4da72efe1ad",
     "semantic_hash": ""
   },
   "src/lib/foundation/frame.test.ts": {
@@ -690,21 +690,39 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/frame.ts": {
-    "mtime": 1795336027.1624792,
-    "seen": 1795336834.6508117,
-    "ast_hash": "e8c8530660d8c6dd08d6a36062c78077",
+    "mtime": 1795337037.0550673,
+    "seen": 1795338109.1349359,
+    "ast_hash": "e6a27e8f17eddc7dbf65c5c2f934c387",
     "semantic_hash": ""
   },
   "src/lib/foundation/frameIntegration.test.ts": {
-    "mtime": 1795336359.1376424,
-    "seen": 1795336834.6508145,
-    "ast_hash": "b4f60327d20e56a580745aefea49de87",
+    "mtime": 1795336920.4137967,
+    "seen": 1795338109.1349375,
+    "ast_hash": "2f5d496af7323f99eedc8b7dd1fc529d",
     "semantic_hash": ""
   },
   "vitest.config.mts": {
     "mtime": 1795335617.6199677,
     "seen": 1795336834.6508512,
     "ast_hash": "2f7588506187aac19f1300cc57a75443",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateral.test.ts": {
+    "mtime": 1795337186.4661055,
+    "seen": 1795338109.134947,
+    "ast_hash": "5918814c0f890c4a49708bcfab052d0c",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateral.ts": {
+    "mtime": 1795337140.2903433,
+    "seen": 1795338109.1349494,
+    "ast_hash": "080ddf062e19d3c242ec7f2610c3ff23",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateralFoundation.test.ts": {
+    "mtime": 1795337860.0957103,
+    "seen": 1795338109.134951,
+    "ast_hash": "875c5672c15b68dba10c690892f13f7a",
     "semantic_hash": ""
   },
   "package-lock.json": {

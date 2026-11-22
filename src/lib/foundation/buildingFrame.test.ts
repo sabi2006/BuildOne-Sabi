@@ -209,3 +209,105 @@ describe('Realistic grids', () => {
     expect(Date.now() - t0).toBeLessThan(1000);
   });
 });
+
+describe('Lateral loads (equivalent static seismic and wind from a pressure)', () => {
+  const seismic = { zone: 'III' as const, importanceFactor: 1, responseReduction: 3, soil: 'medium' as const, infilledFrame: true };
+  const mk = (over: Partial<BuildingFrameInput> = {}) => grid(1, 1, 6, 6, { storeyHeightsM: [3, 3, 3], floorLoadKnM2: 8, roofLoadKnM2: 10, floorLiveKnM2: 2, roofLiveKnM2: 1.5, lateral: { seismic }, ...over });
+
+  it('seismic weight of a one-storey frame by hand: roof slab dead 10 × 36 + 4 beams (22.5 each) + half the columns (4 × 6) = 474 kN', () => {
+    const r = analyseBuildingFrame(grid(1, 1, 6, 6, { roofLoadKnM2: 11.5, roofLiveKnM2: 1.5, lateral: { seismic } }));
+    // roof: dead part 10 kN/m², live 1.5 (no live load on the roof in the seismic weight)
+    const expected = 10 * 36 + 4 * beamSw(6) + 4 * ((0.4 ** 2 * GAMMA * 3) / 2) + 4 * 2.185 * 0 /* no parapet given */;
+    expect(r.lateral!.seismic!.weightsKn[0]).toBeCloseTo(expected, 6);
+    expect(r.lateral!.seismic!.weightsKn[0]).toBeCloseTo(474, 6);
+  });
+
+  it('floor weights include 25 % of the live load (intensity 2 ≤ 3): level 1 = dead + 0.25 × 2 × 36', () => {
+    const r = analyseBuildingFrame(mk());
+    const deadSlab = (8 - 2) * 36;
+    const beams = 4 * beamSw(6);
+    const cols = 4 * ((0.4 ** 2 * GAMMA * 3) / 2 + (0.4 ** 2 * GAMMA * 3) / 2);
+    expect(r.lateral!.seismic!.weightsKn[0]).toBeCloseTo(deadSlab + 0.25 * 2 * 36 + beams + cols, 6);
+  });
+
+  it('base shear of the frame equals the seismic base shear VB = Ah W in both directions', () => {
+    const r = analyseBuildingFrame(mk());
+    for (const id of ['EQX', 'EQZ'] as const) {
+      const chk = r.lateral!.baseShearCheck[id]!;
+      expect(chk.reactionKn).toBeCloseTo(chk.appliedKn, 6);
+    }
+    const sx = r.lateral!.seismic!;
+    expect(sx.X.baseShearKn).toBeCloseTo(sx.X.Ah * sx.totalWeightKn, 9);
+    expect(sx.X.storeyForcesKn.reduce((a, b) => a + b, 0)).toBeCloseTo(sx.X.baseShearKn, 9);
+  });
+
+  it('overturning moment equilibrium: Σ(Mz_i + x_i·N_i) = Σ Qk·yk for the X earthquake, Σ(Mx_i − z_i·N_i) = −Σ Qk·yk for Z', () => {
+    const inp = mk();
+    const r = analyseBuildingFrame(inp);
+    const colAt = (id: string) => inp.columns.find(c => c.id === id)!;
+    const hts = [3, 6, 9];
+    const QX = r.lateral!.seismic!.X.storeyForcesKn, QZ = r.lateral!.seismic!.Z.storeyForcesKn;
+    const sumQy = (Q: number[]) => Q.reduce((s, q, k) => s + q * hts[k], 0);
+    const fx = r.lateral!.cases.EQX!, fz = r.lateral!.cases.EQZ!;
+    const mzX = fx.reduce((s, f) => s + f.momentAboutYKnM + colAt(f.id).xM * f.axialKn, 0);
+    const mxZ = fz.reduce((s, f) => s + f.momentAboutXKnM - colAt(f.id).yM * f.axialKn, 0);
+    expect(mzX).toBeCloseTo(sumQy(QX), 4);
+    expect(mxZ).toBeCloseTo(-sumQy(QZ), 4);
+  });
+
+  it('a symmetric single bay shares the lateral force equally: V = VB/4 per column; axial changes cancel (no net vertical force)', () => {
+    const r = analyseBuildingFrame(mk());
+    const VB = r.lateral!.seismic!.X.baseShearKn;
+    for (const f of r.lateral!.cases.EQX!) expect(Math.abs(f.shearXKn)).toBeCloseTo(VB / 4, 4);
+    expect(r.lateral!.cases.EQX!.reduce((s, f) => s + f.axialKn, 0)).toBeCloseTo(0, 6);
+    // the two columns on the leeward face go up in compression, the two on the windward face the opposite
+    const byX = r.lateral!.cases.EQX!.map(f => ({ x: grid(1, 1, 6, 6).columns.find(c => c.id === f.id)!.xM, n: f.axialKn }));
+    expect(byX.filter(c => c.x === 0)[0].n).toBeCloseTo(-byX.filter(c => c.x === 6)[0].n, 6);
+  });
+
+  it('wind: total base shear = p × width × (H − h₁/2 + parapet); equilibrium holds', () => {
+    const inp = mk({ lateral: { windPressureKnM2: 1.5, planLengthM: 6.4, planWidthM: 6.4 } });
+    const r = analyseBuildingFrame(inp);
+    const W = r.lateral!.wind!;
+    expect(W.X.totalKn).toBeCloseTo(1.5 * 6.4 * (9 - 1.5 + 1.0), 6);
+    for (const id of ['WX', 'WZ'] as const) expect(r.lateral!.baseShearCheck[id]!.reactionKn).toBeCloseTo(r.lateral!.baseShearCheck[id]!.appliedKn, 6);
+    expect(r.lateral!.seismic).toBeUndefined();
+  });
+
+  it('lateral cases do not change the gravity results (DL+LL columns are identical with and without them)', () => {
+    const noLat = analyseBuildingFrame(mk({ lateral: undefined }));
+    const withLat = analyseBuildingFrame(mk());
+    for (let i = 0; i < 4; i++) {
+      expect(withLat.columns[i].axialKn).toBeCloseTo(noLat.columns[i].axialKn, 8);
+      expect(withLat.columns[i].momentAboutXKnM).toBeCloseTo(noLat.columns[i].momentAboutXKnM, 8);
+    }
+  });
+
+  it('combinations: gravity only → 2 per column; seismic adds 2 directions × 8 = 16; seismic + wind adds 32', () => {
+    expect(Object.values(analyseBuildingFrame(mk({ lateral: undefined })).combos)[0].length).toBe(2);
+    expect(Object.values(analyseBuildingFrame(mk()).combos)[0].length).toBe(2 + 16);
+    expect(Object.values(analyseBuildingFrame(mk({ lateral: { seismic, windPressureKnM2: 1 } })).combos)[0].length).toBe(2 + 32);
+  });
+
+  it('the 0.9DL + 1.5EQ combination has less axial load but larger overturning than 1.5(DL+LL)', () => {
+    const r = analyseBuildingFrame(mk());
+    const cs = Object.values(r.combos)[0];
+    const g = cs.find(c => c.name === '1.5(DL+LL)')!, e = cs.find(c => c.name === '0.9DL+1.5EQX')!;
+    expect(e.axialKn).toBeLessThan(g.axialKn);
+    expect(Math.abs(e.momentYKnM)).toBeGreaterThan(Math.abs(g.momentYKnM) * 0.5);
+  });
+
+  it('more storeys raise the earthquake overturning (taller, heavier building)', () => {
+    const a = analyseBuildingFrame(mk({ storeyHeightsM: [3, 3] }));
+    const b = analyseBuildingFrame(mk({ storeyHeightsM: [3, 3, 3, 3] }));
+    const ot = (r: typeof a, n: number) => r.lateral!.seismic!.X.storeyForcesKn.reduce((s, q, k) => s + q * (k + 1) * 3, 0) / n;
+    expect(ot(b, 1)).toBeGreaterThan(ot(a, 1));
+  });
+
+  it('without bays the lateral force is still applied and the model warns that floors are not tied', () => {
+    const base = mk();
+    const r = analyseBuildingFrame({ ...base, bays: [] });
+    expect(r.warnings.join(' ')).toContain('equally');
+    expect(r.lateral!.baseShearCheck.EQX!.reactionKn).toBeCloseTo(r.lateral!.baseShearCheck.EQX!.appliedKn, 6);
+  });
+});

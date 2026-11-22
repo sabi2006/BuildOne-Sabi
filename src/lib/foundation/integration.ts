@@ -26,7 +26,8 @@ import {
 import { designBasement, type BasementDesignResult } from './basementDesignService';
 import { buildBBS, type BBSResult } from './bbs';
 import { RCC_UNIT_WEIGHT } from './rcDesign';
-import { analyseBuildingFrame, type BuildingFrameInput, type BuildingFrameResult } from './buildingFrame';
+import { analyseBuildingFrame, type BuildingFrameInput, type BuildingFrameResult, type BuildingFrameLateralResult } from './buildingFrame';
+import type { ColumnCombo } from './lateral';
 import { FrameError } from './frame';
 
 export interface LoadPathLevel {
@@ -60,6 +61,8 @@ export interface LoadPathColumn {
   shearYKn?: number;
   momentXKnM?: number;
   momentYKnM?: number;
+  /** IS 456 / IS 1893 load combinations from the frame (gravity only, or with wind/earthquake) */
+  combos?: ColumnCombo[];
 }
 
 export interface FoundationBasementIntegration {
@@ -79,6 +82,8 @@ export interface FoundationBasementIntegration {
       /** why the frame was requested but not used */
       reason?: string;
       totals?: BuildingFrameResult['totals'];
+      /** Wind / earthquake results when lateral cases were requested */
+      lateral?: BuildingFrameLateralResult;
       assumptions: string[];
       warnings: string[];
     };
@@ -253,6 +258,16 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       const b = k === nSt ? (summary.roofBeamCalculation ?? beamsCalc[Math.min(k, beamsCalc.length - 1)]) : beamsCalc[Math.min(k, beamsCalc.length - 1)];
       return b ? { widthMm: b.beamWidthMm, depthMm: b.beamDepthMm } : { widthMm: 230, depthMm: 300 };
     });
+    const latCfg = details.lateral;
+    const seismicOn = !!latCfg?.seismic?.enabled;
+    const windOn = !!latCfg?.wind?.enabled && (latCfg.wind.designPressureKnM2 ?? 0) > 0;
+    const lateralInput: BuildingFrameInput['lateral'] = (seismicOn || windOn)
+      ? {
+          seismic: seismicOn ? { zone: latCfg!.seismic!.zone, importanceFactor: latCfg!.seismic!.importanceFactor, responseReduction: latCfg!.seismic!.responseReduction, soil: latCfg!.seismic!.soil, infilledFrame: latCfg!.seismic!.infilledFrame } : undefined,
+          windPressureKnM2: windOn ? latCfg!.wind!.designPressureKnM2 : undefined,
+          planLengthM: args.buildingLengthM, planWidthM: args.buildingWidthM,
+        }
+      : undefined;
     if (!args.frameGeometry || args.frameGeometry.beams.length === 0) {
       frameInfo = { requested: true, used: false, reason: 'No pillar-to-pillar beams were detected, so a frame cannot be formed. The tributary-area loads are used.', assumptions: [], warnings: [] };
     } else if (floorQ === undefined || roofQ === undefined) {
@@ -269,10 +284,13 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
         beamSizeByLevel: beamSizes,
         fckMpa: Number((details.concreteGrade ?? config.concreteGrade).replace('M', '')),
         baseFixity: 'fixed',
+        floorLiveKnM2: slabs[1]?.liveLoadKnM2 ?? slabs[0]?.liveLoadKnM2,
+        roofLiveKnM2: summary.roofSlabCalculation?.liveLoadKnM2,
+        lateral: lateralInput,
       };
       try {
         frameResult = analyseBuildingFrame(frameInput);
-        frameInfo = { requested: true, used: true, totals: frameResult.totals, assumptions: frameResult.assumptions, warnings: frameResult.warnings };
+        frameInfo = { requested: true, used: true, totals: frameResult.totals, lateral: frameResult.lateral, assumptions: frameResult.assumptions, warnings: frameResult.warnings };
       } catch (e) {
         frameInfo = { requested: true, used: false, reason: `Frame analysis failed (${e instanceof FrameError ? e.message : String(e)}). The tributary-area loads are used.`, assumptions: [], warnings: [] };
       }
@@ -297,13 +315,18 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       col.momentXKnM = round(f.momentAboutXKnM);
       col.momentYKnM = round(f.momentAboutYKnM);
       col.source = 'frame_analysis';
+      col.combos = frameResult.combos[col.id];
       const lv: LoadPathLevel[] = [{ level: 'Gravity frame analysis: column base reaction (all storeys, roof, beams, walls, self-weight)', addedKn: round(structure), cumulativeKn: round(structure) }];
       if (basementAdd > 0) lv.push({ level: 'Basement: column self-weight (not in the frame)', addedKn: round(basementAdd), cumulativeKn: round(structure + basementAdd) });
       lv.push({ level: 'Foundation base (soil)', addedKn: 0, cumulativeKn: round(structure + basementAdd) });
       col.levels = lv;
     }
     capabilityGaps = [
-      'Wind and seismic loads (IS 875 Part 3, IS 1893) are not included: the moments and shears are from gravity loads only (no sway).',
+      ...(frameResult.lateral
+        ? [
+            'Wind and earthquake loads are equivalent static forces from user-entered parameters: accidental torsion (IS 1893 Cl. 7.9.2), vertical earthquake, P-Δ effects, soil-structure interaction and the IS 875 Part 3 wind map are not modelled. The IS 1893 constants must be checked against the printed code.',
+          ]
+        : ['Wind and seismic loads (IS 875 Part 3, IS 1893) are not included: the moments and shears are from gravity loads only (no sway). Enable them in the foundation details.']),
       'Frame idealisations: gross (uncracked) sections, fully fixed column bases, no foundation or soil flexibility, no staircase or slab-opening effects, simple 45° slab load transfer to beams.',
     ];
   }
@@ -333,14 +356,30 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       demand: round(frameTotal, 1), capacity: round(tribTotal, 1), unit: 'kN',
       note: `The frame total is ${diff >= 0 ? '+' : ''}${round(diff * 100, 1)}% against the host tributary-area estimate. The frame is built from the actual beams, slab bays and walls. The host estimate is a heuristic: it applies role factors, counts the on-grade ground slab as a storey (n storeys + roof), and its tributary areas total ${round(ratio * 100, 0)}% of the plan area. A difference above 15% should be reviewed before relying on either.`,
     });
+    const lat = frameResult.lateral;
     checks.push({
-      id: 'moments_shear', label: 'Column base moments and shear from the gravity frame', status: 'WARNING',
-      note: 'Used for the base pressure of isolated footings (with the load) and the raft contact pressure. Sway moments are absent (no lateral loads). Combined footings and piles do not use them.',
+      id: 'moments_shear', label: lat ? 'Column base moments and shear from the frame (gravity + lateral)' : 'Column base moments and shear from the gravity frame', status: 'WARNING',
+      note: `Used for the base pressure of isolated footings (with the load) and the raft contact pressure.${lat ? '' : ' Sway moments are absent (no lateral loads).'} Combined footings and piles do not use them.`,
     });
-    checks.push({
-      id: 'lateral_loads', label: 'Wind / seismic load combinations', status: 'NOT_VERIFIED',
-      note: 'Not part of the analysis: moments and shears are from gravity loads only.',
-    });
+    if (lat) {
+      const bits: string[] = [];
+      if (lat.seismic) bits.push(`Earthquake: zone ${lat.seismic.params.zone}, I = ${lat.seismic.params.importanceFactor}, R = ${lat.seismic.params.responseReduction}, ${lat.seismic.params.soil} soil; T = ${round(lat.seismic.X.periodS, 3)} s (X) / ${round(lat.seismic.Z.periodS, 3)} s (plan y), base shear ${round(lat.seismic.X.baseShearKn, 1)} / ${round(lat.seismic.Z.baseShearKn, 1)} kN on a seismic weight of ${round(lat.seismic.totalWeightKn, 0)} kN.`);
+      if (lat.wind) bits.push(`Wind: user-entered net pressure ${lat.wind.pressureKnM2} kN/m², total ${round(lat.wind.X.totalKn, 1)} kN (along X) / ${round(lat.wind.Z.totalKn, 1)} kN (along plan y).`);
+      const lateralSbc = Math.max(1, details.lateral?.sbcIncreaseFactor ?? 1);
+      checks.push({
+        id: 'lateral_loads', label: 'Wind / seismic load combinations', status: 'WARNING',
+        note: `${bits.join(' ')} Equivalent static forces on a rigid-diaphragm frame; IS 456 Table 18 combinations (1.5(DL+LL), 1.2(DL+LL±L), 1.5(DL±L), 0.9DL±1.5L) and service combinations DL+LL±L for the soil pressure${lateralSbc > 1 ? ` (available pressure ×${lateralSbc} for the lateral service combinations, user-entered)` : ' (no increase of the available pressure is taken)'}. Not modelled: accidental torsion, vertical earthquake, P-Δ, soil-structure interaction. Combined footings and piles still use the gravity loads only.`,
+      });
+      const bsBad = Object.entries(lat.baseShearCheck).filter(([, v]) => v && Math.abs(v.appliedKn - v.reactionKn) > 0.5 + 0.001 * Math.abs(v.appliedKn));
+      if (bsBad.length > 0) {
+        checks.push({ id: 'lateral_equilibrium', label: 'Lateral equilibrium (base shear = applied storey forces)', status: 'FAIL', note: `Base reactions disagree with the applied forces for: ${bsBad.map(([k]) => k).join(', ')}.` });
+      }
+    } else {
+      checks.push({
+        id: 'lateral_loads', label: 'Wind / seismic load combinations', status: 'NOT_VERIFIED',
+        note: 'Not part of the analysis: moments and shears are from gravity loads only. Enable earthquake and/or wind in the foundation details.',
+      });
+    }
     if (frameResult.totals.equilibriumErrorKn > 0.5) {
       checks.push({ id: 'frame_equilibrium', label: 'Frame vertical equilibrium', status: 'FAIL', demand: round(frameResult.totals.appliedKn, 1), capacity: round(frameResult.totals.reactionKn, 1), unit: 'kN', note: 'Applied load and base reactions disagree.' });
     }
@@ -424,6 +463,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     clearCoverMm: details.clearCoverMm,
     pccThicknessMm: details.pccThicknessMm,
     pile: details.investigation.pile,
+    lateralSbcIncrease: details.lateral?.sbcIncreaseFactor,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,
@@ -432,7 +472,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
   };
   const inputs: FoundationColumnInput[] = columns.map(c => ({
     id: c.id, name: c.name, xM: c.xM, yM: c.yM, widthMm: c.widthMm, depthMm: c.depthMm, serviceLoadKn: c.serviceKn, factoredLoadKn: c.factoredKn,
-    momentXKnM: c.momentXKnM, momentYKnM: c.momentYKnM,
+    momentXKnM: c.momentXKnM, momentYKnM: c.momentYKnM, combos: c.combos,
   }));
   let foundation: FoundationDesignResult | undefined;
   try {

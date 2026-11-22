@@ -35,7 +35,7 @@ const run = (cfg: Partial<BuildingConfig>, n = 3, pts: Pts = INNER4) => {
   return calculateProject(p);
 };
 const FRAME = { selectionMode: 'manual', groundwaterDepthM: 8, columnLoadSource: 'frame' } as any;
-const TRIB = { selectionMode: 'manual', groundwaterDepthM: 8 } as any;
+const TRIB = { selectionMode: 'manual', groundwaterDepthM: 8, columnLoadSource: 'tributary' } as any;
 
 describe('Frame load source: wiring', () => {
   const r = run({ foundationDetails: FRAME });
@@ -53,7 +53,7 @@ describe('Frame load source: wiring', () => {
     }
   });
 
-  it('the default (tributary) path is unchanged and has no frame section', () => {
+  it('the explicit tributary option has no frame section and keeps the host load trace', () => {
     const t = run({ foundationDetails: TRIB }).foundationBasementDesign!;
     expect(t.loadPath.frame).toBeUndefined();
     expect(t.loadPath.columns.every(c => c.source === 'tributary_area_accumulation' && c.momentXKnM === undefined)).toBe(true);
@@ -105,6 +105,42 @@ describe('Frame load source: wiring', () => {
     expect(d.loadPath.checks.find(c => c.id === 'moments_shear')!.status).toBe('WARNING');
     expect(d.status).not.toBe('PASS');
     expect(d.loadPath.capabilityGaps.join(' ')).toContain('Wind and seismic');
+  });
+});
+
+describe('Frame analysis is the default load source', () => {
+  it('foundationDetails without a load source uses the frame', () => {
+    const d = run({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }).foundationBasementDesign!;
+    expect(d.loadPath.frame!.requested).toBe(true);
+    expect(d.loadPath.frame!.used).toBe(true);
+    expect(d.loadPath.columns.every(c => c.source === 'frame_analysis')).toBe(true);
+  });
+
+  it('a project saved before the load-source option existed (no field) now opens with the frame', () => {
+    const p = project({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }, 3, INNER4);
+    const saved = JSON.parse(JSON.stringify(p.buildingModel));
+    delete saved.buildingConfig.foundationDetails.columnLoadSource;
+    for (let i = 0; i < 3; i++) calculateProject({ walls: p.walls, pillars: p.pillars, buildingModel: saved });
+    const d = calculateProject({ walls: p.walls, pillars: p.pillars, buildingModel: saved }).foundationBasementDesign!;
+    expect(d.loadPath.frame!.used).toBe(true);
+  });
+
+  it('choosing the tributary estimate still works, and the two sources give different column loads for the same building', () => {
+    const f = run({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }).foundationBasementDesign!;
+    const t = run({ foundationDetails: TRIB }).foundationBasementDesign!;
+    expect(t.loadPath.frame).toBeUndefined();
+    expect(f.loadPath.totalServiceKn).not.toBeCloseTo(t.loadPath.totalServiceKn, 0);
+  });
+
+  it('the detailed design is still opt-in: no foundationDetails and no basement means no design', () => {
+    expect(run({}).foundationBasementDesign).toBeUndefined();
+  });
+
+  it('when a frame cannot be formed the default falls back to the tributary loads with a warning (never fails)', () => {
+    const d = run({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }, 3, [[10, 8], [30, 20]]).foundationBasementDesign!;
+    expect(d.loadPath.frame!.used).toBe(false);
+    expect(d.foundation).toBeDefined();
+    expect(d.warnings.join(' ')).toContain('tributary');
   });
 });
 

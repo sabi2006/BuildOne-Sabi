@@ -32,7 +32,7 @@ const geo = (d: ReturnType<typeof designOf>, pos?: Record<string, { x: number; z
   buildFoundation3DModel({ design: d, buildingLengthM: L, buildingWidthM: W, columnPositions: pos });
 const sceneCols = (d: ReturnType<typeof designOf>, ox = 0, oz = 0) =>
   Object.fromEntries(d.loadPath.columns.map(c => [c.id, { x: c.xM + ox, z: -c.yM + oz }]));
-const fd = { selectionMode: 'manual' } as any;
+const fd = { selectionMode: 'manual', columnLoadSource: 'tributary' } as any;
 // interior columns (clear of the basement walls) for the basement tests
 const INNER: Array<[number, number]> = [[10, 8], [30, 8], [30, 22], [10, 22]];
 
@@ -159,7 +159,7 @@ describe('Raft', () => {
 
 describe('Pile foundation', () => {
   const pileInv = { sbcSource: 'geotechnical_report', pile: { verifiedPileCapacityKn: 600, pileDiameterMm: 450, pileLengthM: 12 } };
-  const d = designOf({ foundationDetails: { selectionMode: 'manual', investigation: pileInv } as any, foundationType: 'pile' });
+  const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', investigation: pileInv } as any, foundationType: 'pile' });
   const g = geo(d, sceneCols(d));
 
   it('draws the designed number of piles below each cap, at the given length', () => {
@@ -182,8 +182,8 @@ describe('Pile foundation', () => {
 });
 
 describe('Basement', () => {
-  const dNo = designOf({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }, 3, INNER);
-  const d = designOf({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any, basement: basementCfg as any }, 3, INNER);
+  const dNo = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any }, 3, INNER);
+  const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any }, 3, INNER);
   const g = geo(d, sceneCols(d));
   const Df = d.summary.foundationDepthM, pcc = d.summary.pccThicknessMm / 1000;
   const walls = g.boxes.filter(b => b.kind === 'wall');
@@ -249,7 +249,7 @@ describe('Basement', () => {
   });
 
   it('multi-level basement stacks wall levels without gaps or overlap', () => {
-    const d2 = designOf({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 20 } as any, basement: { ...basementCfg, levels: 2, depthM: 6, backfillHeightM: 6 } as any }, 3, INNER);
+    const d2 = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 20 } as any, basement: { ...basementCfg, levels: 2, depthM: 6, backfillHeightM: 6 } as any }, 3, INNER);
     const g2 = geo(d2, sceneCols(d2));
     const n = g2.boxes.filter(b => b.kind === 'wall' && b.id.endsWith('-N')).sort((a, b) => b.center[1] - a.center[1]);
     expect(n.length).toBe(2);
@@ -259,7 +259,7 @@ describe('Basement', () => {
 });
 
 describe('Basement with columns on the wall line', () => {
-  const d = designOf({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any, basement: basementCfg as any });
+  const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any });
   const g = geo(d, sceneCols(d));
 
   it('does not draw overlapping solids and warns that the corner columns are integral with the wall', () => {

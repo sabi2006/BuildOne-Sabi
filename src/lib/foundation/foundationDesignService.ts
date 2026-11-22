@@ -23,6 +23,7 @@
 
 import type { ConcreteGrade, SteelGrade } from '../structuralCalculationService';
 import type { DesignStatus, PileInvestigationData, SbcBasis, StructuralElementIdentity } from './types';
+import type { ColumnCombo } from './lateral';
 import {
   fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
   developmentLengthTensionMm, developmentLengthCompressionMm, selectBarsPerMetre,
@@ -46,6 +47,11 @@ export interface FoundationColumnInput {
   /** Optional service moments, kN·m. momentXKnM acts about the x-axis (varies pressure along y). */
   momentXKnM?: number;
   momentYKnM?: number;
+  /**
+   * IS 456 / IS 1893 load combinations for this column (service for the soil pressure, ultimate for the footing design).
+   * When present they REPLACE the single service/factored case for isolated footings and rafts.
+   */
+  combos?: ColumnCombo[];
 }
 
 export interface FoundationDesignOptions {
@@ -96,6 +102,8 @@ export interface FoundationDesignParams {
    * an overburden. `wallWeightKnM2` is the weight of the basement walls spread over the footprint.
    */
   basement?: { depthM: number; wallWeightKnM2: number };
+  /** Allowed increase of the available soil pressure for service combinations with wind or earthquake (default 1 = none) */
+  lateralSbcIncrease?: number;
   options?: FoundationDesignOptions;
 }
 
@@ -351,7 +359,18 @@ export function designIsolatedFooting(
   const cx = col.widthMm, cy = col.depthMm;
   const Pu = col.factoredLoadKn, Ps = col.serviceLoadKn;
   const Mx = Math.abs(col.momentXKnM ?? 0), My = Math.abs(col.momentYKnM ?? 0);
-  const momentsUsed = col.momentXKnM !== undefined || col.momentYKnM !== undefined;
+  const hasCombos = !!col.combos && col.combos.length > 0;
+  const momentsUsed = hasCombos || col.momentXKnM !== undefined || col.momentYKnM !== undefined;
+  const latF = Math.max(1, p.lateralSbcIncrease ?? 1);
+  // service combinations check the soil pressure (with the allowed increase for wind/earthquake), ultimate ones size the footing
+  type Cb = { name: string; P: number; Mx: number; My: number; f: number };
+  const svcCombos: Cb[] = hasCombos
+    ? col.combos!.filter(c => c.limit === 'service').map(c => ({ name: c.name, P: c.axialKn, Mx: Math.abs(c.momentXKnM), My: Math.abs(c.momentYKnM), f: c.lateral ? latF : 1 }))
+    : [{ name: 'service load', P: Ps, Mx, My, f: 1 }];
+  const ultCombos: Cb[] = hasCombos
+    ? col.combos!.filter(c => c.limit === 'ultimate').map(c => ({ name: c.name, P: c.axialKn, Mx: Math.abs(c.momentXKnM), My: Math.abs(c.momentYKnM), f: 1 }))
+    : [{ name: '1.5 × service load', P: Pu, Mx: 1.5 * Mx, My: 1.5 * My, f: 1 }];
+  const PuMax = Math.max(Pu, ...ultCombos.map(c => c.P));
 
   if (!(Ps > 0)) return unverified(id, 'isolated_footing', 'isolated', [col], p, 'Column service load is zero or missing.');
 
@@ -369,17 +388,26 @@ export function designIsolatedFooting(
     let B = area / L;
     L = Math.max(ceilTo(L, 0.05), ceilTo(cx / 1000 + 0.3, 0.05));
     B = Math.max(ceilTo(B, 0.05), ceilTo(cy / 1000 + 0.3, 0.05));
-    let qmax = 0, qmin = 0, pressureOk = false;
+    let qmax = 0, qmin = 0, govService = '', pressureOk = false;
     for (let it = 0; it < 400; it++) {
-      const q0 = Ps / (L * B);
-      const mTerm = (6 * My) / (B * L * L) + (6 * Mx) / (L * B * B);
-      qmax = q0 + mTerm; qmin = q0 - mTerm;
-      if (qmax <= qAvail && qmin >= 0) { pressureOk = true; break; }
+      let ok = true, worst = -Infinity;
+      qmin = Infinity;
+      for (const c of svcCombos) {
+        const q0 = c.P / (L * B);
+        const mTerm = (6 * c.My) / (B * L * L) + (6 * c.Mx) / (L * B * B);
+        const hi = q0 + mTerm, lo = q0 - mTerm;
+        qmin = Math.min(qmin, lo);
+        if (hi / (qAvail * c.f) > worst) { worst = hi / (qAvail * c.f); qmax = hi / c.f; govService = c.name; }
+        if (hi > qAvail * c.f || lo < 0) ok = false;
+      }
+      if (ok) { pressureOk = true; break; }
       L = round(L + 0.05, 2); B = round(B + 0.05, 2);
     }
     if (!pressureOk) continue;
 
-    const qu = Pu / (L * B) + 1.5 * ((6 * My) / (B * L * L) + (6 * Mx) / (L * B * B));
+    const quOf = (c: Cb) => c.P / (L * B) + (6 * c.My) / (B * L * L) + (6 * c.Mx) / (L * B * B);
+    const qu = Math.max(...ultCombos.map(quOf));
+    const govUltimate = ultCombos.reduce((a, c) => (quOf(c) > quOf(a) ? c : a), ultCombos[0]).name;
     const axM = (L - cx / 1000) / 2;
     const ayM = (B - cy / 1000) / 2;
     const mx = (qu * axM * axM) / 2; // kN·m per m, steel along x
@@ -407,7 +435,7 @@ export function designIsolatedFooting(
 
       const lMm = L * 1000, bMm = B * 1000;
       const cp = criticalPerimeter(cx, cy, lMm / 2, bMm / 2, d, { x0: 0, x1: lMm, y0: 0, y1: bMm });
-      const vp = Math.max(0, Pu - qu * cp.areaM2);
+      const vp = Math.max(0, ...ultCombos.map(c => c.P - quOf(c) * cp.areaM2));
       const tvp = (vp * 1000) / (cp.b0Mm * d);
       const tcp = punchingAllowableMpa(Math.min(cx, cy), Math.max(cx, cy), p.concreteGrade);
       if (tvp > tcp) break;
@@ -456,7 +484,10 @@ export function designIsolatedFooting(
       // checks
       const cks: DesignCheck[] = [];
       cks.push({ id: 'bearing_pressure', label: 'Max service base pressure ≤ available pressure', clause: 'IS 6403',
-        status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²' });
+        status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²',
+        note: hasCombos ? `Governing service combination: ${govService}${latF > 1 ? ` (lateral combinations: available pressure increased ×${latF}, pressure shown divided by that factor)` : ''}.` : undefined });
+      if (hasCombos) cks.push({ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS',
+        note: `${svcCombos.length} service and ${ultCombos.length} ultimate combinations evaluated. Governing ultimate base pressure from ${govUltimate}. Combinations use column forces from the frame analysis.` });
       if (momentsUsed) cks.push({ id: 'no_tension', label: 'Minimum base pressure ≥ 0 (no uplift)', status: qmin >= 0 ? 'PASS' : 'FAIL', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' });
       cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(mx, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
       cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(my, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
@@ -472,8 +503,8 @@ export function designIsolatedFooting(
         note: availX >= ldX && availY >= ldY ? undefined : 'Straight development length not available: provide hooks/bends or a larger footing.' });
       const bearingCap = (0.45 * fck * colArea) / 1000;
       cks.push({ id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4.1',
-        status: Pu <= bearingCap ? 'PASS' : 'WARNING', demand: round(Pu, 1), capacity: round(bearingCap, 1), unit: 'kN',
-        note: Pu <= bearingCap ? undefined : 'Excess load must be carried by dowels/column steel (Cl. 34.4).' });
+        status: PuMax <= bearingCap ? 'PASS' : 'WARNING', demand: round(PuMax, 1), capacity: round(bearingCap, 1), unit: 'kN',
+        note: PuMax <= bearingCap ? undefined : 'Excess load must be carried by dowels/column steel (Cl. 34.4).' });
       cks.push({ id: 'dowels', label: 'Dowel development length into footing', clause: 'IS 456 Cl. 34.4.3, 26.2.1.1',
         status: availDowel >= ldComp ? 'PASS' : 'WARNING', demand: ldComp, capacity: availDowel, unit: 'mm',
         note: availDowel >= ldComp ? `Provide at least ${e.dowels.minBars} dowels of ${dowelDia} mm (0.5% of column area).` : 'Footing depth is insufficient for straight dowel development: use bent-leg dowels or increase depth.' });
@@ -746,22 +777,46 @@ function designRaftWithProjection(
   const projMax = Math.max(colMinX - x0, x1 - colMaxX, colMinY - y0, y1 - colMaxY);
   const L = x1 - x0, B = y1 - y0, A = L * B;
   const S = columns.reduce((s, c) => s + c.serviceLoadKn, 0);
-  const Su = columns.reduce((s, c) => s + c.factoredLoadKn, 0);
   const cover = p.clearCoverMm;
 
-  // load centroid vs raft centroid -> contact pressure (rigid raft)
-  const xl = columns.reduce((s, c) => s + c.serviceLoadKn * c.xM, 0) / S;
-  const yl = columns.reduce((s, c) => s + c.serviceLoadKn * c.yM, 0) / S;
-  const ex = xl - (x0 + x1) / 2, ey = yl - (y0 + y1) / 2;
-  const q0 = S / A;
   // column base moments (service, conservatively summed in magnitude) add to the eccentricity moment
   const sumMx = columns.reduce((s, c) => s + Math.abs(c.momentXKnM ?? 0), 0);
   const sumMy = columns.reduce((s, c) => s + Math.abs(c.momentYKnM ?? 0), 0);
-  const momentPressure = (6 * sumMy) / (B * L * L) + (6 * sumMx) / (L * B * B);
-  const qmax = q0 * (1 + (6 * Math.abs(ex)) / L + (6 * Math.abs(ey)) / B) + momentPressure;
-  const qmin = q0 * (1 - (6 * Math.abs(ex)) / L - (6 * Math.abs(ey)) / B) - momentPressure;
-  const quAvg = Su / A;
-  const qu = quAvg * (qmax / q0);
+
+  // contact pressure of a rigid raft for each load combination: load centroid vs raft centroid + column base moments
+  const hasCombos = columns.length > 0 && columns.every(c => c.combos && c.combos.length > 0);
+  const latF = Math.max(1, p.lateralSbcIncrease ?? 1);
+  type Agg = { name: string; limit: 'service' | 'ultimate'; f: number; qmax: number; qmin: number };
+  const pressureOf = (P: number, ex0: number, ey0: number, mx: number, my: number) => {
+    const q0 = P / A;
+    const mp = (6 * my) / (B * L * L) + (6 * mx) / (L * B * B);
+    return { hi: q0 * (1 + (6 * Math.abs(ex0)) / L + (6 * Math.abs(ey0)) / B) + mp, lo: q0 * (1 - (6 * Math.abs(ex0)) / L - (6 * Math.abs(ey0)) / B) - mp };
+  };
+  const aggs: Agg[] = [];
+  if (hasCombos) {
+    for (const cn of columns[0].combos!) {
+      const cs = columns.map(c => c.combos!.find(x => x.name === cn.name)!);
+      const P = cs.reduce((s, c) => s + c.axialKn, 0);
+      const xl = P !== 0 ? cs.reduce((s, c, i) => s + c.axialKn * columns[i].xM, 0) / P : (x0 + x1) / 2;
+      const yl = P !== 0 ? cs.reduce((s, c, i) => s + c.axialKn * columns[i].yM, 0) / P : (y0 + y1) / 2;
+      const pr = pressureOf(P, xl - (x0 + x1) / 2, yl - (y0 + y1) / 2, cs.reduce((s, c) => s + Math.abs(c.momentXKnM), 0), cs.reduce((s, c) => s + Math.abs(c.momentYKnM), 0));
+      aggs.push({ name: cn.name, limit: cn.limit, f: cn.limit === 'service' && cn.lateral ? latF : 1, qmax: pr.hi, qmin: pr.lo });
+    }
+  } else {
+    const xl = columns.reduce((s, c) => s + c.serviceLoadKn * c.xM, 0) / S;
+    const yl = columns.reduce((s, c) => s + c.serviceLoadKn * c.yM, 0) / S;
+    const ex0 = xl - (x0 + x1) / 2, ey0 = yl - (y0 + y1) / 2;
+    const s1 = pressureOf(S, ex0, ey0, sumMx, sumMy);
+    aggs.push({ name: 'service load', limit: 'service', f: 1, qmax: s1.hi, qmin: s1.lo });
+    aggs.push({ name: '1.5 × service load', limit: 'ultimate', f: 1, qmax: 1.5 * s1.hi, qmin: 1.5 * s1.lo });
+  }
+  const svcAggs = aggs.filter(a => a.limit === 'service');
+  const ultAggs = aggs.filter(a => a.limit === 'ultimate');
+  const governingService = svcAggs.reduce((a, c) => (c.qmax / c.f > a.qmax / a.f ? c : a), svcAggs[0]);
+  const governingUltimate = ultAggs.reduce((a, c) => (c.qmax > a.qmax ? c : a), ultAggs[0]);
+  const qmax = governingService.qmax / governingService.f;   // equivalent pressure to compare with the available pressure
+  const qmin = Math.min(...svcAggs.map(a => a.qmin));
+  const qu = governingUltimate.qmax;
 
   const spansX = gridSpans(columns.map(c => c.xM));
   const spansY = gridSpans(columns.map(c => c.yM));
@@ -771,7 +826,7 @@ function designRaftWithProjection(
   for (let D = Math.max(opt.minFootingDepthMm, 400); D <= MAX_DEPTH_MM; D += 25) {
     const Dm = D / 1000;
     const { qAvail } = availablePressure(p, Dm);
-    if (qmax > qAvail || qmin < 0) {
+    if (svcAggs.some(a => a.qmax > qAvail * a.f) || qmin < 0) {
       const e = failed(id, 'raft', 'raft', columns, p,
         `Raft contact pressure ${round(qmax, 1)} kN/m² (min ${round(qmin, 1)}) exceeds the available ${round(qAvail, 1)} kN/m² even over the full plan ${round(L, 2)} x ${round(B, 2)} m. Soil is too weak for a raft at this SBC: consider piles or ground improvement.`);
       e.plan = { x0, x1, y0, y1 }; e.sizeXM = L; e.sizeYM = B;
@@ -846,7 +901,10 @@ function designRaftWithProjection(
         formworkM2: round(2 * (L + B) * Dm, 3),
       };
       const cks: DesignCheck[] = [
-        { id: 'contact_pressure', label: 'Max contact pressure ≤ available pressure (rigid raft)', clause: 'IS 2950 (Part 1)', status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²' },
+        { id: 'contact_pressure', label: 'Max contact pressure ≤ available pressure (rigid raft)', clause: 'IS 2950 (Part 1)', status: 'PASS', demand: round(qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²',
+          note: hasCombos ? `Governing service combination: ${governingService.name}.` : undefined },
+        ...(hasCombos ? [{ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS' as const,
+          note: `${svcAggs.length} service and ${ultAggs.length} ultimate combinations evaluated. Governing ultimate contact pressure from ${governingUltimate.name}. Combinations use column forces from the frame analysis; column moments are summed in magnitude (conservative).` }] : []),
         { id: 'no_tension', label: 'Minimum contact pressure ≥ 0', status: 'PASS', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' },
         { id: 'flexure', label: 'Flexure (strip method, IS 456 Table 12 envelope coefficients)', clause: 'IS 456 Annex G, Table 12', status: 'PASS',
           demand: round(Math.max(mBotX, mBotY, mTopX, mTopY), 2), capacity: round(lim, 2), unit: 'kN·m/m' },

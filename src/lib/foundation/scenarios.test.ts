@@ -35,7 +35,7 @@ const project = (cfg: Partial<BuildingConfig>, floorsN: number, pts: Pts, dims: 
 const run = (cfg: Partial<BuildingConfig>, floorsN = 3, pts: Pts = INNER4, dims: [number, number] = [40, 30]) =>
   calculateProject(project(cfg, floorsN, pts, dims));
 
-const fd = (o: Record<string, unknown> = {}) => ({ selectionMode: 'auto', groundwaterDepthM: 8, ...o }) as any;
+const fd = (o: Record<string, unknown> = {}) => ({ selectionMode: 'auto', columnLoadSource: 'tributary', groundwaterDepthM: 8, ...o }) as any;
 const bsm = (o: Record<string, unknown> = {}) => ({
   enabled: true, levels: 1, depthM: 3, clearHeightM: 2.7, frictionAngleDeg: 30, soilUnitWeightKnM3: 18, backfillHeightM: 3, surchargeKnM2: 10, ...o,
 }) as any;
@@ -134,14 +134,14 @@ function invariants(r: ReturnType<typeof run>, label: string) {
 describe('Scenario 1-3: isolated footings for G+0 … G+3', () => {
   for (const n of [1, 2, 3, 4]) {
     it(`G+${n - 1}: ${n} storey(s), isolated`, () => {
-      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }) }, n), `G+${n - 1}`);
+      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }, n), `G+${n - 1}`);
       expect(d.foundation!.selectedType).toBe('isolated');
       expect(d.foundation!.elements.length).toBe(4);
       expect(d.foundation!.elements.every(e => e.depthMm !== undefined)).toBe(true);
     });
   }
   it('ground-column load rises with storeys, footing concrete never falls', () => {
-    const ds = [1, 2, 3, 4].map(n => invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }) }, n), `n=${n}`));
+    const ds = [1, 2, 3, 4].map(n => invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }, n), `n=${n}`));
     for (let i = 1; i < ds.length; i++) {
       expect(ds[i].loadPath.totalServiceKn).toBeGreaterThan(ds[i - 1].loadPath.totalServiceKn);
       expect(ds[i].foundation!.totals.concreteM3).toBeGreaterThanOrEqual(ds[i - 1].foundation!.totals.concreteM3 - 1e-6);
@@ -155,14 +155,14 @@ describe('Scenario 4: combined footing where isolated footings overlap', () => {
     expect(['combined', 'raft']).toContain(d.foundation!.selectedType);
   });
   it('manual combined selection designs the overlapping pair as one footing', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'combined', allowableSoilBearingPressureKnM2: 120 }, 3, [[14, 15], [22, 15], [34, 8], [34, 24]]), 'combined-manual');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'combined', allowableSoilBearingPressureKnM2: 120 }, 3, [[14, 15], [22, 15], [34, 8], [34, 24]]), 'combined-manual');
     expect(d.foundation!.elements.some(e => e.system === 'combined')).toBe(true);
   });
 });
 
 describe('Overlapping footings are handled, not drawn silently', () => {
   it('manual isolated footings that overlap are flagged FAIL, shown, and not used for the BOQ', () => {
-    const r = run({ foundationDetails: fd({ selectionMode: 'manual' }) }, 4, INNER4);
+    const r = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }, 4, INNER4);
     const d = invariants(r, 'overlap-manual');
     expect(d.foundation!.status).toBe('FAIL');
     expect(d.foundation!.elements.some(e => e.checks.some(c => c.id === 'footing_overlap'))).toBe(true);
@@ -185,7 +185,7 @@ describe('Overlapping footings are handled, not drawn silently', () => {
 
 describe('Scenario 5: raft foundation', () => {
   it('raft on a 3x3 grid (manual)', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 150 }, 3, GRID9), 'raft');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 150 }, 3, GRID9), 'raft');
     expect(d.foundation!.selectedType).toBe('raft');
     expect(d.foundation!.elements.length).toBe(1);
     expect(d.foundation!.elements[0].reinforcement.length).toBe(4);
@@ -195,7 +195,7 @@ describe('Scenario 5: raft foundation', () => {
     expect(['raft', 'combined']).toContain(d.foundation!.selectedType);
   });
   it('the raft grows toward the building footprint when the minimum plan is too small, never beyond it', () => {
-    const r = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 150 }, 3, CLOSE_PAIR);
+    const r = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 150 }, 3, CLOSE_PAIR);
     const d = invariants(r, 'raft-grow');
     const el = d.foundation!.elements[0];
     expect(el.status).not.toBe('FAIL');
@@ -207,7 +207,7 @@ describe('Scenario 5: raft foundation', () => {
     expect(el.assumptions.join(' ')).toContain('enlarged');
   });
   it('a soil too weak for a raft FAILs with an explanation and the BOQ keeps the legacy foundation', () => {
-    const r = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 40 }, 4, GRID9);
+    const r = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', allowableSoilBearingPressureKnM2: 40 }, 4, GRID9);
     const d = invariants(r, 'raft-weak');
     expect(d.foundation!.status).toBe('FAIL');
     expect(r.buildingBOQ!.foundationBasement?.replacedLegacyFoundation ?? false).toBe(false);
@@ -216,14 +216,14 @@ describe('Scenario 5: raft foundation', () => {
 
 describe('Scenario 6: pile foundation configuration', () => {
   it('without borehole data it is NOT_VERIFIED, nothing is drawn, BOQ keeps the legacy foundation', () => {
-    const r = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'pile' });
+    const r = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'pile' });
     const d = invariants(r, 'pile-nodata');
     expect(d.foundation!.status).toBe('NOT_VERIFIED');
     expect(d.bbs?.rows.length ?? 0).toBe(0);
   });
   it('with a verified capacity it counts piles and still never PASSes', () => {
     const inv = { sbcSource: 'geotechnical_report', pile: { verifiedPileCapacityKn: 700, pileDiameterMm: 450, pileLengthM: 12 } };
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', investigation: inv }), foundationType: 'pile' }), 'pile');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', investigation: inv }), foundationType: 'pile' }), 'pile');
     expect(d.foundation!.elements.every(e => e.pile!.pilesRequired! >= 1)).toBe(true);
     expect(d.foundation!.status).not.toBe('PASS');
   });
@@ -231,25 +231,25 @@ describe('Scenario 6: pile foundation configuration', () => {
 
 describe('Scenario 7-10: basements', () => {
   it('7: one basement', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm() }), 'basement-1');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm() }), 'basement-1');
     expect(d.basement!.elements.filter(e => e.elementType === 'basement_wall').length).toBe(1);
     expect(d.summary.basementConcreteM3).toBeGreaterThan(0);
   });
   it('8: multiple basement levels', () => {
     for (const levels of [2, 3]) {
-      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', groundwaterDepthM: 30 }), basement: bsm({ levels, depthM: 3 * levels, backfillHeightM: 3 * levels }) }), `basement-${levels}`);
+      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 30 }), basement: bsm({ levels, depthM: 3 * levels, backfillHeightM: 3 * levels }) }), `basement-${levels}`);
       expect(d.basement!.elements.filter(e => e.elementType === 'basement_wall').length).toBe(levels);
     }
   });
   it('9: high groundwater adds uplift and a flotation verdict', () => {
-    const r = run({ foundationDetails: fd({ selectionMode: 'manual', groundwaterDepthM: 0.5 }), basement: bsm() });
+    const r = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 0.5 }), basement: bsm() });
     const d = invariants(r, 'basement-gw');
     expect(d.basement!.stability.upliftKn).toBeGreaterThan(0);
     expect(['PASS', 'WARNING', 'FAIL']).toContain(d.basement!.stability.checks.find(c => c.id === 'flotation')!.status);
   });
   it('10: surcharge raises wall pressure and never thins the wall', () => {
-    const lo = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm({ surchargeKnM2: 0 }) }), 'sur0');
-    const hi = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm({ surchargeKnM2: 40 }) }), 'sur40');
+    const lo = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm({ surchargeKnM2: 0 }) }), 'sur0');
+    const hi = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm({ surchargeKnM2: 40 }) }), 'sur40');
     const wl = lo.basement!.elements[0], wh = hi.basement!.elements[0];
     expect(wh.pressure!.bottomKnM2).toBeGreaterThan(wl.pressure!.bottomKnM2);
     expect(wh.thicknessMm!).toBeGreaterThanOrEqual(wl.thicknessMm!);
@@ -258,15 +258,15 @@ describe('Scenario 7-10: basements', () => {
 
 describe('Foundation under a basement is not penalised by excavated soil', () => {
   it('same building, SBC and 3 m founding depth: designed with a basement, fails as a backfilled foundation', () => {
-    const withB = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
-    const noB = run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', foundationDepthM: 3, allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
+    const withB = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
+    const noB = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', foundationDepthM: 3, allowableSoilBearingPressureKnM2: 120 }, 4, GRID9);
     const dB = invariants(withB, 'void-yes'), dN = invariants(noB, 'void-no');
     expect(dN.foundation!.status).toBe('FAIL');
     expect(dB.foundation!.status).not.toBe('FAIL');
     expect(dB.foundation!.elements[0].depthMm).toBeDefined();
   });
   it('available pressure = SBC − 25 D − wall weight (hand derivation from the design itself)', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 150 }, 3, GRID9), 'void-hand');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationType: 'raft', basement: bsm({ groundwaterDepthM: 8 }), allowableSoilBearingPressureKnM2: 150 }, 3, GRID9), 'void-hand');
     const el = d.foundation!.elements[0];
     const walls = d.basement!.elements.filter(e => e.elementType === 'basement_wall');
     const wallWeight = (walls.reduce((s, w) => s + w.quantities!.concreteM3, 0) * 25) / (d.summary.plan.lengthM * d.summary.plan.widthM);
@@ -274,7 +274,7 @@ describe('Foundation under a basement is not penalised by excavated soil', () =>
     expect(el.assumptions.join(' ')).toContain('Basement void');
   });
   it('a foundation without a basement keeps the soil overburden deduction', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), foundationDepthM: 3, allowableSoilBearingPressureKnM2: 250 }, 2, INNER4), 'no-void');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), foundationDepthM: 3, allowableSoilBearingPressureKnM2: 250 }, 2, INNER4), 'no-void');
     const el = d.foundation!.elements[0];
     const D = el.depthMm! / 1000;
     expect(el.availablePressureKnM2!).toBeCloseTo(250 - (18 * (3 - D) + 25 * D), 1);
@@ -283,24 +283,24 @@ describe('Foundation under a basement is not penalised by excavated soil', () =>
 
 describe('Scenario 11-14: changing inputs recalculates', () => {
   it('11: SBC changes the foundation size monotonically', () => {
-    const sizes = [300, 200, 150, 100].map(sbc => invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), allowableSoilBearingPressureKnM2: sbc }), `sbc${sbc}`).foundation!.totals.concreteM3);
+    const sizes = [300, 200, 150, 100].map(sbc => invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), allowableSoilBearingPressureKnM2: sbc }), `sbc${sbc}`).foundation!.totals.concreteM3);
     for (let i = 1; i < sizes.length; i++) expect(sizes[i]).toBeGreaterThanOrEqual(sizes[i - 1] - 1e-6);
   });
   it('12: heavier occupancy (commercial) raises column loads and the foundation', () => {
-    const res = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), buildingType: 'residential' }), 'res');
-    const com = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), buildingType: 'commercial' }), 'com');
+    const res = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), buildingType: 'residential' }), 'res');
+    const com = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), buildingType: 'commercial' }), 'com');
     expect(com.loadPath.totalServiceKn).toBeGreaterThan(res.loadPath.totalServiceKn);
     expect(com.foundation!.totals.concreteM3).toBeGreaterThanOrEqual(res.foundation!.totals.concreteM3 - 1e-6);
   });
   it('13: concrete and steel grades are carried into every element', () => {
     for (const g of ['M20', 'M25', 'M30', 'M35'] as const) {
-      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', concreteGrade: g, steelGrade: 'Fe415' }) }), `grade-${g}`);
+      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', concreteGrade: g, steelGrade: 'Fe415' }) }), `grade-${g}`);
       expect(d.foundation!.elements.every(e => e.concreteGrade === g && e.steelGrade === 'Fe415')).toBe(true);
     }
   });
   it('14: building dimensions drive the basement plan, walls and base slab', () => {
-    const small = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm() }, 3, INNER4, [40, 30]), 'small');
-    const big = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm() }, 3, [[15, 12], [45, 12], [45, 32], [15, 32]], [60, 44]), 'big');
+    const small = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm() }, 3, INNER4, [40, 30]), 'small');
+    const big = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm() }, 3, [[15, 12], [45, 12], [45, 32], [15, 32]], [60, 44]), 'big');
     expect(big.summary.plan.lengthM).toBeCloseTo(60 * FT, 3);
     expect(big.basement!.totals.concreteM3).toBeGreaterThan(small.basement!.totals.concreteM3);
     expect(big.basement!.totals.excavationM3).toBeGreaterThan(small.basement!.totals.excavationM3);
@@ -309,14 +309,14 @@ describe('Scenario 11-14: changing inputs recalculates', () => {
 
 describe('Scenario 15-16: reinforcement and BBS', () => {
   it('15: foundation BBS has mesh and dowels with consistent weights', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }) }), 'bbs-f');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }), 'bbs-f');
     const rows = d.bbs!.rows;
     expect(rows.some(r => r.shape === 'dowel_L')).toBe(true);
     expect(rows.some(r => /-B[XY]$/.test(r.mark))).toBe(true);
     expect(d.bbs!.totals.steelKg).toBeGreaterThan(0);
   });
   it('16: basement BBS has wall vertical/ring bars and base slab bars', () => {
-    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual' }), basement: bsm({ groundwaterDepthM: 1.5 }) }), 'bbs-b');
+    const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }), basement: bsm({ groundwaterDepthM: 1.5 }) }), 'bbs-b');
     const marks = d.bbs!.rows.map(r => r.mark);
     expect(marks.some(m => /^BW-L\d+-V/.test(m))).toBe(true);
     expect(marks.some(m => /^BW-L\d+-H/.test(m))).toBe(true);
@@ -326,7 +326,7 @@ describe('Scenario 15-16: reinforcement and BBS', () => {
 
 describe('Scenario 17: save and reload', () => {
   it('the configuration and the design survive a JSON round trip and recompute identically', () => {
-    const proj = project({ foundationDetails: fd({ selectionMode: 'manual', concreteGrade: 'M30' }), basement: bsm() }, 3, INNER4);
+    const proj = project({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', concreteGrade: 'M30' }), basement: bsm() }, 3, INNER4);
     // The host's auto-sizing feeds column sizes back into the model and needs a few passes to settle
     // (pre-existing behaviour, also without the detailed design); the app recalculates continuously.
     for (let i = 0; i < 3; i++) calculateProject(proj);

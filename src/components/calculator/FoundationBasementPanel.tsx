@@ -8,6 +8,7 @@ import {
   resolveBasementConfig,
   type FoundationDetailsConfig,
   type BasementConfig,
+  type LateralLoadConfig,
 } from '../../lib/foundation/types';
 
 interface Props {
@@ -92,6 +93,14 @@ export function FoundationBasementPanel({ config, onChange }: Props) {
   const setBs = (patch: Partial<BasementConfig>) =>
     onChange({ basement: { ...bs, ...patch } });
 
+  const lat: LateralLoadConfig = fd.lateral ?? {};
+  const seis = { zone: 'III' as const, importanceFactor: 1, responseReduction: 3, soil: 'medium' as const, infilledFrame: true, ...(lat.seismic ?? {}) };
+  const setLateral = (patch: Partial<LateralLoadConfig>) => setFd({ lateral: { ...lat, ...patch } });
+  const setSeismic = (patch: Partial<NonNullable<LateralLoadConfig['seismic']>>) =>
+    setLateral({ seismic: { ...seis, enabled: lat.seismic?.enabled ?? false, ...patch } });
+  const setWind = (patch: Partial<NonNullable<LateralLoadConfig['wind']>>) =>
+    setLateral({ wind: { enabled: false, designPressureKnM2: 0, ...(lat.wind ?? {}), ...patch } });
+
   const isPile = config.foundationType === 'pile';
   const sbcAssumed = fd.investigation.sbcSource === 'assumed_preliminary';
 
@@ -122,13 +131,13 @@ export function FoundationBasementPanel({ config, onChange }: Props) {
           />
           <SelectField
             label="Column Load Source"
-            value={fd.columnLoadSource ?? 'tributary'}
+            value={fd.columnLoadSource ?? 'frame'}
             onChange={(v) => setFd({ columnLoadSource: v })}
             options={[
               { id: 'tributary', label: 'Tributary-area estimate (axial only)' },
               { id: 'frame', label: 'Gravity frame analysis (axial, shear, moments)' },
             ]}
-            hint="Frame: 3D analysis of the beams, slabs, walls and columns. Gravity only: no wind or seismic."
+            hint="Frame: 3D analysis of the beams, slabs, walls and columns. Wind and earthquake loads are added below (optional)."
           />
           <SelectField
             label="SBC Source"
@@ -160,6 +169,47 @@ export function FoundationBasementPanel({ config, onChange }: Props) {
             />
             <span className={hintCls}>Use with the SBC and soil parameters below when no catalog class fits</span>
           </div>
+        </div>
+
+        {/* ------------------- wind & earthquake (frame analysis) ------------------- */}
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-3" data-testid="lateral-config">
+          <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Wind &amp; earthquake loads (optional)</div>
+          {(fd.columnLoadSource ?? 'frame') !== 'frame' && (
+            <span className={hintCls}>Needs the Gravity frame analysis column load source: these loads are ignored with the tributary estimate.</span>
+          )}
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+            <input type="checkbox" checked={!!lat.seismic?.enabled} onChange={(e) => setSeismic({ enabled: e.target.checked })} />
+            Earthquake (IS 1893 equivalent static)
+          </label>
+          {lat.seismic?.enabled && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <SelectField label="Seismic zone" value={seis.zone} onChange={(v) => setSeismic({ zone: v })}
+                options={[{ id: 'II', label: 'II (Z = 0.10)' }, { id: 'III', label: 'III (Z = 0.16)' }, { id: 'IV', label: 'IV (Z = 0.24)' }, { id: 'V', label: 'V (Z = 0.36)' }]}
+                hint="Look up your site in IS 1893 (Part 1)" />
+              <SelectField label="Soil type (for Sa/g)" value={seis.soil} onChange={(v) => setSeismic({ soil: v })}
+                options={[{ id: 'rock', label: 'Rock / hard soil' }, { id: 'medium', label: 'Medium soil' }, { id: 'soft', label: 'Soft soil' }]} />
+              <SelectField label="Frame type" value={seis.infilledFrame ? 'infilled' : 'bare'} onChange={(v) => setSeismic({ infilledFrame: v === 'infilled' })}
+                options={[{ id: 'infilled', label: 'RC frame with masonry infill' }, { id: 'bare', label: 'Bare RC frame' }]} hint="Sets the approximate period" />
+              <NumField label="Importance factor I" value={seis.importanceFactor} step={0.1} min={1}
+                onChange={(v) => setSeismic({ importanceFactor: v ?? 1 })} />
+              <NumField label="Response reduction R" value={seis.responseReduction} step={0.5} min={1}
+                hint="3 ordinary, 5 special RC moment frame" onChange={(v) => setSeismic({ responseReduction: v ?? 3 })} />
+            </div>
+          )}
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+            <input type="checkbox" checked={!!lat.wind?.enabled} onChange={(e) => setWind({ enabled: e.target.checked })} />
+            Wind (net design pressure entered by you)
+          </label>
+          {lat.wind?.enabled && (
+            <NumField label="Net design wind pressure" unit="kN/m²" value={lat.wind.designPressureKnM2 || undefined} step={0.1} min={0}
+              hint="From your own IS 875 (Part 3) calculation: the application does not derive wind speed or pressure"
+              onChange={(v) => setWind({ designPressureKnM2: v ?? 0 })} />
+          )}
+          {(lat.seismic?.enabled || lat.wind?.enabled) && (
+            <NumField label="Soil pressure increase for wind / earthquake combinations" value={lat.sbcIncreaseFactor ?? 1} step={0.05} min={1}
+              hint="1.0 = no increase (default). Enter 1.25 only if your geotechnical report or the code clause you rely on allows it."
+              onChange={(v) => setLateral({ sbcIncreaseFactor: Math.max(1, v ?? 1) })} />
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

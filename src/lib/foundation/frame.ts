@@ -47,6 +47,8 @@ export interface FrameMember {
    * split there so piecewise-linear loads are integrated exactly; without it a kink between Gauss points is approximate.
    */
   loadBreaks?: number[];
+  /** Truss-like link: only axial stiffness (no bending or torsion). Used for rigid-diaphragm bracing. */
+  axialOnly?: boolean;
 }
 
 export interface FrameSupport {
@@ -130,6 +132,7 @@ export function localStiffness(m: FrameMember, L: number): Float64Array {
   const set = (r: number, c: number, v: number) => { k[r * 12 + c] = v; k[c * 12 + r] = v; };
   const ea = (E * A) / L, gj = (G * J) / L;
   set(0, 0, ea); set(6, 6, ea); set(0, 6, -ea);
+  if (m.axialOnly) return k;
   set(3, 3, gj); set(9, 9, gj); set(3, 9, -gj);
   const a1 = (12 * E * Iz) / L ** 3, a2 = (6 * E * Iz) / L ** 2, a3 = (4 * E * Iz) / L, a4 = (2 * E * Iz) / L;
   set(1, 1, a1); set(1, 5, a2); set(1, 7, -a1); set(1, 11, a2);
@@ -182,8 +185,8 @@ export function equivalentLoadLocal(m: FrameMember, R: [V3, V3, V3], L: number):
   return f;
 }
 
-/** Solve K x = b for symmetric positive-definite K (dense Cholesky). K is overwritten. */
-function choleskySolve(K: Float64Array, b: Float64Array, n: number): Float64Array {
+/** In-place dense Cholesky factorisation: the lower triangle of K becomes L (K = L Lᵀ) */
+function choleskyFactor(K: Float64Array, n: number): void {
   for (let j = 0; j < n; j++) {
     let d = K[j * n + j];
     for (let k = 0; k < j; k++) d -= K[j * n + k] ** 2;
@@ -196,24 +199,50 @@ function choleskySolve(K: Float64Array, b: Float64Array, n: number): Float64Arra
       K[i * n + j] = s / Ljj;
     }
   }
+}
+
+function choleskyBackSolve(L: Float64Array, b: Float64Array, n: number): Float64Array {
   const y = new Float64Array(n);
   for (let i = 0; i < n; i++) {
     let s = b[i];
-    for (let k = 0; k < i; k++) s -= K[i * n + k] * y[k];
-    y[i] = s / K[i * n + i];
+    for (let k = 0; k < i; k++) s -= L[i * n + k] * y[k];
+    y[i] = s / L[i * n + i];
   }
   const x = new Float64Array(n);
   for (let i = n - 1; i >= 0; i--) {
     let s = y[i];
-    for (let k = i + 1; k < n; k++) s -= K[k * n + i] * x[k];
-    x[i] = s / K[i * n + i];
+    for (let k = i + 1; k < n; k++) s -= L[k * n + i] * x[k];
+    x[i] = s / L[i * n + i];
   }
   return x;
 }
 
 export const MAX_FRAME_DOFS = 2400;
 
+/** One load case for solveFrameCases (members' own `downwardLoad` is ignored there) */
+export interface FrameLoadCase {
+  id: string;
+  nodalLoads?: NodalLoad[];
+  /** downward distributed member loads, keyed by member id */
+  memberLoads?: Record<string, { fn: (xFromI: number) => number; breaks?: number[] }>;
+}
+
+/**
+ * Solve several load cases on the same frame with ONE stiffness assembly and factorisation (linear elasticity).
+ * The members' own `downwardLoad` and the model's `nodalLoads` are ignored: loads come from the cases.
+ */
+export function solveFrameCases(model: FrameModel, cases: FrameLoadCase[]): Record<string, FrameResult> {
+  return solveInternal(model, cases.map(c => ({ id: c.id, nodal: c.nodalLoads ?? [], memberLoads: c.memberLoads, useOwn: false })));
+}
+
+/** Solve the frame under the loads declared on its members and in `nodalLoads` */
 export function solveFrame(model: FrameModel): FrameResult {
+  return solveInternal(model, [{ id: '_', nodal: model.nodalLoads ?? [], memberLoads: undefined, useOwn: true }])._;
+}
+
+interface InternalCase { id: string; nodal: NodalLoad[]; memberLoads?: FrameLoadCase['memberLoads']; useOwn: boolean }
+
+function solveInternal(model: FrameModel, cases: InternalCase[]): Record<string, FrameResult> {
   const idx = new Map<string, number>();
   model.nodes.forEach((n, k) => idx.set(n.id, k));
   const nNodes = model.nodes.length;
@@ -225,7 +254,6 @@ export function solveFrame(model: FrameModel): FrameResult {
     return k;
   };
 
-  // restraints
   const restrained = new Array<boolean>(N).fill(false);
   for (const s of model.supports) {
     const k = node(s.node);
@@ -234,19 +262,13 @@ export function solveFrame(model: FrameModel): FrameResult {
   }
 
   const Kg = new Float64Array(N * N);
-  const F = new Float64Array(N);
-  const mdata: Array<{ m: FrameMember; ia: number; ib: number; R: [V3, V3, V3]; L: number; kLoc: Float64Array; fLoc: Float64Array }> = [];
-
+  const mdata: Array<{ m: FrameMember; ia: number; ib: number; R: [V3, V3, V3]; L: number; kLoc: Float64Array; T: Float64Array; dofs: number[] }> = [];
   for (const m of model.members) {
     const ia = node(m.i), ib = node(m.j);
     const { R, length } = memberAxes(model.nodes[ia], model.nodes[ib]);
     const kLoc = localStiffness(m, length);
-    const fLoc = equivalentLoadLocal(m, R, length);
-    mdata.push({ m, ia, ib, R, L: length, kLoc, fLoc });
-    // T (12x12 block diagonal of R) : u_loc = T u_glob
     const T = new Float64Array(144);
     for (let b = 0; b < 4; b++) for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) T[(b * 3 + r) * 12 + b * 3 + c] = R[r][c];
-    // Kglob = T^T kLoc T
     const tmp = new Float64Array(144);
     for (let r = 0; r < 12; r++) for (let c = 0; c < 12; c++) { let s = 0; for (let k = 0; k < 12; k++) s += kLoc[r * 12 + k] * T[k * 12 + c]; tmp[r * 12 + c] = s; }
     const dofs = [...Array.from({ length: 6 }, (_, d) => ia * 6 + d), ...Array.from({ length: 6 }, (_, d) => ib * 6 + d)];
@@ -254,65 +276,72 @@ export function solveFrame(model: FrameModel): FrameResult {
       let s = 0; for (let k = 0; k < 12; k++) s += T[k * 12 + r] * tmp[k * 12 + c];
       Kg[dofs[r] * N + dofs[c]] += s;
     }
-    for (let r = 0; r < 12; r++) { let s = 0; for (let k = 0; k < 12; k++) s += T[k * 12 + r] * fLoc[k]; F[dofs[r]] += s; }
-  }
-  let appliedDown = 0;
-  for (const md of mdata) {
-    // downward applied load of members: integrate shape
-    if (md.m.downwardLoad) for (const { x, w } of quadrature(md.m, md.L)) appliedDown += md.m.downwardLoad(x) * w;
-  }
-  for (const nl of model.nodalLoads ?? []) {
-    const k = node(nl.node);
-    for (let d = 0; d < 6; d++) F[k * 6 + d] += nl.load[d];
-    appliedDown += -nl.load[1];
+    mdata.push({ m, ia, ib, R, L: length, kLoc, T, dofs });
   }
 
-  // reduce to free DOFs and solve
   const free: number[] = [];
   for (let d = 0; d < N; d++) if (!restrained[d]) free.push(d);
   const nf = free.length;
   const Kff = new Float64Array(nf * nf);
-  const Ff = new Float64Array(nf);
-  for (let r = 0; r < nf; r++) { Ff[r] = F[free[r]]; for (let c = 0; c < nf; c++) Kff[r * nf + c] = Kg[free[r] * N + free[c]]; }
-  const uf = nf > 0 ? choleskySolve(Kff, Ff, nf) : new Float64Array(0);
-  const U = new Float64Array(N);
-  free.forEach((d, r) => { U[d] = uf[r]; });
+  for (let r = 0; r < nf; r++) for (let c = 0; c < nf; c++) Kff[r * nf + c] = Kg[free[r] * N + free[c]];
+  if (nf > 0) choleskyFactor(Kff, nf);
 
-  // reactions: (K U - F) at restrained DOFs
-  const reactions: FrameResult['reactions'] = {};
-  let reactionUp = 0;
-  for (const s of model.supports) {
-    const k = node(s.node);
-    const r: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
-    for (let d = 0; d < 6; d++) {
-      if (!restrained[k * 6 + d]) continue;
-      let sum = 0;
-      for (let c = 0; c < N; c++) sum += Kg[(k * 6 + d) * N + c] * U[c];
-      r[d] = sum - F[k * 6 + d];
+  const out: Record<string, FrameResult> = {};
+  for (const cs of cases) {
+    const F = new Float64Array(N);
+    const fLocs: Float64Array[] = [];
+    let appliedDown = 0;
+    for (const md of mdata) {
+      const own = cs.useOwn ? md.m.downwardLoad : cs.memberLoads?.[md.m.id]?.fn;
+      const breaks = cs.useOwn ? md.m.loadBreaks : cs.memberLoads?.[md.m.id]?.breaks;
+      const mm: FrameMember = { ...md.m, downwardLoad: own, loadBreaks: breaks };
+      const fLoc = equivalentLoadLocal(mm, md.R, md.L);
+      fLocs.push(fLoc);
+      for (let r = 0; r < 12; r++) { let s = 0; for (let k = 0; k < 12; k++) s += md.T[k * 12 + r] * fLoc[k]; F[md.dofs[r]] += s; }
+      if (own) for (const { x, w } of quadrature(mm, md.L)) appliedDown += own(x) * w;
     }
-    reactions[s.node] = r;
-    reactionUp += r[1];
+    for (const nl of cs.nodal) {
+      const k = node(nl.node);
+      for (let d = 0; d < 6; d++) F[k * 6 + d] += nl.load[d];
+      appliedDown += -nl.load[1];
+    }
+    const Ff = new Float64Array(nf);
+    for (let r = 0; r < nf; r++) Ff[r] = F[free[r]];
+    const uf = nf > 0 ? choleskyBackSolve(Kff, Ff, nf) : new Float64Array(0);
+    const U = new Float64Array(N);
+    free.forEach((d, r) => { U[d] = uf[r]; });
+
+    const reactions: FrameResult['reactions'] = {};
+    let reactionUp = 0;
+    for (const s of model.supports) {
+      const k = node(s.node);
+      const r: [number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0];
+      for (let d = 0; d < 6; d++) {
+        if (!restrained[k * 6 + d]) continue;
+        let sum = 0;
+        for (let c = 0; c < N; c++) sum += Kg[(k * 6 + d) * N + c] * U[c];
+        r[d] = sum - F[k * 6 + d];
+      }
+      reactions[s.node] = r;
+      reactionUp += r[1];
+    }
+
+    const members: Record<string, MemberEndForces> = {};
+    mdata.forEach((md, mi) => {
+      const ug: number[] = [];
+      for (const n of [md.ia, md.ib]) for (let d = 0; d < 6; d++) ug.push(U[n * 6 + d]);
+      const ul = new Array<number>(12).fill(0);
+      for (let b = 0; b < 4; b++) for (let r = 0; r < 3; r++) { let s = 0; for (let c = 0; c < 3; c++) s += md.R[r][c] * ug[b * 3 + c]; ul[b * 3 + r] = s; }
+      const fe: number[] = [];
+      for (let r = 0; r < 12; r++) { let s = 0; for (let c = 0; c < 12; c++) s += md.kLoc[r * 12 + c] * ul[c]; fe.push(s - fLocs[mi][r]); }
+      members[md.m.id] = { id: md.m.id, length: md.L, endI: fe.slice(0, 6) as MemberEndForces['endI'], endJ: fe.slice(6, 12) as MemberEndForces['endJ'] };
+    });
+
+    const displacements: FrameResult['displacements'] = {};
+    model.nodes.forEach((n, k) => { displacements[n.id] = [0, 1, 2, 3, 4, 5].map(d => U[k * 6 + d]) as FrameResult['displacements'][string]; });
+    out[cs.id] = { displacements, reactions, members, equilibrium: { appliedDownKn: appliedDown, reactionUpKn: reactionUp, errorKn: Math.abs(appliedDown - reactionUp) } };
   }
-
-  // member end forces (local): k u_loc - f_eq_loc
-  const members: Record<string, MemberEndForces> = {};
-  for (const md of mdata) {
-    const ug: number[] = [];
-    for (const n of [md.ia, md.ib]) for (let d = 0; d < 6; d++) ug.push(U[n * 6 + d]);
-    const ul = new Array<number>(12).fill(0);
-    for (let b = 0; b < 4; b++) for (let r = 0; r < 3; r++) { let s = 0; for (let c = 0; c < 3; c++) s += md.R[r][c] * ug[b * 3 + c]; ul[b * 3 + r] = s; }
-    const fe: number[] = [];
-    for (let r = 0; r < 12; r++) { let s = 0; for (let c = 0; c < 12; c++) s += md.kLoc[r * 12 + c] * ul[c]; fe.push(s - md.fLoc[r]); }
-    members[md.m.id] = { id: md.m.id, length: md.L, endI: fe.slice(0, 6) as MemberEndForces['endI'], endJ: fe.slice(6, 12) as MemberEndForces['endJ'] };
-  }
-
-  const displacements: FrameResult['displacements'] = {};
-  model.nodes.forEach((n, k) => { displacements[n.id] = [0, 1, 2, 3, 4, 5].map(d => U[k * 6 + d]) as FrameResult['displacements'][string]; });
-
-  return {
-    displacements, reactions, members,
-    equilibrium: { appliedDownKn: appliedDown, reactionUpKn: reactionUp, errorKn: Math.abs(appliedDown - reactionUp) },
-  };
+  return out;
 }
 
 /** Young's modulus of concrete, kN/m²: Ec = 5000 √fck (MPa) (IS 456:2000 Cl. 6.2.3.1) */

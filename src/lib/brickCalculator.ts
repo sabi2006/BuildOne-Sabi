@@ -16,6 +16,7 @@ import {
   StructuralRatesConfig
 } from './structuralCalculationService';
 import { computeFoundationBasementDesign, isDetailedDesignRequested, type FoundationBasementIntegration } from './foundation/integration';
+import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
@@ -5552,7 +5553,7 @@ export const calculateProject = (
           floors: (bModel.floors || []).map(f => ({ id: f.id })),
           buildingLengthM: bLengthM,
           buildingWidthM: bWidthM,
-          frameGeometry: bConfig.foundationDetails?.columnLoadSource === 'frame' ? buildFrameGeometryForDesign(bModel, effectivePillars) : undefined,
+          frameGeometry: resolveFoundationDetails(bConfig.foundationDetails).columnLoadSource === 'frame' ? buildFrameGeometryForDesign(bModel, effectivePillars) : undefined,
           storeyHeightsM: (bModel.floors || []).map(f => toMeters(f.height, f.unit)),
           options: { manualFootingCount: (bModel.foundation?.footings || []).filter(f => f.isManual).length },
         });

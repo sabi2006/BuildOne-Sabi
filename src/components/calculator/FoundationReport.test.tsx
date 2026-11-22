@@ -31,7 +31,7 @@ const bsm = { enabled: true, levels: 1, depthM: 3, clearHeightM: 2.7, frictionAn
 const count = (s: string, re: RegExp) => (s.match(re) || []).length;
 
 describe('FoundationReport', () => {
-  const d = design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any, basement: bsm });
+  const d = design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: bsm });
   const out = html(d);
 
   it('renders the overall status exactly as the engine reported it, never PASS here', () => {
@@ -95,7 +95,7 @@ describe('FoundationReport', () => {
   });
 
   it('shows FAIL elements with their reason (overlapping manual footings)', () => {
-    const dd = design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }, undefined, 4);
+    const dd = design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any }, undefined, 4);
     const o = html(dd);
     expect(dd.foundation!.elements.some(e => e.status === 'FAIL')).toBe(true);
     expect(o).toContain('data-status="FAIL"');
@@ -103,7 +103,7 @@ describe('FoundationReport', () => {
   });
 
   it('shows NOT VERIFIED pile elements with the missing-data explanation and no bar schedule', () => {
-    const dd = design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any, foundationType: 'pile' });
+    const dd = design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, foundationType: 'pile' });
     const o = html(dd);
     expect(o).toContain('NOT VERIFIED');
     expect(o).toContain('borehole');
@@ -111,7 +111,7 @@ describe('FoundationReport', () => {
   });
 
   it('omits the basement section when no basement is designed', () => {
-    const dd = design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any });
+    const dd = design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any });
     const o = html(dd);
     expect(o).not.toContain('3. Basement');
     expect(o).toContain('2. Foundation');
@@ -127,7 +127,7 @@ describe('FoundationReport – frame analysis sections', () => {
     expect(out).toContain('data-testid="frame-summary"');
     expect(out).toContain('Gravity frame analysis');
     expect(out).toContain('Equilibrium error');
-    expect(out).toContain('wind and seismic loads are NOT included');
+    expect(out).toContain('Wind and seismic loads are NOT included');
   });
 
   it('adds host-estimate, base moment and shear columns to the load table, one value per column', () => {
@@ -143,7 +143,7 @@ describe('FoundationReport – frame analysis sections', () => {
   });
 
   it('the tributary default shows neither the frame summary nor the extra columns', () => {
-    const t = html(design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }));
+    const t = html(design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any }));
     expect(t).not.toContain('frame-summary');
     expect(t).not.toContain('Base Mx kN·m');
   });
@@ -152,5 +152,29 @@ describe('FoundationReport – frame analysis sections', () => {
     const f = html(design(frameCfg, [[10, 8], [30, 20]]));
     expect(f).toContain('data-testid="frame-fallback"');
     expect(f).toContain('Frame analysis was requested but not used');
+  });
+});
+
+describe('FoundationReport – wind and earthquake', () => {
+  const seis = { enabled: true, zone: 'IV', importanceFactor: 1, responseReduction: 3, soil: 'medium', infilledFrame: true };
+  const d = design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8, columnLoadSource: 'frame', lateral: { seismic: seis, wind: { enabled: true, designPressureKnM2: 1.2 } } } as any });
+  const out = html(d);
+
+  it('shows the seismic and wind summary with the values the analysis computed', () => {
+    expect(out).toContain('data-testid="lateral-summary"');
+    expect(out).toContain('Earthquake: zone IV');
+    expect(out).toContain('Wind pressure (user input)');
+    expect(out).toContain('Base shear (X / plan y)');
+    expect(out).toContain('Wind / seismic load combinations');
+  });
+
+  it('still lists what is not modelled and is never PASS', () => {
+    expect(out).toContain('accidental torsion');
+    expect(d.status).not.toBe('PASS');
+  });
+
+  it('gravity-only frame has no lateral summary', () => {
+    const g = html(design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8, columnLoadSource: 'frame' } as any }));
+    expect(g).not.toContain('lateral-summary');
   });
 });
