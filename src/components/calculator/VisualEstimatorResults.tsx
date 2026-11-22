@@ -32,6 +32,7 @@ import { VisualEstimator3D } from '../3d/VisualEstimator3D';
 import { SaveProjectModal } from './SaveProjectModal';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { StructuralConfigModal } from './StructuralConfigModal';
+import { FoundationReport } from './FoundationReport';
 
 const WhatsAppIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={className}>
@@ -2529,6 +2530,9 @@ Please contact me.`;
       {/* Section 4b Plaster Estimate has been relocated directly after Brick Masonry (Section 2b) */}
 
       {/* 5. Dynamic Bill of Quantities (BOQ) & Building Cost Estimation */}
+      {/* Detailed foundation & basement design report (present once the foundation panel is used or a basement is enabled) */}
+      {computedResult.foundationBasementDesign && <FoundationReport design={computedResult.foundationBasementDesign} />}
+
       {computedResult.buildingBOQ && (() => {
         const boq = computedResult.buildingBOQ!;
         const products = boq.products || [];

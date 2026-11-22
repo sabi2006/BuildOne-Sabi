@@ -198,9 +198,9 @@
     "semantic_hash": "8c2b640aeeb62b60044e141e237a1a5b"
   },
   "src/components/calculator/VisualEstimatorResults.tsx": {
-    "mtime": 1795332752.1076567,
-    "seen": 1795333326.6458607,
-    "ast_hash": "0f86bb31ce4597bfa449bc1821dccf96",
+    "mtime": 1795333460.3892996,
+    "seen": 1795333672.7961693,
+    "ast_hash": "9a91efaf44dd80ade238a4705934e4d0",
     "semantic_hash": ""
   },
   "src/components/calculator/VisualPreviews.tsx": {
@@ -657,6 +657,18 @@
     "mtime": 1795333113.1025648,
     "seen": 1795333326.645887,
     "ast_hash": "32ca62de1100731d35b79c40731d5c96",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/FoundationReport.test.tsx": {
+    "mtime": 1795333600.060719,
+    "seen": 1795333672.796155,
+    "ast_hash": "ceec68fa78d4c65a0052b08e74a514a3",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/FoundationReport.tsx": {
+    "mtime": 1795333442.7178743,
+    "seen": 1795333672.7961574,
+    "ast_hash": "de986c39506d09214779cf0df5f28269",
     "semantic_hash": ""
   },
   "package-lock.json": {
