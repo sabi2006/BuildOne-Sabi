@@ -5055,6 +5055,57 @@ export function calculateBuildingBOQ(params: {
   };
 }
 
+/**
+ * Geometry for the gravity frame analysis of the detailed foundation design: the pillar-to-pillar beams of the ground
+ * floor (by pillar id, with the wall line load each carries) and the closed slab bays. Only ids and loads are returned:
+ * the design module takes positions and sizes from the structural summary, so it stays independent of this file.
+ * Wall line load = wall height × thickness × 19 kN/m³ (the host's masonry weight) × (1 − opening fraction), spread over
+ * the part of the beam the wall covers. The ground floor's walls are used for every storey.
+ */
+export const buildFrameGeometryForDesign = (
+  model: BuildingModel,
+  pillars: Pillar[]
+): {
+  beams: Array<{ id: string; startId: string; endId: string; wallLineLoadKnM?: number }>;
+  bays: Array<{ id: string; pillarIds: string[] }>;
+} => {
+  const unit: Unit = model.buildingUnit || 'ft';
+  const ground = model.floors?.[0];
+  const groundPillars = pillars.filter(p => !p.floorId || p.floorId === ground?.id || p.floorId === 'floor-0' || p.floorId === 'ground');
+  const walls: Wall[] = ground ? [...(ground.externalWalls || []), ...(ground.internalWalls || [])] : [];
+  const beams = detectPillarToPillarBeams(groundPillars, unit, walls);
+  const bays = detectClosedStructuralBays(groundPillars, unit, walls);
+  const perUnitM = toMeters(1, unit);
+  const tolUnits = 0.3 / perUnitM;
+
+  const outBeams = beams.map(b => {
+    const dx = b.end.x - b.start.x, dy = b.end.y - b.start.y;
+    const len = Math.hypot(dx, dy);
+    let lineLoad = 0;
+    if (len > 1e-9) {
+      for (const w of walls) {
+        if (!w.start || !w.end || !w.dimensions) continue;
+        // perpendicular distance of both wall ends to the beam line
+        const dist = (px: number, py: number) => Math.abs((px - b.start.x) * dy - (py - b.start.y) * dx) / len;
+        if (dist(w.start.x, w.start.y) > tolUnits || dist(w.end.x, w.end.y) > tolUnits) continue;
+        const t0 = ((w.start.x - b.start.x) * dx + (w.start.y - b.start.y) * dy) / len;
+        const t1 = ((w.end.x - b.start.x) * dx + (w.end.y - b.start.y) * dy) / len;
+        const overlap = Math.max(0, Math.min(Math.max(t0, t1), len) - Math.max(Math.min(t0, t1), 0));
+        if (overlap <= 1e-9) continue;
+        const wallLenM = toMeters(w.dimensions.length, w.dimensions.unit || unit);
+        const h = toMeters(w.dimensions.height, w.dimensions.unit || unit);
+        const t = toMeters(w.dimensions.thickness, w.dimensions.thicknessUnit || 'in');
+        const openings = (w.openings || []).reduce((sum, o) => sum + toMeters(o.width, o.unit || w.dimensions.unit || unit) * toMeters(o.height, o.unit || w.dimensions.unit || unit) * (o.count || 1), 0);
+        const openFrac = wallLenM * h > 0 ? Math.min(0.95, openings / (wallLenM * h)) : 0;
+        const perM = h * t * 19 * (1 - openFrac);
+        lineLoad += perM * ((overlap * perUnitM) / (len * perUnitM));
+      }
+    }
+    return { id: b.id, startId: b.startPillarId, endId: b.endPillarId, wallLineLoadKnM: lineLoad > 0 ? lineLoad : undefined };
+  });
+  return { beams: outBeams, bays: bays.map(bay => ({ id: bay.id, pillarIds: bay.pillarIds })) };
+};
+
 export const calculateProject = (
   project: { walls: Wall[]; pillars?: Pillar[]; buildingModel?: BuildingModel },
   brick: BrickSpecification = DEFAULT_TN_RED_BRICK,
@@ -5501,6 +5552,8 @@ export const calculateProject = (
           floors: (bModel.floors || []).map(f => ({ id: f.id })),
           buildingLengthM: bLengthM,
           buildingWidthM: bWidthM,
+          frameGeometry: bConfig.foundationDetails?.columnLoadSource === 'frame' ? buildFrameGeometryForDesign(bModel, effectivePillars) : undefined,
+          storeyHeightsM: (bModel.floors || []).map(f => toMeters(f.height, f.unit)),
           options: { manualFootingCount: (bModel.foundation?.footings || []).filter(f => f.isManual).length },
         });
       } catch (err) {

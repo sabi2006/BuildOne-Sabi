@@ -754,8 +754,12 @@ function designRaftWithProjection(
   const yl = columns.reduce((s, c) => s + c.serviceLoadKn * c.yM, 0) / S;
   const ex = xl - (x0 + x1) / 2, ey = yl - (y0 + y1) / 2;
   const q0 = S / A;
-  const qmax = q0 * (1 + (6 * Math.abs(ex)) / L + (6 * Math.abs(ey)) / B);
-  const qmin = q0 * (1 - (6 * Math.abs(ex)) / L - (6 * Math.abs(ey)) / B);
+  // column base moments (service, conservatively summed in magnitude) add to the eccentricity moment
+  const sumMx = columns.reduce((s, c) => s + Math.abs(c.momentXKnM ?? 0), 0);
+  const sumMy = columns.reduce((s, c) => s + Math.abs(c.momentYKnM ?? 0), 0);
+  const momentPressure = (6 * sumMy) / (B * L * L) + (6 * sumMx) / (L * B * B);
+  const qmax = q0 * (1 + (6 * Math.abs(ex)) / L + (6 * Math.abs(ey)) / B) + momentPressure;
+  const qmin = q0 * (1 - (6 * Math.abs(ex)) / L - (6 * Math.abs(ey)) / B) - momentPressure;
   const quAvg = Su / A;
   const qu = quAvg * (qmax / q0);
 
@@ -850,7 +854,10 @@ function designRaftWithProjection(
         { id: 'punching', label: 'Punching shear (worst column, perimeter clipped at raft edge)', clause: 'IS 456 Cl. 31.6.3', status: 'PASS', demand: round(worstTv, 3), capacity: round(worstTc, 3), unit: 'N/mm²' },
         { id: 'raft_method', label: 'Raft analysis method', clause: 'IS 2950 (Part 1)', status: 'WARNING',
           note: 'Rigid-raft one-way strip method only. Flexible-raft / finite-element analysis and column-load redistribution are not implemented. Treat as preliminary.' },
-        { id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED', note: 'Column moments are not included in raft design.' },
+        ...(sumMx + sumMy > 0
+          ? [{ id: 'moments', label: 'Column base moments in the contact pressure', status: 'WARNING' as const, demand: round(sumMx + sumMy, 1), unit: 'kN·m',
+              note: 'Service column base moments (summed in magnitude, conservative) are added to the load-eccentricity moment for the contact pressure. They are not applied to the raft bending or punching design.' }]
+          : [{ id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED' as const, note: 'No column moments supplied: raft design is for axial load only.' }]),
         ...commonChecks(p, true),
       ];
       e.checks = cks;

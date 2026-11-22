@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1795334338.6890202,
-    "seen": 1795334549.1246576,
-    "ast_hash": "fcf82f987efcb2b02faa231d62a06f3c",
+    "mtime": 1795335198.029027,
+    "seen": 1795335365.454966,
+    "ast_hash": "cc71e8030bfcba7cae98aba26b1cb4eb",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/FoundationBasement3D.tsx": {
-    "mtime": 1795331813.6537564,
-    "seen": 1795332235.877741,
-    "ast_hash": "99135dc4684c2bf2cac6b8901d1553d6",
+    "mtime": 1795335150.6415946,
+    "seen": 1795335365.4549603,
+    "ast_hash": "3ac898c180b24410b9da455b476d2c2f",
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {

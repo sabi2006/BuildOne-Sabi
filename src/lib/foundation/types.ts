@@ -17,6 +17,8 @@ export type DesignStatus = 'PASS' | 'WARNING' | 'FAIL' | 'NOT_VERIFIED';
 
 export type FoundationSelectionMode = 'auto' | 'manual';
 export type FoundationDesignPreference = 'economy' | 'balanced' | 'conservative';
+/** Where the ground column loads come from: the host's tributary-area estimate, or a gravity frame analysis */
+export type ColumnLoadSource = 'tributary' | 'frame';
 export type SbcSource = 'geotechnical_report' | 'assumed_preliminary';
 /** Whether the entered SBC is the gross allowable pressure at founding level, or the net (excess over overburden) */
 export type SbcBasis = 'gross' | 'net';
@@ -53,6 +55,8 @@ export interface FoundationDetailsConfig {
 
   /** Depth of groundwater table below ground level, metres. Undefined = unknown. */
   groundwaterDepthM?: number;
+  /** Column load source (default 'tributary'). 'frame' runs a 3D gravity frame analysis for axial loads, shears and moments. */
+  columnLoadSource?: ColumnLoadSource;
   /** 'gross' (default, conservative): overburden is deducted from SBC. 'net': SBC used as given. */
   sbcBasis?: SbcBasis;
   soilUnitWeightKnM3: number;

@@ -117,3 +117,40 @@ describe('FoundationReport', () => {
     expect(o).toContain('2. Foundation');
   });
 });
+
+describe('FoundationReport – frame analysis sections', () => {
+  const frameCfg = { foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8, columnLoadSource: 'frame' } as any };
+  const d = design(frameCfg);
+  const out = html(d);
+
+  it('shows the frame summary with equilibrium and the model assumptions', () => {
+    expect(out).toContain('data-testid="frame-summary"');
+    expect(out).toContain('Gravity frame analysis');
+    expect(out).toContain('Equilibrium error');
+    expect(out).toContain('wind and seismic loads are NOT included');
+  });
+
+  it('adds host-estimate, base moment and shear columns to the load table, one value per column', () => {
+    expect(out).toContain('Host estimate kN');
+    expect(out).toContain('Base Mx kN·m');
+    expect(out).toContain('Shear Vx / Vy kN');
+    for (const c of d.loadPath.columns) expect(out).toContain(c.name);
+  });
+
+  it('keeps the lateral-load limit visible and the frame-vs-tributary check listed', () => {
+    expect(out).toContain('Wind / seismic load combinations');
+    expect(out).toContain('Frame total load vs the host tributary-area estimate');
+  });
+
+  it('the tributary default shows neither the frame summary nor the extra columns', () => {
+    const t = html(design({ foundationDetails: { selectionMode: 'manual', groundwaterDepthM: 8 } as any }));
+    expect(t).not.toContain('frame-summary');
+    expect(t).not.toContain('Base Mx kN·m');
+  });
+
+  it('a frame that could not be used is explained instead of silently ignored', () => {
+    const f = html(design(frameCfg, [[10, 8], [30, 20]]));
+    expect(f).toContain('data-testid="frame-fallback"');
+    expect(f).toContain('Frame analysis was requested but not used');
+  });
+});

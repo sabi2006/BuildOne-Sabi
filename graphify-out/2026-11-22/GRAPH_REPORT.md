@@ -1,7 +1,7 @@
 # Graph Report - brick-factory  (2026-11-22)
 
 ## Corpus Check
-- 103 files · ~289,480 words
+- 103 files · ~289,752 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 5 file(s) not represented in the graph (top: (none) 2, .prisma 1, .ico 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `25bbcac2`
+- Built from commit: `3aa604c8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -116,12 +116,12 @@
 10. `getEffectiveFloorBeams()` - 26 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Issue 4: Footing Recalculation Depending on an Already Initialized `footings` Array` --references--> `FoundationFooting`  [INFERRED]
-  PILLAR_DEPENDENCY_ANALYSIS.md → src/lib/brickCalculator.ts
 - `1. Domain Model Overview` --references--> `BuildingModel`  [INFERRED]
   FINAL_GRAPHIFY_DOMAIN_MODEL.md → src/lib/brickCalculator.ts
 - `5.1 Save / Load & Serialization` --references--> `BuildingModel`  [INFERRED]
   FINAL_POST_IMPLEMENTATION_VALIDATION.md → src/lib/brickCalculator.ts
+- `Issue 4: Footing Recalculation Depending on an Already Initialized `footings` Array` --references--> `FoundationFooting`  [INFERRED]
+  PILLAR_DEPENDENCY_ANALYSIS.md → src/lib/brickCalculator.ts
 - `File 1: `src/lib/brickCalculator.ts`` --references--> `Pillar`  [INFERRED]
   FINAL_INTEGRATION_REVIEW.md → src/lib/brickCalculator.ts
 - `Contract 1: `Pillar` Type Definition Enhancement` --references--> `Pillar`  [INFERRED]
@@ -471,16 +471,16 @@ Nodes (5): Failure 6: Line 1775, Failure 7: Line 1797, Failure 8: Line 1945, Fai
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `splitWallByPillars()` connect `BuildingEditor.tsx` to `detectPillarToPillarBeams`, `Full Building Construction Calculation & Structural Engineering Manual`, `brickCalculator.ts`, `trimWallByPillars`, `3. Comprehensive Module Breakdown`, `brickCalculator.test.ts`, `VisualEstimator3D.tsx`?**
-  _High betweenness centrality (0.135) - this node is a cross-community bridge._
+  _High betweenness centrality (0.127) - this node is a cross-community bridge._
 - **Are the 39 inferred relationships involving `calculateProject()` (e.g. with `3. Relevant Files and Functions` and `4. Synchronization (2D vs. Context vs. 3D)`) actually correct?**
   _`calculateProject()` has 39 INFERRED edges - model-reasoned connections that need verification._
 - **Should `CalculatorContext.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.1380952380952381 - nodes in this community are weakly interconnected._
 - **Why does `calculateProject()` connect `calculateProject` to `CalculatorContext.tsx`, `detectPillarToPillarBeams`, `2. Phase-by-Phase Completion Breakdown`, `brickCalculator.ts`, `Pillar`, `trimWallByPillars`, `brickCalculator.test.ts`, `VisualEstimator3D.tsx`, `3. Verification of Requirements`, `3. Core Dependency Rules & Verification`, `structuralCalculationService.ts`, `7. Phase 3: Final Implementation Plan & Test Checklist`, `Final Graph Report — Brick Factory Architecture`, `Graphify Automation & Developer Guide — Brick Factory`, `geometry3d.test.ts`, `VisualEstimatorResults.tsx`, `integration.ts`, `2. Implemented Capabilities & File Changes`, `FoundationReport.test.tsx`, `2. Milestone-by-Milestone Architectural Changes`, `Graphify Setup Status — Brick Factory`, `Phase 2: Structural Dependency Analysis — Pillar Dimension Update`, `boq.test.ts`, `calculateBuildingStructuralSummary`, `FoundationFooting`, `calculateDynamicPillarFooting`, `7.4 File-by-File Implementation Plan`, `Suite 3: Ground Floor Foundation & Sub-grade Construction System (4 Failures)`?**
-  _High betweenness centrality (0.133) - this node is a cross-community bridge._
+  _High betweenness centrality (0.113) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `calculateBuildingStructuralSummary()` (e.g. with `10. Missing Test Cases` and `11. Recommended Fix Plan`) actually correct?**
   _`calculateBuildingStructuralSummary()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **Should `2. Phase-by-Phase Completion Breakdown` be split into smaller, more focused modules?**
   _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
-- **Why does `Module 2: Real-Time 3D WebGL Visualization Engine` connect `3. Comprehensive Module Breakdown` to `BuildingEditor.tsx`?**
-  _High betweenness centrality (0.081) - this node is a cross-community bridge._
+- **Why does `3. Comprehensive Module Breakdown` connect `3. Comprehensive Module Breakdown` to `Brick Factory – Complete Project Documentation & Technical Architecture`?**
+  _High betweenness centrality (0.077) - this node is a cross-community bridge._

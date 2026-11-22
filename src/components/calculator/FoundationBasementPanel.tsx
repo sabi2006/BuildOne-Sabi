@@ -121,6 +121,16 @@ export function FoundationBasementPanel({ config, onChange }: Props) {
             hint="Auto picks isolated / combined / raft from loads and SBC"
           />
           <SelectField
+            label="Column Load Source"
+            value={fd.columnLoadSource ?? 'tributary'}
+            onChange={(v) => setFd({ columnLoadSource: v })}
+            options={[
+              { id: 'tributary', label: 'Tributary-area estimate (axial only)' },
+              { id: 'frame', label: 'Gravity frame analysis (axial, shear, moments)' },
+            ]}
+            hint="Frame: 3D analysis of the beams, slabs, walls and columns. Gravity only: no wind or seismic."
+          />
+          <SelectField
             label="SBC Source"
             value={fd.investigation.sbcSource}
             onChange={(v) => setInv({ sbcSource: v })}

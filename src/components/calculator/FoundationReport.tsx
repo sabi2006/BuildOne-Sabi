@@ -241,6 +241,24 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
           <h4 className="text-sm font-bold text-slate-900 mb-2">1. Load path and method limits</h4>
           <ChecksTable checks={design.loadPath.checks} />
           <List title="Analysis the application does not provide" items={design.loadPath.capabilityGaps} tone="amber" />
+          {design.loadPath.frame?.used && (
+            <div className="mt-3 border border-sky-200 bg-sky-50 rounded-lg p-3" data-testid="frame-summary">
+              <div className="text-xs font-bold text-slate-900 mb-1">Gravity frame analysis</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+                <KV k="Applied load" v={`${fmt(design.loadPath.frame.totals?.appliedKn, 0)} kN`} />
+                <KV k="Base reactions" v={`${fmt(design.loadPath.frame.totals?.reactionKn, 0)} kN`} />
+                <KV k="Equilibrium error" v={`${fmt(design.loadPath.frame.totals?.equilibriumErrorKn, 6)} kN`} />
+                <KV k="Slab load reaching beams" v={`${fmt((design.loadPath.frame.totals?.slabLoadCapturedRatio ?? 0) * 100, 0)} %`} />
+              </div>
+              <List title="Model assumptions" items={design.loadPath.frame.assumptions} />
+              <List title="Frame warnings" items={design.loadPath.frame.warnings} tone="amber" />
+            </div>
+          )}
+          {design.loadPath.frame && !design.loadPath.frame.used && (
+            <div className="mt-3 text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded p-2" data-testid="frame-fallback">
+              Frame analysis was requested but not used: {design.loadPath.frame.reason}
+            </div>
+          )}
           <details className="mt-3">
             <summary className="cursor-pointer text-xs font-semibold text-slate-700">Column load trace: roof → storeys → basement → foundation ({design.loadPath.groundColumnCount} ground columns, {fmt(design.loadPath.totalServiceKn, 0)} kN service)</summary>
             <div className="overflow-x-auto mt-2">
@@ -248,6 +266,11 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
                 <thead><tr className="text-left text-slate-500 border-b border-slate-200">
                   <th className="py-1 pr-2">Column</th><th className="py-1 pr-2">Role</th><th className="py-1 pr-2">Size (mm)</th>
                   <th className="py-1 pr-2 text-right">Tributary m²</th><th className="py-1 pr-2 text-right">Service kN</th><th className="py-1 pr-2 text-right">Factored kN</th>
+                  {design.loadPath.frame?.used && (<>
+                    <th className="py-1 pr-2 text-right">Host estimate kN</th>
+                    <th className="py-1 pr-2 text-right">Base Mx kN·m</th><th className="py-1 pr-2 text-right">Base My kN·m</th>
+                    <th className="py-1 pr-2 text-right">Shear Vx / Vy kN</th>
+                  </>)}
                 </tr></thead>
                 <tbody>
                   {design.loadPath.columns.map(c => (
@@ -258,6 +281,12 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
                       <td className="py-1 pr-2 text-right font-mono">{fmt(c.tributaryAreaM2, 1)}</td>
                       <td className="py-1 pr-2 text-right font-mono">{fmt(c.serviceKn, 1)}</td>
                       <td className="py-1 pr-2 text-right font-mono">{fmt(c.factoredKn, 1)}</td>
+                      {design.loadPath.frame?.used && (<>
+                        <td className="py-1 pr-2 text-right font-mono text-slate-500">{fmt(c.tributaryServiceKn, 1)}</td>
+                        <td className="py-1 pr-2 text-right font-mono">{fmt(c.momentXKnM, 1)}</td>
+                        <td className="py-1 pr-2 text-right font-mono">{fmt(c.momentYKnM, 1)}</td>
+                        <td className="py-1 pr-2 text-right font-mono">{fmt(c.shearXKn, 1)} / {fmt(c.shearYKn, 1)}</td>
+                      </>)}
                     </tr>
                   ))}
                 </tbody>
