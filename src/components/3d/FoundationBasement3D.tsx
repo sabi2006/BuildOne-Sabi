@@ -35,6 +35,9 @@ interface Props {
   showBasement: boolean;
   showRebar: boolean;
   showLabels: boolean;
+  /** Excavation pit / soil stratum under the designed foundation */
+  showSoilBed?: boolean;
+  soilColor?: string;
   isConcreteSolid?: boolean;
   isGhosted?: boolean;
 }
@@ -68,7 +71,7 @@ function InstancedBars({ bars, color }: { bars: BarSpec[]; color: string }) {
   );
 }
 
-export function FoundationBasement3D({ geometry, showFoundation, showBasement, showRebar, showLabels, isConcreteSolid = false, isGhosted = false }: Props) {
+export function FoundationBasement3D({ geometry, showFoundation, showBasement, showRebar, showLabels, showSoilBed = false, soilColor = '#b45309', isConcreteSolid = false, isGhosted = false }: Props) {
   const opacity = isGhosted ? 0.05 : (isConcreteSolid ? 1.0 : 0.35);
   const transparent = !isConcreteSolid;
 
@@ -88,10 +91,29 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
     return map;
   }, [geometry.bars, showRebar, showFoundation, showBasement]);
 
-  if (!showFoundation && !showBasement) return null;
+  if (!showFoundation && !showBasement && !showSoilBed) return null;
+
+  // soil pit: a thin stratum just below the lowest designed solid, 2 m beyond the building plan on every side
+  const pit = (() => {
+    const solids = geometry.boxes;
+    if (!showSoilBed || solids.length === 0) return null;
+    let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+    for (const b of solids) {
+      x0 = Math.min(x0, b.center[0] - b.size[0] / 2); x1 = Math.max(x1, b.center[0] + b.size[0] / 2);
+      z0 = Math.min(z0, b.center[2] - b.size[2] / 2); z1 = Math.max(z1, b.center[2] + b.size[2] / 2);
+    }
+    const m = 2;
+    return { cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, w: x1 - x0 + 2 * m, d: z1 - z0 + 2 * m, y: geometry.minY - 0.04 };
+  })();
 
   return (
     <group name="detailed-foundation-basement">
+      {pit && (
+        <mesh position={[pit.cx, pit.y, pit.cz]} receiveShadow>
+          <boxGeometry args={[pit.w, 0.08, pit.d]} />
+          <meshStandardMaterial color={soilColor} roughness={0.95} metalness={0} />
+        </mesh>
+      )}
       {visibleBoxes.map(b => {
         const failed = b.status === 'FAIL';
         const color = failed ? '#ef4444' : KIND_COLOR[b.kind];

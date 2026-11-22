@@ -2311,11 +2311,11 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
     }
   }, [detailedDesign, groundPillars, groundFloorWalls, model.buildingUnit, model.buildingLength, model.buildingWidth]);
   // When the detailed foundation is drawn it replaces the legacy footing meshes (they would overlap)
-  const useDetailedFoundation = !!detailedGeometry && showDetailedFoundation && detailedGeometry.boxes.some(b => b.group === 'foundation');
-  // The legacy footings and soil bed are sized from the plain founding depth and know nothing about a basement: with the
-  // basement drawn they would cut through it, so they are hidden whenever the basement is shown.
-  const basementShown = !!detailedGeometry && showBasement && detailedGeometry.boxes.some(b => b.group === 'basement');
-  const hideLegacyFoundation = useDetailedFoundation || basementShown;
+  // Once a detailed design exists it SUPERSEDES the legacy footing sketch: the legacy footings are a per-column estimate
+  // sized from the plain founding depth. They ignore overlaps, raft/combined systems and the basement, so showing them
+  // next to (or instead of) the designed foundation would contradict it. Turning the designed foundation off hides it
+  // rather than falling back to the legacy pads.
+  const hideLegacyFoundation = !!detailedGeometry;
 
   const debugInfo = useMemo(() => {
     let ew = 0, iw = 0;
@@ -2728,8 +2728,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
               </label>
 
               <label className="flex items-center space-x-2 cursor-pointer text-amber-900 font-semibold bg-amber-50/90 px-1.5 py-0.5 rounded border border-amber-300/70">
-                <input type="checkbox" checked={showFoundation} onChange={(e) => setShowFoundation(e.target.checked)} className="rounded text-amber-600 focus:ring-amber-500" />
-                <span>Show Foundation (Footing/PCC)</span>
+                <input type="checkbox" checked={showFoundation && !hideLegacyFoundation} disabled={hideLegacyFoundation} onChange={(e) => setShowFoundation(e.target.checked)} className="rounded text-amber-600 focus:ring-amber-500" />
+                <span>Show Foundation (Footing/PCC){hideLegacyFoundation ? ' – replaced by the designed foundation' : ''}</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer text-amber-800 font-bold bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-400/80">
                 <input type="checkbox" checked={showFootingRebar} onChange={(e) => setShowFootingRebar(e.target.checked)} className="rounded text-amber-600 focus:ring-amber-500" />
@@ -2834,7 +2834,18 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
               </div>
               <span className="text-[10px] px-1.5 py-0.2 bg-cyan-950 text-cyan-300 rounded border border-cyan-700">3D X-Ray</span>
             </div>
-            {showFootingRebar && (
+            {showFootingRebar && detailedGeometry && (
+              <div className="space-y-0.5" data-testid="designed-rebar-legend">
+                <div className="text-[11px] font-semibold text-amber-300">Designed Foundation &amp; Basement Rebar:</div>
+                {(model.foundationBasementDesign?.foundation?.elements ?? []).slice(0, 1).flatMap(e => e.reinforcement.slice(0, 4)).map(l => (
+                  <div key={l.id} className="text-[10px] text-slate-300">
+                    • {l.location} {l.direction}: <span className="text-cyan-300 font-mono font-bold">{l.diaMm}mm{l.spacingMm ? ` @ ${l.spacingMm}` : ''}</span>
+                  </div>
+                ))}
+                <div className="text-[10px] text-slate-400">Full bar bending schedule: see the Foundation &amp; Basement Design Report.</div>
+              </div>
+            )}
+            {showFootingRebar && !detailedGeometry && (
               <div className="space-y-0.5">
                 <div className="text-[11px] font-semibold text-amber-300">Foundation Footing Rebar:</div>
                 <div className="text-[10px] text-slate-300">
@@ -3289,6 +3300,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   geometry={detailedGeometry}
                   showFoundation={showDetailedFoundation}
                   showBasement={showBasement}
+                  showSoilBed={showSoilBed}
+                  soilColor={({ dense_sand_gravel: '#b45309', loose_sand: '#eab308', stiff_clay: '#9a3412', soft_clay: '#78716c', black_cotton: '#1c1917', made_up_fill: '#57534e', rock: '#334155' } as Record<string, string>)[model.buildingConfig?.soilClassification || 'dense_sand_gravel'] || '#b45309'}
                   showRebar={showFootingRebar}
                   showLabels={showPillarLabels}
                   isConcreteSolid={isConcreteSolid}
