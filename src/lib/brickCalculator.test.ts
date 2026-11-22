@@ -50,7 +50,9 @@ import {
   CommonPillarConfig,
   RingBeamJunction,
   FullRoofJunction,
-  TopRccStructuralJunction
+  TopRccStructuralJunction,
+  detectStructuralPillars,
+  checkPillarOpeningCollision
 } from './brickCalculator';
 
 describe('RCC Pillar Exact Corner Placement & Alignment', () => {
@@ -244,7 +246,6 @@ describe('Multi-Floor RCC Concrete Pillar System', () => {
       ]
     };
 
-    const { detectStructuralPillars } = require('./brickCalculator');
     const pillars = detectStructuralPillars(floor, 40, 30, 'ft', 10);
 
     // Verify corners
@@ -262,7 +263,6 @@ describe('Multi-Floor RCC Concrete Pillar System', () => {
   });
 
   it('correctly warns on conflict when a candidate pillar overlaps with a door or window opening', () => {
-    const { checkPillarOpeningCollision } = require('./brickCalculator');
     const wallWithDoor: Wall = {
       id: 'w-door',
       name: 'Front Wall',
@@ -285,7 +285,6 @@ describe('Multi-Floor RCC Concrete Pillar System', () => {
 });
 
 describe('Wall Segmentation around RCC Pillars (Zero Overlap)', () => {
-  const { splitWallByPillars } = require('./brickCalculator');
 
   it('Case 1: One pillar on straight wall splits into BRICK | RCC | BRICK', () => {
     const wall: Wall = {
@@ -1498,9 +1497,10 @@ describe('RCC Calculation & Unit Consistency Audit', () => {
     // 3. Cement bags verification: 195.6724 * 1 / 5.5 = 35.5768 m3 / 0.0347 ≈ 1025.27 bags
     expect(materials.cementExactBags).toBeCloseTo(1025.27, 1);
 
-    // 4. Jalli amount calculation @ ₹1200 / CFT: 3769.154 * 1200 ≈ ₹45,22,984.8
+    // 4. Jalli amount calculation @ ₹1200 / CFT. Exact: 195.6724 * 3 / 5.5 = 106.7304 m3 = 3769.15206 CFT -> 3769.15206 * 1200 = ₹45,22,982.47
+    //    (the previous hand-rounded literal 4522985 came from rounding the CFT up to 3769.154)
     expect(materials.costs.aggregate).toBeCloseTo(materials.aggregateCft * 1200, 1);
-    expect(materials.costs.aggregate).toBeCloseTo(4522985, 0);
+    expect(materials.costs.aggregate).toBeCloseTo(4522982.47, 0);
 
     // 5. Total RCC cost must be exact sum of all line items
     const expectedTotal = materials.costs.cement +
