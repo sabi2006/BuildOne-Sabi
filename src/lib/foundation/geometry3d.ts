@@ -50,6 +50,8 @@ export interface Foundation3DModel {
   boxes: BoxSpec[];
   bars: BarSpec[];
   warnings: string[];
+  /** Elements whose footing/pedestal lies on the basement wall line and is treated as integral with the wall */
+  integralElementIds: string[];
   /** lowest Y of any solid, m (negative) */
   minY: number;
 }
@@ -267,6 +269,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   // Perimeter columns/footings that coincide with a basement wall are integral with it: drawing them as
   // separate solids would overlap the wall, so they are not drawn as separate solids and a warning is raised.
   const droppedFootings = new Set<string>();
+  const droppedElements = new Set<string>();
   if (basementOn) {
     const wallBoxes = boxes.filter(b => b.kind === 'wall');
     const hits = (b: BoxSpec) => findBoxOverlaps([b, ...wallBoxes]).some(([a2]) => a2 === b.id);
@@ -274,6 +277,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     if (integral.length) {
       const ids = new Set(integral.map(b => b.id));
       integral.filter(b => b.kind === 'footing').forEach(b => droppedFootings.add(b.elementId));
+      integral.forEach(b => droppedElements.add(b.elementId));
       for (let i = boxes.length - 1; i >= 0; i--) if (ids.has(boxes[i].id)) boxes.splice(i, 1);
       const els = [...new Set(integral.map(b => b.elementId))];
       warnings.push(`${els.join(', ')}: column/footing lies on the basement wall line and is treated as integral with the wall (not drawn as a separate solid). The footing also extends outside the basement footprint: check the footing–wall detail.`);
@@ -424,5 +428,5 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   if (thinned) warnings.push(`Reinforcement is drawn at reduced density (more than ${maxBars} bars): the schedule (BBS) still counts every bar.`);
 
   const minY = boxes.length ? Math.min(...boxes.map(b => b.center[1] - b.size[1] / 2)) : 0;
-  return { boxes, bars, warnings, minY: r4(minY) };
+  return { boxes, bars, warnings, integralElementIds: [...droppedElements], minY: r4(minY) };
 }

@@ -195,9 +195,11 @@ describe('Retaining wall design', () => {
     expect(horizTotal).toBeGreaterThanOrEqual(frac * 1000 * t - 1);
   });
 
-  it('wall concrete quantity equals perimeter × height × thickness', () => {
-    expect(wall.quantities!.concreteM3).toBeCloseTo(2 * (12 + 10) * 3 * (wall.thicknessMm! / 1000), 3);
-    expect(wall.quantities!.formworkM2).toBeCloseTo(2 * 44 * 3, 3);
+  it('wall concrete quantity counts the corners once', () => {
+    // outer perimeter 44 m; corners counted once: (44 - 4t) × 3 × t ; formwork outer 44 + inner (44 - 8t), × 3 m
+    const tm = wall.thicknessMm! / 1000;
+    expect(wall.quantities!.concreteM3).toBeCloseTo((44 - 4 * tm) * 3 * tm, 3);
+    expect(wall.quantities!.formworkM2).toBeCloseTo((88 - 8 * tm) * 3, 3);
   });
 
   it('higher groundwater or surcharge gives an equal or thicker wall and larger pressure', () => {

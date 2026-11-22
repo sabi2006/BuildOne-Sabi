@@ -78,7 +78,9 @@ export interface FoundationBasementIntegration {
     pccThicknessMm: number;
     clearCoverMm: number;
     /** Basement geometry used by the design (undefined when no basement) */
-    basement?: { depthM: number; levels: number };
+    basement?: { depthM: number; levels: number; waterproofing: string; drainage: string };
+    /** Building plan (also the basement footprint), m */
+    plan: { lengthM: number; widthM: number };
   };
   status: DesignStatus;
   warnings: string[];
@@ -146,7 +148,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     return {
       generatedFrom: 'structural_summary',
       loadPath: { columns: [], totalServiceKn: 0, totalFactoredKn: 0, groundColumnCount: 0, checks: [], capabilityGaps },
-      summary: { foundationConcreteM3: 0, basementConcreteM3: 0, steelKg: 0, excavationM3: 0, foundationDepthM: config.foundationDepthM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm },
+      summary: { foundationConcreteM3: 0, basementConcreteM3: 0, steelKg: 0, excavationM3: 0, foundationDepthM: config.foundationDepthM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm, plan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM } },
       status: 'NOT_VERIFIED',
       warnings: ['No ground-level columns were found in the structural summary: foundation cannot be designed.'],
     };
@@ -328,7 +330,8 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       steelKg: bbs?.totals.steelKg ?? 0,
       excavationM3: Math.max(foundation?.totals.excavationM3 ?? 0, basement?.totals.excavationM3 ?? 0),
       foundationDepthM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm,
-      basement: basementOn ? { depthM: basementCfg.depthM, levels: levelsBelow } : undefined,
+      basement: basementOn ? { depthM: basementCfg.depthM, levels: levelsBelow, waterproofing: basementCfg.waterproofing, drainage: basementCfg.drainage } : undefined,
+      plan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM },
     },
     status, warnings,
   };

@@ -16,6 +16,7 @@ import {
   StructuralRatesConfig
 } from './structuralCalculationService';
 import { computeFoundationBasementDesign, isDetailedDesignRequested, type FoundationBasementIntegration } from './foundation/integration';
+import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
   switch (grade) {
@@ -2286,6 +2287,7 @@ export interface BOQProductItem {
     rcc?: number;
     pcc?: number;
     footings?: number;
+    basement?: number;
   };
 }
 
@@ -2295,6 +2297,7 @@ export interface FloorBOQSchedule {
   floorName: string;
   isRoof?: boolean;
   isFoundation?: boolean;
+  isBasement?: boolean;
   products: {
     cement: { bags: number; cost: number };
     sand: { cft: number; m3: number; cost: number };
@@ -2343,6 +2346,16 @@ export interface BuildingBOQSummary {
   grandTotal: number;
   totalBuiltUpAreaSqFt: number;
   costPerSqFt: number;
+  /** Present when the detailed foundation/basement design fed this BOQ */
+  foundationBasement?: {
+    quantities: FoundationBasementQuantities;
+    costs: FoundationBasementCosts;
+    /** the detailed design replaced the legacy foundation quantities */
+    replacedLegacyFoundation: boolean;
+    /** basement quantities and costs were added */
+    addedBasement: boolean;
+    warnings: string[];
+  };
 }
 
 export const toMeters = (value: number, unit: Unit): number => {
@@ -4409,6 +4422,7 @@ export function calculateBuildingBOQ(params: {
   cementBags?: number;
   sandVolume?: number;
   customRates?: StructuralRatesConfig;
+  foundationBasementDesign?: FoundationBasementIntegration;
 }): BuildingBOQSummary {
   const bModel = params.buildingModel;
   const bConfig = bModel?.buildingConfig || DEFAULT_BUILDING_CONFIG;
@@ -4432,13 +4446,18 @@ export function calculateBuildingBOQ(params: {
 
   // 1. Concrete Volumes
   const s = params.structuralSummary;
-  const pccM3 = s ? (s.totalPccM3 || 0) : (params.foundationEstimate ? (params.foundationEstimate.totalPccVolumeM3 || 0) : 0);
-  const footingRccM3 = s ? (s.totalFootingRccM3 || 0) : (params.foundationEstimate ? (params.foundationEstimate.totalFootingRccVolumeM3 || 0) : 0);
+  // Detailed foundation/basement design (replaces the legacy foundation quantities only when fully designed)
+  const fbq = params.foundationBasementDesign ? buildFoundationBasementQuantities(params.foundationBasementDesign) : undefined;
+  const useFbFoundation = !!fbq && fbq.hasQuantities && fbq.foundationComplete;
+  const useFbBasement = !!fbq && fbq.basementEnabled && fbq.basementComplete && fbq.basementRccM3 > 0;
+  const basementRccM3 = useFbBasement ? fbq!.basementRccM3 : 0;
+  const pccM3 = useFbFoundation ? fbq!.pccM3 : (s ? (s.totalPccM3 || 0) : (params.foundationEstimate ? (params.foundationEstimate.totalPccVolumeM3 || 0) : 0));
+  const footingRccM3 = useFbFoundation ? fbq!.foundationRccM3 : (s ? (s.totalFootingRccM3 || 0) : (params.foundationEstimate ? (params.foundationEstimate.totalFootingRccVolumeM3 || 0) : 0));
   const columnRccM3 = s ? (s.totalColumnRccM3 || 0) : (bModel?.pillars ? bModel.pillars.reduce((sum, p) => sum + calculatePillarMetrics(p).volume, 0) : 0);
   const beamRccM3 = s ? (s.totalBeamRccM3 || 0) : 0;
   const slabRccM3 = s ? (s.totalSlabRccM3 || 0) : 0;
 
-  const totalRccM3 = footingRccM3 + columnRccM3 + beamRccM3 + slabRccM3;
+  const totalRccM3 = footingRccM3 + columnRccM3 + beamRccM3 + slabRccM3 + basementRccM3;
   const totalConcreteM3 = totalRccM3 + pccM3;
   const totalConcreteCft = totalConcreteM3 * 35.3147;
 
@@ -4459,7 +4478,9 @@ export function calculateBuildingBOQ(params: {
 
   // 3. Foundation Sand Bedding
   let footingBedSandM3 = 0;
-  if (s && s.pillarsCalculations && s.pillarsCalculations.length > 0) {
+  if (useFbFoundation) {
+    footingBedSandM3 = 0; // the detailed foundation has no sand bed (PCC on the founding level)
+  } else if (s && s.pillarsCalculations && s.pillarsCalculations.length > 0) {
     footingBedSandM3 = s.pillarsCalculations.reduce((sum, c) => sum + (c.providedFootingLengthM * c.providedFootingWidthM * 0.1), 0);
   } else if (params.foundationEstimate) {
     footingBedSandM3 = params.foundationEstimate.totalSandFillVolumeM3 || (params.foundationEstimate.totalSandFillCft / 35.3147) || 0;
@@ -4492,7 +4513,8 @@ export function calculateBuildingBOQ(params: {
   const plasterWetMortarM3 = plasterEnabled ? (plaster.totalWetVolumeM3 || 0) : 0;
 
   // 6. Steel & Binding Wire
-  const footingSteelKg = s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.footingSteelKg || 0), 0) : (params.foundationEstimate?.totalSteelKg || 0);
+  const footingSteelKg = useFbFoundation ? fbq!.foundationSteelKg : (s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.footingSteelKg || 0), 0) : (params.foundationEstimate?.totalSteelKg || 0));
+  const basementSteelKg = useFbBasement ? fbq!.basementSteelKg : 0;
   const columnSteelKg = s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.totalSteelWeightKg || 0), 0) : 0;
   const beamSteelKg = s
     ? (s.floorBeamCalculations || []).reduce((sum, b) => sum + (b.totalSteelWeightKg || 0), 0) + (s.roofBeamCalculation?.totalSteelWeightKg || 0)
@@ -4501,7 +4523,7 @@ export function calculateBuildingBOQ(params: {
     ? (s.floorSlabCalculations || []).reduce((sum, sl) => sum + (sl.totalSteelWeightKg || 0), 0) + (s.roofSlabCalculation?.totalSteelWeightKg || 0)
     : 0;
 
-  const totalSteelKg = Math.round((footingSteelKg + columnSteelKg + beamSteelKg + slabSteelKg) * 10) / 10;
+  const totalSteelKg = Math.round((footingSteelKg + basementSteelKg + columnSteelKg + beamSteelKg + slabSteelKg) * 10) / 10;
   const totalSteelTonnes = Math.round((totalSteelKg / 1000) * 1000) / 1000;
   const bindingWireKg = Math.round(totalSteelKg * 0.011 * 10) / 10;
 
@@ -4600,6 +4622,7 @@ export function calculateBuildingBOQ(params: {
       description: 'High-yield deformed thermo-mechanically treated reinforcement bars',
       sourceBreakdown: {
         footings: Math.round(footingSteelKg * 10) / 10,
+        basement: Math.round(basementSteelKg * 10) / 10,
         columns: Math.round(columnSteelKg * 10) / 10,
         beams: Math.round(beamSteelKg * 10) / 10,
         slabs: Math.round(slabSteelKg * 10) / 10
@@ -4649,6 +4672,7 @@ export function calculateBuildingBOQ(params: {
       sourceBreakdown: {
         pcc: Math.round(pccM3 * 100) / 100,
         footings: Math.round(footingRccM3 * 100) / 100,
+        basement: Math.round(basementRccM3 * 100) / 100,
         columns: Math.round(columnRccM3 * 100) / 100,
         beams: Math.round(beamRccM3 * 100) / 100,
         slabs: Math.round(slabRccM3 * 100) / 100
@@ -4720,6 +4744,39 @@ export function calculateBuildingBOQ(params: {
         mortar: { m3: 0, cft: 0, cost: 0 }
       },
       floorMaterialCost: fCementCost + fSandCost + fAggCost + fSteelCost + fWireCost
+    });
+  }
+
+  // A2. Basement (detailed design only)
+  const fbCost = fbq && (useFbFoundation || useFbBasement) ? priceFoundationBasement(fbq, rates, steelRate) : undefined;
+  if (useFbBasement) {
+    const bCementBags = Math.ceil((basementRccM3 * mix.cementKgPerM3) / 50);
+    const bCementCost = bCementBags * cementRate;
+    const bSandCft = Math.round((((basementRccM3 * mix.fineAggKgPerM3) / 1600) * 35.3147) * 10) / 10;
+    const bSandCost = Math.round(bSandCft * sandRate);
+    const bAggCft = Math.round((((basementRccM3 * mix.coarseAggKgPerM3) / 1500) * 35.3147) * 10) / 10;
+    const bAggCost = Math.round(bAggCft * aggregateRate);
+    const bSteelKg = Math.round(basementSteelKg * 10) / 10;
+    const bSteelCost = Math.round(bSteelKg * steelRate);
+    const bWireKg = Math.round(bSteelKg * 0.011 * 10) / 10;
+    const bWireCost = Math.round(bWireKg * bindingWireRate);
+    const bConcM3 = Math.round(basementRccM3 * 100) / 100;
+    floorSchedules.push({
+      floorId: 'basement',
+      floorLevel: -2,
+      floorName: 'Basement (walls & base slab)',
+      isBasement: true,
+      products: {
+        cement: { bags: bCementBags, cost: bCementCost },
+        sand: { cft: bSandCft, m3: Math.round((bSandCft / 35.3147) * 100) / 100, cost: bSandCost },
+        coarseAggregate: { cft: bAggCft, m3: Math.round((bAggCft / 35.3147) * 100) / 100, cost: bAggCost },
+        tmtSteel: { kg: bSteelKg, tonnes: Math.round((bSteelKg / 1000) * 1000) / 1000, cost: bSteelCost },
+        bindingWire: { kg: bWireKg, cost: bWireCost },
+        bricks: { count: 0, cost: 0 },
+        concrete: { m3: bConcM3, cft: Math.round(bConcM3 * 35.3147 * 10) / 10, cost: Math.round(bConcM3 * concreteRate) },
+        mortar: { m3: 0, cft: 0, cost: 0 }
+      },
+      floorMaterialCost: bCementCost + bSandCost + bAggCost + bSteelCost + bWireCost
     });
   }
 
@@ -4873,10 +4930,10 @@ export function calculateBuildingBOQ(params: {
     {
       id: 'foundation',
       name: '1. Substructure & Foundation',
-      description: 'Earthwork Excavation, Sand Bedding, PCC Lean Concrete, RCC Footing Pads & Starter Rebar',
-      materialCost: s ? Math.round(s.costs.foundation.sandFill + s.costs.foundation.pcc + s.costs.foundation.rccFooting + s.costs.foundation.steel) : (params.foundationEstimate?.costs.total || 0),
-      labourCost: s ? Math.round(s.costs.foundation.excavation + s.costs.foundation.backfill) : (params.foundationEstimate?.costs.excavation || 0),
-      totalCost: s ? Math.round(s.costs.foundation.total) : (params.foundationEstimate?.costs.total || 0),
+      description: useFbFoundation ? 'Earthwork Excavation & Backfill, PCC Lean Concrete, Designed RCC Footings / Raft & Pedestals, Foundation Rebar (BBS) and Shuttering' : 'Earthwork Excavation, Sand Bedding, PCC Lean Concrete, RCC Footing Pads & Starter Rebar',
+      materialCost: useFbFoundation ? Math.round(fbCost!.foundationDisplayMaterial) : (s ? Math.round(s.costs.foundation.sandFill + s.costs.foundation.pcc + s.costs.foundation.rccFooting + s.costs.foundation.steel) : (params.foundationEstimate?.costs.total || 0)),
+      labourCost: useFbFoundation ? Math.round(fbCost!.foundationLabour) : (s ? Math.round(s.costs.foundation.excavation + s.costs.foundation.backfill) : (params.foundationEstimate?.costs.excavation || 0)),
+      totalCost: useFbFoundation ? Math.round(fbCost!.foundationDisplayMaterial + fbCost!.foundationLabour) : (s ? Math.round(s.costs.foundation.total) : (params.foundationEstimate?.costs.total || 0)),
       concreteVolumeM3: Math.round((pccM3 + footingRccM3) * 100) / 100,
       steelWeightKg: Math.round(footingSteelKg * 10) / 10
     },
@@ -4931,6 +4988,18 @@ export function calculateBuildingBOQ(params: {
       steelWeightKg: 0
     }
   ];
+  if (useFbBasement) {
+    categoryBreakdown.push({
+      id: 'basement',
+      name: '7. Basement (Retaining Walls & Base Slab)',
+      description: 'Designed RCC Basement Walls and Base Slab, Basement Rebar (BBS), Shuttering, Waterproofing and Drainage',
+      materialCost: Math.round(basementRccM3 * concreteRate + basementSteelKg * steelRate),
+      labourCost: Math.round(fbCost!.basementLabour),
+      totalCost: Math.round(basementRccM3 * concreteRate + basementSteelKg * steelRate + fbCost!.basementLabour),
+      concreteVolumeM3: Math.round(basementRccM3 * 100) / 100,
+      steelWeightKg: Math.round(basementSteelKg * 10) / 10
+    });
+  }
 
   // 10. Financial Summary & Grand Total
   const labourAndFormworkSubtotal = categoryBreakdown.reduce((sum, c) => sum + c.labourCost, 0);
@@ -4975,7 +5044,14 @@ export function calculateBuildingBOQ(params: {
     taxGst,
     grandTotal,
     totalBuiltUpAreaSqFt: Math.round(builtUpAreaSqFt),
-    costPerSqFt
+    costPerSqFt,
+    foundationBasement: fbq && fbCost ? {
+      quantities: fbq,
+      costs: fbCost,
+      replacedLegacyFoundation: useFbFoundation,
+      addedBasement: useFbBasement,
+      warnings: [...fbq.warnings, ...fbCost.unpriced.map(u => `Not priced: ${u}`)]
+    } : undefined
   };
 }
 
@@ -5686,6 +5762,7 @@ export const calculateProject = (
     settings,
     brick,
     structuralSummary,
+    foundationBasementDesign,
     floorMasonryEstimates,
     foundationEstimate,
     plasterEstimate,

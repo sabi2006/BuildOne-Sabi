@@ -352,8 +352,11 @@ function designWallLevel(args: {
       }
       cks.push({ id: 'axial', label: 'Wall axial load from superstructure', status: 'NOT_VERIFIED', note: 'Wall is designed as a vertical flexural slab; axial compression is not considered.' });
       e.checks = cks;
-      const wallVol = perimeterM * hsM * (t / 1000);
-      e.quantities = { concreteM3: round(wallVol, 3), formworkM2: round(2 * perimeterM * hsM, 3), waterproofingM2: 0 };
+      // outer perimeter × thickness would count each of the four wall corners twice: use (perimeter − 4t)
+      const tM = t / 1000;
+      const wallVol = (perimeterM - 4 * tM) * hsM * tM;
+      // formwork: outer face (full perimeter) + inner face (perimeter − 8t)
+      e.quantities = { concreteM3: round(wallVol, 3), formworkM2: round((2 * perimeterM - 8 * tM) * hsM, 3), waterproofingM2: 0 };
       e.assumptions = [
         `Pressure from ${cfg.earthPressureCondition === 'at_rest' ? 'at-rest (Jaky) coefficient' : 'Rankine active coefficient'}; cohesion ignored.`,
         lowest ? 'Lowest level: pinned at the floor slab above, fixed at the base slab (propped cantilever).' : 'Intermediate level: simply supported between floor slabs.',

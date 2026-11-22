@@ -54,7 +54,7 @@ describe('Detailed design is opt-in and isolated', () => {
     expect(r.structuralSummary).toBeDefined();
   });
 
-  it('existing structural summary is identical with and without the detailed design', () => {
+  it('existing structural summary and superstructure BOQ are identical with and without the detailed design', () => {
     const plain = calculateProject(makeProject());
     const withDesign = calculateProject(makeProject({ foundationDetails: { selectionMode: 'manual' } as any }));
     expect(withDesign.foundationBasementDesign).toBeDefined();
@@ -62,7 +62,12 @@ describe('Detailed design is opt-in and isolated', () => {
     const strip = (x: any) => { const { buildingConfig, ...rest } = x; void buildingConfig; return rest; };
     expect(JSON.stringify(strip(withDesign.structuralSummary))).toBe(JSON.stringify(strip(plain.structuralSummary)));
     expect(withDesign.totalCost).toBe(plain.totalCost);
-    expect(withDesign.buildingBOQ?.grandTotal).toBe(plain.buildingBOQ?.grandTotal);
+    // the BOQ foundation lines are intentionally replaced by the design (see boq.test.ts); everything else is unchanged
+    expect(withDesign.buildingBOQ?.foundationBasement).toBeDefined();
+    for (const id of ['columns', 'beams', 'slabs', 'masonry', 'plaster']) {
+      const f = (r: typeof plain) => JSON.stringify(r.buildingBOQ!.categoryBreakdown.find(c => c.id === id));
+      expect(f(withDesign)).toBe(f(plain));
+    }
   });
 
   it('the design is stored on the building model so it persists with the project', () => {

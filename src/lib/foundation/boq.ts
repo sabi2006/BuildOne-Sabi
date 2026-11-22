@@ -1,0 +1,250 @@
+// -------------------------------------------------------------
+// FOUNDATION & BASEMENT QUANTITIES AND PRICING FOR THE BOQ (Phase 9)
+//
+// Pure functions. Quantities come from the design engines (never re-derived from the legacy footing
+// sizing). Pricing reuses the EXISTING rate keys of StructuralRatesConfig (excavation, PCC, footing,
+// column labour, formwork, steel); there is no separate price list. Items that have no existing rate
+// (waterproofing, drainage, sump) are priced only when their optional rate is set; otherwise the
+// quantity is listed with a zero cost and a warning, never an invented price.
+//
+// Rules so nothing is counted twice:
+//  - Without a basement: PCC, RCC, excavation and formwork come from each footing/raft element.
+//  - With a basement: one PCC layer under the whole footprint, one excavation pit, the base slab and
+//    the walls (corners counted once); footings/rafts count only the part rising above the base slab
+//    (same union rule as the 3D view); pedestals are counted unless the column is integral with a wall.
+//  - Steel is the BBS net weight (wastage is applied by the BOQ's existing wastage allowance).
+//  - If any foundation element could not be designed, the legacy foundation quantities are kept and
+//    a warning is raised: a partial design must not silently lower the estimate.
+// -------------------------------------------------------------
+
+import type { StructuralRatesConfig } from '../structuralCalculationService';
+import type { FoundationBasementIntegration } from './integration';
+import { buildFoundation3DModel } from './geometry3d';
+
+export interface FoundationBasementQuantities {
+  /** Design produced usable quantities */
+  hasQuantities: boolean;
+  /** Every foundation element was designed: the legacy foundation quantities can be replaced */
+  foundationComplete: boolean;
+  /** Every basement element was designed */
+  basementComplete: boolean;
+  basementEnabled: boolean;
+
+  excavationM3: number;
+  backfillM3: number;
+  pccM3: number;
+  /** Footings/rafts (above the base slab when a basement exists) + pedestals */
+  foundationRccM3: number;
+  footingRccM3: number;
+  pedestalRccM3: number;
+  basementWallRccM3: number;
+  basementSlabRccM3: number;
+  basementRccM3: number;
+
+  foundationSteelKg: number;
+  basementSteelKg: number;
+
+  foundationFormworkM2: number;
+  basementFormworkM2: number;
+
+  waterproofingM2: number;
+  drainPerimeterM: number;
+  sumpCount: number;
+
+  warnings: string[];
+  notes: string[];
+}
+
+const r3 = (v: number) => Math.round(v * 1000) / 1000;
+
+export function buildFoundationBasementQuantities(
+  design: FoundationBasementIntegration,
+  options?: { plinthThicknessM?: number; workingSpaceM?: number }
+): FoundationBasementQuantities {
+  const plinth = options?.plinthThicknessM ?? 0.1;
+  const ws = options?.workingSpaceM ?? 0.3;
+  const sum = design.summary;
+  const Df = sum.foundationDepthM;
+  const pcc = sum.pccThicknessMm / 1000;
+  const L = sum.plan?.lengthM ?? 0, B = sum.plan?.widthM ?? 0;
+  const warnings: string[] = [];
+  const notes: string[] = [];
+
+  const els = design.foundation?.elements ?? [];
+  const designed = els.filter(e => e.quantities && e.depthMm);
+  const skipped = els.filter(e => !(e.quantities && e.depthMm));
+  const foundationComplete = els.length > 0 && skipped.length === 0;
+  if (skipped.length) {
+    warnings.push(`Foundation elements not designed (${skipped.map(e => e.id).join(', ')}): the legacy foundation quantities are kept; the detailed design is not used for the foundation BOQ.`);
+  }
+
+  const basementOn = !!design.basement?.enabled && !!sum.basement;
+  const bEls = design.basement?.elements ?? [];
+  const wallEls = bEls.filter(e => e.elementType === 'basement_wall');
+  const baseEl = bEls.find(e => e.elementType === 'basement_base_slab');
+  const wallsDesigned = wallEls.filter(e => e.quantities);
+  const slabDesigned = !!baseEl?.quantities && !!baseEl.thicknessMm;
+  const basementComplete = basementOn && wallsDesigned.length === wallEls.length && wallEls.length > 0 && slabDesigned;
+  if (basementOn && !basementComplete) {
+    warnings.push('Basement is only partly designed (walls or base slab missing): the basement is NOT included in the BOQ, so the estimate has no basement cost. Complete the soil/water inputs.');
+  }
+  const slabT = slabDesigned ? baseEl!.thicknessMm! / 1000 : undefined;
+  const slabTop = slabT !== undefined ? -Df + pcc + slabT : -Df + pcc;
+
+  const integral = new Set<string>();
+  if (basementOn && L > 0 && B > 0) {
+    buildFoundation3DModel({ design, buildingLengthM: L, buildingWidthM: B, plinthThicknessM: plinth }).integralElementIds.forEach(id => integral.add(id));
+  }
+  const colInfo = new Map(design.loadPath.columns.map(c => [c.id, c]));
+
+  let pccM3 = 0, excavationM3 = 0, backfillM3 = 0;
+  let footingRccM3 = 0, pedestalRccM3 = 0;
+  let foundationFormworkM2 = 0;
+
+  for (const e of designed) {
+    const D = e.depthMm! / 1000;
+    const sx = e.sizeXM ?? 0, sy = e.sizeYM ?? 0;
+    const footTop = -Df + pcc + D;
+    // footing / raft concrete
+    let elRcc: number;
+    let elForm: number;
+    if (basementOn && slabT !== undefined) {
+      const above = Math.max(0, D - slabT);
+      elRcc = sx * sy * above;
+      elForm = 2 * (sx + sy) * above;
+    } else {
+      elRcc = e.quantities!.concreteM3;
+      elForm = e.quantities!.formworkM2;
+    }
+    footingRccM3 += elRcc;
+    foundationFormworkM2 += elForm;
+
+    // pedestals / column stubs up to the underside of the plinth
+    let elPed = 0;
+    if (!(basementOn && integral.has(e.id))) {
+      const supportTop = basementOn && slabT !== undefined ? Math.max(footTop, slabTop) : footTop;
+      const h = -plinth - supportTop;
+      if (h >= 0.05) {
+        for (const cid of e.columnIds) {
+          const c = colInfo.get(cid);
+          if (!c) continue;
+          const w = c.widthMm / 1000, d = c.depthMm / 1000;
+          elPed += w * d * h;
+          foundationFormworkM2 += 2 * (w + d) * h;
+        }
+      }
+    }
+    pedestalRccM3 += elPed;
+
+    if (!basementOn) {
+      pccM3 += e.quantities!.pccM3;
+      excavationM3 += e.quantities!.excavationM3;
+      backfillM3 += Math.max(0, e.quantities!.excavationM3 - e.quantities!.pccM3 - e.quantities!.concreteM3 - elPed);
+    }
+  }
+
+  let basementWallRccM3 = 0, basementSlabRccM3 = 0, basementFormworkM2 = 0;
+  let waterproofingM2 = 0, drainPerimeterM = 0, sumpCount = 0;
+  if (basementOn && L > 0 && B > 0) {
+    pccM3 = L * B * pcc;
+    excavationM3 = (L + 2 * ws) * (B + 2 * ws) * Df;
+    backfillM3 = ((L + 2 * ws) * (B + 2 * ws) - L * B) * Df;
+    for (const w of wallsDesigned) {
+      basementWallRccM3 += w.quantities!.concreteM3;
+      basementFormworkM2 += w.quantities!.formworkM2;
+    }
+    if (slabDesigned) {
+      basementSlabRccM3 = baseEl!.quantities!.concreteM3;
+      basementFormworkM2 += baseEl!.quantities!.formworkM2;
+    }
+    waterproofingM2 = design.basement?.totals.waterproofingM2 ?? 0;
+    const drainage = sum.basement!.drainage;
+    if (drainage === 'perimeter_drain' || drainage === 'perimeter_drain_and_sump') drainPerimeterM = 2 * (L + B);
+    if (drainage === 'sump_and_pump' || drainage === 'perimeter_drain_and_sump') sumpCount = 1;
+    notes.push('Basement excavation, backfill ring and PCC are computed for the whole footprint; basement internal floors/roof slabs, columns and beams are not designed and not included.');
+    notes.push('Sand bedding under the PCC is not part of the detailed design and is not carried.');
+  }
+  if (!basementOn) notes.push('Sand bedding under the PCC is not part of the detailed design; the legacy sand bed quantity is dropped while the detailed foundation is used.');
+
+  // steel from the BBS (net weight)
+  const fIds = new Set(els.map(e => e.id));
+  const bIds = new Set(bEls.map(e => e.id));
+  let foundationSteelKg = 0, basementSteelKg = 0;
+  for (const row of design.bbs?.rows ?? []) {
+    if (fIds.has(row.member)) foundationSteelKg += row.totalWeightKg;
+    else if (bIds.has(row.member)) basementSteelKg += row.totalWeightKg;
+  }
+
+  const rcc = footingRccM3 + pedestalRccM3;
+  const hasQuantities = rcc > 0 || basementWallRccM3 + basementSlabRccM3 > 0;
+  notes.push('Pile foundations are not costed (pile design is not verified).');
+  const piles = els.filter(e => e.system === 'pile');
+  if (piles.length) warnings.push('Pile foundations are present: their concrete and steel are not included.');
+
+  return {
+    hasQuantities, foundationComplete, basementComplete, basementEnabled: basementOn,
+    excavationM3: r3(excavationM3), backfillM3: r3(backfillM3), pccM3: r3(pccM3),
+    foundationRccM3: r3(rcc), footingRccM3: r3(footingRccM3), pedestalRccM3: r3(pedestalRccM3),
+    basementWallRccM3: r3(basementWallRccM3), basementSlabRccM3: r3(basementSlabRccM3),
+    basementRccM3: r3(basementWallRccM3 + basementSlabRccM3),
+    foundationSteelKg: r3(foundationSteelKg), basementSteelKg: r3(basementSteelKg),
+    foundationFormworkM2: r3(foundationFormworkM2), basementFormworkM2: r3(basementFormworkM2),
+    waterproofingM2: r3(waterproofingM2), drainPerimeterM: r3(drainPerimeterM), sumpCount,
+    warnings, notes,
+  };
+}
+
+// ------------------------------ pricing (existing rate keys) ------------------------------
+
+export interface FoundationBasementCosts {
+  excavation: number;
+  backfill: number;
+  foundationFormwork: number;
+  basementFormwork: number;
+  basementRccLabour: number;
+  waterproofing: number;
+  drainage: number;
+  sump: number;
+  /** Counts toward the BOQ total (parity with the legacy foundation: excavation, backfill, + formwork) */
+  foundationLabour: number;
+  /** Counts toward the BOQ total */
+  basementLabour: number;
+  /** Display only (legacy semantics): PCC and footing RCC valued at their labour-style rates */
+  foundationDisplayMaterial: number;
+  unpriced: string[];
+}
+
+export const LEGACY_BACKFILL_RATE_PER_M3 = 120;
+
+export function priceFoundationBasement(
+  q: FoundationBasementQuantities,
+  rates: StructuralRatesConfig,
+  steelRatePerKg: number
+): FoundationBasementCosts {
+  const unpriced: string[] = [];
+  const excavation = q.excavationM3 * (rates.excavationRatePerM3 || 250);
+  const backfill = q.backfillM3 * (rates.backfillRatePerM3 ?? LEGACY_BACKFILL_RATE_PER_M3);
+  const formworkRate = rates.formworkRatePerM2 || 350;
+  const foundationFormwork = q.foundationFormworkM2 * formworkRate;
+  const basementFormwork = q.basementFormworkM2 * formworkRate;
+  const basementRccLabour = q.basementRccM3 * (rates.columnLabourRatePerM3 || 3500);
+
+  const priced = (qty: number, rate: number | undefined, label: string): number => {
+    if (qty <= 0) return 0;
+    if (rate === undefined) { unpriced.push(`${label}: ${r3(qty)} listed, no rate set`); return 0; }
+    return qty * rate;
+  };
+  const waterproofing = priced(q.waterproofingM2, rates.waterproofingRatePerM2, 'Waterproofing (m²)');
+  const drainage = priced(q.drainPerimeterM, rates.drainagePerimeterRatePerM, 'Perimeter drain (m)');
+  const sump = priced(q.sumpCount, rates.sumpRatePerNo, 'Sump and pump (nos)');
+
+  const foundationLabour = excavation + backfill + foundationFormwork;
+  const basementLabour = basementFormwork + basementRccLabour + waterproofing + drainage + sump;
+  const foundationDisplayMaterial =
+    q.pccM3 * (rates.pccLabourRatePerM3 || 3200) + q.foundationRccM3 * (rates.footingLabourRatePerM3 || 3500) + q.foundationSteelKg * steelRatePerKg;
+
+  return {
+    excavation, backfill, foundationFormwork, basementFormwork, basementRccLabour, waterproofing, drainage, sump,
+    foundationLabour, basementLabour, foundationDisplayMaterial, unpriced,
+  };
+}

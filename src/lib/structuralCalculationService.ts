@@ -156,6 +156,14 @@ export interface StructuralRatesConfig {
   masonWagePerDay?: number;
   helperWagePerDay?: number;
   formworkRatePerM2?: number;
+  /** Backfill / compaction labour, per m³ (defaults to 120, the value used by the legacy foundation cost) */
+  backfillRatePerM3?: number;
+  /** Basement waterproofing, per m² of external wall + base area. No default: unpriced if unset. */
+  waterproofingRatePerM2?: number;
+  /** Basement perimeter drain, per metre run. No default: unpriced if unset. */
+  drainagePerimeterRatePerM?: number;
+  /** Basement sump + pump, per number. No default: unpriced if unset. */
+  sumpRatePerNo?: number;
   wastagePercent?: number;
   contingencyPercent?: number;
   taxPercent?: number;

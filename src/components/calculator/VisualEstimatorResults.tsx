@@ -2775,6 +2775,57 @@ Please contact me.`;
                 </div>
               </div>
 
+              {/* 5B2: Detailed foundation & basement quantities (design engine) */}
+              {boq.foundationBasement && (() => {
+                const fbq = boq.foundationBasement!.quantities;
+                const fbc = boq.foundationBasement!.costs;
+                const rows: Array<[string, string, number]> = [
+                  ['Excavation', 'm³', fbq.excavationM3],
+                  ['Backfilling', 'm³', fbq.backfillM3],
+                  ['PCC', 'm³', fbq.pccM3],
+                  ['RCC footings / raft', 'm³', fbq.footingRccM3],
+                  ['RCC pedestals', 'm³', fbq.pedestalRccM3],
+                  ['Basement wall RCC', 'm³', fbq.basementWallRccM3],
+                  ['Basement slab RCC', 'm³', fbq.basementSlabRccM3],
+                  ['Foundation steel (BBS)', 'kg', fbq.foundationSteelKg],
+                  ['Basement steel (BBS)', 'kg', fbq.basementSteelKg],
+                  ['Shuttering (foundation)', 'm²', fbq.foundationFormworkM2],
+                  ['Shuttering (basement)', 'm²', fbq.basementFormworkM2],
+                  ['Waterproofing', 'm²', fbq.waterproofingM2],
+                  ['Perimeter drain', 'm', fbq.drainPerimeterM],
+                  ['Sump and pump', 'nos', fbq.sumpCount],
+                ];
+                return (
+                  <div data-testid="boq-foundation-basement">
+                    <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+                      2B. Designed Foundation &amp; Basement Quantities
+                    </h4>
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-[11px] text-slate-400 mb-3">
+                        {boq.foundationBasement!.replacedLegacyFoundation
+                          ? 'These quantities come from the foundation design engine and replace the legacy footing quantities in the totals above.'
+                          : 'The detailed foundation design was incomplete, so the legacy footing quantities are used in the totals above.'}
+                        {boq.foundationBasement!.addedBasement ? ' The basement is added as category 7.' : ''}
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        {rows.filter(([, , v]) => v > 0).map(([label, unit, v]) => (
+                          <div key={label} className="bg-slate-900 rounded-lg px-3 py-2 border border-slate-800">
+                            <div className="text-slate-400">{label}</div>
+                            <div className="font-mono font-bold text-white">{v.toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-slate-500 font-normal">{unit}</span></div>
+                          </div>
+                        ))}
+                      </div>
+                      {(boq.foundationBasement!.warnings.length > 0 || fbc.unpriced.length > 0) && (
+                        <ul className="mt-3 space-y-1 text-[11px] text-amber-300 list-disc pl-4">
+                          {boq.foundationBasement!.warnings.map((w, i) => <li key={`w${i}`}>{w}</li>)}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 5C: Floor-wise BOQ Schedule Table */}
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">

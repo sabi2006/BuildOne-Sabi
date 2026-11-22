@@ -1771,6 +1771,37 @@ export function StructuralConfigModal({
                   Formwork, Wastage &amp; Contingency Percentages
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div className="sm:col-span-4 grid grid-cols-1 sm:grid-cols-4 gap-3 border-b border-slate-200 pb-3">
+                    <div className="sm:col-span-4 text-[11px] text-slate-500">
+                      Basement items (used when a basement is designed). Leave blank to list the quantity without a price.
+                    </div>
+                    {([
+                      ['backfillRatePerM3', 'Backfill / Compaction', '/m³', 120],
+                      ['waterproofingRatePerM2', 'Basement Waterproofing', '/m²', undefined],
+                      ['drainagePerimeterRatePerM', 'Perimeter Drain', '/m', undefined],
+                      ['sumpRatePerNo', 'Sump & Pump', '/no', undefined],
+                    ] as Array<[string, string, string, number | undefined]>).map(([key, label, unit, dflt]) => (
+                      <div key={key}>
+                        <label className="block text-[11px] font-bold text-slate-600 mb-1">{label}</label>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            min={0}
+                            placeholder={dflt === undefined ? 'not set' : String(dflt)}
+                            value={(rates as Record<string, number | undefined>)[key] ?? ''}
+                            onChange={(e) => {
+                              const v = parseFloat(e.target.value);
+                              setLocalConfig(prev => ({ ...prev, customRates: { ...(prev.customRates || {}), [key]: Number.isFinite(v) ? v : undefined } }));
+                            }}
+                            className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                          />
+                          <span className="text-[10px] text-slate-500 shrink-0">{unit}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
                   <div>
                     <label className="block text-[11px] font-bold text-slate-600 mb-1">Formwork Shuttering</label>
                     <div className="flex items-center gap-1.5">
