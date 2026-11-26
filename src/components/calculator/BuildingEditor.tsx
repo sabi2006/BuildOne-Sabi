@@ -58,6 +58,11 @@ import {
 import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUndoableState } from '../../hooks/useUndoableState';
+import {
+  applyPillarProperties, alignPillars, setPillarsLocked, copyPillarProperties, applyFootingProperties, alignFootings,
+  setFootingsLocked, duplicateFooting, copyFootingProperties, isLinkedFooting,
+  type PillarPropertyClipboard, type FootingPropertyClipboard, type BulkResult,
+} from '../../lib/editorBulkOps';
 import { hasColumnRebarOverride, worstRebarStatus, type ColumnRebarOverride } from '../../lib/rebarChecks';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { SaveProjectModal } from './SaveProjectModal';
@@ -938,7 +943,13 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
 
   const handleFootingMouseDown = (e: React.MouseEvent, footing: FoundationFooting) => {
     e.stopPropagation();
+    if (e.shiftKey || e.ctrlKey || e.metaKey) return; // multi-select click
     setSelectedFootingId(footing.id);
+    if (footing.isLocked) return;
+    if (isLinkedFooting(footing)) {
+      setPillarNotice({ msg: `${footing.pillarName || 'This footing'} is linked to its column and stays centred under it. Set "Linked Ground Pillar" to None to move it freely.`, type: 'info' });
+      return;
+    }
     if (!isPlacingFooting) {
       const rawCoords = getFoundationCoords(e, 'free');
       if (rawCoords && footing.position) {
@@ -1079,6 +1090,12 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   };
 
   const handleUpdateFooting = (footingId: string, changes: Partial<FoundationFooting>) => {
+    const cur = (model.foundation?.footings || []).find(f => f.id === footingId);
+    if (cur?.isLocked) { setPillarNotice({ msg: 'Footing is locked: unlock it to edit it.', type: 'error' }); return; }
+    if (cur && changes.position && isLinkedFooting(cur) && changes.pillarId === undefined && !('pillarId' in changes)) {
+      setPillarNotice({ msg: 'A linked footing stays centred under its column. Set "Linked Ground Pillar" to None to move it.', type: 'info' });
+      return;
+    }
     setModel(prev => {
       const curF = prev.foundation || DEFAULT_FOUNDATION_CONFIG;
       const isSizeChange = changes.footingLength !== undefined || changes.footingWidth !== undefined || changes.footingDepth !== undefined;
@@ -1276,6 +1293,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   };
 
   const handleDeleteFooting = (footingId: string) => {
+    if ((model.foundation?.footings || []).find(f => f.id === footingId)?.isLocked) { setPillarNotice({ msg: 'Footing is locked: unlock it to delete it.', type: 'error' }); return; }
     setModel(prev => {
       const curF = prev.foundation || DEFAULT_FOUNDATION_CONFIG;
       return {
@@ -1534,6 +1552,15 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   const [pillarPreview, setPillarPreview] = useState<{valid: boolean; coord: Coordinate | null; message?: string}>({ valid: true, coord: null });
   const svgRef = useRef<SVGSVGElement>(null);
   const pillarPressRef = useRef<{ id: string; wasSelected: boolean; x: number; y: number } | null>(null);
+  // multi-selection (Shift / Ctrl / Cmd + click) and property clipboards
+  const [multiPillarIds, setMultiPillarIds] = useState<string[]>([]);
+  const [pillarClipboard, setPillarClipboard] = useState<PillarPropertyClipboard | null>(null);
+  const [multiFootingIds, setMultiFootingIds] = useState<string[]>([]);
+  const [footingClipboard, setFootingClipboard] = useState<FootingPropertyClipboard | null>(null);
+  const isMultiKey = (e: React.MouseEvent) => e.shiftKey || e.ctrlKey || e.metaKey;
+  const bulkNotice = (r: BulkResult, what: string, extra = '') =>
+    setPillarNotice({ msg: `${what}: ${r.changedIds.length} changed${r.skippedLockedIds.length ? `, ${r.skippedLockedIds.length} locked skipped` : ''}${extra}.`, type: r.changedIds.length ? 'success' : 'info' });
+  const runPillarBulk = (r: BulkResult, what: string) => { setModel(r.model); bulkNotice(r, what); };
 
   // ---------------- undo / redo (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z) ----------------
   const { undo: historyUndo, redo: historyRedo } = modelHistory;
@@ -4797,6 +4824,46 @@ if (activeMode === 'foundation') {
                     </button>
                   </div>
 
+                  <div className="flex flex-wrap items-center gap-1.5" data-testid="footing-actions">
+                    <label className="flex items-center gap-1 text-[10px] font-semibold text-gray-800 mr-1">
+                      <input type="checkbox" data-testid="footing-lock" checked={!!selectedFooting.isLocked}
+                        onChange={e => setModel(setFootingsLocked(model, [selectedFooting.id], e.target.checked))} />
+                      Lock
+                    </label>
+                    <button type="button" data-testid="footing-duplicate" className="px-2 py-0.5 bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 rounded text-[10px] font-semibold"
+                      title="Copy as an independent footing beside this one"
+                      onClick={() => {
+                        const step = model.buildingUnit === 'm' ? 1.5 : 5;
+                        const r = duplicateFooting(model, selectedFooting.id, { dx: step, dy: 0 }, `footing-manual-${uniqueIdSuffix()}`);
+                        if (r.footing) { setModel(r.model); setSelectedFootingId(r.footing.id); setPillarNotice({ msg: `Duplicated as an independent footing ${step} ${model.buildingUnit} to the side.`, type: 'success' }); }
+                      }}>Duplicate</button>
+                    <button type="button" data-testid="footing-copy" className="px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded text-[10px] font-semibold"
+                      onClick={() => { setFootingClipboard(copyFootingProperties(selectedFooting)); setPillarNotice({ msg: 'Copied footing size, PCC, sand bed, grade and bars.', type: 'info' }); }}>Copy props</button>
+                    {footingClipboard && multiFootingIds.length < 2 && (
+                      <button type="button" data-testid="footing-paste" disabled={!!selectedFooting.isLocked} className="px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded text-[10px] font-semibold disabled:opacity-50"
+                        onClick={() => { const r = applyFootingProperties(model, [selectedFooting.id], footingClipboard); setModel(r.model); bulkNotice(r, 'Pasted footing properties'); }}>Paste props</button>
+                    )}
+                    {isLinkedFooting(selectedFooting) && <span className="text-[9px] text-sky-800">Linked: stays centred under its column</span>}
+                  </div>
+                  {multiFootingIds.length >= 2 && (() => {
+                    const btn = 'px-2 py-0.5 bg-white hover:bg-blue-50 text-blue-800 border border-blue-200 rounded text-[10px] font-semibold disabled:opacity-50';
+                    const fx = selectedFooting.position?.x ?? 0, fy = selectedFooting.position?.y ?? 0;
+                    return (
+                      <div className="rounded border border-blue-300 bg-blue-50/60 p-2 space-y-1.5" data-testid="footing-bulk">
+                        <div className="text-[10px] font-bold text-blue-900">{multiFootingIds.length} footings selected <span className="font-normal text-blue-700">(Shift/Ctrl + click)</span></div>
+                        <div className="flex flex-wrap gap-1">
+                          <button type="button" className={btn} disabled={!footingClipboard} data-testid="footing-bulk-paste"
+                            onClick={() => { if (!footingClipboard) return; const r = applyFootingProperties(model, multiFootingIds, footingClipboard); setModel(r.model); bulkNotice(r, 'Pasted footing properties'); }}>Paste props to all</button>
+                          <button type="button" className={btn} onClick={() => { const r = alignFootings(model, multiFootingIds, 'x', fx); setModel(r.model); bulkNotice(r, 'Aligned on X', r.skippedLinkedIds.length ? `, ${r.skippedLinkedIds.length} linked (stay under their column)` : ''); }}>Align X</button>
+                          <button type="button" className={btn} onClick={() => { const r = alignFootings(model, multiFootingIds, 'y', fy); setModel(r.model); bulkNotice(r, 'Aligned on Y', r.skippedLinkedIds.length ? `, ${r.skippedLinkedIds.length} linked (stay under their column)` : ''); }}>Align Y</button>
+                          <button type="button" className={btn} data-testid="footing-bulk-lock" onClick={() => setModel(setFootingsLocked(model, multiFootingIds, true))}>Lock all</button>
+                          <button type="button" className={btn} onClick={() => setModel(setFootingsLocked(model, multiFootingIds, false))}>Unlock all</button>
+                          <button type="button" className={btn} onClick={() => setMultiFootingIds([])}>Clear selection</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   {/* FOUNDATION POSITION (X, Z) - Live 2D & 3D coordinate editing */}
                   <div className="bg-white p-2.5 rounded border border-amber-200 shadow-xs space-y-1.5">
                     <div className="flex justify-between items-center">
@@ -4808,7 +4875,7 @@ if (activeMode === 'foundation') {
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="block text-[9px] font-bold text-gray-700 mb-0.5">X Position (ft)</label>
-                        <input
+                        <input disabled={isLinkedFooting(selectedFooting) || !!selectedFooting.isLocked} title={isLinkedFooting(selectedFooting) ? "Linked footings stay centred under their column" : undefined}
                           type="number"
                           step="0.5"
                           value={selectedFooting.position?.x ?? 0}
@@ -4823,7 +4890,7 @@ if (activeMode === 'foundation') {
                       </div>
                       <div>
                         <label className="block text-[9px] font-bold text-gray-700 mb-0.5">Z Position (ft)</label>
-                        <input
+                        <input disabled={isLinkedFooting(selectedFooting) || !!selectedFooting.isLocked} title={isLinkedFooting(selectedFooting) ? "Linked footings stay centred under their column" : undefined}
                           type="number"
                           step="0.5"
                           value={selectedFooting.position?.y ?? 0}
@@ -4887,7 +4954,8 @@ if (activeMode === 'foundation') {
                         onClick={() => {
                           if (linkedPillar?.position) {
                             handleUpdateFooting(selectedFooting.id, {
-                              position: { x: linkedPillar.position.x, y: linkedPillar.position.y }
+                              position: { x: linkedPillar.position.x, y: linkedPillar.position.y },
+                              pillarId: selectedFooting.pillarId
                             });
                             setPillarNotice({
                               msg: `Aligned footing ${selectedFooting.pillarName || selectedFooting.id} to pillar ${linkedPillar.name} at (${linkedPillar.position.x}', ${linkedPillar.position.y}').`,
@@ -6792,8 +6860,43 @@ if (activeMode === 'foundation') {
                       title="Restore default shape/finish and return to structural auto-sizing (position kept)">
                       Reset Properties
                     </button>
+                    <button type="button" data-testid="pillar-copy-props"
+                      onClick={() => { const src = findPillarById(selectedPillarId); if (src) { setPillarClipboard(copyPillarProperties(src)); setPillarNotice({ msg: `Copied size, shape, finish, grade and reinforcement of ${src.name || 'the column'}.`, type: 'info' }); } }}
+                      className="flex-1 px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded text-[10px] font-semibold"
+                      title="Copy this column's properties (not its position)">
+                      Copy props
+                    </button>
+                    {pillarClipboard && multiPillarIds.length < 2 && (
+                      <button type="button" data-testid="pillar-paste-props" disabled={selectedPillarLocked}
+                        onClick={() => runPillarBulk(applyPillarProperties(model, [selectedPillarId!], pillarClipboard), 'Pasted properties')}
+                        className="flex-1 px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded text-[10px] font-semibold disabled:opacity-50">
+                        Paste props
+                      </button>
+                    )}
                   </div>
                 )}
+                {multiPillarIds.length >= 2 && (() => {
+                  const primary = findPillarById(selectedPillarId) || findPillarById(multiPillarIds[multiPillarIds.length - 1]);
+                  const px = primary?.position?.x ?? primary?.x ?? 0, py = primary?.position?.y ?? primary?.y ?? 0;
+                  const btn = 'px-2 py-0.5 bg-white hover:bg-blue-50 text-blue-800 border border-blue-200 rounded text-[10px] font-semibold disabled:opacity-50';
+                  return (
+                    <div className="rounded border border-blue-300 bg-blue-50/60 p-2 space-y-1.5" data-testid="pillar-bulk">
+                      <div className="text-[10px] font-bold text-blue-900">{multiPillarIds.length} columns selected <span className="font-normal text-blue-700">(Shift/Ctrl + click to add or remove)</span></div>
+                      <div className="flex flex-wrap gap-1">
+                        <button type="button" className={btn} disabled={!pillarClipboard} data-testid="bulk-paste"
+                          onClick={() => pillarClipboard && runPillarBulk(applyPillarProperties(model, multiPillarIds, pillarClipboard), 'Pasted properties')}>Paste props to all</button>
+                        <button type="button" className={btn} data-testid="bulk-align-x" title={`Same X as ${primary?.name || 'the main column'} (${px.toFixed(2)})`}
+                          onClick={() => runPillarBulk(alignPillars(model, multiPillarIds, 'x', px), 'Aligned on X')}>Align X</button>
+                        <button type="button" className={btn} data-testid="bulk-align-y" title={`Same Y as ${primary?.name || 'the main column'} (${py.toFixed(2)})`}
+                          onClick={() => runPillarBulk(alignPillars(model, multiPillarIds, 'y', py), 'Aligned on Y')}>Align Y</button>
+                        <button type="button" className={btn} data-testid="bulk-lock" onClick={() => { setModel(setPillarsLocked(model, multiPillarIds, true)); setPillarNotice({ msg: `Locked ${multiPillarIds.length} columns.`, type: 'success' }); }}>Lock all</button>
+                        <button type="button" className={btn} onClick={() => { setModel(setPillarsLocked(model, multiPillarIds, false)); setPillarNotice({ msg: `Unlocked ${multiPillarIds.length} columns.`, type: 'success' }); }}>Unlock all</button>
+                        <button type="button" className={btn} onClick={() => setMultiPillarIds([])}>Clear selection</button>
+                      </div>
+                      <div className="text-[9px] text-blue-700">Align uses the main (last clicked) column. Locked columns are never changed.</div>
+                    </div>
+                  );
+                })()}
                 {selectedPillarId && pillarNotice && (
                   <div className={cn('text-[10px] px-2 py-1 rounded border',
                     pillarNotice.type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : pillarNotice.type === 'info' ? 'bg-sky-50 text-sky-800 border-sky-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200')}>
@@ -8711,6 +8814,14 @@ if (activeMode === 'foundation') {
                     onMouseDown={(e) => handleFootingMouseDown(e, f)}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                        setMultiFootingIds(prev => {
+                          const base = prev.length ? prev : (selectedFootingId ? [selectedFootingId] : []);
+                          return base.includes(f.id) ? base.filter(x => x !== f.id) : [...base, f.id];
+                        });
+                        return;
+                      }
+                      setMultiFootingIds([]);
                       setSelectedFootingId(f.id);
                     }}
                     className={cn("cursor-pointer group", draggingFootingId === f.id ? "cursor-grabbing" : "cursor-grab")}
@@ -8784,6 +8895,14 @@ if (activeMode === 'foundation') {
                           P
                         </text>
                       </g>
+                    )}
+                    {multiFootingIds.includes(f.id) && (
+                      <rect x={posX - pccL / 2 - 0.3} y={posY - pccW / 2 - 0.3} width={pccL + 0.6} height={pccW + 0.6}
+                        fill="#2563eb" fillOpacity="0.1" stroke="#2563eb" strokeWidth="0.15" data-multi-selected="true" />
+                    )}
+                    {f.isLocked && (
+                      <text x={posX + fL / 2} y={posY + fW / 2} fontSize="0.6" className="pointer-events-none select-none"
+                        transform={`scale(1, -1) translate(0, ${-(posY + fW / 2) * 2})`}>🔒</text>
                     )}
                     {/* Footing Identification Label with Stub Status */}
                     <text 
@@ -8994,6 +9113,7 @@ if (activeMode === 'foundation') {
                       onMouseDown={(e) => {
                         if (isDeleteMode) return;
                         e.stopPropagation();
+                        if (isMultiKey(e)) return; // multi-select click: no drag, no single selection
                         const mouse = getMouseCoords(e);
                         // remembered for the click that follows: a click selects; only a click (not a drag) on an
                         // already-selected column deselects it
@@ -9025,7 +9145,14 @@ if (activeMode === 'foundation') {
                         e.stopPropagation();
                         if (isDeleteMode) {
                           promptRemovePillar(p);
+                        } else if (isMultiKey(e)) {
+                          setMultiPillarIds(prev => {
+                            const base = prev.length ? prev : (selectedPillarId ? [selectedPillarId] : []);
+                            return base.includes(p.id) ? base.filter(x => x !== p.id) : [...base, p.id];
+                          });
+                          pillarPressRef.current = null;
                         } else {
+                          setMultiPillarIds([]);
                           const press = pillarPressRef.current;
                           pillarPressRef.current = null;
                           const moved = !!press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 4;
@@ -9056,6 +9183,14 @@ if (activeMode === 'foundation') {
                         isDraggingThis ? "cursor-grabbing opacity-80" : "cursor-grab"
                       )}
                     >
+                      {multiPillarIds.includes(p.id) && (
+                        <rect
+                          x={effPos.x - drawW / 2 - 0.45} y={effPos.y - drawD / 2 - 0.45}
+                          width={drawW + 0.9} height={drawD + 0.9}
+                          fill="#2563eb" fillOpacity="0.12" stroke="#2563eb" strokeWidth="0.15"
+                          data-multi-selected="true"
+                        />
+                      )}
                       {isSelected && (
                         <rect 
                           x={effPos.x - drawW / 2 - 0.25} y={effPos.y - drawD / 2 - 0.25}

@@ -1660,6 +1660,8 @@ export interface FoundationFooting {
   enabled?: boolean;
   includeInEstimate?: boolean;
   notes?: string;
+  /** Locked footings cannot be moved, edited or deleted */
+  isLocked?: boolean;
 }
 
 export interface CommonFootingSize {
