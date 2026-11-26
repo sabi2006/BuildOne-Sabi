@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1795696999.9086578,
-    "seen": 1795697080.891052,
-    "ast_hash": "12b08a3fba3d16ef430d50d8aa7a4442",
+    "mtime": 1795697308.9793894,
+    "seen": 1795697421.2118282,
+    "ast_hash": "fffdfb5208c98fe444b52da81bc05133",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1795696861.2819593,
-    "seen": 1795697080.8910878,
-    "ast_hash": "ae3d07d10d208285e1f48c2208b1cafd",
+    "mtime": 1795697233.3520112,
+    "seen": 1795697421.2118595,
+    "ast_hash": "98dc42e3c31c863dc19b46ca1087012c",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -807,6 +807,18 @@
     "mtime": 1795696891.6238823,
     "seen": 1795697080.891097,
     "ast_hash": "f536fa68426e7418cc525d552f98b0d9",
+    "semantic_hash": ""
+  },
+  "src/lib/foundationLayers.test.ts": {
+    "mtime": 1795697262.939739,
+    "seen": 1795697421.2118726,
+    "ast_hash": "b7ea19be9c8075cd2cfef610ec73f855",
+    "semantic_hash": ""
+  },
+  "src/lib/foundationLayers.ts": {
+    "mtime": 1795697167.0839036,
+    "seen": 1795697421.2118738,
+    "ast_hash": "e22ed16b5e588ee5976c5d9be46dd52a",
     "semantic_hash": ""
   },
   "package-lock.json": {

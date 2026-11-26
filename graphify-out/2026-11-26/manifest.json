@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1795696473.2523785,
-    "seen": 1795696670.5526602,
-    "ast_hash": "a22f2188d700a6fe61244c03796c1f85",
+    "mtime": 1795696999.9086578,
+    "seen": 1795697080.891052,
+    "ast_hash": "12b08a3fba3d16ef430d50d8aa7a4442",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
@@ -180,9 +180,9 @@
     "semantic_hash": "cc40302ff300257e1ed7cbaa032c128b"
   },
   "src/components/calculator/StructuralConfigModal.tsx": {
-    "mtime": 1795682750.5559025,
-    "seen": 1795682955.4244635,
-    "ast_hash": "eab2cf569ff69c2afb0de91c412c4215",
+    "mtime": 1795696861.3727555,
+    "seen": 1795697080.891072,
+    "ast_hash": "acdfa68c6deebb9592cc19348f586104",
     "semantic_hash": ""
   },
   "src/components/calculator/StructurePreview3D.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1795696290.1618073,
-    "seen": 1795696670.5526912,
-    "ast_hash": "2d417ef49623fd04f2b97feed8b32951",
+    "mtime": 1795696861.2819593,
+    "seen": 1795697080.8910878,
+    "ast_hash": "ae3d07d10d208285e1f48c2208b1cafd",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -264,9 +264,9 @@
     "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
   },
   "src/lib/structuralCalculationService.ts": {
-    "mtime": 1795682057.3218124,
-    "seen": 1795682955.4245296,
-    "ast_hash": "7e8f67a16fea5b11205c2c952e229aa3",
+    "mtime": 1795696791.988396,
+    "seen": 1795697080.891139,
+    "ast_hash": "84631a70f76686c22c40bc00999fbf1c",
     "semantic_hash": ""
   },
   "src/lib/utils.ts": {
@@ -786,9 +786,9 @@
     "semantic_hash": ""
   },
   "src/lib/rebarChecks.ts": {
-    "mtime": 1795682429.0776067,
-    "seen": 1795682955.4245255,
-    "ast_hash": "2c9b740375b2e5b18aa1cd6bf85fbb09",
+    "mtime": 1795696791.9873827,
+    "seen": 1795697080.8911352,
+    "ast_hash": "4ff06e86227d74433764ade83eed5265",
     "semantic_hash": ""
   },
   "src/lib/editorBulkOps.test.ts": {
@@ -801,6 +801,12 @@
     "mtime": 1795696366.92588,
     "seen": 1795696670.5526996,
     "ast_hash": "01fb01f93559b35a486e578de7618a59",
+    "semantic_hash": ""
+  },
+  "src/lib/elementDesignInputs.test.ts": {
+    "mtime": 1795696891.6238823,
+    "seen": 1795697080.891097,
+    "ast_hash": "f536fa68426e7418cc525d552f98b0d9",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -58,6 +58,7 @@ import {
 import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUndoableState } from '../../hooks/useUndoableState';
+import type { FoundationLayerSettings, SoilStratum } from '../../lib/foundationLayers';
 import {
   applyPillarProperties, alignPillars, setPillarsLocked, copyPillarProperties, applyFootingProperties, alignFootings,
   setFootingsLocked, duplicateFooting, copyFootingProperties, isLinkedFooting,
@@ -4380,6 +4381,70 @@ if (activeMode === 'foundation') {
                   </span>
                 </div>
               </label>
+
+              {/* Construction layers & earthwork extras */}
+              {(() => {
+                const L = model.foundation?.layers || {};
+                const setL = (patch: Partial<FoundationLayerSettings>) => setModel(prev => ({
+                  ...prev,
+                  foundation: { ...(prev.foundation || DEFAULT_FOUNDATION_CONFIG), layers: { ...(prev.foundation?.layers || {}), ...patch } }
+                }));
+                const num = (v: string) => (v.trim() === '' ? undefined : Number(v));
+                const lt = result?.foundationEstimate?.layers;
+                const f = 'w-full px-1.5 py-0.5 text-xs border border-gray-300 rounded bg-white';
+                const strata = L.soilStrata || [];
+                const setStratum = (i: number, patch: Partial<SoilStratum>) => setL({ soilStrata: strata.map((x, k) => (k === i ? { ...x, ...patch } : x)) });
+                return (
+                  <details className="bg-white p-2 rounded-md border border-amber-200 shadow-xs text-[11px]" data-testid="foundation-layers">
+                    <summary className="cursor-pointer font-semibold text-gray-800">Construction layers &amp; earthwork</summary>
+                    <div className="mt-2 space-y-2">
+                      <div className="text-[9.5px] text-gray-500">All off by default. Quantities are added to the estimate; a cost only where you enter a rate.</div>
+                      <label className="block text-[10px] text-gray-700">Excavation side slope (horizontal per 1 vertical)
+                        <input type="number" min={0} step={0.25} placeholder="0 = vertical" className={f} data-testid="layers-slope" value={L.excavationSideSlope ?? ''} onChange={e => setL({ excavationSideSlope: num(e.target.value) })} />
+                      </label>
+                      <div className="grid grid-cols-[auto_1fr_1fr] gap-1.5 items-center">
+                        <label className="flex items-center gap-1"><input type="checkbox" data-testid="layers-gsb" checked={!!L.granularSubBase?.enabled} onChange={e => setL({ granularSubBase: { thicknessMm: 150, ...(L.granularSubBase || {}), enabled: e.target.checked } })} />Granular sub-base</label>
+                        <input type="number" min={0} step={25} className={f} title="Thickness, mm" placeholder="mm" value={L.granularSubBase?.thicknessMm ?? ''} onChange={e => setL({ granularSubBase: { enabled: !!L.granularSubBase?.enabled, thicknessMm: num(e.target.value) ?? 0, ratePerM3: L.granularSubBase?.ratePerM3 } })} />
+                        <input type="number" min={0} className={f} title="Rate per m³" placeholder="rate/m³" value={L.granularSubBase?.ratePerM3 ?? ''} onChange={e => setL({ granularSubBase: { enabled: !!L.granularSubBase?.enabled, thicknessMm: L.granularSubBase?.thicknessMm ?? 150, ratePerM3: num(e.target.value) } })} />
+                        <label className="flex items-center gap-1"><input type="checkbox" checked={!!L.waterproofing?.enabled} onChange={e => setL({ waterproofing: { ...(L.waterproofing || {}), enabled: e.target.checked } })} />Waterproofing</label>
+                        <span className="text-[9px] text-gray-400">footing base + sides</span>
+                        <input type="number" min={0} className={f} placeholder="rate/m²" value={L.waterproofing?.ratePerM2 ?? ''} onChange={e => setL({ waterproofing: { enabled: !!L.waterproofing?.enabled, ratePerM2: num(e.target.value) } })} />
+                        <label className="flex items-center gap-1"><input type="checkbox" data-testid="layers-at" checked={!!L.antiTermite?.enabled} onChange={e => setL({ antiTermite: { ...(L.antiTermite || {}), enabled: e.target.checked } })} />Anti-termite</label>
+                        <span className="text-[9px] text-gray-400">pit bottom + sides (IS 6313-2)</span>
+                        <input type="number" min={0} className={f} placeholder="rate/m²" value={L.antiTermite?.ratePerM2 ?? ''} onChange={e => setL({ antiTermite: { enabled: !!L.antiTermite?.enabled, ratePerM2: num(e.target.value) } })} />
+                        <label className="flex items-center gap-1"><input type="checkbox" checked={!!L.shoring?.enabled} onChange={e => setL({ shoring: { minDepthM: 1.5, ...(L.shoring || {}), enabled: e.target.checked } })} />Shoring</label>
+                        <input type="number" min={0} step={0.25} className={f} title="Pits at least this deep (m) get shoring" placeholder="min depth m" value={L.shoring?.minDepthM ?? ''} onChange={e => setL({ shoring: { enabled: !!L.shoring?.enabled, minDepthM: num(e.target.value) ?? 0, ratePerM2: L.shoring?.ratePerM2 } })} />
+                        <input type="number" min={0} className={f} placeholder="rate/m²" value={L.shoring?.ratePerM2 ?? ''} onChange={e => setL({ shoring: { enabled: !!L.shoring?.enabled, minDepthM: L.shoring?.minDepthM ?? 1.5, ratePerM2: num(e.target.value) } })} />
+                      </div>
+                      <div className="text-[9.5px] text-gray-500">Shoring depth threshold is yours to set (default 1.5 m): check it against your site safety plan.</div>
+                      <div className="space-y-1">
+                        <div className="text-[10px] font-semibold text-gray-700">Soil strata (from ground level down)</div>
+                        {strata.map((st, i) => (
+                          <div key={i} className="grid grid-cols-[1fr_70px_70px_auto] gap-1">
+                            <input className={f} value={st.name} placeholder="e.g. Soft soil" onChange={e => setStratum(i, { name: e.target.value })} />
+                            <input type="number" min={0} step={0.1} className={f} title="Thickness, m" placeholder="m" value={st.thicknessM} onChange={e => setStratum(i, { thicknessM: num(e.target.value) ?? 0 })} />
+                            <input type="number" min={0} className={f} title="Excavation rate per m³" placeholder="rate/m³" value={st.ratePerM3 ?? ''} onChange={e => setStratum(i, { ratePerM3: num(e.target.value) })} />
+                            <button type="button" className="px-1 text-red-600" onClick={() => setL({ soilStrata: strata.filter((_, k) => k !== i) })}>✕</button>
+                          </div>
+                        ))}
+                        <button type="button" data-testid="layers-add-stratum" className="text-[10px] font-semibold text-amber-800" onClick={() => setL({ soilStrata: [...strata, { name: `Stratum ${strata.length + 1}`, thicknessM: 1 }] })}>+ Add stratum</button>
+                      </div>
+                      {lt && (
+                        <div className="rounded bg-amber-50 border border-amber-200 p-1.5 text-[10px] text-gray-800 space-y-0.5" data-testid="layers-quantities">
+                          {lt.extraFromSlopeM3 > 0 && <div>Extra excavation from side slope: <b>{lt.extraFromSlopeM3.toFixed(2)} m³</b> (also added to backfill)</div>}
+                          {lt.granularSubBaseM3 > 0 && <div>Granular sub-base: <b>{lt.granularSubBaseM3.toFixed(2)} m³</b></div>}
+                          {lt.waterproofingM2 > 0 && <div>Waterproofing: <b>{lt.waterproofingM2.toFixed(1)} m²</b></div>}
+                          {lt.antiTermiteM2 > 0 && <div>Anti-termite treatment: <b>{lt.antiTermiteM2.toFixed(1)} m²</b></div>}
+                          {lt.shoringM2 > 0 && <div>Shoring: <b>{lt.shoringM2.toFixed(1)} m²</b></div>}
+                          {lt.strataM3.length > 0 && <div>Excavation by stratum: {lt.strataM3.map((v, i) => `${strata[i]?.name || 'below listed strata'} ${v.toFixed(2)} m³`).join(' · ')}</div>}
+                          {lt.costs.total > 0 && <div>Added cost: <b>₹{Math.round(lt.costs.total).toLocaleString('en-IN')}</b></div>}
+                          {lt.unpriced.length > 0 && <div className="text-amber-800">Not priced (no rate): {lt.unpriced.join(', ')}</div>}
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                );
+              })()}
 
               {/* Manual Foundation / Footing Placement Tool */}
               <div className="space-y-1.5 bg-white p-2.5 rounded-md border border-amber-300 shadow-xs">

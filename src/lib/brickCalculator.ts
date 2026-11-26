@@ -20,6 +20,7 @@ import { computeFoundationBasementDesign, isDetailedDesignRequested, type Founda
 import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
+import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
   switch (grade) {
@@ -1724,7 +1725,10 @@ export interface FoundationConfig {
   
   dpcThicknessMm: number;
   dpcWidthIn: number;
-  
+
+  /** Construction layers and earthwork extras (side slope, sub-base, waterproofing, anti-termite, shoring, strata) */
+  layers?: FoundationLayerSettings;
+
   footings: FoundationFooting[];
 }
 
@@ -1868,6 +1872,8 @@ export interface FootingItemEstimate {
 }
 
 export interface FoundationEstimate {
+  /** Construction layers & earthwork extras (only when FoundationConfig.layers is set) */
+  layers?: LayerTotals;
   totalExcavationM3: number;
   totalExcavationVolumeM3: number;
   totalExcavationVolumeCft: number;
@@ -1946,6 +1952,8 @@ export interface FoundationEstimate {
       helper: number;
       totalLabour: number;
     };
+    /** Construction layers (sub-base, waterproofing, anti-termite, shoring), priced only where a rate is set */
+    layers?: number;
     total: number;
   };
   
@@ -3710,7 +3718,26 @@ export const calculateFoundationEstimate = (
   const footingLabourRate = settings.footingLabourRatePerM3 ?? 3500;
   const stubLabourRate = settings.pillarLabourRatePerM3 ?? settings.footingLabourRatePerM3 ?? 3500;
 
-  const costExc = totalExcavationM3 * excRate;
+  // Construction layers & earthwork extras (all off by default: no change unless the user sets them)
+  const layerSettings = foundationConfig?.layers;
+  const layerTotals: LayerTotals | undefined = layerSettings ? foundationLayerTotals(activeFootings.map(f => {
+    const u = (x: Unit | undefined) => x || buildingUnit;
+    return {
+      id: f.id,
+      excLengthM: toMeters(f.excavationLength, u(f.excavationUnit)), excWidthM: toMeters(f.excavationWidth, u(f.excavationUnit)),
+      excDepthM: toMeters(f.excavationDepth, u(f.excavationUnit)),
+      pccLengthM: toMeters(f.pccLength, u(f.pccUnit)), pccWidthM: toMeters(f.pccWidth, u(f.pccUnit)),
+      footingLengthM: toMeters(f.footingLength, u(f.footingUnit)), footingWidthM: toMeters(f.footingWidth, u(f.footingUnit)),
+      footingDepthM: toMeters(f.footingDepth, u(f.footingUnit)),
+    };
+  }), layerSettings) : undefined;
+  const slopeExtraM3 = layerTotals?.extraFromSlopeM3 ?? 0;
+  // with strata rates, each stratum is priced at its own rate (strata without a rate at the general excavation rate)
+  const strataSet = layerSettings?.soilStrata && layerSettings.soilStrata.length > 0 && layerTotals;
+  const costExc = strataSet
+    ? layerTotals!.strataM3.reduce((t, v, i) => t + v * (layerSettings!.soilStrata![i]?.ratePerM3 ?? excRate), 0)
+    : (totalExcavationM3 + slopeExtraM3) * excRate;
+  const costLayers = layerTotals ? layerTotals.costs.granularSubBase + layerTotals.costs.waterproofing + layerTotals.costs.antiTermite + layerTotals.costs.shoring : 0;
   const costSandFill = totalSandFillCft * sandFillRate;
   const costCement = cementBags * cementPrice;
   const costSand = sandCft * sandRate;
@@ -3734,12 +3761,14 @@ export const calculateFoundationEstimate = (
     totalLabour
   };
 
-  const totalCost = costExc + costSandFill + costCement + costSand + costAgg + costSteel + costWire + costCover + totalLabour;
+  const totalCost = costExc + costSandFill + costCement + costSand + costAgg + costSteel + costWire + costCover + totalLabour + costLayers;
+  const excavationWithSlopeM3 = totalExcavationM3 + slopeExtraM3;
 
   return {
-    totalExcavationM3,
-    totalExcavationVolumeM3: totalExcavationM3,
-    totalExcavationVolumeCft: totalExcavationM3 * 35.3147,
+    totalExcavationM3: excavationWithSlopeM3,
+    totalExcavationVolumeM3: excavationWithSlopeM3,
+    totalExcavationVolumeCft: excavationWithSlopeM3 * 35.3147,
+    layers: layerTotals,
     totalSandFillM3,
     totalSandFillVolumeM3: totalSandFillM3,
     totalSandFillCft,
@@ -3773,7 +3802,7 @@ export const calculateFoundationEstimate = (
     totalBindingWireKg: bindingWireKg,
     coverBlocks,
     totalCoverBlocks: coverBlocks,
-    backfillVolumeM3,
+    backfillVolumeM3: backfillVolumeM3 + slopeExtraM3,
     dpcAreaM2,
     dpcAreaSqM: dpcAreaM2,
     dpcAreaSqFt,
@@ -3798,6 +3827,7 @@ export const calculateFoundationEstimate = (
       bindingWire: costWire,
       coverBlocks: costCover,
       labour: labourBreakdown,
+      layers: costLayers,
       total: totalCost
     },
     totalCost,
