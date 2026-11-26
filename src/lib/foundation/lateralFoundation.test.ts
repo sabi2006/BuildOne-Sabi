@@ -284,3 +284,23 @@ describe('Lateral loads: wiring', () => {
     expect(v[3] / v[0]).toBeCloseTo(0.36 / 0.10, 6);
   });
 });
+
+describe('Footing stability and settlement through the building pipeline', () => {
+  const d = run({ ...BASE, frictionAngleDeg: 30, soilModulusMpa: 25, poissonRatio: 0.3, allowableSettlementMm: 25, lateral: { seismic: SEIS } });
+
+  it('every isolated footing gets computed sliding, overturning, uplift and settlement checks', () => {
+    const els = d.foundation!.elements.filter(e => e.elementType === 'isolated_footing');
+    expect(els.length).toBeGreaterThan(0);
+    for (const e of els) {
+      for (const id of ['sliding', 'overturning', 'uplift', 'settlement']) {
+        const c = e.checks.find(x => x.id === id)!;
+        expect(c).toBeDefined();
+        expect(c.status).not.toBe('NOT_VERIFIED');
+      }
+    }
+  });
+
+  it('the load cases reach the footing input (frame case forces on every column)', () => {
+    for (const c of d.loadPath.columns) expect(c.caseForces?.DL).toBeDefined();
+  });
+});

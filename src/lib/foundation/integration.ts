@@ -27,7 +27,7 @@ import { designBasement, type BasementDesignResult } from './basementDesignServi
 import { buildBBS, type BBSResult } from './bbs';
 import { RCC_UNIT_WEIGHT } from './rcDesign';
 import { analyseBuildingFrame, type BuildingFrameInput, type BuildingFrameResult, type BuildingFrameLateralResult } from './buildingFrame';
-import type { ColumnCombo } from './lateral';
+import type { ColumnCombo, CaseForces, CaseId } from './lateral';
 import { FrameError } from './frame';
 
 export interface LoadPathLevel {
@@ -63,6 +63,8 @@ export interface LoadPathColumn {
   momentYKnM?: number;
   /** IS 456 / IS 1893 load combinations from the frame (gravity only, or with wind/earthquake) */
   combos?: ColumnCombo[];
+  /** Base forces of each load case from the frame (service) */
+  caseForces?: Partial<Record<CaseId, CaseForces>>;
 }
 
 export interface FoundationBasementIntegration {
@@ -316,6 +318,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       col.momentYKnM = round(f.momentAboutYKnM);
       col.source = 'frame_analysis';
       col.combos = frameResult.combos[col.id];
+      col.caseForces = frameResult.caseForces[col.id];
       const lv: LoadPathLevel[] = [{ level: 'Gravity frame analysis: column base reaction (all storeys, roof, beams, walls, self-weight)', addedKn: round(structure), cumulativeKn: round(structure) }];
       if (basementAdd > 0) lv.push({ level: 'Basement: column self-weight (not in the frame)', addedKn: round(basementAdd), cumulativeKn: round(structure + basementAdd) });
       lv.push({ level: 'Foundation base (soil)', addedKn: 0, cumulativeKn: round(structure + basementAdd) });
@@ -465,6 +468,10 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     pile: details.investigation.pile,
     lateralSbcIncrease: details.lateral?.sbcIncreaseFactor,
     barOverrides: details.barOverrides,
+    soilModulusKnM2: details.soilModulusMpa ? details.soilModulusMpa * 1000 : undefined,
+    poissonRatio: details.poissonRatio,
+    cohesiveSoil: (details.cohesionKnM2 ?? 0) > 0,
+    frictionAngleDeg: details.frictionAngleDeg,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,
@@ -473,7 +480,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
   };
   const inputs: FoundationColumnInput[] = columns.map(c => ({
     id: c.id, name: c.name, xM: c.xM, yM: c.yM, widthMm: c.widthMm, depthMm: c.depthMm, serviceLoadKn: c.serviceKn, factoredLoadKn: c.factoredKn,
-    momentXKnM: c.momentXKnM, momentYKnM: c.momentYKnM, combos: c.combos,
+    momentXKnM: c.momentXKnM, momentYKnM: c.momentYKnM, combos: c.combos, caseForces: c.caseForces,
   }));
   let foundation: FoundationDesignResult | undefined;
   try {

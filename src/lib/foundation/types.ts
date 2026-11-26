@@ -95,6 +95,9 @@ export interface FoundationDetailsConfig {
   /** Angle of internal friction φ, degrees (where applicable) */
   frictionAngleDeg?: number;
   allowableSettlementMm?: number;
+  /** Soil modulus of elasticity Es, MPa, and Poisson's ratio (from the soil report) for the settlement check */
+  soilModulusMpa?: number;
+  poissonRatio?: number;
   investigation: SoilInvestigationData;
 
   concreteGrade?: ConcreteGrade;

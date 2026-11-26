@@ -134,6 +134,8 @@ export interface BuildingFrameResult {
   lateral?: BuildingFrameLateralResult;
   /** IS 456 / IS 1893 combinations per column id (gravity only when no lateral case is defined) */
   combos: Record<string, ColumnCombo[]>;
+  /** Base forces of every load case per column id (DL, LL and any lateral cases), service values */
+  caseForces: Record<string, Partial<Record<CaseId, CaseForces>>>;
   warnings: string[];
   assumptions: string[];
 }
@@ -422,10 +424,12 @@ export function analyseBuildingFrame(input: BuildingFrameInput): BuildingFrameRe
     lateralResult.cases.DL = dlF; lateralResult.cases.LL = llF;
   }
   const combos: Record<string, ColumnCombo[]> = {};
+  const perColumnCases: Record<string, Partial<Record<CaseId, CaseForces>>> = {};
   input.columns.forEach((c, i) => {
     const per: Partial<Record<CaseId, CaseForces>> = { DL: caseForces.DL[i], LL: caseForces.LL[i] };
     for (const id of lateralCaseIds) per[id] = caseForces[id][i];
     combos[c.id] = columnCombinations(per);
+    perColumnCases[c.id] = per;
   });
 
   const captured = expectedSlabKn > 0 ? deliveredSlabKn / expectedSlabKn : 1;
@@ -449,6 +453,7 @@ export function analyseBuildingFrame(input: BuildingFrameInput): BuildingFrameRe
     totals: { appliedKn, reactionKn, equilibriumErrorKn: Math.abs(appliedKn - reactionKn), slabLoadCapturedRatio: captured, bayAreaM2 },
     lateral: lateralResult,
     combos,
+    caseForces: perColumnCases,
     warnings,
     assumptions,
   };

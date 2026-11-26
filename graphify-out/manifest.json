@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {
-    "mtime": 1795682897.105133,
-    "seen": 1795682955.4244523,
-    "ast_hash": "9193a90d145c1430f01a3b18f6e68212",
+    "mtime": 1795698173.7635517,
+    "seen": 1795698301.2769625,
+    "ast_hash": "00f9b428a2e110bd5eceb28e2c7312e7",
     "semantic_hash": ""
   },
   "src/lib/foundation/basementDesignService.test.ts": {
@@ -600,9 +600,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795682628.4915419,
-    "seen": 1795682955.424503,
-    "ast_hash": "6695ba6d717c54f74076246dc594ab27",
+    "mtime": 1795698141.724045,
+    "seen": 1795698301.2770753,
+    "ast_hash": "5da25fc67a2a9afc4ca4f81c3dff19bb",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.ts": {
-    "mtime": 1795682646.6121829,
-    "seen": 1795682955.424512,
-    "ast_hash": "6b1418792bea96a925976505bff90e15",
+    "mtime": 1795698158.5249188,
+    "seen": 1795698301.2770934,
+    "ast_hash": "5744a8c7b6f1ed86f6beb2e687fb4d8e",
     "semantic_hash": ""
   },
   "src/lib/foundation/rcDesign.ts": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/types.ts": {
-    "mtime": 1795682646.6111968,
-    "seen": 1795682955.4245203,
-    "ast_hash": "610afd6575c52dee27737327d628a57d",
+    "mtime": 1795698158.5239196,
+    "seen": 1795698301.2771122,
+    "ast_hash": "8c62b8b0eae434b7ccb213d08d49e0f3",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.test.ts": {
@@ -678,9 +678,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/buildingFrame.ts": {
-    "mtime": 1795337336.3297634,
-    "seen": 1795338109.1349285,
-    "ast_hash": "4e476aa89ddac3b2df11b4da72efe1ad",
+    "mtime": 1795698069.250926,
+    "seen": 1795698301.2770648,
+    "ast_hash": "44ae6c1793af90a3bdea3eb0e3dd05cd",
     "semantic_hash": ""
   },
   "src/lib/foundation/frame.test.ts": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/lateralFoundation.test.ts": {
-    "mtime": 1795674351.901144,
-    "seen": 1795674398.0362177,
-    "ast_hash": "abcfd4719e31c5024bca3dec39bab68d",
+    "mtime": 1795698239.9799445,
+    "seen": 1795698301.2771008,
+    "ast_hash": "2c226d702664e43c247b481e3fc16a1b",
     "semantic_hash": ""
   },
   "src/hooks/useUndoableState.ts": {
@@ -819,6 +819,24 @@
     "mtime": 1795697167.0839036,
     "seen": 1795697421.2118738,
     "ast_hash": "e22ed16b5e588ee5976c5d9be46dd52a",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/footingStability.test.ts": {
+    "mtime": 1795698219.02,
+    "seen": 1795698301.2770703,
+    "ast_hash": "00c63b12b967462389d668a29fc6fc90",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/stability.test.ts": {
+    "mtime": 1795698028.320441,
+    "seen": 1795698301.2771077,
+    "ast_hash": "0180f60f247844d3111f2bc42f19adda",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/stability.ts": {
+    "mtime": 1795698028.1265006,
+    "seen": 1795698301.27711,
+    "ast_hash": "42a49177c27a5fae64c823cd2757e752",
     "semantic_hash": ""
   },
   "package-lock.json": {

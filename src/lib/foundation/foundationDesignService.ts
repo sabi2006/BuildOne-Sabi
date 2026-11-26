@@ -23,7 +23,8 @@
 
 import type { ConcreteGrade, SteelGrade } from '../structuralCalculationService';
 import type { DesignStatus, PileInvestigationData, SbcBasis, StructuralElementIdentity } from './types';
-import type { ColumnCombo } from './lateral';
+import type { ColumnCombo, CaseForces, CaseId } from './lateral';
+import { elasticSettlementMm, slidingFactorOfSafety, overturningCheck, upliftCheck } from './stability';
 import {
   fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
   developmentLengthTensionMm, developmentLengthCompressionMm, selectBarsPerMetre,
@@ -52,9 +53,11 @@ export interface FoundationColumnInput {
    * When present they REPLACE the single service/factored case for isolated footings and rafts.
    */
   combos?: ColumnCombo[];
+  /** Base forces of each load case (service), from the frame analysis: used for the sliding / overturning / uplift checks */
+  caseForces?: Partial<Record<CaseId, CaseForces>>;
 }
 
-export interface FoundationDesignOptions {
+export interface FoundationDesignOptions{
   /** Excavation working space beyond footing edge, mm (default 300) */
   workingSpaceMm?: number;
   /** PCC projection beyond footing edge, mm (default 100) */
@@ -110,6 +113,13 @@ export interface FoundationDesignParams {
    * and any shortfall is reported as FAIL. They are never replaced silently.
    */
   barOverrides?: Record<string, FootingBarOverride>;
+  /** Soil modulus Es (kN/m²) and Poisson's ratio for the immediate-settlement check (user input; absent → NOT_VERIFIED) */
+  soilModulusKnM2?: number;
+  poissonRatio?: number;
+  /** Cohesive soil (clay): consolidation settlement is not computed, so the settlement check is at best a WARNING */
+  cohesiveSoil?: boolean;
+  /** Soil friction angle φ (degrees) for base sliding resistance (absent → sliding NOT_VERIFIED) */
+  frictionAngleDeg?: number;
   options?: FoundationDesignOptions;
 }
 
@@ -265,20 +275,96 @@ export function availablePressure(p: FoundationDesignParams, Dm: number): { qAva
   return { qAvail, overburden };
 }
 
-function commonChecks(p: FoundationDesignParams, momentsUsed: boolean): DesignCheck[] {
+/** Immediate settlement of a footing/raft of plan L × B under net service pressure q (IS 8009 Part 1 elastic approach) */
+function settlementCheck(p: FoundationDesignParams, geom?: { lengthM: number; widthM: number; qNetKnM2: number }): DesignCheck {
+  const base = { id: 'settlement', label: 'Immediate settlement ≤ allowable', clause: 'IS 8009 (Part 1)' } as const;
+  if (!geom) return { ...base, status: 'NOT_VERIFIED', note: 'Settlement is not computed for this element type.' };
+  if (!(p.soilModulusKnM2 && p.soilModulusKnM2 > 0) || p.poissonRatio === undefined) {
+    return { ...base, status: 'NOT_VERIFIED', note: 'Enter the soil modulus Es and Poisson\'s ratio (from the soil report) to compute settlement.' };
+  }
+  const s = elasticSettlementMm({ qNetKnM2: geom.qNetKnM2, lengthM: geom.lengthM, widthM: geom.widthM, soilModulusKnM2: p.soilModulusKnM2, poissonRatio: p.poissonRatio });
+  const limit = p.allowableSettlementMm;
+  const note = `S = q B (1 − ν²) Iρ / Es with q = ${round(geom.qNetKnM2, 1)} kN/m², rigid footing, no depth correction.${p.cohesiveSoil ? ' Cohesive soil: consolidation settlement is NOT included and must be assessed separately.' : ''} Differential settlement between footings is not checked.`;
+  if (limit === undefined) return { ...base, status: 'WARNING', demand: round(s, 1), unit: 'mm', note: `No allowable settlement entered. ${note}` };
+  const ok = s <= limit;
+  return { ...base, status: !ok ? 'FAIL' : p.cohesiveSoil ? 'WARNING' : 'PASS', demand: round(s, 1), capacity: limit, unit: 'mm', note };
+}
+
+/**
+ * Sliding, overturning and uplift of an isolated footing (IS 456 Cl. 20), from the frame's per-case column base forces.
+ * Footing weight and the soil on top of it resist (no soil above when a basement is excavated).
+ */
+function footingStabilityChecks(col: FoundationColumnInput, p: FoundationDesignParams, L: number, B: number, Dmm: number): DesignCheck[] {
+  const cf = col.caseForces;
+  if (!cf?.DL) {
+    const note = 'Needs the frame analysis load cases (Column Load Source: Frame analysis).';
+    return [
+      { id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2', status: 'NOT_VERIFIED', note },
+      { id: 'overturning', label: 'Overturning (0.9 M_R ≥ 1.2 M_DL + 1.4 M_imposed)', clause: 'IS 456 Cl. 20.1', status: 'NOT_VERIFIED', note },
+      { id: 'uplift', label: 'Uplift (0.9 × weight ≥ 1.2 × uplift)', clause: 'IS 456 Cl. 20.1 (applied to uplift)', status: 'NOT_VERIFIED', note },
+    ];
+  }
+  const Dm = Dmm / 1000;
+  const Wf = RCC_UNIT_WEIGHT * L * B * Dm;
+  const soilH = p.basement ? 0 : Math.max(0, p.foundationDepthM - (Dmm + p.pccThicknessMm) / 1000);
+  const Ws = p.soilUnitWeightKnM3 * L * B * soilH;
+  const dl = cf.DL, ll = cf.LL ?? { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 };
+  const lats = (['EQX', 'EQZ', 'WX', 'WZ'] as CaseId[]).filter(id => cf[id]).map(id => ({ id, f: cf[id]! }));
+  const hasLateral = lats.length > 0;
+  const comb = (parts: Array<[CaseForces, number]>): CaseForces => parts.reduce((a, [f, k]) => ({
+    axialKn: a.axialKn + k * f.axialKn, momentXKnM: a.momentXKnM + k * f.momentXKnM, momentYKnM: a.momentYKnM + k * f.momentYKnM,
+    shearXKn: a.shearXKn + k * f.shearXKn, shearYKn: a.shearYKn + k * f.shearYKn,
+  }), { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 });
+  const lateralNote = hasLateral ? '' : ' No wind/earthquake defined: horizontal forces are the gravity frame shears only.';
+  const NDL = Math.max(0, dl.axialKn) + Wf + Ws;
+  const cks: DesignCheck[] = [];
+
+  // sliding: worst service horizontal force
+  const svc = [comb([[dl, 1], [ll, 1]]), ...lats.flatMap(l => [1, -1].map(sg => comb([[dl, 1], [ll, 1], [l.f, sg]])))];
+  const H = Math.max(...svc.map(f => Math.hypot(f.shearXKn, f.shearYKn)));
+  if (p.frictionAngleDeg === undefined) {
+    cks.push({ id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2', status: 'NOT_VERIFIED',
+      note: `Enter the soil friction angle φ to check sliding. Horizontal force ${round(H, 1)} kN.` });
+  } else {
+    const fs = slidingFactorOfSafety({ deadVerticalKn: NDL, horizontalKn: H, frictionAngleDeg: p.frictionAngleDeg });
+    cks.push({ id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2',
+      status: fs < 1.4 ? 'FAIL' : hasLateral ? 'PASS' : 'WARNING', demand: 1.4, capacity: Number.isFinite(fs) ? round(fs, 2) : undefined,
+      note: `μ = tan φ (concrete cast on soil, δ = φ assumed; adhesion ignored). H = ${round(H, 1)} kN, dead load incl. footing and soil = ${round(NDL, 1)} kN.${lateralNote}` });
+  }
+
+  // overturning about each footing axis: column base moment + shear × footing thickness
+  const otAbout = (f: CaseForces, axis: 'x' | 'y') => axis === 'x'
+    ? Math.abs(f.momentXKnM) + Math.abs(f.shearYKn) * Dm
+    : Math.abs(f.momentYKnM) + Math.abs(f.shearXKn) * Dm;
+  const imposed = [ll, ...lats.flatMap(l => [1, -1].map(sg => comb([[ll, 1], [l.f, sg]]))), ...lats.flatMap(l => [1, -1].map(sg => comb([[l.f, sg]])))];
+  let worst = { ratio: -Infinity, restoring: 0, required: 0, axis: 'x' as 'x' | 'y' };
+  for (const axis of ['x', 'y'] as const) {
+    const lever = axis === 'x' ? B / 2 : L / 2;
+    const r = overturningCheck({ deadVerticalKn: NDL, leverM: lever, overturningDeadKnM: otAbout(dl, axis), overturningImposedKnM: Math.max(...imposed.map(f => otAbout(f, axis))) });
+    const ratio = r.requiredKnM / Math.max(r.restoringKnM, 1e-9);
+    if (ratio > worst.ratio) worst = { ratio, restoring: r.restoringKnM, required: r.requiredKnM, axis };
+  }
+  cks.push({ id: 'overturning', label: 'Overturning (0.9 M_R ≥ 1.2 M_DL + 1.4 M_imposed)', clause: 'IS 456 Cl. 20.1',
+    status: worst.required > worst.restoring ? 'FAIL' : hasLateral ? 'PASS' : 'WARNING', demand: round(worst.required, 1), capacity: round(worst.restoring, 1), unit: 'kN·m',
+    note: `About the footing ${worst.axis === 'x' ? 'x' : 'y'}-axis edge; wind/earthquake treated as imposed loads.${lateralNote}` });
+
+  // uplift: least axial force with dead load and a lateral case (no live load: more adverse)
+  const Nmin = Math.min(dl.axialKn, ...lats.flatMap(l => [1, -1].map(sg => dl.axialKn + sg * l.f.axialKn)));
+  const up = upliftCheck({ resistingWeightKn: Wf + Ws, upliftKn: -Nmin });
+  cks.push({ id: 'uplift', label: 'Uplift (0.9 × weight ≥ 1.2 × uplift)', clause: 'IS 456 Cl. 20.1 (applied to uplift)',
+    status: up.ok ? (hasLateral ? 'PASS' : 'WARNING') : 'FAIL', demand: round(up.requiredKn, 1), capacity: round(up.resistingKn, 1), unit: 'kN',
+    note: Nmin >= 0 ? `No tension in the column in any combination (least axial ${round(Nmin, 1)} kN).${lateralNote}` : `Column tension ${round(-Nmin, 1)} kN resisted by footing + soil weight ${round(Wf + Ws, 1)} kN.${lateralNote}` });
+  return cks;
+}
+
+function commonChecks(p: FoundationDesignParams, momentsUsed: boolean, geom?: { lengthM: number; widthM: number; qNetKnM2: number }): DesignCheck[] {
   const checks: DesignCheck[] = [];
   checks.push({
     id: 'sbc_source', label: 'SBC from geotechnical investigation', clause: 'IS 1892 / IS 6403',
     status: p.sbcSource === 'geotechnical_report' ? 'PASS' : 'WARNING',
     note: p.sbcSource === 'geotechnical_report' ? undefined : 'SBC is assumed/preliminary. Confirm with a soil investigation report.',
   });
-  checks.push({
-    id: 'settlement', label: 'Settlement', clause: 'IS 8009',
-    status: 'NOT_VERIFIED',
-    note: p.allowableSettlementMm
-      ? `Allowable settlement ${p.allowableSettlementMm} mm entered, but settlement analysis (IS 8009) needs compressibility data that is not captured.`
-      : 'No allowable settlement specified and no settlement analysis implemented.',
-  });
+  checks.push(settlementCheck(p, geom));
   checks.push({
     id: 'groundwater', label: 'Groundwater effect on bearing capacity', clause: 'IS 6403',
     status: p.groundwaterDepthM === undefined ? 'NOT_VERIFIED' : (p.groundwaterDepthM < p.foundationDepthM ? 'WARNING' : 'PASS'),
@@ -553,7 +639,8 @@ export function designIsolatedFooting(
       cks.push({ id: 'founding_depth', label: 'Footing + PCC fits within founding depth', status: D + p.pccThicknessMm <= p.foundationDepthM * 1000 ? 'PASS' : 'WARNING',
         demand: D + p.pccThicknessMm, capacity: p.foundationDepthM * 1000, unit: 'mm',
         note: D + p.pccThicknessMm <= p.foundationDepthM * 1000 ? undefined : 'Footing top would be above ground level: increase founding depth or use a pedestal.' });
-      cks.push(...commonChecks(p, momentsUsed));
+      cks.push(...footingStabilityChecks(col, p, L, B, D));
+      cks.push(...commonChecks(p, momentsUsed, { lengthM: L, widthM: B, qNetKnM2: Ps / (L * B) }));
 
       e.checks = cks;
       e.status = overallStatus(cks);
@@ -816,7 +903,8 @@ export function designCombinedFooting(
         cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? 'PASS' : 'WARNING',
           note: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
       }
-      cks.push(...commonChecks(p, true));
+      cks.push({ id: 'stability', label: 'Sliding / overturning / uplift', clause: 'IS 456 Cl. 20', status: 'NOT_VERIFIED', note: 'Checked for isolated footings only.' });
+      cks.push(...commonChecks(p, true, { lengthM: L, widthM: B, qNetKnM2: S / (L * B) }));
 
       e.checks = cks;
       e.status = overallStatus(cks);
@@ -1022,7 +1110,7 @@ function designRaftWithProjection(
           ? [{ id: 'moments', label: 'Column base moments in the contact pressure', status: 'WARNING' as const, demand: round(sumMx + sumMy, 1), unit: 'kN·m',
               note: 'Service column base moments (summed in magnitude, conservative) are added to the load-eccentricity moment for the contact pressure. They are not applied to the raft bending or punching design.' }]
           : [{ id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED' as const, note: 'No column moments supplied: raft design is for axial load only.' }]),
-        ...commonChecks(p, true),
+        ...commonChecks(p, true, { lengthM: L, widthM: B, qNetKnM2: S / A }),
       ];
       e.checks = cks;
       e.status = overallStatus(cks);

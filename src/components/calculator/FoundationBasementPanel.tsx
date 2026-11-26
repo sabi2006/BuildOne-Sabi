@@ -229,8 +229,14 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
           <NumField label="Friction Angle φ" unit="deg" value={fd.frictionAngleDeg} min={0} step={0.5}
             onChange={(v) => setFd({ frictionAngleDeg: v })} />
           <NumField label="Allowable Settlement" unit="mm" value={fd.allowableSettlementMm} min={0} step={5}
-            hint="Blank = settlement check not verified"
+            hint="Limit for the settlement check"
             onChange={(v) => setFd({ allowableSettlementMm: v })} />
+          <NumField label="Soil Modulus Es" unit="MPa" value={fd.soilModulusMpa} min={0} step={1}
+            hint="From the soil report; needed for settlement"
+            onChange={(v) => setFd({ soilModulusMpa: v })} />
+          <NumField label="Poisson's Ratio ν" value={fd.poissonRatio} min={0} step={0.05}
+            hint="Typically 0.25–0.35 sand, 0.4–0.5 saturated clay (soil report)"
+            onChange={(v) => setFd({ poissonRatio: v })} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
