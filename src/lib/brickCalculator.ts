@@ -18,6 +18,7 @@ import {
 import { computeFoundationBasementDesign, isDetailedDesignRequested, type FoundationBasementIntegration } from './foundation/integration';
 import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
+import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
   switch (grade) {
@@ -142,7 +143,13 @@ export interface Pillar {
     pillarCoverMm?: number;
     mainSteelWeightKg?: number;
     stirrupSteelWeightKg?: number;
+    /** True when any value comes from the user's override (rebarOverride) */
+    overridden?: boolean;
+    /** IS 456 checks on the bars provided */
+    checks?: RebarCheck[];
   };
+  /** User reinforcement override (bar diameter / count, tie diameter / spacing, cover); kept and checked, never auto-corrected */
+  rebarOverride?: ColumnRebarOverride;
   calculatedFooting?: {
     lengthM: number;
     widthM: number;
@@ -5626,9 +5633,11 @@ export const calculateProject = (
           pillarMainBarDiaMm: calc.providedBarDiaMm,
           pillarStirrupDiaMm: calc.stirrupDiaMm,
           pillarStirrupSpacingMm: calc.stirrupSpacingMm,
-          pillarCoverMm: 40,
+          pillarCoverMm: calc.coverMm,
           mainSteelWeightKg: calc.mainSteelWeightKg,
-          stirrupSteelWeightKg: calc.stirrupWeightKg
+          stirrupSteelWeightKg: calc.stirrupWeightKg,
+          overridden: calc.rebarOverridden,
+          checks: calc.rebarChecks
         };
         p.structuralData = {
           role: calc.role,
@@ -5729,6 +5738,22 @@ export const calculateProject = (
             fl.fullRingBeam.width = autoWidthIn;
             fl.fullRingBeam.widthUnit = 'in';
           }
+        }
+        // a user-sized beam keeps its size, but its bar data must still follow the design (incl. rebar overrides)
+        if (bCalc && fl.ringBeam?.isCustomSize) {
+          fl.ringBeam = {
+            ...fl.ringBeam,
+            structuralDetails: bCalc,
+            rebarConfig: {
+              beamTopBarDiaMm: bCalc.topAnchorBarDiaMm,
+              beamTopBarCount: bCalc.topAnchorBarCount,
+              beamBottomBarDiaMm: bCalc.bottomMainBarDiaMm,
+              beamBottomBarCount: bCalc.bottomMainBarCount,
+              beamStirrupDiaMm: bCalc.stirrupDiaMm,
+              beamStirrupSpacingMm: bCalc.stirrupSpacingMm,
+              beamCoverMm: bCalc.nominalCoverMm
+            }
+          };
         }
       });
 
@@ -6791,9 +6816,11 @@ export function recalculateBuildingPillarSizing(
         pillarMainBarDiaMm: calc.providedBarDiaMm,
         pillarStirrupDiaMm: calc.stirrupDiaMm,
         pillarStirrupSpacingMm: calc.stirrupSpacingMm,
-        pillarCoverMm: 40,
+        pillarCoverMm: calc.coverMm,
         mainSteelWeightKg: calc.mainSteelWeightKg,
-        stirrupSteelWeightKg: calc.stirrupWeightKg
+        stirrupSteelWeightKg: calc.stirrupWeightKg,
+        overridden: calc.rebarOverridden,
+        checks: calc.rebarChecks
       };
 
       updatedP.structuralData = {

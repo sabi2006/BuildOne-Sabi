@@ -3,6 +3,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { BuildingConfig, ConcreteGrade, SteelGrade } from '../../lib/structuralCalculationService';
+import type { FoundationBasementIntegration } from '../../lib/foundation/integration';
 import {
   resolveFoundationDetails,
   resolveBasementConfig,
@@ -14,6 +15,8 @@ import {
 interface Props {
   config: BuildingConfig;
   onChange: (patch: Partial<BuildingConfig>) => void;
+  /** The last calculated design (used to list the footings that can take a bar override) */
+  design?: FoundationBasementIntegration;
 }
 
 const CONCRETE_GRADES: ConcreteGrade[] = ['M15', 'M20', 'M25', 'M30', 'M35'];
@@ -82,7 +85,7 @@ function Section({ title, defaultOpen, children }: { title: string; defaultOpen?
   );
 }
 
-export function FoundationBasementPanel({ config, onChange }: Props) {
+export function FoundationBasementPanel({ config, onChange, design }: Props) {
   const fd = resolveFoundationDetails(config.foundationDetails);
   const bs = resolveBasementConfig(config.basement);
 
@@ -299,6 +302,67 @@ export function FoundationBasementPanel({ config, onChange }: Props) {
       </Section>
 
       {/* ------------------------- BASEMENT ------------------------- */}
+      {/* ------------------------ FOOTING BAR OVERRIDE ------------------------ */}
+      {(() => {
+        const footings = (design?.foundation?.elements || []).filter(e => e.elementType === 'isolated_footing' && e.depthMm);
+        if (footings.length === 0) return null;
+        const ovs = fd.barOverrides || {};
+        const setOv = (id: string, patch: { diaMm?: number; spacingMm?: number }) => {
+          const next = { ...(ovs[id] || {}), ...patch };
+          if (next.diaMm === undefined) delete next.diaMm;
+          if (next.spacingMm === undefined) delete next.spacingMm;
+          const all = { ...ovs, [id]: next };
+          if (!next.diaMm && !next.spacingMm) delete all[id];
+          setFd({ barOverrides: Object.keys(all).length ? all : undefined });
+        };
+        const badge = (st: string) => st === 'PASS' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : st === 'FAIL' ? 'bg-red-100 text-red-800 border-red-300' : 'bg-amber-100 text-amber-800 border-amber-300';
+        return (
+          <Section title="Footing Bars (override, isolated footings)" defaultOpen={Object.keys(ovs).length > 0}>
+            <div className="text-[11px] text-slate-600" data-testid="footing-bar-overrides">
+              Blank = automatic. The footing size is not changed for your bars: they are checked on the designed section (steel, spacing, shear, punching) and any shortfall shows FAIL.
+              Statuses below are from the last calculation: press <b>Apply &amp; Recalculate</b> to update them.
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-[11px]">
+                <thead>
+                  <tr className="text-left text-slate-500 border-b border-slate-200">
+                    <th className="py-1 pr-2">Footing</th><th className="py-1 pr-2">Designed bars</th><th className="py-1 pr-2">Bar ⌀ (mm)</th><th className="py-1 pr-2">Spacing (mm)</th><th className="py-1 pr-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {footings.map(e => {
+                    const bx = e.reinforcement.find(r => r.direction === 'x');
+                    const fails = e.checks.filter(c => c.status === 'FAIL').map(c => c.label);
+                    const o = ovs[e.id] || {};
+                    return (
+                      <tr key={e.id} className="border-b border-slate-100" data-footing={e.id}>
+                        <td className="py-1 pr-2 font-semibold text-slate-800">{e.id}<div className="text-[10px] text-slate-500 font-normal">{e.sizeXM} × {e.sizeYM} m × {e.depthMm} mm</div></td>
+                        <td className="py-1 pr-2 font-mono">{bx ? `${bx.diaMm} @ ${bx.spacingMm}` : '—'}</td>
+                        <td className="py-1 pr-2">
+                          <select className="text-xs px-1 py-0.5 rounded border border-slate-300 bg-white" value={o.diaMm ?? ''}
+                            onChange={(ev) => setOv(e.id, { diaMm: ev.target.value === '' ? undefined : Number(ev.target.value) })}>
+                            <option value="">Auto</option>
+                            {[10, 12, 16, 20, 25].map(d => <option key={d} value={d}>{d}</option>)}
+                          </select>
+                        </td>
+                        <td className="py-1 pr-2">
+                          <input type="number" min={50} step={5} placeholder="Auto" className="w-20 text-xs px-1 py-0.5 rounded border border-slate-300 bg-white" value={o.spacingMm ?? ''}
+                            onChange={(ev) => setOv(e.id, { spacingMm: ev.target.value === '' ? undefined : Number(ev.target.value) })} />
+                        </td>
+                        <td className="py-1 pr-2">
+                          <span className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${badge(e.status)}`}>{e.status.replace('_', ' ')}</span>
+                          {fails.length > 0 && <div className="text-[10px] text-red-700 mt-0.5">{fails.join('; ')}</div>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+        );
+      })()}
+
       <Section title="Basement Configuration" defaultOpen={bs.enabled}>
         <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
           <input type="checkbox" checked={bs.enabled}

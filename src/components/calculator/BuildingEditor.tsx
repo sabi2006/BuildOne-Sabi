@@ -58,6 +58,7 @@ import {
 import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUndoableState } from '../../hooks/useUndoableState';
+import { hasColumnRebarOverride, worstRebarStatus, type ColumnRebarOverride } from '../../lib/rebarChecks';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { SaveProjectModal } from './SaveProjectModal';
 import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
@@ -2625,7 +2626,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   /** A locked pillar keeps its geometry: only these view/lock flags may change */
   const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
   /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
-  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes']);
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes', 'rebarOverride']);
   const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
   const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
 
@@ -3390,9 +3391,11 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
             pillarMainBarDiaMm: calc.providedBarDiaMm,
             pillarStirrupDiaMm: calc.stirrupDiaMm,
             pillarStirrupSpacingMm: calc.stirrupSpacingMm,
-            pillarCoverMm: 40,
+            pillarCoverMm: calc.coverMm,
             mainSteelWeightKg: calc.mainSteelWeightKg,
-            stirrupSteelWeightKg: calc.stirrupWeightKg
+            stirrupSteelWeightKg: calc.stirrupWeightKg,
+            overridden: calc.rebarOverridden,
+            checks: calc.rebarChecks
           },
           structuralData: {
             role: calc.role,
@@ -6893,6 +6896,89 @@ if (activeMode === 'foundation') {
                     <option value="painted">Painted</option>
                   </select>
                   <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">3D appearance only: painting is not priced in the estimate.</span>
+                </div>
+
+                {/* ---------------- Reinforcement (automatic, with optional user override) ---------------- */}
+                {selectedPillarId && (() => {
+                  const calc = result?.structuralSummary?.pillarsCalculations?.find(c => c.pillarId === selectedPillarId);
+                  const ov = findPillarById(selectedPillarId)?.rebarOverride || {};
+                  const setOv = (patch: Partial<ColumnRebarOverride>) => {
+                    const next: ColumnRebarOverride = { ...ov, ...patch };
+                    (Object.keys(next) as (keyof ColumnRebarOverride)[]).forEach(k => { if (next[k] === undefined || Number.isNaN(next[k])) delete next[k]; });
+                    updateActiveFloorPillar({ rebarOverride: Object.keys(next).length ? next : undefined });
+                  };
+                  const numOrUndef = (v: string) => (v.trim() === '' ? undefined : Number(v));
+                  const overridden = hasColumnRebarOverride(ov);
+                  const checks = calc?.rebarChecks || [];
+                  const worst = checks.length ? worstRebarStatus(checks) : undefined;
+                  const field = 'block w-full px-1.5 py-0.5 text-xs border rounded';
+                  return (
+                    <details className="rounded border border-blue-200 bg-blue-50/40 p-2" open={overridden || worst === 'FAIL'} data-testid="pillar-rebar">
+                      <summary className="cursor-pointer text-[10px] font-bold text-blue-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <span>Reinforcement (IS 456)</span>
+                        {worst && (
+                          <span data-testid="pillar-rebar-status" className={cn('px-1.5 py-0.5 rounded text-[9px] font-bold border',
+                            worst === 'PASS' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : worst === 'WARNING' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-300')}>
+                            {worst}
+                          </span>
+                        )}
+                        {overridden && <span className="text-[9px] font-semibold text-blue-700 normal-case">user values</span>}
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        {calc ? (
+                          <div className="text-[10px] text-gray-700">
+                            Provided: <b>{calc.providedBarCount} × {calc.providedBarDiaMm} mm</b> ({calc.steelPercentageP.toFixed(2)} %), ties <b>{calc.stirrupDiaMm} mm @ {calc.stirrupSpacingMm} mm</b>, cover <b>{calc.coverMm} mm</b>
+                          </div>
+                        ) : (
+                          <div className="text-[10px] text-gray-500">Not calculated yet.</div>
+                        )}
+                        <div className="text-[9px] text-gray-500">Leave a field blank to use the automatic design. Your values are kept as entered and checked below; they are never corrected silently.</div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <label className="block text-[9px] text-gray-600">Main bar dia (mm)
+                            <select className={field} data-testid="ov-main-dia" value={ov.mainBarDiaMm ?? ''} onChange={e => setOv({ mainBarDiaMm: numOrUndef(e.target.value) })}>
+                              <option value="">Auto</option>
+                              {[10, 12, 16, 20, 25, 32].map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                          </label>
+                          <label className="block text-[9px] text-gray-600">Main bar count
+                            <input type="number" min={1} step={1} className={field} data-testid="ov-main-count" placeholder="Auto" value={ov.mainBarCount ?? ''} onChange={e => setOv({ mainBarCount: numOrUndef(e.target.value) })} />
+                          </label>
+                          <label className="block text-[9px] text-gray-600">Tie dia (mm)
+                            <select className={field} data-testid="ov-tie-dia" value={ov.tieDiaMm ?? ''} onChange={e => setOv({ tieDiaMm: numOrUndef(e.target.value) })}>
+                              <option value="">Auto</option>
+                              {[6, 8, 10, 12].map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                          </label>
+                          <label className="block text-[9px] text-gray-600">Tie spacing (mm)
+                            <input type="number" min={50} step={5} className={field} data-testid="ov-tie-spacing" placeholder="Auto" value={ov.tieSpacingMm ?? ''} onChange={e => setOv({ tieSpacingMm: numOrUndef(e.target.value) })} />
+                          </label>
+                          <label className="block text-[9px] text-gray-600">Clear cover (mm)
+                            <input type="number" min={15} step={5} className={field} data-testid="ov-cover" placeholder="Auto (40)" value={ov.coverMm ?? ''} onChange={e => setOv({ coverMm: numOrUndef(e.target.value) })} />
+                          </label>
+                          {overridden && (
+                            <button type="button" className="self-end px-2 py-0.5 text-[10px] font-semibold rounded border border-gray-300 bg-white hover:bg-gray-50" onClick={() => updateActiveFloorPillar({ rebarOverride: undefined })}>
+                              Use automatic design
+                            </button>
+                          )}
+                        </div>
+                        {checks.length > 0 && (
+                          <table className="w-full text-[9.5px]" data-testid="pillar-rebar-checks">
+                            <tbody>
+                              {checks.map(c => (
+                                <tr key={c.id} className="border-t border-blue-100" data-check={c.id} data-status={c.status}>
+                                  <td className="py-0.5 pr-1 text-gray-700">{c.label}<div className="text-gray-400">{c.clause}</div></td>
+                                  <td className="py-0.5 pr-1 text-right font-mono whitespace-nowrap">{c.demand ?? ''}{c.capacity !== undefined ? ` / ${c.capacity}` : ''} {c.unit ?? ''}</td>
+                                  <td className={cn('py-0.5 text-right font-bold', c.status === 'PASS' ? 'text-emerald-700' : c.status === 'WARNING' ? 'text-amber-700' : 'text-red-700')}>{c.status}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    </details>
+                  );
+                })()}
+                <div>
                 </div>
 
                 {/* Selected Pillar Cross-Section Presets */}

@@ -464,6 +464,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     pccThicknessMm: details.pccThicknessMm,
     pile: details.investigation.pile,
     lateralSbcIncrease: details.lateral?.sbcIncreaseFactor,
+    barOverrides: details.barOverrides,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,

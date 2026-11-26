@@ -44,6 +44,8 @@ import {
 } from '@/lib/brickCalculator';
 import { CalculatorContext } from './CalculatorContext';
 import { FoundationBasementPanel } from './FoundationBasementPanel';
+import { hasBeamRebarOverride, worstRebarStatus, type BeamRebarOverride } from '../../lib/rebarChecks';
+import { useCalculator } from './CalculatorContext';
 
 export interface BuildingDetailsConfig {
   length: number;
@@ -63,6 +65,63 @@ interface StructuralConfigModalProps {
   onSave: (updatedConfig: BuildingConfig, buildingDetails?: BuildingDetailsConfig) => void;
 }
 
+
+/** Per-floor beam reinforcement override with the IS 456 checks of the bars provided */
+function BeamRebarEditor({ beam, value, onChange, testId }: {
+  beam: FloorBeamStructuralCalculation;
+  value?: BeamRebarOverride;
+  onChange: (next: BeamRebarOverride | undefined) => void;
+  testId: string;
+}) {
+  const v = value || {};
+  const set = (patch: Partial<BeamRebarOverride>) => {
+    const next: BeamRebarOverride = { ...v, ...patch };
+    (Object.keys(next) as (keyof BeamRebarOverride)[]).forEach(k => { if (next[k] === undefined || Number.isNaN(next[k])) delete next[k]; });
+    onChange(Object.keys(next).length ? next : undefined);
+  };
+  const num = (s: string) => (s.trim() === '' ? undefined : Number(s));
+  const checks = beam.rebarChecks || [];
+  const worst = checks.length ? worstRebarStatus(checks) : undefined;
+  const overridden = hasBeamRebarOverride(v);
+  const inp = 'w-full text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white';
+  const badge = (st?: string) => st === 'PASS' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : st === 'WARNING' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-300';
+  return (
+    <details className="pt-2 border-t border-slate-200/80" open={overridden || worst === 'FAIL'} data-testid={testId}>
+      <summary className="cursor-pointer text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
+        <span>Beam reinforcement & IS 456 checks</span>
+        {worst && <span data-testid={`${testId}-status`} className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${badge(worst)}`}>{worst}</span>}
+        {overridden && <span className="text-[10px] text-blue-700">user values</span>}
+      </summary>
+      <div className="mt-2 space-y-2">
+        <div className="text-[10px] text-slate-500">Blank = automatic design. Your values are kept as entered and checked below (never corrected silently).</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] text-slate-600">
+          <label>Bottom ⌀ <span className="text-slate-400">({beam.bottomMainBarDiaMm})</span><select className={inp} data-testid={`${testId}-bot-dia`} value={v.bottomBarDiaMm ?? ''} onChange={e => set({ bottomBarDiaMm: num(e.target.value) })}><option value="">Auto</option>{[10, 12, 16, 20, 25].map(d => <option key={d} value={d}>{d}</option>)}</select></label>
+          <label>Bottom no.<input type="number" min={2} className={inp} data-testid={`${testId}-bot-count`} placeholder={String(beam.bottomMainBarCount)} value={v.bottomBarCount ?? ''} onChange={e => set({ bottomBarCount: num(e.target.value) })} /></label>
+          <label>Top ⌀ <span className="text-slate-400">({beam.topAnchorBarDiaMm})</span><select className={inp} value={v.topBarDiaMm ?? ''} onChange={e => set({ topBarDiaMm: num(e.target.value) })}><option value="">Auto</option>{[8, 10, 12, 16, 20].map(d => <option key={d} value={d}>{d}</option>)}</select></label>
+          <label>Top no.<input type="number" min={2} className={inp} placeholder={String(beam.topAnchorBarCount)} value={v.topBarCount ?? ''} onChange={e => set({ topBarCount: num(e.target.value) })} /></label>
+          <label>Stirrup ⌀ <span className="text-slate-400">({beam.stirrupDiaMm})</span><select className={inp} value={v.stirrupDiaMm ?? ''} onChange={e => set({ stirrupDiaMm: num(e.target.value) })}><option value="">Auto</option>{[6, 8, 10, 12].map(d => <option key={d} value={d}>{d}</option>)}</select></label>
+          <label>Spacing mm<input type="number" min={50} step={5} className={inp} data-testid={`${testId}-spacing`} placeholder={String(beam.stirrupSpacingMm)} value={v.stirrupSpacingMm ?? ''} onChange={e => set({ stirrupSpacingMm: num(e.target.value) })} /></label>
+          <label>Cover mm<input type="number" min={15} step={5} className={inp} data-testid={`${testId}-cover`} placeholder={String(beam.nominalCoverMm)} value={v.coverMm ?? ''} onChange={e => set({ coverMm: num(e.target.value) })} /></label>
+          {overridden && <button type="button" className="self-end text-[10px] font-semibold px-1 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50" onClick={() => onChange(undefined)}>Automatic</button>}
+        </div>
+        {checks.length > 0 && (
+          <table className="w-full text-[10px]" data-testid={`${testId}-checks`}>
+            <tbody>
+              {checks.map(c => (
+                <tr key={c.id} className="border-t border-slate-200" data-check={c.id} data-status={c.status}>
+                  <td className="py-0.5 pr-1 text-slate-700">{c.label}<div className="text-slate-400">{c.clause}{c.note ? ` · ${c.note}` : ''}</div></td>
+                  <td className="py-0.5 pr-1 text-right font-mono whitespace-nowrap">{c.demand ?? ''}{c.capacity !== undefined ? ` / ${c.capacity}` : ''} {c.unit ?? ''}</td>
+                  <td className={`py-0.5 text-right font-bold ${c.status === 'PASS' ? 'text-emerald-700' : c.status === 'WARNING' ? 'text-amber-700' : 'text-red-700'}`}>{c.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </details>
+  );
+}
+
 export function StructuralConfigModal({
   isOpen,
   config,
@@ -73,6 +132,7 @@ export function StructuralConfigModal({
   onClose,
   onSave
 }: StructuralConfigModalProps) {
+  const { result: calcResult } = useCalculator();
   const calcContext = useContext(CalculatorContext);
   const [activeTab, setActiveTab] = useState<'storeys' | 'materials' | 'soil' | 'rates'>('storeys');
   const [localConfig, setLocalConfig] = useState<BuildingConfig>({
@@ -144,6 +204,19 @@ export function StructuralConfigModal({
     });
   };
 
+  const handleFloorBeamRebarOverride = (floorId: string, next: BeamRebarOverride | undefined) => {
+    setLocalConfig(prev => {
+      const existing = prev.floorOverrides?.[floorId] || {};
+      return {
+        ...prev,
+        floorOverrides: {
+          ...(prev.floorOverrides || {}),
+          [floorId]: { ...existing, beamRebar: next && hasBeamRebarOverride(next) ? next : undefined }
+        }
+      };
+    });
+  };
+
   const handleResetFloorOverride = (floorId: string) => {
     setLocalConfig(prev => {
       if (!prev.floorOverrides) return prev;
@@ -210,7 +283,8 @@ export function StructuralConfigModal({
         {
           customWidthMm: override?.customBeamWidthIn ? Math.round(override.customBeamWidthIn * 25.4) : undefined,
           customDepthMm: override?.customBeamDepthIn ? Math.round(override.customBeamDepthIn * 25.4) : undefined,
-          isCustomSize: Boolean(override?.isCustomBeam)
+          isCustomSize: Boolean(override?.isCustomBeam),
+          rebarOverride: override?.beamRebar
         }
       );
 
@@ -249,7 +323,8 @@ export function StructuralConfigModal({
       {
         customWidthMm: roofOverride?.customBeamWidthIn ? Math.round(roofOverride.customBeamWidthIn * 25.4) : undefined,
         customDepthMm: roofOverride?.customBeamDepthIn ? Math.round(roofOverride.customBeamDepthIn * 25.4) : undefined,
-        isCustomSize: Boolean(roofOverride?.isCustomBeam)
+        isCustomSize: Boolean(roofOverride?.isCustomBeam),
+        rebarOverride: roofOverride?.beamRebar
       }
     );
 
@@ -871,6 +946,9 @@ export function StructuralConfigModal({
                                       <span className="text-[11px] text-slate-500">in</span>
                                     </div>
                                   </div>
+
+                                  <BeamRebarEditor beam={beam} value={override?.beamRebar} testId={`beam-rebar-${floorId}`}
+                                    onChange={(next) => handleFloorBeamRebarOverride(floorId, next)} />
                                 </div>
                               </div>
                             </div>
@@ -1053,6 +1131,9 @@ export function StructuralConfigModal({
                                       <span className="text-[11px] text-slate-500">in</span>
                                     </div>
                                   </div>
+
+                                  <BeamRebarEditor beam={beam} value={override?.beamRebar} testId={`beam-rebar-${'roof'}`}
+                                    onChange={(next) => handleFloorBeamRebarOverride('roof', next)} />
                                 </div>
                               </div>
                             </div>
@@ -1390,6 +1471,7 @@ export function StructuralConfigModal({
               <FoundationBasementPanel
                 config={localConfig}
                 onChange={(patch) => setLocalConfig(prev => ({ ...prev, ...patch }))}
+                design={calcResult?.foundationBasementDesign}
               />
             </div>
           )}

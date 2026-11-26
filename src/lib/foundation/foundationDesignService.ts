@@ -27,7 +27,7 @@ import type { ColumnCombo } from './lateral';
 import {
   fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
   developmentLengthTensionMm, developmentLengthCompressionMm, selectBarsPerMetre,
-  barAreaMm2, MIN_STEEL_FRACTION_HYSD, RCC_UNIT_WEIGHT,
+  barAreaMm2, MIN_STEEL_FRACTION_HYSD, RCC_UNIT_WEIGHT, type BarsPerMetre,
 } from './rcDesign';
 
 export type FoundationSystem = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile';
@@ -104,7 +104,18 @@ export interface FoundationDesignParams {
   basement?: { depthM: number; wallWeightKnM2: number };
   /** Allowed increase of the available soil pressure for service combinations with wind or earthquake (default 1 = none) */
   lateralSbcIncrease?: number;
+  /**
+   * User bar diameter / spacing for an isolated footing, keyed by element id (e.g. "F-C1"). The footing is sized and
+   * designed as usual; the user's bars are then checked on that section (flexure, spacing, shear, punching, anchorage)
+   * and any shortfall is reported as FAIL. They are never replaced silently.
+   */
+  barOverrides?: Record<string, FootingBarOverride>;
   options?: FoundationDesignOptions;
+}
+
+export interface FootingBarOverride {
+  diaMm?: number;
+  spacingMm?: number;
 }
 
 export interface DesignCheck {
@@ -441,23 +452,45 @@ export function designIsolatedFooting(
       if (tvp > tcp) break;
 
       // ------------------ section accepted: assemble result ------------------
+      // A user bar override is evaluated on this accepted section (the section is not re-sized for it).
+      const ov = p.barOverrides?.[id];
+      const ovOn = !!ov && !!(ov.diaMm || ov.spacingMm);
+      const phiE = ovOn && ov!.diaMm ? ov!.diaMm : phi;
+      const dE = D - cover - 1.5 * phiE;
+      const limE = muLimitKnM(1000, dE, p.concreteGrade, p.steelGrade);
+      const reqAst = (m: number) => Math.max(m <= limE ? flexureAstMm2(m, 1000, dE, p.concreteGrade, p.steelGrade).astMm2 : Infinity, minAst);
+      const astXE = ovOn ? reqAst(mx) : astX, astYE = ovOn ? reqAst(my) : astY;
+      const userBars = (astReq: number, auto: BarsPerMetre): BarsPerMetre | null => {
+        if (!ovOn) return auto;
+        const sp = ov!.spacingMm || selectBarsPerMetre(astReq, dE, [phiE], 50)?.spacingMm;
+        return sp ? { diaMm: phiE, spacingMm: sp, astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / sp } : null;
+      };
+      const bxE = userBars(astXE, bx) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
+      const byE = userBars(astYE, by) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
+      const tvXE = (qu * Math.max(0, axM - dE / 1000)) / dE, tvYE = (qu * Math.max(0, ayM - dE / 1000)) / dE;
+      const tcXE = tauCMpa((100 * bxE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
+      const tcYE = tauCMpa((100 * byE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
+      const cpE = criticalPerimeter(cx, cy, lMm / 2, bMm / 2, dE, { x0: 0, x1: lMm, y0: 0, y1: bMm });
+      const tvpE = (Math.max(0, ...ultCombos.map(c => c.P - quOf(c) * cpE.areaM2)) * 1000) / (cpE.b0Mm * dE);
+      const maxSpE = Math.min(3 * dE, 300);
       const e = baseElement(id, 'isolated_footing', 'isolated', [col], p);
       const x0 = col.xM - L / 2, y0 = col.yM - B / 2;
       e.plan = { x0, x1: x0 + L, y0, y1: y0 + B };
-      e.sizeXM = L; e.sizeYM = B; e.depthMm = D; e.effectiveDepthMm = d;
+      e.sizeXM = L; e.sizeYM = B; e.depthMm = D; e.effectiveDepthMm = dE;
       e.availablePressureKnM2 = round(qAvail, 2);
       e.maxServicePressureKnM2 = round(qmax, 2);
       e.factoredPressureKnM2 = round(qu, 2);
 
-      const countX = Math.floor((bMm - 2 * cover) / bx.spacingMm) + 1;
-      const countY = Math.floor((lMm - 2 * cover) / by.spacingMm) + 1;
-      const ldX = developmentLengthTensionMm(bx.diaMm, p.concreteGrade, p.steelGrade);
-      const ldY = developmentLengthTensionMm(by.diaMm, p.concreteGrade, p.steelGrade);
+      const countX = Math.floor((bMm - 2 * cover) / bxE.spacingMm) + 1;
+      const countY = Math.floor((lMm - 2 * cover) / byE.spacingMm) + 1;
+      const ldX = developmentLengthTensionMm(bxE.diaMm, p.concreteGrade, p.steelGrade);
+      const ldY = developmentLengthTensionMm(byE.diaMm, p.concreteGrade, p.steelGrade);
+      const ovNote = ovOn ? 'User bar override (checked on the designed section).' : undefined;
       e.reinforcement = [
-        { id: `${id}-BX`, location: 'bottom', direction: 'x', role: 'main', diaMm: bx.diaMm, spacingMm: bx.spacingMm, count: countX,
-          astRequiredMm2PerM: round(astX, 1), astProvidedMm2PerM: round(bx.astProvidedMm2PerM, 1), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ldX },
-        { id: `${id}-BY`, location: 'bottom', direction: 'y', role: 'main', diaMm: by.diaMm, spacingMm: by.spacingMm, count: countY,
-          astRequiredMm2PerM: round(astY, 1), astProvidedMm2PerM: round(by.astProvidedMm2PerM, 1), straightLengthMm: bMm - 2 * cover, zoneWidthMm: lMm, developmentLengthMm: ldY },
+        { id: `${id}-BX`, location: 'bottom', direction: 'x', role: 'main', diaMm: bxE.diaMm, spacingMm: bxE.spacingMm, count: countX,
+          astRequiredMm2PerM: round(astXE, 1), astProvidedMm2PerM: round(bxE.astProvidedMm2PerM, 1), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ldX, note: ovNote },
+        { id: `${id}-BY`, location: 'bottom', direction: 'y', role: 'main', diaMm: byE.diaMm, spacingMm: byE.spacingMm, count: countY,
+          astRequiredMm2PerM: round(astYE, 1), astProvidedMm2PerM: round(byE.astProvidedMm2PerM, 1), straightLengthMm: bMm - 2 * cover, zoneWidthMm: lMm, developmentLengthMm: ldY, note: ovNote },
       ];
 
       // dowels (Cl. 34.4.3)
@@ -489,13 +522,22 @@ export function designIsolatedFooting(
       if (hasCombos) cks.push({ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS',
         note: `${svcCombos.length} service and ${ultCombos.length} ultimate combinations evaluated. Governing ultimate base pressure from ${govUltimate}. Combinations use column forces from the frame analysis.` });
       if (momentsUsed) cks.push({ id: 'no_tension', label: 'Minimum base pressure ≥ 0 (no uplift)', status: qmin >= 0 ? 'PASS' : 'FAIL', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' });
-      cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(mx, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
-      cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(my, 2), capacity: round(lim, 2), unit: 'kN·m/m' });
-      cks.push({ id: 'min_steel', label: 'Minimum reinforcement 0.12%', clause: 'IS 456 Cl. 26.5.2.1, 34.5', status: 'PASS',
-        demand: round(minAst, 0), capacity: round(Math.min(bx.astProvidedMm2PerM, by.astProvidedMm2PerM), 0), unit: 'mm²/m' });
-      cks.push({ id: 'shear_x', label: 'One-way shear at d from column face (x)', clause: 'IS 456 Cl. 34.2.4, 40.2', status: 'PASS', demand: round(tvX, 3), capacity: round(tcX, 3), unit: 'N/mm²' });
-      cks.push({ id: 'shear_y', label: 'One-way shear at d from column face (y)', clause: 'IS 456 Cl. 34.2.4, 40.2', status: 'PASS', demand: round(tvY, 3), capacity: round(tcY, 3), unit: 'N/mm²' });
-      cks.push({ id: 'punching', label: 'Two-way (punching) shear at d/2', clause: 'IS 456 Cl. 31.6.3, 34.2.4', status: 'PASS', demand: round(tvp, 3), capacity: round(tcp, 3), unit: 'N/mm²' });
+      cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: mx <= limE ? 'PASS' : 'FAIL', demand: round(mx, 2), capacity: round(limE, 2), unit: 'kN·m/m' });
+      cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: my <= limE ? 'PASS' : 'FAIL', demand: round(my, 2), capacity: round(limE, 2), unit: 'kN·m/m' });
+      if (ovOn) {
+        cks.push({ id: 'steel_x', label: 'Provided steel along x ≥ required (user bars)', clause: 'IS 456 Cl. 34.2.3, Annex G-1.1',
+          status: bxE.astProvidedMm2PerM >= astXE ? 'PASS' : 'FAIL', demand: round(astXE, 0), capacity: round(bxE.astProvidedMm2PerM, 0), unit: 'mm²/m',
+          note: `${bxE.diaMm} mm @ ${bxE.spacingMm} mm; d = ${round(dE, 0)} mm.` });
+        cks.push({ id: 'steel_y', label: 'Provided steel along y ≥ required (user bars)', clause: 'IS 456 Cl. 34.2.3, Annex G-1.1',
+          status: byE.astProvidedMm2PerM >= astYE ? 'PASS' : 'FAIL', demand: round(astYE, 0), capacity: round(byE.astProvidedMm2PerM, 0), unit: 'mm²/m' });
+        cks.push({ id: 'bar_spacing', label: 'Bar spacing ≤ 3d and ≤ 300 mm', clause: 'IS 456 Cl. 26.3.3(b)(1)',
+          status: Math.max(bxE.spacingMm, byE.spacingMm) <= maxSpE + 1e-9 ? 'PASS' : 'FAIL', demand: Math.max(bxE.spacingMm, byE.spacingMm), capacity: round(maxSpE, 0), unit: 'mm' });
+      }
+      cks.push({ id: 'min_steel', label: 'Minimum reinforcement 0.12%', clause: 'IS 456 Cl. 26.5.2.1, 34.5', status: Math.min(bxE.astProvidedMm2PerM, byE.astProvidedMm2PerM) >= minAst - 1e-6 ? 'PASS' : 'FAIL',
+        demand: round(minAst, 0), capacity: round(Math.min(bxE.astProvidedMm2PerM, byE.astProvidedMm2PerM), 0), unit: 'mm²/m' });
+      cks.push({ id: 'shear_x', label: 'One-way shear at d from column face (x)', clause: 'IS 456 Cl. 34.2.4, 40.2', status: tvXE <= tcXE ? 'PASS' : 'FAIL', demand: round(tvXE, 3), capacity: round(tcXE, 3), unit: 'N/mm²' });
+      cks.push({ id: 'shear_y', label: 'One-way shear at d from column face (y)', clause: 'IS 456 Cl. 34.2.4, 40.2', status: tvYE <= tcYE ? 'PASS' : 'FAIL', demand: round(tvYE, 3), capacity: round(tcYE, 3), unit: 'N/mm²' });
+      cks.push({ id: 'punching', label: 'Two-way (punching) shear at d/2', clause: 'IS 456 Cl. 31.6.3, 34.2.4', status: tvpE <= tcp ? 'PASS' : 'FAIL', demand: round(tvpE, 3), capacity: round(tcp, 3), unit: 'N/mm²' });
 
       const availX = axM * 1000 - cover, availY = ayM * 1000 - cover;
       cks.push({ id: 'dev_length', label: 'Development length of footing bars beyond column face', clause: 'IS 456 Cl. 26.2.1',

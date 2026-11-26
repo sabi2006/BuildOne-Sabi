@@ -14,6 +14,7 @@
  */
 
 import type { FoundationDetailsConfig, BasementConfig } from './foundation/types';
+import { columnRebarChecks, hasColumnRebarOverride, beamRebarChecks, hasBeamRebarOverride, type ColumnRebarOverride, type BeamRebarOverride, type RebarCheck } from './rebarChecks';
 
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
 
@@ -200,6 +201,8 @@ export interface BuildingConfig {
     customBeamDepthIn?: number;
     isCustomSlab?: boolean;
     isCustomBeam?: boolean;
+    /** User beam reinforcement for this floor: kept as entered and checked against IS 456 */
+    beamRebar?: BeamRebarOverride;
   }>;
   customRates?: StructuralRatesConfig;
   /** Extended geotechnical/foundation inputs (optional; defaults via resolveFoundationDetails) */
@@ -387,7 +390,13 @@ export interface ColumnStructuralCalculation {
   stirrupCount: number;
   stirrupWeightKg: number;
   totalSteelWeightKg: number;
-  
+  /** Clear cover to the longitudinal bars, mm */
+  coverMm: number;
+  /** True when the user overrode any of bar diameter / count, tie diameter / spacing or cover */
+  rebarOverridden: boolean;
+  /** IS 456 detailing and axial-capacity checks on the bars actually provided */
+  rebarChecks: RebarCheck[];
+
   // Concrete Quantity (Handbook Section 6.1)
   concreteVolumeM3: number;
   concreteVolumeCft: number;
@@ -563,6 +572,10 @@ export interface FloorBeamStructuralCalculation {
 
   status: 'SAFE' | 'WARNING';
   notes: string[];
+  /** True when the user overrode any beam reinforcement value for this floor */
+  rebarOverridden: boolean;
+  /** IS 456 flexure / shear / detailing checks on the bars provided */
+  rebarChecks: RebarCheck[];
 }
 
 export interface BuildingStructuralSummary {
@@ -996,6 +1009,7 @@ export function calculateFloorBeamStructuralDetails(
     customWidthMm?: number;
     customDepthMm?: number;
     isCustomSize?: boolean;
+    rebarOverride?: BeamRebarOverride;
   }
 ): FloorBeamStructuralCalculation {
   const spanM = Math.max(1.0, effectiveSpanM);
@@ -1040,8 +1054,10 @@ export function calculateFloorBeamStructuralDetails(
   let beamDepthMm = isCustomSize ? (overrides?.customDepthMm || 300) : recommendedDepthMm;
   let beamDepthIn = Math.round((beamDepthMm / 25.4) * 10) / 10;
 
-  const nominalCoverMm = 25; // IS 456 Table 16 for beams
-  const stirrupDiaMm = 8;
+  const bro = overrides?.rebarOverride;
+  const rebarOverridden = hasBeamRebarOverride(bro);
+  const nominalCoverMm = bro?.coverMm || 25; // IS 456 Table 16 for beams
+  const stirrupDiaMm = bro?.stirrupDiaMm || 8;
   const assumedMainBarDiaMm = 16;
   let effectiveDepthD_mm = Math.max(150, beamDepthMm - nominalCoverMm - stirrupDiaMm - assumedMainBarDiaMm / 2);
 
@@ -1116,12 +1132,14 @@ export function calculateFloorBeamStructuralDetails(
     bottomMainBarDiaMm = 20;
     bottomMainBarCount = Math.max(3, Math.ceil(bottomAstRequiredMm2 / barArea20));
   }
+  if (bro?.bottomBarDiaMm) bottomMainBarDiaMm = bro.bottomBarDiaMm;
+  if (bro?.bottomBarCount) bottomMainBarCount = bro.bottomBarCount;
   const bottomBarSingleArea = (Math.PI * bottomMainBarDiaMm * bottomMainBarDiaMm) / 4;
   const bottomAstProvidedMm2 = Math.round(bottomMainBarCount * bottomBarSingleArea);
 
   // Top Anchor / Hanger Bars (at least 2 bars of 10mm or 12mm for stirrup cages)
-  const topAnchorBarCount = 2;
-  const topAnchorBarDiaMm = bottomMainBarDiaMm >= 16 ? 12 : 10;
+  const topAnchorBarCount = bro?.topBarCount || 2;
+  const topAnchorBarDiaMm = bro?.topBarDiaMm || (bottomMainBarDiaMm >= 16 ? 12 : 10);
   const topBarSingleArea = (Math.PI * topAnchorBarDiaMm * topAnchorBarDiaMm) / 4;
   const topAstProvidedMm2 = Math.round(topAnchorBarCount * topBarSingleArea);
 
@@ -1148,7 +1166,7 @@ export function calculateFloorBeamStructuralDetails(
     // Minimum shear reinforcement formula (IS 456 Cl. 26.5.1.6): Asv / (b * sv) >= 0.4 / (0.87 * fy)
     calculatedStirrupSpacingMm = (0.87 * fy * AsvMm2) / (0.4 * beamWidthMm);
   }
-  const stirrupSpacingMm = Math.max(75, Math.min(maxStirrupSpacingMm, Math.floor(calculatedStirrupSpacingMm / 25) * 25 || 150));
+  const stirrupSpacingMm = bro?.stirrupSpacingMm || Math.max(75, Math.min(maxStirrupSpacingMm, Math.floor(calculatedStirrupSpacingMm / 25) * 25 || 150));
   const stirrupsSafe = nominalShearStressTauV_Mpa <= maxShearStressTauCMax_Mpa;
 
   // Deflection Check (IS 456 Cl. 23.2.1)
@@ -1236,7 +1254,16 @@ export function calculateFloorBeamStructuralDetails(
     steelDensityKgPerM3,
     coverBlocksCount,
     status,
-    notes
+    notes,
+    rebarOverridden,
+    rebarChecks: beamRebarChecks({
+      widthMm: beamWidthMm, depthMm: beamDepthMm, coverMm: nominalCoverMm,
+      bottomBarDiaMm: bottomMainBarDiaMm, bottomBarCount: bottomMainBarCount,
+      topBarDiaMm: topAnchorBarDiaMm, topBarCount: topAnchorBarCount,
+      stirrupDiaMm, stirrupSpacingMm, stirrupLegs,
+      concreteGrade: config.concreteGrade, steelGrade: config.steelGrade,
+      muKnM: designBendingMomentMuKnM, vuKn: designShearForceVuKn,
+    })
   };
 }
 
@@ -1297,6 +1324,9 @@ export function calculatePillarStructuralDetails(
     customBeamWidthMm?: number;
     customBeamDepthMm?: number;
     customSlabThicknessMm?: number;
+    /** User reinforcement override: kept as entered (never auto-upsized) and checked against IS 456 */
+    rebarOverride?: ColumnRebarOverride;
+    circular?: boolean;
   }
 ): ColumnStructuralCalculation {
   // 1. Determine Surrounding Spans & Tributary Area (Handbook Section 3.3)
@@ -1537,7 +1567,10 @@ export function calculatePillarStructuralDetails(
   const requiredAscMm2 = Math.min(maxAscMm2, Math.max(minAscMm2, calculatedAscMm2));
 
   // Determine bar diameter and count
-  let providedBarDiaMm = overrides?.customBarDiaMm || (providedDepthMm >= 450 ? 25 : (providedDepthMm >= 380 ? 20 : 16));
+  const ro = overrides?.rebarOverride;
+  const rebarOverridden = hasColumnRebarOverride(ro);
+  const userDia = ro?.mainBarDiaMm || undefined, userCount = ro?.mainBarCount || undefined;
+  let providedBarDiaMm = userDia || overrides?.customBarDiaMm || (providedDepthMm >= 450 ? 25 : (providedDepthMm >= 380 ? 20 : 16));
   let barArea = (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4;
   let rawBarCount = Math.ceil(requiredAscMm2 / barArea);
   
@@ -1545,8 +1578,8 @@ export function calculatePillarStructuralDetails(
   let providedBarCount: number;
   let barArrangement: '4_bars_corner' | '6_bars_face' | '8_bars_face' | '12_bars_face' | '16_bars_face';
 
-  if (overrides?.customBarCount) {
-    providedBarCount = overrides.customBarCount;
+  if (userCount || overrides?.customBarCount) {
+    providedBarCount = (userCount || overrides?.customBarCount)!;
     barArrangement = providedBarCount === 4 
       ? '4_bars_corner' 
       : (providedBarCount === 6 ? '6_bars_face' : (providedBarCount <= 8 ? '8_bars_face' : (providedBarCount <= 12 ? '12_bars_face' : '16_bars_face')));
@@ -1567,8 +1600,10 @@ export function calculatePillarStructuralDetails(
     barArrangement = '16_bars_face';
   }
 
-  // If provided bars still don't satisfy Asc, upsize diameter up to 32mm
-  while ((providedBarCount * (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarDiaMm < 32) {
+  // If provided bars still don't satisfy Asc, upsize diameter up to 32mm (never when the user fixed the bars:
+  // a user override is kept as entered and the checks below report FAIL instead)
+  const userFixedBars = !!(userDia || userCount);
+  while (!userFixedBars && (providedBarCount* (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarDiaMm < 32) {
     if (providedBarDiaMm === 16) providedBarDiaMm = 20;
     else if (providedBarDiaMm === 20) providedBarDiaMm = 25;
     else if (providedBarDiaMm === 25) providedBarDiaMm = 32;
@@ -1576,7 +1611,7 @@ export function calculatePillarStructuralDetails(
   }
 
   // If still insufficient with 32mm, increase bar count in increments of 4
-  while ((providedBarCount * (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarCount < 32) {
+  while (!userFixedBars && (providedBarCount* (Math.PI * providedBarDiaMm * providedBarDiaMm) / 4) < requiredAscMm2 && providedBarCount < 32) {
     providedBarCount += 4;
   }
 
@@ -1600,13 +1635,13 @@ export function calculatePillarStructuralDetails(
   const mainSteelWeightKg = totalColStoreys * providedBarCount * mainBarCuttingLengthM * unitWeightMainKgPerM;
 
   // 5. Lateral Ties / Stirrups Design (IS 456 Cl. 26.5.3.2)
-  const stirrupDiaMm = Math.max(8, Math.ceil(providedBarDiaMm / 4));
+  const stirrupDiaMm = ro?.tieDiaMm || Math.max(8, Math.ceil(providedBarDiaMm / 4));
   const maxSpacingByCode = Math.min(providedWidthMm, providedDepthMm, 16 * providedBarDiaMm, 300);
-  const stirrupSpacingMm = Math.min(150, maxSpacingByCode);
-  const stirrupConfinementSpacingMm = 100; // top & bottom confinement zone
+  const stirrupSpacingMm = ro?.tieSpacingMm || Math.min(150, maxSpacingByCode);
+  const stirrupConfinementSpacingMm = Math.min(100, stirrupSpacingMm); // top & bottom confinement zone
 
   // Cut length for rectangular tie = 2*(w - 2*cover) + 2*(d - 2*cover) + 2*10*db_tie
-  const coverMm = 40; // column cover
+  const coverMm = ro?.coverMm || 40; // column cover (IS 456 Cl. 26.4.2.1 minimum 40 mm)
   const coreWidthM = Math.max(0.05, (providedWidthMm - 2 * coverMm) * 0.001);
   const coreDepthM = Math.max(0.05, (providedDepthMm - 2 * coverMm) * 0.001);
   const hookAllowanceM = 2 * (10 * stirrupDiaMm) * 0.001;
@@ -1758,6 +1793,13 @@ export function calculatePillarStructuralDetails(
     stirrupCount,
     stirrupWeightKg,
     totalSteelWeightKg,
+    coverMm,
+    rebarOverridden,
+    rebarChecks: columnRebarChecks({
+      widthMm: providedWidthMm, depthMm: providedDepthMm, circular: overrides?.circular,
+      mainBarDiaMm: providedBarDiaMm, mainBarCount: providedBarCount, tieDiaMm: stirrupDiaMm, tieSpacingMm: stirrupSpacingMm,
+      coverMm, fckMpa: fck, fyMpa: fy, factoredLoadKn: factoredUltimateLoadKn,
+    }),
 
     concreteVolumeM3,
     concreteVolumeCft,
@@ -1801,6 +1843,8 @@ export function calculateBuildingStructuralSummary(
     depth?: number;
     unit?: Unit;
     connectedWallIds?: string[];
+    shape?: 'square' | 'rectangle' | 'circular';
+    rebarOverride?: ColumnRebarOverride;
   }>,
   walls: Array<{
     id: string;
@@ -1958,7 +2002,9 @@ export function calculateBuildingStructuralSummary(
         singleFloorHeightM,
         customBeamWidthMm: configuredBeamWidthMm,
         customBeamDepthMm: configuredBeamDepthMm,
-        customSlabThicknessMm: configuredSlabThicknessMm
+        customSlabThicknessMm: configuredSlabThicknessMm,
+        rebarOverride: p.rebarOverride,
+        circular: p.shape === 'circular'
       }
     );
   });
@@ -2004,8 +2050,20 @@ export function calculateBuildingStructuralSummary(
       calc.providedWidthMm = shaft.widthMm;
       calc.providedDepthMm = shaft.depthMm;
       calc.providedGrossAreaAgMm2 = shaft.widthMm * shaft.depthMm;
-      calc.providedBarCount = Math.max(calc.providedBarCount, shaft.barCount);
-      calc.providedBarDiaMm = Math.max(calc.providedBarDiaMm, shaft.barDiaMm);
+      const userFixedBars = !!(p.rebarOverride?.mainBarCount || p.rebarOverride?.mainBarDiaMm);
+      if (!userFixedBars) {
+        calc.providedBarCount = Math.max(calc.providedBarCount, shaft.barCount);
+        calc.providedBarDiaMm = Math.max(calc.providedBarDiaMm, shaft.barDiaMm);
+      }
+      calc.providedAscMm2 = calc.providedBarCount * (Math.PI * calc.providedBarDiaMm ** 2) / 4;
+      calc.steelPercentageP = (calc.providedAscMm2 / calc.providedGrossAreaAgMm2) * 100;
+      calc.rebarChecks = columnRebarChecks({
+        widthMm: calc.providedWidthMm, depthMm: calc.providedDepthMm, circular: p.shape === 'circular',
+        mainBarDiaMm: calc.providedBarDiaMm, mainBarCount: calc.providedBarCount, tieDiaMm: calc.stirrupDiaMm,
+        tieSpacingMm: calc.stirrupSpacingMm, coverMm: calc.coverMm,
+        fckMpa: CONCRETE_MIX_DATABASE[config.concreteGrade].fckMpa, fyMpa: STEEL_YIELD_STRENGTH[config.steelGrade],
+        factoredLoadKn: calc.factoredUltimateLoadKn,
+      });
 
       const colWidthM = calc.providedWidthMm * 0.001;
       const colDepthM = calc.providedDepthMm * 0.001;
@@ -2287,7 +2345,8 @@ export function calculateBuildingStructuralSummary(
       {
         customWidthMm: customBeamWMm,
         customDepthMm: customBeamDMm,
-        isCustomSize: Boolean(customBeamWMm || customBeamDMm)
+        isCustomSize: Boolean(customBeamWMm || customBeamDMm),
+        rebarOverride: flOverrides?.beamRebar
       }
     );
     floorBeamCalculations.push(beamCalc);
@@ -2331,7 +2390,8 @@ export function calculateBuildingStructuralSummary(
       0.23,
       maxRoofSpanM / 2,
       roofSlabCalculation,
-      config
+      config,
+      { rebarOverride: (config.floorOverrides?.['roof'] || config.floorOverrides?.[`floor-${numFloors}`])?.beamRebar }
     );
   }
 

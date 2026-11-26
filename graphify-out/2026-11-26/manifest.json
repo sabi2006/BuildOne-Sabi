@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1795677042.6730127,
-    "seen": 1795677879.1701934,
-    "ast_hash": "343e46214ecc75916a999ca0268c1d16",
+    "mtime": 1795679501.3950071,
+    "seen": 1795679648.6081896,
+    "ast_hash": "4afa30824fc650f19e02312161195f62",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
