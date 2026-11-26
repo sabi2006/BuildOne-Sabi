@@ -422,6 +422,8 @@ export interface ColumnStructuralCalculation {
   concreteGrade: ConcreteGrade;
   steelGrade: SteelGrade;
   extraServiceLoadKn: number;
+  /** True when the user entered the column service load (it replaces the computed accumulation) */
+  loadSpecifiedByUser: boolean;
   effectiveLengthFactor: number;
 
   // Concrete Quantity (Handbook Section 6.1)
@@ -1382,6 +1384,8 @@ export function calculatePillarStructuralDetails(
     steelGrade?: SteelGrade;
     /** Extra service load on this column (machinery, tank, cantilever reaction...), kN, added to the accumulated load */
     extraServiceLoadKn?: number;
+    /** Service load of the column at the foundation top (kN), entered by the user: replaces the computed load */
+    manualServiceLoadKn?: number;
     /** Effective length factor k (IS 456 Table 28): l_eff = k × storey height (default 0.85) */
     effectiveLengthFactor?: number;
   }
@@ -1524,7 +1528,8 @@ export function calculatePillarStructuralDetails(
   // Total Accumulated Load across floors (Handbook Section 7.2)
   const numFloors = Math.max(1, overrides?.supportedFloors !== undefined ? overrides.supportedFloors : config.floorCount);
   const extraServiceLoadKn = Math.max(0, overrides?.extraServiceLoadKn || 0);
-  const totalServiceLoadKn = (numFloors * storeyServiceLoadKn) + roofLoadKn + extraServiceLoadKn;
+  const manualServiceLoadKn = overrides?.manualServiceLoadKn && overrides.manualServiceLoadKn > 0 ? overrides.manualServiceLoadKn : undefined;
+  const totalServiceLoadKn = manualServiceLoadKn ?? ((numFloors * storeyServiceLoadKn) + roofLoadKn + extraServiceLoadKn);
   const factoredUltimateLoadKn = 1.5 * totalServiceLoadKn; // Limit State factored design load Pu
 
   // 3. Preliminary Column Section Sizing (IS 456 Cl. 39.3 & Handbook Section 7.3)
@@ -1866,6 +1871,7 @@ export function calculatePillarStructuralDetails(
     concreteGrade: columnConcreteGrade,
     steelGrade: columnSteelGrade,
     extraServiceLoadKn,
+    loadSpecifiedByUser: manualServiceLoadKn !== undefined,
     effectiveLengthFactor,
 
     concreteVolumeM3,
@@ -1924,6 +1930,7 @@ export function calculateBuildingStructuralSummary(
     concreteGrade?: ConcreteGrade;
     steelGrade?: SteelGrade;
     extraServiceLoadKn?: number;
+    manualServiceLoadKn?: number;
     effectiveLengthFactor?: number;
   }>,
   walls: Array<{
@@ -2089,6 +2096,7 @@ export function calculateBuildingStructuralSummary(
         concreteGrade: p.concreteGrade,
         steelGrade: p.steelGrade,
         extraServiceLoadKn: p.extraServiceLoadKn,
+        manualServiceLoadKn: p.manualServiceLoadKn,
         effectiveLengthFactor: p.effectiveLengthFactor
       }
     );

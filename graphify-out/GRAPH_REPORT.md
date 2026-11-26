@@ -1,7 +1,7 @@
 # Graph Report - brick-factory  (2026-11-27)
 
 ## Corpus Check
-- 148 files · ~361,527 words
+- 148 files · ~362,417 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 2, .prisma 1, .ico 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a9142074`
+- Built from commit: `12f0a1d0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -532,16 +532,16 @@ Nodes (5): 7.2 Architectural Strategy & Data Model Contracts, Contract 1: `Pilla
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `calculateProject()` connect `calculateProject` to `brickCalculator.test.ts`, `integration.ts`, `types.ts`, `brickCalculator.ts`, `Pillar`, `2. Git Diff Review of the Five Changed Files`, `4. Deep Audit of the 16 Pre-existing Legacy Test Failures`, `3. Core Dependency Rules & Verification`, `2. Step-by-Step Dependency Trace`, `Graphify Automation & Developer Guide — Brick Factory`, `CalculatorContext.tsx`, `7. Phase 3: Final Implementation Plan & Test Checklist`, `toMeters`, `structuralCalculationService.ts`, `lateralFoundation.test.ts`, `2. Investigation of the 11 Legacy Test Failures (`brickCalculator.test.ts`)`, `calculateBuildingStructuralSummary`, `frameIntegration.test.ts`, `FoundationReport.tsx`, `2. Milestone-by-Milestone Architectural Changes`, `2. Git Diff Review of the Five Changed Files`, `VisualEstimatorResults.tsx`, `2. Phase-by-Phase Completion Breakdown`, `7.2 Architectural Strategy & Data Model Contracts`?**
-  _High betweenness centrality (0.131) - this node is a cross-community bridge._
+  _High betweenness centrality (0.107) - this node is a cross-community bridge._
 - **Are the 39 inferred relationships involving `calculateProject()` (e.g. with `3. Relevant Files and Functions` and `4. Synchronization (2D vs. Context vs. 3D)`) actually correct?**
   _`calculateProject()` has 39 INFERRED edges - model-reasoned connections that need verification._
 - **Should `brickCalculator.test.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.11379800853485064 - nodes in this community are weakly interconnected._
 - **Why does `splitWallByPillars()` connect `brickCalculator.test.ts` to `Full Building Construction Calculation & Structural Engineering Manual`, `brickCalculator.ts`, `BuildingEditor.tsx`, `3. Comprehensive Module Breakdown`, `VisualEstimator3D.tsx`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `BuildingEditor()` (e.g. with `4. Architecture Coverage & Boundary Analysis` and `6. Verification Summary Table`) actually correct?**
   _`BuildingEditor()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Full Building Construction Calculation & Structural Engineering Manual` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
-- **Why does `react` connect `VisualEstimator.tsx` to `layout.tsx`, `types.ts`, `package.json`, `package.json`, `BuildingEditor.tsx`, `Wall`, `app/page.tsx`, `SharedBrickWall.tsx`, `lucide-react`, `columnGeometry.ts`, `CalculatorContext.tsx`, `FoundationReport.tsx`, `VisualEstimator3D.tsx`, `BuildingModel`, `useCalculator`, `EditHistory`, `VisualEstimatorResults.tsx`, `StructuralConfigModal.tsx`?**
-  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+- **Why does `Module 2: Real-Time 3D WebGL Visualization Engine` connect `3. Comprehensive Module Breakdown` to `brickCalculator.test.ts`?**
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._

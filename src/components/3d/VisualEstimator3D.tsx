@@ -3406,6 +3406,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   showSoilBed={showSoilBed}
                   soilColor={({ dense_sand_gravel: '#b45309', loose_sand: '#eab308', stiff_clay: '#9a3412', soft_clay: '#78716c', black_cotton: '#1c1917', made_up_fill: '#57534e', rock: '#334155' } as Record<string, string>)[model.buildingConfig?.soilClassification || 'dense_sand_gravel'] || '#b45309'}
                   showRebar={showFootingRebar}
+                  finish={model.buildingConfig?.foundationDetails?.finish}
                   showLabels={showPillarLabels}
                   isConcreteSolid={isConcreteSolid}
                   isGhosted={isGhosted}

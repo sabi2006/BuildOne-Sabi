@@ -52,6 +52,8 @@ export interface LoadPathColumn {
   basementAddedServiceKn: number;
   serviceKn: number;
   factoredKn: number;
+  /** The user entered the service load of this column (it replaces the computed load) */
+  userSpecified?: boolean;
   /** 'tributary_area_accumulation' (host estimate) or 'frame_analysis' (3D gravity frame) */
   source: 'tributary_area_accumulation' | 'frame_analysis';
   /** The host's tributary-area service load for this column (kept for comparison when the frame is used) */
@@ -225,8 +227,8 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       levels.push({ level: label, addedKn: round(perStorey), cumulativeKn: round(cum) });
     }
     const structureService = c.totalServiceLoadKn;
-    // Decomposition must reproduce the host's column total
-    if (Math.abs(cum - structureService) > 0.5) {
+    // Decomposition must reproduce the host's column total (not applicable when the user entered the load)
+    if (!c.loadSpecifiedByUser && Math.abs(cum - structureService) > 0.5) {
       warnings.push(`${c.pillarName}: load decomposition (${round(cum)} kN) differs from the host column total (${round(structureService)} kN).`);
     }
     let basementAdd = 0;
@@ -239,12 +241,19 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     }
     const service = structureService + basementAdd;
     const factored = c.factoredUltimateLoadKn + 1.5 * basementAdd;
+    if (c.loadSpecifiedByUser) {
+      // the user's load replaces the roof / storey accumulation
+      levels.length = 0;
+      levels.push({ level: 'User-specified column service load (replaces the computed accumulation)', addedKn: round(structureService), cumulativeKn: round(structureService) });
+      if (basementAdd > 0) levels.push({ level: `Basement (${levelsBelow} level${levelsBelow > 1 ? 's' : ''}): column self-weight`, addedKn: round(basementAdd), cumulativeKn: round(service) });
+    }
     levels.push({ level: 'Foundation base (soil)', addedKn: 0, cumulativeKn: round(service) });
     return {
       id: c.pillarId, name: c.pillarName, xM: c.gridCoordinate.x, yM: c.gridCoordinate.y,
       widthMm: c.providedWidthMm, depthMm: c.providedDepthMm, role: c.role, supportedFloors: n,
       tributaryAreaM2: round(c.tributaryAreaM2), levels, structureServiceKn: round(structureService),
       basementAddedServiceKn: round(basementAdd), serviceKn: round(service), factoredKn: round(factored), source: 'tributary_area_accumulation',
+      userSpecified: c.loadSpecifiedByUser || undefined,
     };
   });
 
@@ -338,6 +347,30 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
         : ['Wind and seismic loads (IS 875 Part 3, IS 1893) are not included: the moments and shears are from gravity loads only (no sway). Enable them in the foundation details.']),
       'Frame idealisations: gross (uncracked) sections, fully fixed column bases, no foundation or soil flexibility, no staircase or slab-opening effects, simple 45° slab load transfer to beams.',
     ];
+  }
+
+  // user-specified column loads win over the frame reaction too: the case axial forces are scaled in proportion, moments and shears are kept
+  const specified = calcs.filter(c => c.loadSpecifiedByUser);
+  if (specified.length > 0) {
+    for (const calc of specified) {
+      const col = columns.find(k => k.id === calc.pillarId);
+      if (!col || col.source !== 'frame_analysis') continue;
+      const newStructure = calc.totalServiceLoadKn;
+      const oldStructure = col.structureServiceKn;
+      const f = oldStructure > 0 ? newStructure / oldStructure : 1;
+      col.structureServiceKn = round(newStructure);
+      col.serviceKn = round(newStructure + col.basementAddedServiceKn);
+      col.factoredKn = round(1.5 * newStructure + 1.5 * col.basementAddedServiceKn);
+      col.userSpecified = true;
+      if (col.caseForces) col.caseForces = Object.fromEntries(Object.entries(col.caseForces).map(([k, v]) => [k, v ? { ...v, axialKn: v.axialKn * f } : v])) as typeof col.caseForces;
+      col.combos = undefined;
+      col.levels = [
+        { level: 'User-specified column service load (replaces the frame reaction)', addedKn: round(newStructure), cumulativeKn: round(newStructure) },
+        ...(col.basementAddedServiceKn > 0 ? [{ level: 'Basement: column self-weight (not in the frame)', addedKn: round(col.basementAddedServiceKn), cumulativeKn: col.serviceKn }] : []),
+        { level: 'Foundation base (soil)', addedKn: 0, cumulativeKn: col.serviceKn },
+      ];
+    }
+    warnings.push(`${specified.length} column load${specified.length === 1 ? ' is' : 's are'} user-specified (${specified.map(c => c.pillarName).join(', ')}): the specified service load replaces the computed one${frameRequested ? '; frame moments and shears are kept, the case axial forces are scaled in proportion and the frame load combinations are not used for these columns' : ''}.`);
   }
 
   const totalService = columns.reduce((s, c) => s + c.serviceKn, 0);

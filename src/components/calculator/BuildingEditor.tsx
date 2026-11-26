@@ -2674,7 +2674,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   /** A locked pillar keeps its geometry: only these view/lock flags may change */
   const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
   /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
-  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'loadBearing', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor', 'columnType', 'colour', 'texture', 'roughness', 'metalness', 'steelWallMm', 'materialRate', 'finishRatePerM2']);
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'loadBearing', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor', 'manualServiceLoadKn', 'columnType', 'colour', 'texture', 'roughness', 'metalness', 'steelWallMm', 'materialRate', 'finishRatePerM2']);
   const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
   const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
 
@@ -7123,6 +7123,13 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                         <input type="number" min={0} step={5} placeholder="0" data-testid="pillar-extra-load" value={sp?.extraServiceLoadKn ?? ''}
                           onChange={e => updateActiveFloorPillar({ extraServiceLoadKn: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) })}
                           className="block w-full px-2 py-1 rounded border border-gray-300 text-xs" title="Service load not in the floor loads (tank, machine, cantilever reaction)" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-[10px] font-medium text-gray-500 mb-1">Column load override (service, kN)</label>
+                        <input type="number" min={0} step={10} placeholder="computed automatically" data-testid="pillar-manual-load" value={sp?.manualServiceLoadKn ?? ''}
+                          onChange={e => updateActiveFloorPillar({ manualServiceLoadKn: e.target.value === '' || Number(e.target.value) <= 0 ? undefined : Number(e.target.value) })}
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs" title="Service load of this column at the foundation top. It replaces the computed load for the column design and the footing." />
+                        <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">Replaces the automatic load (also the frame reaction) for the column check and the footing; frame moments are kept.</span>
                       </div>
                       <div className="col-span-2">
                         <label className="block text-[10px] font-medium text-gray-500 mb-1">End conditions (effective length, IS 456 Table 28)</label>

@@ -140,6 +140,8 @@ export interface Pillar {
   /** Split column: height of this segment's base above the column base (m; 0 = lowest segment) and its height (m; undefined = up to the top of the storey) */
   segmentBaseM?: number;
   segmentHeightM?: number;
+  /** Column service load (kN) at the foundation top, entered by the user: replaces the computed load for the column design and the foundation */
+  manualServiceLoadKn?: number;
   /** Load-bearing (structural) column. Default true; false = non-structural post: no footing is designed for it */
   loadBearing?: boolean;
   notes?: string;

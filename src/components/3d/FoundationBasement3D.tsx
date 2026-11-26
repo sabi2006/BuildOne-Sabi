@@ -40,6 +40,8 @@ interface Props {
   soilColor?: string;
   isConcreteSolid?: boolean;
   isGhosted?: boolean;
+  /** Concrete finish of the footings (3D look only) */
+  finish?: { kind: 'raw' | 'smooth' | 'painted'; colour?: string };
 }
 
 /** One draw call for all bars of a kind. */
@@ -104,7 +106,7 @@ function InstancedBars({ bars, color }: { bars: BarSpec[]; color: string }) {
   );
 }
 
-export function FoundationBasement3D({ geometry, showFoundation, showBasement, showRebar, showLabels, showSoilBed = false, soilColor = '#b45309', isConcreteSolid = false, isGhosted = false }: Props) {
+export function FoundationBasement3D({ geometry, showFoundation, showBasement, showRebar, showLabels, showSoilBed = false, soilColor = '#b45309', isConcreteSolid = false, isGhosted = false, finish }: Props) {
   const opacity = isGhosted ? 0.05 : (isConcreteSolid ? 1.0 : 0.35);
   const transparent = !isConcreteSolid;
 
@@ -149,7 +151,9 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
       )}
       {visibleBoxes.map(b => {
         const failed = b.status === 'FAIL';
-        const color = failed ? '#ef4444' : KIND_COLOR[b.kind];
+        const concreteKind = b.kind === 'footing' || b.kind === 'raft' || b.kind === 'pile_cap' || b.kind === 'pedestal';
+        const color = failed ? '#ef4444' : (concreteKind && finish ? (finish.colour || (finish.kind === 'painted' ? '#cbd5e1' : KIND_COLOR[b.kind])) : KIND_COLOR[b.kind]);
+        const roughness = concreteKind && finish ? (finish.kind === 'raw' ? 0.85 : finish.kind === 'smooth' ? 0.35 : 0.6) : 0.6;
         return (
           <mesh key={b.id} position={b.center} castShadow={b.kind !== 'pcc'} receiveShadow>
             {b.shape === 'cylinder'
@@ -159,7 +163,7 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
               : b.shape === 'frustum' && b.topSize
                 ? <FrustumGeometry base={[b.size[0], b.size[2]]} top={b.topSize} height={b.size[1]} />
                 : <boxGeometry args={b.size} />}
-            <meshStandardMaterial color={color} roughness={0.6} metalness={0.05} transparent={transparent} opacity={opacity} depthWrite={isConcreteSolid} />
+            <meshStandardMaterial color={color} roughness={roughness} metalness={0.05} transparent={transparent} opacity={opacity} depthWrite={isConcreteSolid} />
           </mesh>
         );
       })}

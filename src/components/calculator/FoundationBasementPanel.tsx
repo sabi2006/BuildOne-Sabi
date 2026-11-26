@@ -287,6 +287,25 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
           <NumField label="PCC Thickness" unit="mm" value={fd.pccThicknessMm} step={10} min={50}
             onChange={(v) => setFd({ pccThicknessMm: v ?? 100 })} />
           <SelectField
+            label="Concrete Finish (3D look)"
+            value={fd.finish?.kind ?? 'raw'}
+            onChange={(v) => setFd({ finish: v === 'raw' && !fd.finish?.colour ? undefined : { ...fd.finish, kind: v as 'raw' | 'smooth' | 'painted' } })}
+            options={[
+              { id: 'raw', label: 'Raw concrete' },
+              { id: 'smooth', label: 'Smooth / fair-face concrete' },
+              { id: 'painted', label: 'Painted / coated' },
+            ]}
+            hint="Appearance only: not priced"
+          />
+          <div>
+            <label className={labelCls}>Footing Colour</label>
+            <div className="flex items-center gap-2">
+              <input type="color" data-testid="foundation-colour" value={fd.finish?.colour ?? '#3b82f6'}
+                onChange={(e) => setFd({ finish: { kind: fd.finish?.kind ?? 'raw', colour: e.target.value } })} className="h-8 w-10 p-0 border border-slate-300 rounded" />
+              {fd.finish?.colour && <button type="button" className="text-xs text-slate-500 underline" onClick={() => setFd({ finish: fd.finish?.kind && fd.finish.kind !== 'raw' ? { kind: fd.finish.kind } : undefined })}>reset</button>}
+            </div>
+          </div>
+          <SelectField
             label="Isolated Footing Shape"
             value={fd.isolatedShape ?? 'flat'}
             onChange={(v) => setFd({ isolatedShape: v === 'flat' ? undefined : v })}

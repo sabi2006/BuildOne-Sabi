@@ -417,3 +417,36 @@ describe('Custom-shaped footings through the full pipeline', () => {
     });
   }
 });
+
+describe('User-specified column load', () => {
+  it('replaces the computed load for the column design and the footing, with a one-line trace', () => {
+    const cfg = { foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) };
+    const base = calculateProject(project(cfg, 3, INNER4)).foundationBasementDesign!;
+    const proj = project(cfg, 3, INNER4);
+    proj.pillars[0].manualServiceLoadKn = 1234;
+    const res = calculateProject(proj);
+    const d = res.foundationBasementDesign!;
+    const col = d.loadPath.columns.find(c => c.name === 'C1')!;
+    expect(col.serviceKn).toBeCloseTo(1234, 0);
+    expect(col.factoredKn).toBeCloseTo(1.5 * 1234, 0);
+    expect(col.userSpecified).toBe(true);
+    expect(col.levels[0].level).toContain('User-specified');
+    expect(base.loadPath.columns.find(c => c.name === 'C1')!.serviceKn).not.toBeCloseTo(1234, 0);
+    expect(d.warnings.join(' ')).toContain('user-specified (C1)');
+    expect(d.warnings.join(' ')).not.toContain('load decomposition');
+    const calc = res.structuralSummary!.pillarsCalculations.find(c => c.pillarName === 'C1')!;
+    expect(calc.totalServiceLoadKn).toBeCloseTo(1234, 6);
+    expect(calc.loadSpecifiedByUser).toBe(true);
+    // the other columns are untouched
+    expect(d.loadPath.columns.find(c => c.name === 'C2')!.serviceKn).toBeCloseTo(base.loadPath.columns.find(c => c.name === 'C2')!.serviceKn, 6);
+  });
+
+  it('with frame analysis the specified load wins, case axial forces are scaled, moments kept', () => {
+    const cfg = { foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'frame' }) };
+    const proj = project(cfg, 3, INNER4);
+    proj.pillars[0].manualServiceLoadKn = 900;
+    const col = calculateProject(proj).foundationBasementDesign!.loadPath.columns.find(c => c.name === 'C1')!;
+    expect(col.serviceKn).toBeCloseTo(900, 0);
+    expect(col.userSpecified).toBe(true);
+  });
+});
