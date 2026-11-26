@@ -21,6 +21,7 @@ import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
 import { columnVolumeM3 } from './columnGeometry';
+import { isUpperSegment, isSegmented, segmentHeightM } from './columnSegments';
 import { columnSurfaceAreaM2, steelColumnMassKg, timberColumnCft, hasAppliedFinish, type ColumnType, type ColumnFinish, type ColumnTexture } from './columnAppearance';
 import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
 
@@ -136,6 +137,9 @@ export interface Pillar {
   inclineX?: number;
   inclineY?: number;
   includeInEstimate?: boolean;
+  /** Split column: height of this segment's base above the column base (m; 0 = lowest segment) and its height (m; undefined = up to the top of the storey) */
+  segmentBaseM?: number;
+  segmentHeightM?: number;
   /** Load-bearing (structural) column. Default true; false = non-structural post: no footing is designed for it */
   loadBearing?: boolean;
   notes?: string;
@@ -967,6 +971,8 @@ export const detectPillarToPillarBeams = (
       buildingUnit = wallsOrUnit as Unit;
     }
   }
+
+  pillars = pillars.filter(p => !isUpperSegment(p)); // stacked segments are one column for the frame
 
   const getPillarPos = (p: Pillar): Coordinate => {
     const rawPos = p.position ? { x: p.position.x, y: p.position.y } : { x: p.x ?? 0, y: p.y ?? 0 };
@@ -2514,7 +2520,9 @@ export const calculatePillarsRcc = (
     const pD_M = p.shape === 'circular' ? pW_M : toMeters(p.depth, p.unit || 'in');
     // A frame column runs the full storey height (as drawn in 3D and used by the structural design), so the storey
     // height is used, not a separately stored pillar height that can go stale when the floor height changes.
-    const pH_M = toMeters(floorHeight, buildingUnit || 'ft');
+    const storeyH_M = toMeters(floorHeight, buildingUnit || 'ft');
+    const pH_M = isSegmented(p) ? segmentHeightM(p, storeyH_M) : storeyH_M;
+    const segFrac = storeyH_M > 0 ? pH_M / storeyH_M : 1;
     const pCount = p.count || 1;
 
     // surface finish (paint, cladding, steel / wood finish): applied area, priced only with a rate
@@ -2557,7 +2565,7 @@ export const calculatePillarsRcc = (
     const pMainWeightPerM = getSteelBarWeightPerMeter(mainBarDiaMm);
     const mainBarLengthM = pH_M * mainBarCount * lapFactor;
     const mainBarSteelKg = p.rebarConfig?.mainSteelWeightKg !== undefined
-      ? p.rebarConfig.mainSteelWeightKg * pCount
+      ? p.rebarConfig.mainSteelWeightKg * pCount * segFrac
       : (mainBarLengthM * pMainWeightPerM * pCount);
 
     // Stirrups (use dynamic structural rebarConfig if available)
@@ -2575,7 +2583,7 @@ export const calculatePillarsRcc = (
       stirrupCutLengthM = (2 * (coreW + coreD)) + 0.15; // 15cm hook
     }
     const stirrupSteelKg = p.rebarConfig?.stirrupSteelWeightKg !== undefined
-      ? p.rebarConfig.stirrupSteelWeightKg * pCount
+      ? p.rebarConfig.stirrupSteelWeightKg * pCount * segFrac
       : (stirrupCount * stirrupCutLengthM * pStirrupWeightPerM * pCount);
 
     totalSteelKg += (mainBarSteelKg + stirrupSteelKg);
@@ -5653,7 +5661,7 @@ export const calculateProject = (
         foundationBasementDesign = computeFoundationBasementDesign({
           summary: structuralSummary,
           config: bConfig,
-          pillars: effectivePillars.map(p => ({ id: p.id, floorId: p.floorId, name: p.name, loadBearing: p.loadBearing })),
+          pillars: effectivePillars.map(p => ({ id: p.id, floorId: p.floorId, name: p.name, loadBearing: p.loadBearing, segmentBaseM: p.segmentBaseM })),
           floors: (bModel.floors || []).map(f => ({ id: f.id })),
           buildingLengthM: bLengthM,
           buildingWidthM: bWidthM,

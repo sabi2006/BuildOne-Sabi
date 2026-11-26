@@ -16,6 +16,7 @@
 import type { FoundationDetailsConfig, BasementConfig } from './foundation/types';
 import { columnSectionAreaM2, columnSectionPolygon, columnVolumeM3, columnAxisLengthM, columnTaperRatio } from './columnGeometry';
 import { polygonPerimeter, polygonBounds } from './foundation/polygon';
+import { isSegmented, segmentHeightM } from './columnSegments';
 import { columnRebarChecks, hasColumnRebarOverride, beamRebarChecks, hasBeamRebarOverride, type ColumnRebarOverride, type BeamRebarOverride, type RebarCheck } from './rebarChecks';
 
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
@@ -1916,6 +1917,8 @@ export function calculateBuildingStructuralSummary(
     taperTopRatio?: number;
     inclineX?: number;
     inclineY?: number;
+    segmentBaseM?: number;
+    segmentHeightM?: number;
     columnType?: 'rcc' | 'steel' | 'timber';
     rebarOverride?: ColumnRebarOverride;
     concreteGrade?: ConcreteGrade;
@@ -2169,6 +2172,13 @@ export function calculateBuildingStructuralSummary(
         id: 'shaped_section', label: 'Shaped / tapered / inclined column', clause: 'IS 456 Cl. 25, 26.5.3', status: 'WARNING',
         note: 'Capacity and bar fit are checked on a rectangle of the same area as the smallest section (width / depth ratio kept); biaxial bending, the real centroid and the skew of an inclined axis are not analysed.',
       }];
+    }
+    // stacked column segment: quantities of this segment only
+    if (isSegmented(p)) {
+      const storeyH = p.height ? toMeters(p.height, p.heightUnit || 'ft') : 3.0;
+      const frac = storeyH > 0 ? Math.min(1, segmentHeightM(p, storeyH) / storeyH) : 1;
+      calc.concreteVolumeM3 *= frac; calc.concreteVolumeCft *= frac; calc.formworkAreaM2 *= frac;
+      calc.mainSteelWeightKg *= frac; calc.stirrupWeightKg *= frac; calc.totalSteelWeightKg *= frac;
     }
     // steel / timber columns: no RCC quantities; capacity is not designed (the load still travels to the foundation)
     if (p.columnType === 'steel' || p.columnType === 'timber') {

@@ -71,6 +71,7 @@ import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfig
 
 import { isSpecialColumn, columnTaperRatio, rotatedSectionPolygon } from '@/lib/columnGeometry';
 import { columnAppearance } from '@/lib/columnAppearance';
+import { splitColumn, mergeColumnSegments, columnSegments, isUpperSegment, segmentHeightM } from '@/lib/columnSegments';
 /** Unique id suffix for new elements (module scope: called from event handlers only) */
 /** Plan outline of a shaped column (rotation applied) in building units as an SVG points string; `top` gives the top face (taper + incline) */
 function specialColumnPlanPoints(p: Pillar, c: { x: number; y: number }, bUnit: Unit, top: boolean): string {
@@ -2814,7 +2815,12 @@ setModel(prev => {
                     depth: newDepth,
                     unit: newUnit,
                     shape: changes.shape || p.shape,
-                    isCustomSize: isSizeChange ? true : p.isCustomSize
+                    isCustomSize: isSizeChange ? true : p.isCustomSize,
+                    // the section profile and its rotation run up the shaft
+                    ...('sectionKind' in changes ? { sectionKind: changes.sectionKind } : {}),
+                    ...('sectionLegThickness' in changes ? { sectionLegThickness: changes.sectionLegThickness } : {}),
+                    ...('sectionPolygon' in changes ? { sectionPolygon: changes.sectionPolygon } : {}),
+                    ...('rotationDeg' in changes ? { rotationDeg: changes.rotationDeg } : {}),
                   };
                 }
               }
@@ -7250,6 +7256,60 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                   );
                 })()}
 
+                {/* ---------------- Column segments (split / merge) ---------------- */}
+                {selectedPillarId && (() => {
+                  const sp = findPillarById(selectedPillarId);
+                  if (!sp || !activeFloor) return null;
+                  const storeyM = toMeters(activeFloor.height, activeFloor.unit);
+                  const segs = columnSegments(model, selectedPillarId);
+                  const idx = segs.findIndex(x => x.id === selectedPillarId);
+                  const cur = segs[idx] ?? sp;
+                  const base = cur.segmentBaseM ?? 0;
+                  const top = base + segmentHeightM(cur, storeyM);
+                  const doSplit = () => {
+                    const input = document.querySelector<HTMLInputElement>('[data-testid="pillar-split-at"]');
+                    const at = Number(input?.value);
+                    if (!Number.isFinite(at)) { setPillarNotice({ msg: 'Enter the split height (m above the column base).', type: 'error' }); return; }
+                    const r = splitColumn(model, selectedPillarId, at, storeyM);
+                    if (!r.ok) { setPillarNotice({ msg: r.reason || 'Cannot split.', type: 'error' }); return; }
+                    setModel(r.model);
+                    setPillarNotice({ msg: `Column split at ${at.toFixed(2)} m.`, type: 'success' });
+                  };
+                  const doMerge = () => {
+                    const r = mergeColumnSegments(model, selectedPillarId);
+                    if (!r.ok) { setPillarNotice({ msg: r.reason || 'Cannot merge.', type: 'error' }); return; }
+                    setModel(r.model);
+                    setPillarNotice({ msg: 'Segments merged.', type: 'success' });
+                  };
+                  return (
+                    <div className="space-y-2 pt-1 border-t" data-testid="pillar-segments">
+                      <label className="block text-[10px] font-bold text-gray-600">Column segments</label>
+                      {segs.length > 1 && (
+                        <div className="flex flex-wrap gap-1">
+                          {segs.map((g, i) => (
+                            <button key={g.id} type="button" data-testid={`pillar-segment-${i}`}
+                              onClick={() => setSelectedPillarId(g.id)}
+                              className={cn('px-2 py-0.5 rounded border text-[10px]', g.id === selectedPillarId ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-700 border-gray-300')}>
+                              {(g.segmentBaseM ?? 0).toFixed(2)}-{((g.segmentBaseM ?? 0) + segmentHeightM(g, storeyM)).toFixed(2)} m
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-medium text-gray-500 mb-1">Split at (m above the base)</label>
+                          <input type="number" step="0.05" min={base} max={top} defaultValue={Math.round(((base + top) / 2) * 100) / 100} key={`${selectedPillarId}-${base}-${top}`} data-testid="pillar-split-at"
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" />
+                        </div>
+                        <button type="button" onClick={doSplit} data-testid="pillar-split" className="px-2 py-1 rounded bg-orange-600 text-white text-[10px] font-bold">Split</button>
+                        <button type="button" onClick={doMerge} disabled={segs.length < 2 || idx === segs.length - 1} data-testid="pillar-merge"
+                          className="px-2 py-1 rounded border border-gray-300 text-[10px] font-bold disabled:opacity-40">Merge up</button>
+                      </div>
+                      <span className="text-[9px] text-gray-500 leading-tight block">Segments can have their own section, material and finish. Quantities are per segment; the foundation, frame beams and plan treat the stack as one column.</span>
+                    </div>
+                  );
+                })()}
+
                 {/* ---------------- Section profile, rotation, taper, incline ---------------- */}
                 {selectedPillarId && (() => {
                   const sp = findPillarById(selectedPillarId);
@@ -9432,7 +9492,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                 })()
               ) : (
                 /* Active Floor Concrete Pillars (Floor-Scoped, Interactive) */
-                (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId).map(p => {
+                (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId && !isUpperSegment(p)).map(p => {
                   const effPos = getEffectivePillarPosition(p, allWalls, model.buildingUnit);
                   const drawW = convertUnit(p.width, p.unit, model.buildingUnit);
                   const drawD = convertUnit(p.depth, p.unit, model.buildingUnit);

@@ -122,7 +122,7 @@ export interface IntegrationOptions {
 export interface IntegrationArgs {
   summary: BuildingStructuralSummary;
   config: BuildingConfig;
-  pillars: Array<{ id: string; floorId?: string; name?: string; loadBearing?: boolean }>;
+  pillars: Array<{ id: string; floorId?: string; name?: string; loadBearing?: boolean; segmentBaseM?: number }>;
   floors: Array<{ id: string }>;
   buildingLengthM: number;
   buildingWidthM: number;
@@ -185,9 +185,10 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     !p.floorId || p.floorId === groundFloorId || p.floorId === 'floor-0' || p.floorId === 'ground';
   const nonStructural = args.pillars.filter(p => isGroundPillar(p) && p.loadBearing === false);
   const nonStructuralIds = new Set(nonStructural.map(p => p.id));
-  const groundIds = new Set(args.pillars.filter(p => isGroundPillar(p) && !nonStructuralIds.has(p.id)).map(p => p.id));
+  // upper segments of a split column are the same column: only the lowest segment is a column for the foundation
+  const groundIds = new Set(args.pillars.filter(p => isGroundPillar(p) && !nonStructuralIds.has(p.id) && !((p.segmentBaseM ?? 0) > 1e-9)).map(p => p.id));
   const calcs: ColumnStructuralCalculation[] = summary.pillarsCalculations.filter(c => groundIds.has(c.pillarId));
-  const excluded = summary.pillarsCalculations.length - calcs.length - nonStructural.length;
+  const excluded = summary.pillarsCalculations.length - calcs.length - nonStructural.length - args.pillars.filter(p => isGroundPillar(p) && (p.segmentBaseM ?? 0) > 1e-9).length;
 
   let capabilityGaps = [
     'Column moments, shear and load redistribution (no frame analysis exists): moment-dependent foundation checks are NOT_VERIFIED.',

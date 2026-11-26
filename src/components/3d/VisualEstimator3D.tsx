@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '../../lib/elementMeasurements';
 import { isSpecialColumn } from '../../lib/columnGeometry';
+import { isSegmented, segmentHeightM } from '../../lib/columnSegments';
 import { columnAppearance } from '../../lib/columnAppearance';
 import { getColumnTexture } from './columnTextures';
 import { ColumnGeometry } from './ColumnSolid';
@@ -4300,7 +4301,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                         // Every floor's pillar terminates flush with its Full Ring Beam & Full Roof top
                         const shaftHeightM = floorWallHeightM;
                         const jointHeightM = junction.fullRingBeamHeight;
-                        const totalColumnHeightM = shaftHeightM + jointHeightM;
+                        const fullColumnHeightM = shaftHeightM + jointHeightM;
+                        const totalColumnHeightM = isSegmented(p) ? segmentHeightM(p, fullColumnHeightM) : fullColumnHeightM;
 
                         const effPos = (matchGf && !p.isStoreyOverride)
                           ? getEffectivePillarPosition(matchGf, gfAllWalls, model.buildingUnit)
@@ -4320,7 +4322,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                         return (
                           <group 
                             key={`col-${floor.id}-${p.id || pIdx}`} 
-                            position={[toM(effPos.x), yOffset, -toM(effPos.y)]}
+                            position={[toM(effPos.x), yOffset + (p.segmentBaseM ?? 0), -toM(effPos.y)]}
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedPillar(isPillarSelected ? null : p);
@@ -4377,7 +4379,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                             )}
 
                             {/* 1b. 6mm RCC Surface Plaster Finish Layer: Exposed Faces ONLY, never embedded faces */}
-                            {showRccPlaster && !isSpecialColumn(p) && (() => {
+                            {showRccPlaster && !isSpecialColumn(p) && !isSegmented(p) && (() => {
                               const colPlasterThickMm = (floor.plaster?.rcc?.thickness ?? model.plaster?.rcc?.thickness ?? (floor.plaster as any)?.rccSurfaces?.thickness ?? 6);
                               const colPlasterUnit = (floor.plaster?.rcc?.unit ?? model.plaster?.rcc?.unit ?? 'mm');
                               const colPlasterThickM = Math.max(0.002, toMetersPlaster(colPlasterThickMm, colPlasterUnit));
@@ -4450,7 +4452,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                             )}
 
                             {/* Exposed Rebar Cage Mode: Shaft + Joint Pillar Reinforcement + 35cm Starter Lap */}
-                            {isPillarRebarActive && !isSpecialColumn(p) && (
+                            {isPillarRebarActive && !isSpecialColumn(p) && !isSegmented(p) && (
                               <group position={[0, totalColumnHeightM / 2, 0]}>
                                 <PillarRebarCage 
                                   wM={pW_M} 
