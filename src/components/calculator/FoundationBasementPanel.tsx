@@ -229,6 +229,23 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
             onChange={(v) => setFd({ cohesionKnM2: v })} />
           <NumField label="Friction Angle φ" unit="deg" value={fd.frictionAngleDeg} min={0} step={0.5}
             onChange={(v) => setFd({ frictionAngleDeg: v })} />
+          <SelectField
+            label="Foundation–Soil Contact"
+            value={fd.soilInterface?.contact ?? 'cast_on_soil'}
+            onChange={(v) => setFd({ soilInterface: v === 'cast_on_soil' && !fd.soilInterface?.baseFrictionAngleDeg && !fd.soilInterface?.adhesionKnM2 ? undefined : { ...fd.soilInterface, contact: v as 'cast_on_soil' | 'on_pcc' | 'membrane' } })}
+            options={[
+              { id: 'cast_on_soil', label: 'Concrete cast on soil (δ = φ)' },
+              { id: 'on_pcc', label: 'On a PCC bed' },
+              { id: 'membrane', label: 'On a waterproofing membrane (enter δ)' },
+            ]}
+            hint="Used by the sliding check"
+          />
+          <NumField label="Base Friction δ" unit="deg" value={fd.soilInterface?.baseFrictionAngleDeg} min={0} step={0.5}
+            hint="Blank = φ (not allowed for a membrane)"
+            onChange={(v) => setFd({ soilInterface: { ...(fd.soilInterface ?? { contact: 'cast_on_soil' }), baseFrictionAngleDeg: v } })} />
+          <NumField label="Base Adhesion" unit="kN/m²" value={fd.soilInterface?.adhesionKnM2} min={0} step={1}
+            hint="Blank = ignored"
+            onChange={(v) => setFd({ soilInterface: { ...(fd.soilInterface ?? { contact: 'cast_on_soil' }), adhesionKnM2: v } })} />
           <NumField label="Allowable Settlement" unit="mm" value={fd.allowableSettlementMm} min={0} step={5}
             hint="Limit for the settlement check"
             onChange={(v) => setFd({ allowableSettlementMm: v })} />

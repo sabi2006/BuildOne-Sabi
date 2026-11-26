@@ -133,6 +133,8 @@ export interface IntegrationArgs {
   };
   /** Storey heights from the ground up, metres (defaults to the configured floor height) */
   storeyHeightsM?: number[];
+  /** A waterproofing membrane is enabled under the footings (construction layers) */
+  waterproofingUnderBase?: boolean;
   options?: IntegrationOptions;
 }
 
@@ -479,6 +481,8 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     edgeThicknessMm: details.edgeThicknessMm,
     tieBeams: details.tieBeams,
     customFooting: details.customFooting,
+    soilInterface: details.soilInterface,
+    waterproofingUnderBase: args.waterproofingUnderBase,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,

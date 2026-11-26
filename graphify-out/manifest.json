@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1795716420.5988617,
-    "seen": 1795716445.0837207,
-    "ast_hash": "1722bd95bdfd47f980cdf7755b049104",
+    "mtime": 1795717278.9213672,
+    "seen": 1795717454.222157,
+    "ast_hash": "457ce30e5938521f7196de6c3d8270c8",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {
-    "mtime": 1795716944.3421528,
-    "seen": 1795717168.674932,
-    "ast_hash": "afd8d15c49b2d930b19b524d11b78411",
+    "mtime": 1795717317.789021,
+    "seen": 1795717454.2220888,
+    "ast_hash": "5063746bc2fc5dc181d7ad97b8e896ef",
     "semantic_hash": ""
   },
   "src/lib/foundation/basementDesignService.test.ts": {
@@ -600,9 +600,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795717072.477265,
-    "seen": 1795717168.6749928,
-    "ast_hash": "a3f89ce75edd101b7682e8d6b7e708cc",
+    "mtime": 1795717278.9166386,
+    "seen": 1795717454.2222385,
+    "ast_hash": "5600115f54bc280a821ad1985ff69c6c",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.ts": {
-    "mtime": 1795716717.5928984,
-    "seen": 1795717168.6750014,
-    "ast_hash": "c2b3fabece94703534c4b98c75360384",
+    "mtime": 1795717278.919517,
+    "seen": 1795717454.2222557,
+    "ast_hash": "61fdfd2b037b62a0023a40747293987a",
     "semantic_hash": ""
   },
   "src/lib/foundation/rcDesign.ts": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/types.ts": {
-    "mtime": 1795716717.5928984,
-    "seen": 1795717168.6750166,
-    "ast_hash": "7532ae784e2800fb4d388b4018db207c",
+    "mtime": 1795717278.9185102,
+    "seen": 1795717454.222293,
+    "ast_hash": "d96b971ef392807c73ef1c6b75892865",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.test.ts": {
@@ -822,21 +822,21 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/footingStability.test.ts": {
-    "mtime": 1795700080.3763244,
-    "seen": 1795700275.779967,
-    "ast_hash": "2a261442bc51e16ee4ab33e97b851304",
+    "mtime": 1795717306.3246045,
+    "seen": 1795717454.2222335,
+    "ast_hash": "7214fa82a21b468e2d1a77e5c34e7c44",
     "semantic_hash": ""
   },
   "src/lib/foundation/stability.test.ts": {
-    "mtime": 1795698028.320441,
-    "seen": 1795698301.2771077,
-    "ast_hash": "0180f60f247844d3111f2bc42f19adda",
+    "mtime": 1795717306.3466847,
+    "seen": 1795717454.2222836,
+    "ast_hash": "c04ff2c3274772953c872b9eb4636b92",
     "semantic_hash": ""
   },
   "src/lib/foundation/stability.ts": {
-    "mtime": 1795698028.1265006,
-    "seen": 1795698301.27711,
-    "ast_hash": "42a49177c27a5fae64c823cd2757e752",
+    "mtime": 1795717278.9166386,
+    "seen": 1795717454.2222857,
+    "ast_hash": "6259d973c3f32938661dcc1f80708ec7",
     "semantic_hash": ""
   },
   "src/lib/foundation/strapFooting.test.ts": {

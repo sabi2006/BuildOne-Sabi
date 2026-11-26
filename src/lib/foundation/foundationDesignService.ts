@@ -139,6 +139,10 @@ export interface FoundationDesignParams {
   edgeThicknessMm?: number;
   /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
   tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
+  /** Foundation–soil contact: base friction angle δ and adhesion (user inputs). 'membrane' (waterproofing / polythene under the base) needs a user δ. */
+  soilInterface?: { contact: 'cast_on_soil' | 'on_pcc' | 'membrane'; baseFrictionAngleDeg?: number; adhesionKnM2?: number };
+  /** A waterproofing membrane is laid under the footing base (construction layers): the concrete–soil friction may be lower */
+  waterproofingUnderBase?: boolean;
   /** Plan shape used when the requested type is 'custom' */
   customFooting?: CustomFootingConfig;
   options?: FoundationDesignOptions;
@@ -355,14 +359,28 @@ function footingStabilityChecks(cols: FoundationColumnInput[], p: FoundationDesi
   // sliding: worst service horizontal force on the whole footing
   const svc = [comb([[dl, 1], [ll, 1]]), ...lats.flatMap(l => [1, -1].map(sg => comb([[dl, 1], [ll, 1], [l.f, sg]])))];
   const H = Math.max(...svc.map(f => Math.hypot(f.shearXKn, f.shearYKn)));
-  if (p.frictionAngleDeg === undefined) {
+  const si = p.soilInterface;
+  const contact = si?.contact ?? 'cast_on_soil';
+  const userDelta = si?.baseFrictionAngleDeg;
+  const adhesionKnM2 = si?.adhesionKnM2 ?? 0;
+  const delta = userDelta ?? (contact === 'membrane' ? undefined : p.frictionAngleDeg);
+  if (delta === undefined) {
     cks.push({ id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2', status: 'NOT_VERIFIED',
-      note: `Enter the soil friction angle φ to check sliding. Horizontal force ${round(H, 1)} kN.` });
+      note: contact === 'membrane' && p.frictionAngleDeg !== undefined
+        ? `The base rests on a membrane: enter the base friction angle δ of that contact (a membrane can be much lower than φ). Horizontal force ${round(H, 1)} kN.`
+        : `Enter the soil friction angle φ to check sliding. Horizontal force ${round(H, 1)} kN.` });
   } else {
-    const fs = slidingFactorOfSafety({ deadVerticalKn: NDL, horizontalKn: H, frictionAngleDeg: p.frictionAngleDeg });
+    const adhesionKn = adhesionKnM2 * L * B;
+    const fs = slidingFactorOfSafety({ deadVerticalKn: NDL, horizontalKn: H, frictionAngleDeg: delta, adhesionKn });
+    const waterproofed = !!p.waterproofingUnderBase && contact !== 'membrane';
+    const contactNote = userDelta !== undefined ? `δ = ${userDelta}° entered by the user` : 'δ = φ assumed';
     cks.push({ id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2',
-      status: fs < 1.4 ? 'FAIL' : hasLateral ? 'PASS' : 'WARNING', demand: 1.4, capacity: Number.isFinite(fs) ? round(fs, 2) : undefined,
-      note: `μ = tan φ (concrete cast on soil, δ = φ assumed; adhesion ignored). H = ${round(H, 1)} kN, dead load incl. footing and soil = ${round(NDL, 1)} kN.${lateralNote}` });
+      status: fs < 1.4 ? 'FAIL' : (hasLateral && !waterproofed) ? 'PASS' : 'WARNING', demand: 1.4, capacity: Number.isFinite(fs) ? round(fs, 2) : undefined,
+      note: `μ = tan δ (${contactNote}; ${adhesionKnM2 > 0 ? `adhesion ${adhesionKnM2} kN/m² × base area = ${round(adhesionKn, 1)} kN` : 'adhesion ignored'}). H = ${round(H, 1)} kN, dead load incl. footing and soil = ${round(NDL, 1)} kN.${waterproofed ? ' A waterproofing membrane is laid under the base but the contact is set to concrete on soil: set the contact to "membrane" and enter its δ.' : ''}${lateralNote}` });
+  }
+  if (si || p.waterproofingUnderBase) {
+    cks.push({ id: 'soil_interface', label: 'Foundation–soil interface', status: contact === 'membrane' && userDelta === undefined ? 'NOT_VERIFIED' : (p.waterproofingUnderBase && contact !== 'membrane') ? 'WARNING' : 'PASS',
+      note: `Contact: ${contact === 'cast_on_soil' ? 'concrete cast on soil' : contact === 'on_pcc' ? 'on PCC bed' : 'on a membrane'}; base friction δ = ${delta === undefined ? 'not set' : `${delta}°${userDelta === undefined ? ' (= φ, assumed)' : ''}`}; adhesion ${adhesionKnM2 > 0 ? `${adhesionKnM2} kN/m²` : 'none'}.${p.waterproofingUnderBase && contact !== 'membrane' ? ' Waterproofing is laid under the base: confirm the contact.' : ''}` });
   }
 
   // overturning about each of the four footing edges

@@ -5603,6 +5603,7 @@ export const calculateProject = (
           buildingWidthM: bWidthM,
           frameGeometry: resolveFoundationDetails(bConfig.foundationDetails).columnLoadSource === 'frame' ? buildFrameGeometryForDesign(bModel, effectivePillars) : undefined,
           storeyHeightsM: (bModel.floors || []).map(f => toMeters(f.height, f.unit)),
+          waterproofingUnderBase: !!bModel.foundation?.layers?.waterproofing?.enabled,
           options: { manualFootingCount: (bModel.foundation?.footings || []).filter(f => f.isManual).length },
         });
       } catch (err) {

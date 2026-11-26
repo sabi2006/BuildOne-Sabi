@@ -102,6 +102,8 @@ export interface FoundationDetailsConfig {
   edgeThicknessMm?: number;
   /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
   tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
+  /** Foundation–soil contact (base friction δ, adhesion) used by the sliding check */
+  soilInterface?: { contact: 'cast_on_soil' | 'on_pcc' | 'membrane'; baseFrictionAngleDeg?: number; adhesionKnM2?: number };
   /** Plan shape for the 'custom' foundation type */
   customFooting?: { kind: 'L' | 'trapezoid' | 'polygon'; notchRatio?: number; endRatio?: number; aspect?: number; vertices?: Array<[number, number]> };
   poissonRatio?: number;

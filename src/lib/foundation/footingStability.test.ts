@@ -106,3 +106,47 @@ describe('Stability of combined footings and rafts', () => {
     for (const id of ['sliding', 'overturning', 'uplift']) expect(r.checks.find(c => c.id === id)!.status).not.toBe('NOT_VERIFIED');
   });
 });
+
+describe('Foundation–soil interface (sliding)', () => {
+  const cases = { DL: f(500), LL: f(200), EQX: f(30, 0, 40, 60, 0) };
+  const base = (extra: Partial<FoundationDesignParams>) => designIsolatedFooting(col(cases), params({ frictionAngleDeg: 30, ...extra }));
+  const dead = (e: ReturnType<typeof designIsolatedFooting>) => {
+    const L = e.sizeXM!, B = e.sizeYM!, D = e.depthMm! / 1000;
+    return 500 + 25 * L * B * D + 18 * L * B * (1.5 - D - 0.1);
+  };
+
+  it('no interface set: behaviour unchanged and no interface check is added', () => {
+    const e = base({});
+    expect(e.checks.find(c => c.id === 'soil_interface')).toBeUndefined();
+    expect(chk(e, 'sliding').status).toBe('PASS');
+  });
+
+  it('a user base friction angle δ replaces φ: FS = tan δ · 0.9 N / H (hand value)', () => {
+    const e = base({ soilInterface: { contact: 'on_pcc', baseFrictionAngleDeg: 20 } });
+    expect(chk(e, 'sliding').capacity).toBeCloseTo((Math.tan((20 * Math.PI) / 180) * 0.9 * dead(e)) / 60, 2);
+    expect(chk(e, 'soil_interface').status).toBe('PASS');
+  });
+
+  it('adhesion adds c_a × base area, not reduced by the 0.9 factor', () => {
+    const e = base({ soilInterface: { contact: 'cast_on_soil', adhesionKnM2: 5 } });
+    const A = e.sizeXM! * e.sizeYM!;
+    expect(chk(e, 'sliding').capacity).toBeCloseTo((Math.tan(Math.PI / 6) * 0.9 * dead(e) + 5 * A) / 60, 2);
+  });
+
+  it('a membrane under the base without a user δ is NOT_VERIFIED (never assumes φ)', () => {
+    const e = base({ soilInterface: { contact: 'membrane' } });
+    expect(chk(e, 'sliding').status).toBe('NOT_VERIFIED');
+    expect(chk(e, 'soil_interface').status).toBe('NOT_VERIFIED');
+  });
+
+  it('a low membrane friction (δ = 8°) fails sliding that φ = 30° would pass', () => {
+    const e = base({ soilInterface: { contact: 'membrane', baseFrictionAngleDeg: 8 } });
+    expect(chk(e, 'sliding').status).toBe('FAIL');
+  });
+
+  it('waterproofing under the base with the contact left as concrete-on-soil downgrades sliding to WARNING and asks to confirm', () => {
+    const e = base({ waterproofingUnderBase: true });
+    expect(chk(e, 'sliding').status).toBe('WARNING');
+    expect(chk(e, 'soil_interface').status).toBe('WARNING');
+  });
+});

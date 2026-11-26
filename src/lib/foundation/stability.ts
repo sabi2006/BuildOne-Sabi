@@ -35,10 +35,10 @@ export function elasticSettlementMm(a: { qNetKnM2: number; lengthM: number; widt
   return (Math.max(0, a.qNetKnM2) * B * (1 - a.poissonRatio ** 2) * rigidInfluenceFactor(L / B) / a.soilModulusKnM2) * 1000;
 }
 
-/** Sliding factor of safety (IS 456 Cl. 20.2): μ · 0.9 · N_dead / H */
-export function slidingFactorOfSafety(a: { deadVerticalKn: number; horizontalKn: number; frictionAngleDeg: number }): number {
+/** Sliding factor of safety (IS 456 Cl. 20.2): (μ · 0.9 · N_dead + adhesion force) / H; adhesion is not reduced by the 0.9 factor */
+export function slidingFactorOfSafety(a: { deadVerticalKn: number; horizontalKn: number; frictionAngleDeg: number; adhesionKn?: number }): number {
   if (a.horizontalKn <= 1e-9) return Infinity;
-  return (Math.tan((a.frictionAngleDeg * Math.PI) / 180) * 0.9 * Math.max(0, a.deadVerticalKn)) / a.horizontalKn;
+  return (Math.tan((a.frictionAngleDeg * Math.PI) / 180) * 0.9 * Math.max(0, a.deadVerticalKn) + Math.max(0, a.adhesionKn ?? 0)) / a.horizontalKn;
 }
 
 /** Overturning (IS 456 Cl. 20.1): returns restoring (0.9 × dead) and required (1.2 dead + 1.4 imposed) moments */

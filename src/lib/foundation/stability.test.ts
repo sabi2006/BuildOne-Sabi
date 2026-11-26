@@ -40,3 +40,9 @@ describe('Stability (IS 456 Cl. 20)', () => {
     expect(upliftCheck({ resistingWeightKn: 100, upliftKn: -20 }).ok).toBe(true);
   });
 });
+
+describe('Sliding with adhesion', () => {
+  it('(tan 30° · 0.9 · 500 + 40) / 100', () => {
+    expect(slidingFactorOfSafety({ deadVerticalKn: 500, horizontalKn: 100, frictionAngleDeg: 30, adhesionKn: 40 })).toBeCloseTo((Math.tan(Math.PI / 6) * 450 + 40) / 100, 9);
+  });
+});
