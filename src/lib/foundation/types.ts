@@ -97,6 +97,9 @@ export interface FoundationDetailsConfig {
   allowableSettlementMm?: number;
   /** Soil modulus of elasticity Es, MPa, and Poisson's ratio (from the soil report) for the settlement check */
   soilModulusMpa?: number;
+  /** Isolated footing profile (default flat) and edge thickness, mm (≥ 150, IS 456 Cl. 34.1.2) */
+  isolatedShape?: 'flat' | 'sloped' | 'stepped';
+  edgeThicknessMm?: number;
   poissonRatio?: number;
   investigation: SoilInvestigationData;
 

@@ -268,6 +268,20 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
             onChange={(v) => setFd({ clearCoverMm: v ?? 50 })} />
           <NumField label="PCC Thickness" unit="mm" value={fd.pccThicknessMm} step={10} min={50}
             onChange={(v) => setFd({ pccThicknessMm: v ?? 100 })} />
+          <SelectField
+            label="Isolated Footing Shape"
+            value={fd.isolatedShape ?? 'flat'}
+            onChange={(v) => setFd({ isolatedShape: v === 'flat' ? undefined : v })}
+            options={[
+              { id: 'flat', label: 'Flat slab (uniform thickness)' },
+              { id: 'sloped', label: 'Sloped (thinner at the edge)' },
+              { id: 'stepped', label: 'Stepped (two steps)' },
+            ]}
+            hint="Sloped / stepped save concrete; checked at the reduced sections"
+          />
+          <NumField label="Edge Thickness" unit="mm" value={fd.edgeThicknessMm} min={150} step={25}
+            hint="Sloped / stepped footings: ≥ 150 mm (IS 456 Cl. 34.1.2); blank = 150"
+            onChange={(v) => setFd({ edgeThicknessMm: v === undefined ? undefined : Math.max(150, v) })} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

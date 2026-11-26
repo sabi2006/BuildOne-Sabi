@@ -43,6 +43,26 @@ interface Props {
 }
 
 /** One draw call for all bars of a kind. */
+
+/** Rectangular frustum (sloped footing): base w × d at the bottom, top tw × td, centred, height h */
+function FrustumGeometry({ base, top, height }: { base: [number, number]; top: [number, number]; height: number }) {
+  const geom = React.useMemo(() => {
+    const [w, d] = base, [tw, td] = top, h = height / 2;
+    const v = [
+      [-w / 2, -h, -d / 2], [w / 2, -h, -d / 2], [w / 2, -h, d / 2], [-w / 2, -h, d / 2],
+      [-tw / 2, h, -td / 2], [tw / 2, h, -td / 2], [tw / 2, h, td / 2], [-tw / 2, h, td / 2],
+    ];
+    const faces = [[0, 2, 1], [0, 3, 2], [4, 5, 6], [4, 6, 7], [0, 1, 5], [0, 5, 4], [1, 2, 6], [1, 6, 5], [2, 3, 7], [2, 7, 6], [3, 0, 4], [3, 4, 7]];
+    const pos: number[] = [];
+    faces.forEach(f => f.forEach(i => pos.push(...v[i])));
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.computeVertexNormals();
+    return g;
+  }, [base, top, height]);
+  return <primitive object={geom} attach="geometry" />;
+}
+
 function InstancedBars({ bars, color }: { bars: BarSpec[]; color: string }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => new THREE.CylinderGeometry(1, 1, 1, 8), []);
@@ -121,7 +141,9 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
           <mesh key={b.id} position={b.center} castShadow={b.kind !== 'pcc'} receiveShadow>
             {b.shape === 'cylinder'
               ? <cylinderGeometry args={[b.size[0] / 2, b.size[0] / 2, b.size[1], 16]} />
-              : <boxGeometry args={b.size} />}
+              : b.shape === 'frustum' && b.topSize
+                ? <FrustumGeometry base={[b.size[0], b.size[2]]} top={b.topSize} height={b.size[1]} />
+                : <boxGeometry args={b.size} />}
             <meshStandardMaterial color={color} roughness={0.6} metalness={0.05} transparent={transparent} opacity={opacity} depthWrite={isConcreteSolid} />
           </mesh>
         );

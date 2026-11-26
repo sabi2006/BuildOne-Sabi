@@ -851,13 +851,14 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
     return `F${n}`;
   };
 
-  const handleCreateManualFooting = (coord: Coordinate) => {
+  const handleCreateManualFooting = (coord: Coordinate, drawnSize?: { length: number; width: number }) => {
     const nextLabel = getNextFootingLabel();
     const fId = `footing-manual-${Date.now()}`;
     const stubH = autoCreateStub ? 2.0 : 0.0;
     const isCommon = model.foundation?.useCommonFootingSize && model.foundation?.commonFootingSize;
-    const fLen = isCommon ? (model.foundation!.commonFootingSize!.length || 4.0) : (model.foundation?.defaultFootingLength || 4.0);
-    const fWid = isCommon ? (model.foundation!.commonFootingSize!.width || 4.0) : (model.foundation?.defaultFootingWidth || 4.0);
+    if (drawnSize && isCommon) setPillarNotice({ msg: 'Common footing size is ON: the drawn size is replaced by the common size.', type: 'info' });
+    const fLen = isCommon ? (model.foundation!.commonFootingSize!.length || 4.0) : (drawnSize ? Number(drawnSize.length.toFixed(2)) : (model.foundation?.defaultFootingLength || 4.0));
+    const fWid = isCommon ? (model.foundation!.commonFootingSize!.width || 4.0) : (drawnSize ? Number(drawnSize.width.toFixed(2)) : (model.foundation?.defaultFootingWidth || 4.0));
     const fDep = isCommon ? (model.foundation!.commonFootingSize!.depth || 1.0) : (model.foundation?.defaultFootingDepth || 1.0);
     const pccOffset = 0.5;
     const pccLen = fLen + 2 * pccOffset;
@@ -1553,6 +1554,10 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   const [pillarPreview, setPillarPreview] = useState<{valid: boolean; coord: Coordinate | null; message?: string}>({ valid: true, coord: null });
   const svgRef = useRef<SVGSVGElement>(null);
   const pillarPressRef = useRef<{ id: string; wasSelected: boolean; x: number; y: number } | null>(null);
+  // drag-to-draw a footing footprint (foundation placing mode)
+  const footDrawStartRef = useRef<Coordinate | null>(null);
+  const suppressFootClickRef = useRef(false);
+  const [footDrawRect, setFootDrawRect] = useState<{ a: Coordinate; b: Coordinate } | null>(null);
   // multi-selection (Shift / Ctrl / Cmd + click) and property clipboards
   const [multiPillarIds, setMultiPillarIds] = useState<string[]>([]);
   const [pillarClipboard, setPillarClipboard] = useState<PillarPropertyClipboard | null>(null);
@@ -3770,7 +3775,8 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
   };
 
   const handleSvgClick = (e: React.MouseEvent) => {
-if (activeMode === 'foundation') {
+    if (suppressFootClickRef.current) { suppressFootClickRef.current = false; return; }
+    if (activeMode === 'foundation') {
       if (isPlacingFooting) {
         const fCoords = getFoundationCoords(e, foundationSnapMode);
         if (fCoords) {
@@ -5335,6 +5341,35 @@ if (activeMode === 'foundation') {
                         Bed: -{totalDepth.toFixed(2)} ft
                       </span>
                     </div>
+
+                    {/* Direct elevation control: founding depth (bed level) below ground floor level */}
+                    <div className="grid grid-cols-2 gap-2 items-end" data-testid="footing-elevation">
+                      <div>
+                        <label className="block text-[9px] font-bold text-gray-700 mb-0.5">Founding depth (bed level, ft)</label>
+                        <input
+                          type="number" step="0.25" min={fD + pccT + sandD + (hasStub ? 0.25 : 0)} max="20"
+                          value={Number(totalDepth.toFixed(2))}
+                          disabled={!hasStub}
+                          data-testid="footing-founding-depth"
+                          title={hasStub ? 'Sets the stub height so the bed is at this depth' : 'Add a column stub to lower the footing'}
+                          onChange={e => {
+                            const val = Number(e.target.value);
+                            const stubNew = Math.max(0.25, val - fD - pccT - sandD);
+                            handleUpdateFooting(selectedFooting.id, {
+                              columnStubHeight: stubNew,
+                              excavationDepth: stubNew + fD + pccT + sandD,
+                              foundationBedLevel: -(stubNew + fD + pccT + sandD)
+                            });
+                          }}
+                          className="block w-full px-1.5 py-1 text-xs border border-sky-300 rounded bg-white font-bold text-sky-950 disabled:bg-gray-100 disabled:text-gray-500"
+                        />
+                      </div>
+                      <div className="text-[9px] font-mono text-sky-800 leading-tight">
+                        Footing top: {hasStub ? `-${stubH.toFixed(2)}` : '0.00'} ft<br />
+                        Footing bottom: -{((hasStub ? stubH : 0) + fD).toFixed(2)} ft
+                      </div>
+                    </div>
+                    {!hasStub && <div className="text-[8.5px] text-gray-500">Without a column stub the footing top is at ground-floor level: add a stub to set a deeper founding level.</div>}
 
                     {/* KEY CONTROL: Column Stub Height */}
                     <div className="bg-white p-2 rounded border-2 border-sky-400 shadow-xs">
@@ -8268,8 +8303,34 @@ if (activeMode === 'foundation') {
             className="w-full h-full" 
             preserveAspectRatio="xMidYMid meet"
             onClick={handleSvgClick}
-            onMouseMove={handleSvgMouseMove}
-            onMouseLeave={() => setCanvasCursor(null)}
+            onMouseMove={(e) => {
+              if (footDrawStartRef.current) {
+                const c = getFoundationCoords(e, foundationSnapMode);
+                if (c) setFootDrawRect({ a: footDrawStartRef.current, b: c });
+              }
+              handleSvgMouseMove(e);
+            }}
+            onMouseDown={(e) => {
+              if (activeMode === 'foundation' && isPlacingFooting) {
+                const c = getFoundationCoords(e, foundationSnapMode);
+                if (c) { footDrawStartRef.current = c; setFootDrawRect({ a: c, b: c }); }
+              }
+            }}
+            onMouseUp={(e) => {
+              const a = footDrawStartRef.current;
+              footDrawStartRef.current = null;
+              setFootDrawRect(null);
+              if (!a) return;
+              const b = getFoundationCoords(e, foundationSnapMode);
+              if (!b) return;
+              const len = Math.abs(b.x - a.x), wid = Math.abs(b.y - a.y);
+              if (len >= 1 && wid >= 1) {
+                // a drag draws the footing; the click that follows must not add a second, default-size footing
+                suppressFootClickRef.current = true;
+                handleCreateManualFooting({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, { length: len, width: wid });
+              }
+            }}
+            onMouseLeave={() => { setCanvasCursor(null); footDrawStartRef.current = null; setFootDrawRect(null); }}
           >
             <g transform={`scale(1, -1) translate(0, -${model.buildingWidth})`}>
               {/* Plot Boundary (Light Green) */}
@@ -8277,6 +8338,11 @@ if (activeMode === 'foundation') {
 
               {/* Building Boundary Highlight (Main House Area) */}
               <rect x={0} y={0} width={model.buildingLength} height={model.buildingWidth} fill="#ffffff" stroke="#fcd34d" strokeWidth="0.3" strokeDasharray="2,2" />
+              {footDrawRect && (
+                <rect data-testid="footing-draw-preview" x={Math.min(footDrawRect.a.x, footDrawRect.b.x)} y={Math.min(footDrawRect.a.y, footDrawRect.b.y)}
+                  width={Math.abs(footDrawRect.b.x - footDrawRect.a.x)} height={Math.abs(footDrawRect.b.y - footDrawRect.a.y)}
+                  fill="#f59e0b" fillOpacity="0.15" stroke="#d97706" strokeWidth="0.15" strokeDasharray="0.5,0.3" className="pointer-events-none" />
+              )}
 
               {/* Grid Lines (1ft marks) & X-Axis Labels */}
               {Array.from({length: Math.ceil(model.buildingLength) + 41}).map((_, idx) => {

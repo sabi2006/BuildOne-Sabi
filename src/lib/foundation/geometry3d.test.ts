@@ -365,3 +365,22 @@ describe('Strip footings through the building pipeline (3 × 3 grid)', () => {
     expect(d.bbs!.rows.some(r => r.member.startsWith('SF-ROW-') && r.mark.endsWith('-TD'))).toBe(true);
   });
 });
+
+describe('Sloped and stepped footings in 3D', () => {
+  for (const shape of ['sloped', 'stepped'] as const) {
+    it(`${shape}: lower slab + ${shape === 'sloped' ? 'frustum' : 'upper step'} per footing, no overlapping solids, pedestal on top`, () => {
+      const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8, isolatedShape: shape, edgeThicknessMm: 200 } as any });
+      const g = geo(d, sceneCols(d));
+      const shaped = d.foundation!.elements.filter(e => e.profile);
+      expect(shaped.length).toBeGreaterThan(0);
+      for (const el of shaped) {
+        const upper = g.boxes.find(b => b.id === `${el.id}-rcc2`)!;
+        expect(upper).toBeDefined();
+        if (shape === 'sloped') { expect(upper.shape).toBe('frustum'); expect(upper.topSize![0]).toBeCloseTo(el.profile!.topXM, 6); }
+        const ped = g.boxes.find(b => b.kind === 'pedestal' && b.elementId === el.id)!;
+        expect(ped.center[1] - ped.size[1] / 2).toBeCloseTo(upper.center[1] + upper.size[1] / 2, 3);
+      }
+      expect(findBoxOverlaps(g.boxes)).toEqual([]);
+    });
+  }
+});

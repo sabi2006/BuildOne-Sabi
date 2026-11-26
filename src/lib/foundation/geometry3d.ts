@@ -29,7 +29,9 @@ export interface BoxSpec {
   elementId: string;
   kind: BoxKind;
   group: GeometryGroup;
-  shape: 'box' | 'cylinder';
+  shape: 'box' | 'cylinder' | 'frustum';
+  /** frustum only: plan size of the top face (x, z); the base is size[0] × size[2] */
+  topSize?: [number, number];
   center: [number, number, number];
   size: [number, number, number];
   status: DesignStatus;
@@ -211,7 +213,22 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       }
       pccRects.set(el.id, pr);
       boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
-      boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label }));
+      if (el.profile && el.system === 'isolated') {
+        // sloped / stepped: lower slab of the edge thickness + frustum (sloped) or upper step (stepped)
+        const De = el.profile.edgeThicknessMm / 1000;
+        const cxm = (r.x0 + r.x1) / 2, czm = (r.z0 + r.z1) / 2;
+        boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccBottom + De, r.z0, r.z1, el.status, { label }));
+        const tx = el.profile.topXM, tz = el.profile.topYM;
+        if (el.profile.kind === 'stepped') {
+          boxes.push(box(`${el.id}-rcc2`, el.id, kind, group, cxm - tx / 2, cxm + tx / 2, yRccBottom + De, yRccTop, czm - tz / 2, czm + tz / 2, el.status, { label: `${el.id} upper step` }));
+        } else {
+          const fr = box(`${el.id}-rcc2`, el.id, kind, group, r.x0, r.x1, yRccBottom + De, yRccTop, r.z0, r.z1, el.status, { label: `${el.id} slope` });
+          fr.shape = 'frustum'; fr.topSize = [tx, tz];
+          boxes.push(fr);
+        }
+      } else {
+        boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label }));
+      }
     } else {
       // union with the base slab: only the part of the footing that rises above the slab is drawn
       if (slabT !== undefined) {

@@ -121,6 +121,9 @@ export interface FoundationDesignParams {
   cohesiveSoil?: boolean;
   /** Soil friction angle φ (degrees) for base sliding resistance (absent → sliding NOT_VERIFIED) */
   frictionAngleDeg?: number;
+  /** Isolated footing profile (default flat) and edge thickness for sloped / stepped footings (mm, ≥ 150, IS 456 Cl. 34.1.2) */
+  isolatedShape?: 'flat' | 'sloped' | 'stepped';
+  edgeThicknessMm?: number;
   options?: FoundationDesignOptions;
 }
 
@@ -165,6 +168,8 @@ export interface RebarLayer {
 export interface FoundationElementResult extends StructuralElementIdentity {
   system: FoundationSystem;
   columnIds: string[];
+  /** Sloped / stepped isolated footing: thickness at the edge and the plan of the top platform / upper step (m) */
+  profile?: { kind: 'sloped' | 'stepped'; edgeThicknessMm: number; topXM: number; topYM: number };
   plan?: { x0: number; x1: number; y0: number; y1: number };
   sizeXM?: number;
   sizeYM?: number;
@@ -524,7 +529,7 @@ export function designIsolatedFooting(
     const mx = (qu * axM * axM) / 2; // kN·m per m, steel along x
     const my = (qu * ayM * ayM) / 2; // steel along y
 
-    for (const phi of [10, 12, 16, 20, 25] as const) {
+    phiLoop: for (const phi of [10, 12, 16, 20, 25] as const) {
       const d = D - cover - 1.5 * phi;
       if (d <= 50) continue;
       const lim = muLimitKnM(1000, d, p.concreteGrade, p.steelGrade);
@@ -559,21 +564,120 @@ export function designIsolatedFooting(
       const dE = D - cover - 1.5 * phiE;
       const limE = muLimitKnM(1000, dE, p.concreteGrade, p.steelGrade);
       const reqAst = (m: number) => Math.max(m <= limE ? flexureAstMm2(m, 1000, dE, p.concreteGrade, p.steelGrade).astMm2 : Infinity, minAst);
-      const astXE = ovOn ? reqAst(mx) : astX, astYE = ovOn ? reqAst(my) : astY;
+      let astXE = ovOn ? reqAst(mx) : astX, astYE = ovOn ? reqAst(my) : astY;
       const userBars = (astReq: number, auto: BarsPerMetre): BarsPerMetre | null => {
         if (!ovOn) return auto;
         const sp = ov!.spacingMm || selectBarsPerMetre(astReq, dE, [phiE], 50)?.spacingMm;
         return sp ? { diaMm: phiE, spacingMm: sp, astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / sp } : null;
       };
-      const bxE = userBars(astXE, bx) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
-      const byE = userBars(astYE, by) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
-      const tvXE = (qu * Math.max(0, axM - dE / 1000)) / dE, tvYE = (qu * Math.max(0, ayM - dE / 1000)) / dE;
-      const tcXE = tauCMpa((100 * bxE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
-      const tcYE = tauCMpa((100 * byE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
+      let bxE = userBars(astXE, bx) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
+      let byE = userBars(astYE, by) ?? { diaMm: phiE, spacingMm: Math.min(3 * dE, 300), astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / Math.min(3 * dE, 300) };
+      let tvXE = (qu * Math.max(0, axM - dE / 1000)) / dE, tvYE = (qu * Math.max(0, ayM - dE / 1000)) / dE;
+      let tcXE = tauCMpa((100 * bxE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
+      let tcYE = tauCMpa((100 * byE.astProvidedMm2PerM) / (1000 * dE), p.concreteGrade);
       const cpE = criticalPerimeter(cx, cy, lMm / 2, bMm / 2, dE, { x0: 0, x1: lMm, y0: 0, y1: bMm });
-      const tvpE = (Math.max(0, ...ultCombos.map(c => c.P - quOf(c) * cpE.areaM2)) * 1000) / (cpE.b0Mm * dE);
+      let tvpE = (Math.max(0, ...ultCombos.map(c => c.P - quOf(c) * cpE.areaM2)) * 1000) / (cpE.b0Mm * dE);
       const maxSpE = Math.min(3 * dE, 300);
+
+      // ---- sloped / stepped profile (IS 456 Cl. 34.1.2 edge ≥ 150 mm): checked on this thickness, else next D
+      const shape = p.isolatedShape ?? 'flat';
+      let profile: FoundationElementResult['profile'];
+      let concreteM3Shape = L * B * Dm, formworkM2Shape = 2 * (L + B) * Dm;
+      const shapeChecks: DesignCheck[] = [];
+      let limXS = limE, limYS = limE;
+      if (shape !== 'flat') {
+        const De0 = Math.max(150, p.edgeThicknessMm ?? 150);
+        const saved = { astXE, astYE, bxE, byE, tvXE, tvYE, tcXE, tcYE, tvpE, nChecks: shapeChecks.length };
+        let shapeOk = false;
+        deLoop: for (let De = De0; De <= D - 75; De += 25) {
+          // each trial starts from the flat-section values
+          ({ astXE, astYE, bxE, byE, tvXE, tvYE, tcXE, tcYE, tvpE } = saved); shapeChecks.length = saved.nChecks; limXS = limE; limYS = limE;
+          const Dem = De / 1000;
+          // top platform (sloped: column + 75 mm each side) or upper step (stepped: column + 150 mm each side, at least half the footing)
+          const a1 = shape === 'sloped' ? cx / 1000 + 0.15 : Math.max(cx / 1000 + 0.3, L / 2);
+          const b1 = shape === 'sloped' ? cy / 1000 + 0.15 : Math.max(cy / 1000 + 0.3, B / 2);
+          const offX = (a1 - cx / 1000) / 2, offY = (b1 - cy / 1000) / 2; // platform / step projection beyond the column face
+          // flexure at the column face: total moment over the width, compression width = top width (conservative)
+          limXS = muLimitKnM(b1 * 1000, dE, p.concreteGrade, p.steelGrade) / B; // expressed per metre of footing width
+          limYS = muLimitKnM(a1 * 1000, dE, p.concreteGrade, p.steelGrade) / L;
+          if (mx > limXS || my > limYS) continue deLoop;
+          const astFace = (mPerM: number, width: number, topW: number) =>
+            Math.max(flexureAstMm2(mPerM * width, topW * 1000, dE, p.concreteGrade, p.steelGrade).astMm2 / width, minAst);
+          let reqX = astFace(mx, B, b1), reqY = astFace(my, L, a1);
+          const dEdge = Dem * 1000 - cover - 1.5 * phiE;
+          if (dEdge <= 50) continue deLoop;
+          let shearOk = true;
+          if (shape === 'stepped') {
+            // flexure and one-way shear at the step face on the edge thickness, full width
+            const sx = Math.max(0, axM - offX), sy = Math.max(0, ayM - offY);
+            const mStepX = (qu * sx * sx) / 2, mStepY = (qu * sy * sy) / 2;
+            const limStep = muLimitKnM(1000, dEdge, p.concreteGrade, p.steelGrade);
+            if (mStepX > limStep || mStepY > limStep) continue deLoop;
+            reqX = Math.max(reqX, flexureAstMm2(mStepX, 1000, dEdge, p.concreteGrade, p.steelGrade).astMm2);
+            reqY = Math.max(reqY, flexureAstMm2(mStepY, 1000, dEdge, p.concreteGrade, p.steelGrade).astMm2);
+            const tvSx = (qu * Math.max(0, sx - dEdge / 1000)) / dEdge, tvSy = (qu * Math.max(0, sy - dEdge / 1000)) / dEdge;
+            shapeChecks.push({ id: 'step_flexure', label: 'Flexure at the step face (edge thickness)', clause: 'IS 456 Cl. 34.2.3', status: 'PASS', demand: round(Math.max(mStepX, mStepY), 2), capacity: round(limStep, 2), unit: 'kN·m/m' });
+            tvXE = tvSx; tvYE = tvSy; // shear governs at the thinner section
+          } else {
+            // sloped: one-way shear at d from the column face on the reduced depth and the average section width
+            const shearAt = (a: number, off: number, fullW: number, topW: number) => {
+              const sPos = dE / 1000;
+              const t = a - off > 1e-6 ? Math.min(1, Math.max(0, (sPos - off) / (a - off))) : 1;
+              const depth = Dm * 1000 - (Dm * 1000 - De) * t;
+              const dSec = depth - cover - 1.5 * phiE;
+              const topAt = topW + (fullW - topW) * t;
+              const bEff = (fullW + topAt) / 2;
+              const V = qu * fullW * Math.max(0, a - sPos);
+              return { tv: (V * 1000) / (bEff * 1000 * dSec), dSec, bEff };
+            };
+            const sxx = shearAt(axM, offX, B, b1), syy = shearAt(ayM, offY, L, a1);
+            tvXE = sxx.tv; tvYE = syy.tv;
+          }
+          // bars for the larger requirement (a user override is checked, not changed)
+          astXE = Math.max(astXE, reqX); astYE = Math.max(astYE, reqY);
+          if (!ovOn) {
+            const nbx = bxE.astProvidedMm2PerM >= astXE ? bxE : selectBarsPerMetre(astXE, dE, [phiE]);
+            const nby = byE.astProvidedMm2PerM >= astYE ? byE : selectBarsPerMetre(astYE, dE, [phiE]);
+            if (!nbx || !nby) continue phiLoop;
+            bxE = nbx; byE = nby;
+          }
+          const dShear = shape === 'stepped' ? dEdge : dE;
+          tcXE = tauCMpa((100 * bxE.astProvidedMm2PerM) / (1000 * dShear), p.concreteGrade);
+          tcYE = tauCMpa((100 * byE.astProvidedMm2PerM) / (1000 * dShear), p.concreteGrade);
+          if ((tvXE > tcXE || tvYE > tcYE) && !ovOn) shearOk = false;
+          if (!shearOk) continue deLoop;
+          // punching: the d/2 perimeter beyond the platform / step sees a thinner section
+          const pOff = Math.min(offX, offY);
+          if (dE / 2000 > pOff) {
+            const dP = shape === 'stepped' ? dEdge : dE - (Dm * 1000 - De) * Math.min(1, (dE / 2000 - pOff) / Math.max(Math.min(axM, ayM) - pOff, 1e-6));
+            tvpE = (Math.max(0, ...ultCombos.map(c => c.P - quOf(c) * cpE.areaM2)) * 1000) / (cpE.b0Mm * dP);
+            if (tvpE > tcp && !ovOn) continue deLoop;
+          }
+          profile = { kind: shape, edgeThicknessMm: De, topXM: round(a1, 3), topYM: round(b1, 3) };
+          const A1 = L * B, A2 = a1 * b1;
+          concreteM3Shape = shape === 'sloped'
+            ? Dem * A1 + ((Dm - Dem) / 3) * (A1 + A2 + Math.sqrt(A1 * A2))
+            : Dem * A1 + (Dm - Dem) * A2;
+          formworkM2Shape = shape === 'sloped' ? 2 * (L + B) * Dem : 2 * (L + B) * Dem + 2 * (a1 + b1) * (Dm - Dem);
+          shapeChecks.push({ id: 'edge_thickness', label: 'Edge thickness ≥ 150 mm (footing on soil)', clause: 'IS 456 Cl. 34.1.2', status: 'PASS', demand: 150, capacity: De, unit: 'mm' });
+          shapeChecks.push({ id: 'profile', label: `${shape === 'sloped' ? 'Sloped' : 'Stepped'} footing profile`, status: 'WARNING',
+            note: shape === 'sloped'
+              ? `Slopes from a ${round(a1, 2)} × ${round(b1, 2)} m top platform (75 mm beyond the column) to ${De} mm at the edge. Flexure at the column face uses the platform width as the compression width; shear at d from the face uses the reduced depth and the average section width. Sloping faces assumed cast without top forms (check the slope for your mix).`
+              : `Upper step ${round(a1, 2)} × ${round(b1, 2)} m over a ${De} mm lower step. Flexure at the column face uses the step width as the compression width; flexure and shear are also checked at the step face on the lower step.` });
+          shapeOk = true;
+          break deLoop;
+        }
+        if (!shapeOk) {
+          if (D - De0 < 75) {
+            ({ astXE, astYE, bxE, byE, tvXE, tvYE, tcXE, tcYE, tvpE } = saved); limXS = limE; limYS = limE;
+            shapeChecks.push({ id: 'profile', label: 'Sloped / stepped profile', status: 'WARNING', note: `Footing thickness ${D} mm is too close to the edge thickness ${De0} mm for a ${shape} profile: designed flat.` });
+          } else break phiLoop; // no edge thickness works at this footing depth: try a deeper footing
+        } else if (profile && profile.edgeThicknessMm > De0) {
+          shapeChecks.push({ id: 'edge_raised', label: 'Edge thickness increased', status: 'WARNING', demand: De0, capacity: profile.edgeThicknessMm, unit: 'mm', note: `The entered edge thickness ${De0} mm did not satisfy the ${shape === 'stepped' ? 'step-face' : 'reduced-section'} checks: ${profile.edgeThicknessMm} mm used.` });
+        }
+      }
       const e = baseElement(id, 'isolated_footing', 'isolated', [col], p);
+      if (profile) e.profile = profile;
       const x0 = col.xM - L / 2, y0 = col.yM - B / 2;
       e.plan = { x0, x1: x0 + L, y0, y1: y0 + B };
       e.sizeXM = L; e.sizeYM = B; e.depthMm = D; e.effectiveDepthMm = dE;
@@ -608,10 +712,10 @@ export function designIsolatedFooting(
       // quantities
       const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
       e.quantities = {
-        concreteM3: round(L * B * Dm, 3),
+        concreteM3: round(concreteM3Shape, 3),
         pccM3: round((L + 2 * pp) * (B + 2 * pp) * (p.pccThicknessMm / 1000), 3),
         excavationM3: round((L + 2 * ws) * (B + 2 * ws) * p.foundationDepthM, 3),
-        formworkM2: round(2 * (L + B) * Dm, 3),
+        formworkM2: round(formworkM2Shape, 3),
       };
 
       // checks
@@ -622,8 +726,9 @@ export function designIsolatedFooting(
       if (hasCombos) cks.push({ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS',
         note: `${svcCombos.length} service and ${ultCombos.length} ultimate combinations evaluated. Governing ultimate base pressure from ${govUltimate}. Combinations use column forces from the frame analysis.` });
       if (momentsUsed) cks.push({ id: 'no_tension', label: 'Minimum base pressure ≥ 0 (no uplift)', status: qmin >= 0 ? 'PASS' : 'FAIL', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' });
-      cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: mx <= limE ? 'PASS' : 'FAIL', demand: round(mx, 2), capacity: round(limE, 2), unit: 'kN·m/m' });
-      cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: my <= limE ? 'PASS' : 'FAIL', demand: round(my, 2), capacity: round(limE, 2), unit: 'kN·m/m' });
+      cks.push({ id: 'flexure_x', label: 'Flexure about column face (steel along x)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: mx <= Math.min(limE, limXS) ? 'PASS' : 'FAIL', demand: round(mx, 2), capacity: round(Math.min(limE, limXS), 2), unit: 'kN·m/m' });
+      cks.push({ id: 'flexure_y', label: 'Flexure about column face (steel along y)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: my <= Math.min(limE, limYS) ? 'PASS' : 'FAIL', demand: round(my, 2), capacity: round(Math.min(limE, limYS), 2), unit: 'kN·m/m' });
+      cks.push(...shapeChecks);
       if (ovOn) {
         cks.push({ id: 'steel_x', label: 'Provided steel along x ≥ required (user bars)', clause: 'IS 456 Cl. 34.2.3, Annex G-1.1',
           status: bxE.astProvidedMm2PerM >= astXE ? 'PASS' : 'FAIL', demand: round(astXE, 0), capacity: round(bxE.astProvidedMm2PerM, 0), unit: 'mm²/m',

@@ -472,6 +472,8 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     poissonRatio: details.poissonRatio,
     cohesiveSoil: (details.cohesionKnM2 ?? 0) > 0,
     frictionAngleDeg: details.frictionAngleDeg,
+    isolatedShape: details.isolatedShape,
+    edgeThicknessMm: details.edgeThicknessMm,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,
