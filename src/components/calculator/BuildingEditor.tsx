@@ -2659,7 +2659,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   /** A locked pillar keeps its geometry: only these view/lock flags may change */
   const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
   /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
-  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor']);
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'loadBearing', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor']);
   const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
   const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
 
@@ -7490,6 +7490,16 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                       className="rounded text-orange-600 focus:ring-orange-500" 
                     />
                     <span>Include in Estimate</span>
+                  </label>
+                  <label className="flex items-center space-x-2 text-[10px] text-gray-700 cursor-pointer" title="Untick for a non-structural post: no footing is designed for it">
+                    <input
+                      type="checkbox"
+                      data-testid="pillar-load-bearing"
+                      checked={findPillarById(selectedPillarId ?? "")?.loadBearing !== false}
+                      onChange={e => updateActiveFloorPillar({ loadBearing: e.target.checked ? undefined : false })}
+                      className="rounded text-orange-600 focus:ring-orange-500"
+                    />
+                    <span>Load-bearing (structural) column{findPillarById(selectedPillarId ?? "")?.structuralRole ? ` · auto: ${findPillarById(selectedPillarId ?? "")?.structuralRole}` : ''}</span>
                   </label>
                   <label className="flex items-center space-x-2 text-[10px] text-blue-700 font-medium cursor-pointer">
                     <input 

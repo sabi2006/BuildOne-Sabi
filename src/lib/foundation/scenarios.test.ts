@@ -394,3 +394,16 @@ describe('Matrix: invariants over floors × SBC × grade × layout × basement',
   }
   it('ran the full matrix', () => { expect(count).toBe(4 * 3 * 2 * 3 * 2); });
 });
+
+describe('Non-load-bearing columns', () => {
+  it('a column marked loadBearing=false gets no footing and is reported; the others are unchanged', () => {
+    const base = run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) });
+    const proj = project({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }, 3, INNER4);
+    proj.pillars[0].loadBearing = false;
+    const r = calculateProject(proj).foundationBasementDesign!;
+    expect(r.loadPath.columns.length).toBe(base.foundationBasementDesign!.loadPath.columns.length - 1);
+    expect(r.loadPath.columns.some(c => c.name === 'C1')).toBe(false);
+    expect(r.warnings.join(' ')).toContain('non-load-bearing (C1)');
+    expect(r.foundation!.elements.some(e => e.columnIds.includes('c1'))).toBe(false);
+  });
+});

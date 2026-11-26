@@ -112,6 +112,8 @@ export interface Pillar {
   showRebar?: boolean;
   showBeam?: boolean;
   includeInEstimate?: boolean;
+  /** Load-bearing (structural) column. Default true; false = non-structural post: no footing is designed for it */
+  loadBearing?: boolean;
   notes?: string;
   isLocked?: boolean;
   concreteGrade?: ConcreteGrade;
@@ -5595,7 +5597,7 @@ export const calculateProject = (
         foundationBasementDesign = computeFoundationBasementDesign({
           summary: structuralSummary,
           config: bConfig,
-          pillars: effectivePillars.map(p => ({ id: p.id, floorId: p.floorId })),
+          pillars: effectivePillars.map(p => ({ id: p.id, floorId: p.floorId, name: p.name, loadBearing: p.loadBearing })),
           floors: (bModel.floors || []).map(f => ({ id: f.id })),
           buildingLengthM: bLengthM,
           buildingWidthM: bWidthM,

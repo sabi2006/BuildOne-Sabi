@@ -122,7 +122,7 @@ export interface IntegrationOptions {
 export interface IntegrationArgs {
   summary: BuildingStructuralSummary;
   config: BuildingConfig;
-  pillars: Array<{ id: string; floorId?: string }>;
+  pillars: Array<{ id: string; floorId?: string; name?: string; loadBearing?: boolean }>;
   floors: Array<{ id: string }>;
   buildingLengthM: number;
   buildingWidthM: number;
@@ -181,9 +181,11 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
   const groundFloorId = args.floors[0]?.id;
   const isGroundPillar = (p: { floorId?: string }) =>
     !p.floorId || p.floorId === groundFloorId || p.floorId === 'floor-0' || p.floorId === 'ground';
-  const groundIds = new Set(args.pillars.filter(isGroundPillar).map(p => p.id));
+  const nonStructural = args.pillars.filter(p => isGroundPillar(p) && p.loadBearing === false);
+  const nonStructuralIds = new Set(nonStructural.map(p => p.id));
+  const groundIds = new Set(args.pillars.filter(p => isGroundPillar(p) && !nonStructuralIds.has(p.id)).map(p => p.id));
   const calcs: ColumnStructuralCalculation[] = summary.pillarsCalculations.filter(c => groundIds.has(c.pillarId));
-  const excluded = summary.pillarsCalculations.length - calcs.length;
+  const excluded = summary.pillarsCalculations.length - calcs.length - nonStructural.length;
 
   let capabilityGaps = [
     'Column moments, shear and load redistribution (no frame analysis exists): moment-dependent foundation checks are NOT_VERIFIED.',
@@ -200,6 +202,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       warnings: ['No ground-level columns were found in the structural summary: foundation cannot be designed.'],
     };
   }
+  if (nonStructural.length > 0) warnings.push(`${nonStructural.length} column${nonStructural.length === 1 ? ' is' : 's are'} marked non-load-bearing (${nonStructural.map(p => p.name ?? p.id).join(', ')}): no footing is designed for ${nonStructural.length === 1 ? 'it' : 'them'}, and the loads of the neighbouring columns are not redistributed.`);
   if (excluded > 0) warnings.push(`${excluded} upper-floor column entr${excluded === 1 ? 'y was' : 'ies were'} excluded: their loads already pass through the ground columns.`);
 
   // ---------- load path trace ----------
