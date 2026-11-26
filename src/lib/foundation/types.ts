@@ -100,6 +100,8 @@ export interface FoundationDetailsConfig {
   /** Isolated footing profile (default flat) and edge thickness, mm (≥ 150, IS 456 Cl. 34.1.2) */
   isolatedShape?: 'flat' | 'sloped' | 'stepped';
   edgeThicknessMm?: number;
+  /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
+  tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
   poissonRatio?: number;
   investigation: SoilInvestigationData;
 
@@ -207,6 +209,7 @@ export interface StructuralElementIdentity {
     | 'isolated_footing'
     | 'combined_footing'
     | 'strap_beam'
+    | 'tie_beam'
     | 'strip_footing'
     | 'raft'
     | 'pile_cap'

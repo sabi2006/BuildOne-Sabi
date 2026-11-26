@@ -27,12 +27,12 @@ import type { DesignStatus, PileInvestigationData, SbcBasis, StructuralElementId
 import type { ColumnCombo, CaseForces, CaseId } from './lateral';
 import { elasticSettlementMm, slidingFactorOfSafety, upliftCheck } from './stability';
 import {
-  fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
+  fyOf, fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
   developmentLengthTensionMm, developmentLengthCompressionMm, selectBarsPerMetre,
   barAreaMm2, MIN_STEEL_FRACTION_HYSD, RCC_UNIT_WEIGHT, type BarsPerMetre,
 } from './rcDesign';
 
-export type FoundationSystem = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile';
+export type FoundationSystem = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | 'tie';
 
 export interface FoundationColumnInput {
   id: string;
@@ -124,6 +124,8 @@ export interface FoundationDesignParams {
   /** Isolated footing profile (default flat) and edge thickness for sloped / stepped footings (mm, ≥ 150, IS 456 Cl. 34.1.2) */
   isolatedShape?: 'flat' | 'sloped' | 'stepped';
   edgeThicknessMm?: number;
+  /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
+  tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
   options?: FoundationDesignOptions;
 }
 
@@ -1844,6 +1846,154 @@ export function designPileFoundation(
   return out;
 }
 
+// ------------------------------ TIE (GROUND) BEAMS / RCC GRILLAGE ------------------------------
+
+/**
+ * RCC tie / ground beams joining neighbouring single-column footings (or pile caps) along the grid lines so the footings
+ * form an interconnected grid. Each beam spans the clear gap between two footings and is designed as a simply supported
+ * beam (conservative for continuous spans) for its self-weight plus a user wall load, together with an axial tie force
+ * T = pct x the larger factored column load of the two columns it joins. The tie force percentage is a design criterion
+ * set by the user (no value is taken from a clause here): when it is not entered, 5% is assumed and flagged WARNING.
+ * Tension steel = flexure steel (IS 456 Annex G) + T / 0.87 fy, split between the bottom and top faces.
+ */
+export function designTieBeams(elements: FoundationElementResult[], cols: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved): FoundationElementResult[] {
+  const tb = p.tieBeams;
+  if (!tb) return [];
+  const out: FoundationElementResult[] = [];
+  const colById = new Map(cols.map(c => [c.id, c]));
+  const nodes = elements.filter(e => e.plan && e.columnIds.length === 1 && colById.has(e.columnIds[0])
+    && (e.elementType === 'isolated_footing' || e.elementType === 'pile_cap') && e.status !== 'FAIL' && e.status !== 'NOT_VERIFIED');
+  const colOf = (e: FoundationElementResult) => colById.get(e.columnIds[0])!;
+  const TOL = 0.3;
+  const pairs: Array<{ a: FoundationElementResult; b: FoundationElementResult; alongX: boolean }> = [];
+  for (const a of nodes) {
+    const ca = colOf(a);
+    const nextX = nodes.filter(b => b !== a && colOf(b).xM > ca.xM + 1e-6 && Math.abs(colOf(b).yM - ca.yM) < TOL).sort((u, v) => colOf(u).xM - colOf(v).xM)[0];
+    const nextY = nodes.filter(b => b !== a && colOf(b).yM > ca.yM + 1e-6 && Math.abs(colOf(b).xM - ca.xM) < TOL).sort((u, v) => colOf(u).yM - colOf(v).yM)[0];
+    if (nextX) pairs.push({ a, b: nextX, alongX: true });
+    if (nextY) pairs.push({ a, b: nextY, alongX: false });
+  }
+  const bMm = tb.widthMm, Dmm = tb.depthMm;
+  const cover = p.clearCoverMm;
+  const fy = fyOf(p.steelGrade);
+  const pctInput = tb.tieForcePct !== undefined;
+  const pct = (tb.tieForcePct ?? 5) / 100;
+  const wall = tb.wallLoadKnM ?? 0;
+  const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
+  const stirDia0 = 8;
+  for (const { a, b, alongX } of pairs) {
+    const ca = colOf(a), cb = colOf(b);
+    const id = `TB-${ca.name ?? ca.id}-${cb.name ?? cb.id}`;
+    const pa = a.plan!, pb = b.plan!;
+    const [u0, u1] = alongX ? [pa.x1, pb.x0] : [pa.y1, pb.y0];
+    const clear = u1 - u0;
+    const vC = alongX ? (ca.yM + cb.yM) / 2 : (ca.xM + cb.xM) / 2;
+    const e = baseElement(id, 'tie_beam', 'tie', [], p);
+    e.columnIds = [ca.id, cb.id];
+    if (clear < 0.1) {
+      e.checks = [{ id: 'span', label: 'Clear span between footings', status: 'NOT_VERIFIED', demand: round(clear, 3), unit: 'm', note: 'Footings are less than 100 mm apart: no tie beam drawn (they act together).' }];
+      e.status = 'NOT_VERIFIED'; e.warnings = [e.checks[0].note!];
+      out.push(e); continue;
+    }
+    e.plan = alongX ? { x0: u0, x1: u1, y0: vC - bMm / 2000, y1: vC + bMm / 2000 } : { x0: vC - bMm / 2000, x1: vC + bMm / 2000, y0: u0, y1: u1 };
+    e.sizeXM = e.plan.x1 - e.plan.x0; e.sizeYM = e.plan.y1 - e.plan.y0;
+    e.depthMm = Dmm;
+    // loads and actions
+    const selfW = RCC_UNIT_WEIGHT * (bMm / 1000) * (Dmm / 1000);
+    const w = selfW + wall;
+    const wu = 1.5 * w;
+    const Mu = (wu * clear * clear) / 8, Vu = (wu * clear) / 2;
+    const Tu = pct * Math.max(ca.factoredLoadKn, cb.factoredLoadKn);
+    e.loads = { serviceKn: round(w * clear + pct * Math.max(ca.serviceLoadKn, cb.serviceLoadKn), 1), factoredKn: round(Tu, 1) };
+    const astT = (Tu * 1000) / (0.87 * fy);
+    let sel: { phi: number; n: number; nTop: number; d: number; astBot: number; exceeds: boolean; lim: number } | null = null;
+    for (const phi of [12, 16, 20, 25]) {
+      const d = Dmm - cover - stirDia0 - phi / 2;
+      if (d < 100) continue;
+      const fl = flexureAstMm2(Mu, bMm, d, p.concreteGrade, p.steelGrade);
+      const lim = muLimitKnM(bMm, d, p.concreteGrade, p.steelGrade);
+      const astFlex = Number.isFinite(fl.astMm2) ? fl.astMm2 : 0;
+      const minAst = (0.85 * bMm * d) / fy;
+      const astBot = Math.max(astFlex + astT / 2, minAst);
+      const n = Math.max(2, Math.ceil(astBot / barAreaMm2(phi)));
+      const nTop = Math.max(2, Math.ceil((astT / 2) / barAreaMm2(phi)));
+      const nMax = Math.max(n, nTop);
+      const fits = nMax * phi + (nMax - 1) * Math.max(phi, 25) + 2 * (cover + stirDia0) <= bMm;
+      if (!fits) continue;
+      sel = { phi, n, nTop, d, astBot, exceeds: fl.exceedsLimit || !Number.isFinite(fl.astMm2), lim };
+      break;
+    }
+    if (!sel) {
+      e.checks = [{ id: 'bars', label: 'Bars fit in the beam width', clause: 'IS 456 Cl. 26.3.2', status: 'FAIL', note: `No bar size up to 25 mm fits ${bMm} x ${Dmm} mm for this moment and tie force: increase the beam size.` }];
+      e.status = 'FAIL'; e.warnings = [e.checks[0].note!]; out.push(e); continue;
+    }
+    const { phi, n, nTop, d } = sel;
+    e.effectiveDepthMm = d;
+    const astBotProv = n * barAreaMm2(phi), astTopProv = nTop * barAreaMm2(phi);
+    // shear
+    const tv = (Vu * 1000) / (bMm * d);
+    const tc = tauCMpa((100 * astBotProv) / (bMm * d), p.concreteGrade);
+    const tcMax = TAU_C_MAX_MPA[p.concreteGrade] ?? 2.8;
+    let stirrup = { dia: 8, sv: 0, ok: false };
+    for (const sd of [8, 10]) {
+      const asv = 2 * barAreaMm2(sd);
+      const svMax = Math.min(0.75 * d, 300, (0.87 * fy * asv) / (0.4 * bMm));
+      const vus = Math.max(0, Vu * 1000 - tc * bMm * d);
+      const svReq = vus > 0 ? (0.87 * fy * asv * d) / vus : Infinity;
+      const sv = Math.floor(Math.min(svMax, svReq) / 25) * 25;
+      if (sv >= 75) { stirrup = { dia: sd, sv, ok: true }; break; }
+    }
+    // anchorage into the footings
+    const ld = developmentLengthTensionMm(phi, p.concreteGrade, p.steelGrade);
+    const lenA = (alongX ? pa.x1 - pa.x0 : pa.y1 - pa.y0) * 1000 - cover, lenB = (alongX ? pb.x1 - pb.x0 : pb.y1 - pb.y0) * 1000 - cover;
+    const anchorOk = lenA >= ld && lenB >= ld;
+    const barLen = Math.round(clear * 1000 + Math.min(ld, lenA) + Math.min(ld, lenB));
+    const dir = alongX ? 'x' as const : 'y' as const;
+    const noteBars = 'Bars run through the clear span and are anchored into both footings.';
+    e.reinforcement = [
+      { id: `${id}-B`, location: 'bottom', direction: dir, role: 'main', diaMm: phi, count: n, astRequiredMm2: round(sel.astBot, 0), astProvidedMm2: round(astBotProv, 0), straightLengthMm: barLen, developmentLengthMm: ld, note: noteBars },
+      { id: `${id}-T`, location: 'top', direction: dir, role: 'main', diaMm: phi, count: nTop, astRequiredMm2: round(astT / 2, 0), astProvidedMm2: round(astTopProv, 0), straightLengthMm: barLen, developmentLengthMm: ld, note: noteBars },
+    ];
+    if (stirrup.ok) {
+      const cut = 2 * ((bMm - 2 * cover) + (Dmm - 2 * cover)) + 20 * stirrup.dia;
+      e.reinforcement.push({ id: `${id}-S`, location: 'bottom', direction: dir, role: 'stirrup', diaMm: stirrup.dia, spacingMm: stirrup.sv, count: Math.floor((clear * 1000) / stirrup.sv) + 1,
+        straightLengthMm: Math.round(cut), note: 'Closed 2-legged stirrups over the clear span; cut length 2(a + b) + 20 phi (hooks), bend deductions not applied.' });
+    }
+    const minAstOk = astBotProv >= (0.85 * bMm * d) / fy;
+    const maxAstOk = astBotProv + astTopProv <= 0.04 * bMm * Dmm;
+    e.checks = [
+      { id: 'tie_force', label: `Tie force T = ${round(pct * 100, 1)}% of the larger column load`, status: pctInput ? 'PASS' : 'WARNING', demand: round(Tu, 1), unit: 'kN',
+        note: pctInput ? 'Tie force percentage entered by the user.' : 'Assumed 5%: enter the tie force percentage required by your design criteria.' },
+      { id: 'flexure', label: 'Moment from self-weight and wall load <= Mu,lim', clause: 'IS 456 Annex G', status: sel.exceeds ? 'FAIL' : 'PASS', demand: round(Mu, 1), capacity: round(sel.lim, 1), unit: 'kN·m',
+        note: `Simply supported over the clear span ${round(clear, 2)} m: wu = ${round(wu, 2)} kN/m (self-weight ${round(selfW, 2)} + wall ${round(wall, 2)}, x 1.5).` },
+      { id: 'steel', label: 'Bottom steel >= flexure + half the tie steel; >= 0.85 b d / fy', clause: 'IS 456 Cl. 26.5.1.1', status: astBotProv >= sel.astBot - 1e-6 && minAstOk ? 'PASS' : 'FAIL',
+        demand: round(sel.astBot, 0), capacity: round(astBotProv, 0), unit: 'mm²', note: `${n}-${phi}φ bottom, ${nTop}-${phi}φ top; tie steel T/0.87fy = ${round(astT, 0)} mm² shared between both faces.` },
+      { id: 'steel_max', label: 'Total steel <= 4% of the gross section', clause: 'IS 456 Cl. 26.5.1.1', status: maxAstOk ? 'PASS' : 'FAIL', demand: round(astBotProv + astTopProv, 0), capacity: round(0.04 * bMm * Dmm, 0), unit: 'mm²' },
+      { id: 'bar_fit', label: 'Bars fit within the beam width (clear spacing >= max(φ, 25 mm))', clause: 'IS 456 Cl. 26.3.2', status: 'PASS', note: '20 mm aggregate assumed.' },
+      { id: 'shear_section', label: 'Shear stress <= τc,max', clause: 'IS 456 Cl. 40.2.3, Table 20', status: tv <= tcMax ? 'PASS' : 'FAIL', demand: round(tv, 3), capacity: tcMax, unit: 'N/mm²' },
+      { id: 'stirrups', label: stirrup.ok ? `Stirrups 2L-${stirrup.dia} @ ${stirrup.sv} mm` : 'Stirrups', clause: 'IS 456 Cl. 40.4, 26.5.1.5, 26.5.1.6', status: stirrup.ok ? 'PASS' : 'FAIL', demand: round(Vu, 1), unit: 'kN',
+        note: stirrup.ok ? `Vu = ${round(Vu, 1)} kN; τc = ${round(tc, 3)} N/mm² (tension steel ${round((100 * astBotProv) / (bMm * d), 2)}%).` : 'Required stirrup spacing is below 75 mm: increase the beam size.' },
+      { id: 'anchorage', label: 'Tie bars anchored into both footings (development length)', clause: 'IS 456 Cl. 26.2.1', status: anchorOk ? 'PASS' : 'WARNING', demand: round(ld, 0), capacity: round(Math.min(lenA, lenB), 0), unit: 'mm',
+        note: anchorOk ? undefined : 'A footing is shorter than the development length: bend the bars up inside it.' },
+    ];
+    e.quantities = {
+      concreteM3: round(clear * (bMm / 1000) * (Dmm / 1000), 3),
+      pccM3: round(clear * (bMm / 1000 + 2 * pp) * (p.pccThicknessMm / 1000), 3),
+      excavationM3: round(clear * (bMm / 1000 + 2 * ws) * p.foundationDepthM, 3),
+      formworkM2: round(2 * clear * (Dmm / 1000), 3),
+    };
+    e.status = overallStatus(e.checks);
+    e.assumptions = [
+      'Tie beam bottom is at the footing bottom level; it does not bear on the soil.',
+      `Section ${bMm} x ${Dmm} mm set by the user; the beam is checked, never silently resized.`,
+      'Simply supported over the clear span (conservative for continuous spans); axial tie force carried by steel only.',
+    ];
+    e.warnings = e.checks.filter(k => k.status !== 'PASS' && k.note).map(k => `${k.label}: ${k.note}`);
+    out.push(e);
+  }
+  return out;
+}
+
 // ------------------------------ ORCHESTRATOR ------------------------------
 
 type Plan = { x0: number; x1: number; y0: number; y1: number };
@@ -1977,6 +2127,12 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
         }
       }
     }
+  }
+
+  if (params.tieBeams) {
+    const ties = designTieBeams(elements, cols, params, opt);
+    if (ties.length === 0) warnings.push('Tie beams requested, but no two single-column footings / pile caps share a grid line.');
+    elements.push(...ties);
   }
 
   if (params.basement) {

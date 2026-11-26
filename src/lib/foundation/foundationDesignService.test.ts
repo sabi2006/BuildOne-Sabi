@@ -384,7 +384,7 @@ describe('Pile foundation', () => {
     expect(e.pile!.pilesRequired).toBe(2);
     const fl = e.checks.find(c => c.id === 'cap_flexure')!;
     expect(fl.status).toBe('PASS');
-    const cx = (col('a', 0, 0, 900) as any).widthMm / 1000;
+    const cx = col('a', 0, 0, 900).widthMm / 1000;
     const wcap = 25 * e.sizeXM! * e.sizeYM! * e.depthMm! / 1000;
     const R = (1350 + 1.5 * wcap) / 2;
     const mx = R * (1.125 / 2 - cx / 2);

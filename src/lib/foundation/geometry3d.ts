@@ -203,7 +203,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
         }
       }
       // a strap beam runs between two footings: trim its PCC at the ends where a footing's PCC already lies
-      if (el.elementType === 'strap_beam') {
+      if (el.elementType === 'strap_beam' || el.elementType === 'tie_beam') {
         const alongX = (r.x1 - r.x0) >= (r.z1 - r.z0);
         for (const [oid, o] of pccRects) {
           if (oid === el.id || !(Math.min(pr.x1, o.x1) - Math.max(pr.x0, o.x0) > 1e-6 && Math.min(pr.z1, o.z1) - Math.max(pr.z0, o.z0) > 1e-6)) continue;

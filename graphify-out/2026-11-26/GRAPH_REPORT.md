@@ -1,27 +1,26 @@
 # Graph Report - brick-factory  (2026-11-26)
 
 ## Corpus Check
-- 134 files · ~342,825 words
+- 134 files · ~344,470 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 2, .prisma 1, .ico 1)
 
 ## Summary
-- 1514 nodes · 3400 edges · 85 communities (82 shown, 3 thin omitted)
+- 1514 nodes · 3409 edges · 82 communities (79 shown, 3 thin omitted)
 - Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 326 edges (avg confidence: 0.95)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2de59029`
+- Built from commit: `52a6d88c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - FoundationReport.test.tsx
-- FoundationReport.tsx
 - basementDesignService.ts
 - 2. Phase-by-Phase Completion Breakdown
 - Full Building Construction Calculation & Structural Engineering Manual
-- types.ts
+- integration.ts
 - calculateBuildingStructuralSummary
 - brickCalculator.ts
 - CalculatorContext.tsx
@@ -35,7 +34,6 @@
 - Call method
 - RCC Ring Beam Regression Test Report
 - 4. Complete Civil Engineering Mathematical Formulas
-- integration.ts
 - next
 - NeatPdfDoc
 - PREREQUISITES
@@ -60,7 +58,7 @@
 - foundationLayers.ts
 - useCalculator
 - calculateProject
-- bbs.ts
+- designIsolatedFooting
 - BRICK FACTORY — FINAL AUDIT REPORT: INDEPENDENT VERIFICATION & DISCREPANCY RECONCILIATION
 - app/page.tsx
 - Final Graph Report — Brick Factory Architecture
@@ -85,8 +83,7 @@
 - Graphify Setup Status — Brick Factory
 - 7.3 Detailed Solution Design for Each Confirmed Issue
 - footingStability.test.ts
-- DEFAULT_BUILDING_CONFIG
-- rebarChecks.ts
+- rcDesign.ts
 - lateralFoundation.test.ts
 - BRICK FACTORY – PHASE 5, STAGE 1 REPORT
 - BuildingEditor
@@ -115,33 +112,29 @@
 10. `detectPillarToPillarBeams()` - 27 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `6. Verification Summary Table` --references--> `BuildingEditor()`  [INFERRED]
-  PILLAR_DEPENDENCY_ANALYSIS.md → src/components/calculator/BuildingEditor.tsx
-- `5.1 Save / Load & Serialization` --references--> `BuildingModel`  [INFERRED]
-  FINAL_POST_IMPLEMENTATION_VALIDATION.md → src/lib/brickCalculator.ts
+- `2.8 `StructuralBay` / Slab` --references--> `StructuralBay`  [INFERRED]
+  GRAPHIFY_DOMAIN_MODEL.md → src/lib/brickCalculator.ts
 - `Contract 4: Dynamic Footing Initialization Contract` --references--> `FoundationFooting`  [INFERRED]
   PILLAR_DEPENDENCY_ANALYSIS.md → src/lib/brickCalculator.ts
 - `Issue 4: Footing Recalculation Depending on an Already Initialized `footings` Array` --references--> `FoundationFooting`  [INFERRED]
   PILLAR_DEPENDENCY_ANALYSIS.md → src/lib/brickCalculator.ts
+- `5.1 Save / Load & Serialization` --references--> `BuildingModel`  [INFERRED]
+  FINAL_POST_IMPLEMENTATION_VALIDATION.md → src/lib/brickCalculator.ts
 - `File 1: `src/lib/brickCalculator.ts`` --references--> `Pillar`  [INFERRED]
   FINAL_INTEGRATION_REVIEW.md → src/lib/brickCalculator.ts
 
 ## Import Cycles
 - 3-file cycle: `src/lib/foundation/rcDesign.ts -> src/lib/structuralCalculationService.ts -> src/lib/rebarChecks.ts -> src/lib/foundation/rcDesign.ts`
 
-## Communities (85 total, 3 thin omitted)
+## Communities (82 total, 3 thin omitted)
 
 ### Community 0 - "FoundationReport.test.tsx"
 Cohesion: 0.13
 Nodes (12): bsm, count(), design(), html(), project(), DEFAULT_RCC_RING_BEAM, DEFAULT_RCC_SLAB, LEGACY_BACKFILL_RATE_PER_M3 (+4 more)
 
-### Community 1 - "FoundationReport.tsx"
-Cohesion: 0.62
-Nodes (9): BasementElementCard(), ChecksTable(), fmt(), FoundationElementCard(), FoundationReport(), KV(), List(), STATUS_STYLE (+1 more)
-
 ### Community 2 - "basementDesignService.ts"
-Cohesion: 0.12
-Nodes (30): analyseWallPanel(), barsWithCrackControl(), BasementDesignOptions, BasementRebarLayer, designBasement(), designBaseSlab(), designWallLevel(), earthPressureCoefficient() (+22 more)
+Cohesion: 0.17
+Nodes (21): analyseWallPanel(), barsWithCrackControl(), BasementDesignOptions, BasementRebarLayer, designBasement(), designBaseSlab(), designWallLevel(), earthPressureCoefficient() (+13 more)
 
 ### Community 3 - "2. Phase-by-Phase Completion Breakdown"
 Cohesion: 0.11
@@ -151,13 +144,13 @@ Nodes (17): 1. Executive Summary, 2. Phase-by-Phase Completion Breakdown, 3. Com
 Cohesion: 0.05
 Nodes (41): 13.1 Dead Load Intensities (IS 875 Part 1), 13.2 Imposed Live Loads (IS 875 Part 2), 13.3 Multi-Storey Accumulation, 1.1 Physical Solid Clay Brick, 1.2 The Mortar Joint Cushion, 1.3 Nominal Brick Unit Dimensions, 1.4 Bricks Per Cubic Meter, 1. Executive Summary & System Architecture (+33 more)
 
-### Community 5 - "types.ts"
-Cohesion: 0.09
-Nodes (35): CONCRETE_GRADES, FoundationBasementPanel(), num(), NumField(), Section(), SelectField(), STEEL_GRADES, StructuralGridOptions (+27 more)
+### Community 5 - "integration.ts"
+Cohesion: 0.05
+Nodes (77): CONCRETE_GRADES, FoundationBasementPanel(), num(), NumField(), Section(), SelectField(), STEEL_GRADES, BasementElementCard() (+69 more)
 
 ### Community 6 - "calculateBuildingStructuralSummary"
-Cohesion: 0.15
-Nodes (18): 1. `src/lib/structuralCalculationService.ts`, 2. File-by-File Changes, 2. `src/components/calculator/CalculatorContext.tsx`, 3. `src/lib/brickCalculator.ts`, 4. `src/components/calculator/BuildingEditor.tsx`, Step 4: Column Load and Structural Calculations Update, cfg, coords (+10 more)
+Cohesion: 0.13
+Nodes (21): 1. `src/lib/structuralCalculationService.ts`, 2. File-by-File Changes, 2. `src/components/calculator/CalculatorContext.tsx`, 3. `src/lib/brickCalculator.ts`, 4. `src/components/calculator/BuildingEditor.tsx`, Step 4: Column Load and Structural Calculations Update, pillars, summary() (+13 more)
 
 ### Community 7 - "brickCalculator.ts"
 Cohesion: 0.07
@@ -206,10 +199,6 @@ Nodes (12): 1. Executive Summary, 1. Single Beam Rendering & Elimination of "Dou
 ### Community 18 - "4. Complete Civil Engineering Mathematical Formulas"
 Cohesion: 0.17
 Nodes (12): 4.2 Plastering Formulas (IS 1200 Part XII), 4.6 Dynamic Column Section & Axial Strength (IS 456 Cl. 39.3), 4.7 Foundation Excavation, PCC Base & Footing Pad Sizing, 4.8 Labor Productivity & Rate Takeoff, 4.9 Bill of Quantities (BOQ) & Financial Cost Structure, 4. Complete Civil Engineering Mathematical Formulas, A. Concentric Isolated Footing Sizing, A. Opening Deduction Rules (IS 1200 Part XII Clause 4.1) (+4 more)
-
-### Community 19 - "integration.ts"
-Cohesion: 0.13
-Nodes (23): BasementDesignResult, BasementStabilityResult, BBSResult, BBSRow, BuildingFrameResult, col, flat, DesignCheck (+15 more)
 
 ### Community 20 - "next"
 Cohesion: 0.18
@@ -264,8 +253,8 @@ Cohesion: 0.40
 Nodes (4): CONSTRAINTS, INPUT, OUTPUT, PROCESS
 
 ### Community 33 - "foundationDesignService.ts"
-Cohesion: 0.12
-Nodes (40): col, availablePressure(), baseElement(), ceilTo(), COMMON_ASSUMPTIONS, commonChecks(), criticalPerimeter(), designCombinedFooting() (+32 more)
+Cohesion: 0.08
+Nodes (23): col, col, flat, COMMON_ASSUMPTIONS, designCombinedFooting(), designFoundation(), designRaftFoundation(), FootingBarOverride (+15 more)
 
 ### Community 34 - "spec-impl.md"
 Cohesion: 0.50
@@ -295,9 +284,9 @@ Nodes (13): useCalculator(), CalculatorSettingsPanel(), predefinedBricks, Balcon
 Cohesion: 0.18
 Nodes (17): Phase D: Foundation & Footing Dependency System, 3.2 Dynamic Footing Generation from Empty Footings Array, Failure 1: Line 1317, Failure 2: Line 1380, Suite 1: Standard TN Red Brick Count & Brick Cost Engine (2 Failures), 2. Step-by-Step Dependency Trace, 5.1 Verification: Upper-Floor Pillars Not Updating in BuildingEditor Local State, 5.2 Verification: `isCustomSize` Blocking `verticalColumnId` Synchronization (+9 more)
 
-### Community 44 - "bbs.ts"
-Cohesion: 0.18
-Nodes (18): ALLOWED_BAR_DIAMETERS_MM, BarShape, BBSOptions, buildBasementBBS(), buildBBS(), buildFoundationBBS(), lapLengthCompressionMm(), lapLengthTensionMm() (+10 more)
+### Community 44 - "designIsolatedFooting"
+Cohesion: 0.30
+Nodes (24): availablePressure(), baseElement(), ceilTo(), commonChecks(), criticalPerimeter(), designContinuousFooting(), designIsolatedFooting(), designPileFoundation() (+16 more)
 
 ### Community 45 - "BRICK FACTORY — FINAL AUDIT REPORT: INDEPENDENT VERIFICATION & DISCREPANCY RECONCILIATION"
 Cohesion: 0.08
@@ -392,16 +381,12 @@ Cohesion: 0.40
 Nodes (5): 7.3 Detailed Solution Design for Each Confirmed Issue, Issue 1: Upper-Floor Pillars Not Updating in `BuildingEditor.tsx` Local State, Issue 2: `isCustomSize` Blocking `verticalColumnId` Synchronization, Issue 3: `CalculatorContext` Passing Only Ground-Floor Pillars to `calculateProject()`, Issue 4: Footing Recalculation Depending on an Already Initialized `footings` Array
 
 ### Community 68 - "footingStability.test.ts"
-Cohesion: 0.21
-Nodes (8): footingStabilityChecks(), settlementCheck(), elasticSettlementMm(), I_RIGID, overturningCheck(), rigidInfluenceFactor(), slidingFactorOfSafety(), upliftCheck()
+Cohesion: 0.39
+Nodes (7): settlementCheck(), elasticSettlementMm(), I_RIGID, overturningCheck(), rigidInfluenceFactor(), slidingFactorOfSafety(), upliftCheck()
 
-### Community 69 - "DEFAULT_BUILDING_CONFIG"
-Cohesion: 0.40
-Nodes (4): pillars, summary(), walls, DEFAULT_BUILDING_CONFIG
-
-### Community 71 - "rebarChecks.ts"
-Cohesion: 0.43
-Nodes (7): fyOf(), xuMaxRatio(), barArea(), beamEffectiveDepthMm(), beamRebarChecks(), RebarCheckStatus, TAU_C_MAX
+### Community 71 - "rcDesign.ts"
+Cohesion: 0.14
+Nodes (18): BarsPerMetre, CrackWidthResult, ES_MPA, FCK_MPA, fyOf(), MIN_STEEL_FRACTION_HYSD, muLimCoefficient(), SIGMA_CBC_MPA (+10 more)
 
 ### Community 72 - "lateralFoundation.test.ts"
 Cohesion: 0.22
@@ -421,7 +406,7 @@ Nodes (13): 6. Stale Relationships & Resolved Architectural Bottlenecks, 3. Stru
 
 ### Community 77 - "structuralCalculationService.ts"
 Cohesion: 0.12
-Nodes (23): Props, BuildingDetailsConfig, StructuralConfigModalProps, BOQProductItem, RCCRingBeamConfig, Unit, IntegrationArgs, BeamRebarOverride (+15 more)
+Nodes (24): Props, BuildingDetailsConfig, StructuralConfigModalProps, BOQProductItem, RCCRingBeamConfig, Unit, IntegrationArgs, BeamRebarOverride (+16 more)
 
 ### Community 78 - "calculateFootingRcc"
 Cohesion: 0.15
@@ -465,17 +450,17 @@ Nodes (5): 1. Executive Summary, 3. Verification Test Results (Stage B5), 4. Str
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `calculateProject()` connect `calculateProject` to `FoundationReport.test.tsx`, `types.ts`, `calculateBuildingStructuralSummary`, `brickCalculator.ts`, `CalculatorContext.tsx`, `Pillar`, `integration.ts`, `VisualEstimator3D.tsx`, `3. Verification of Requirements`, `4. Deep Audit of the 16 Pre-existing Legacy Test Failures`, `Final Graph Report — Brick Factory Architecture`, `Graphify Automation & Developer Guide — Brick Factory`, `brickCalculator.test.ts`, `Phase 4 – Beam Dependency Analysis (Architecture Audit)`, `StructuralConfigModal`, `trimWallByPillars`, `3. Core Dependency Rules & Verification`, `calculateDynamicPillarFooting`, `7.3 Detailed Solution Design for Each Confirmed Issue`, `lateralFoundation.test.ts`, `calculateDynamicPillarFooting`, `calculateFootingRcc`, `7. Phase 3: Final Implementation Plan & Test Checklist`, `Phase 2: Structural Dependency Analysis — Pillar Dimension Update`, `frameIntegration.test.ts`, `geometry3d.ts`?**
-  _High betweenness centrality (0.134) - this node is a cross-community bridge._
+- **Why does `calculateProject()` connect `calculateProject` to `FoundationReport.test.tsx`, `integration.ts`, `calculateBuildingStructuralSummary`, `brickCalculator.ts`, `CalculatorContext.tsx`, `Pillar`, `VisualEstimator3D.tsx`, `3. Verification of Requirements`, `4. Deep Audit of the 16 Pre-existing Legacy Test Failures`, `Final Graph Report — Brick Factory Architecture`, `Graphify Automation & Developer Guide — Brick Factory`, `brickCalculator.test.ts`, `Phase 4 – Beam Dependency Analysis (Architecture Audit)`, `StructuralConfigModal`, `trimWallByPillars`, `3. Core Dependency Rules & Verification`, `calculateDynamicPillarFooting`, `7.3 Detailed Solution Design for Each Confirmed Issue`, `lateralFoundation.test.ts`, `calculateDynamicPillarFooting`, `calculateFootingRcc`, `7. Phase 3: Final Implementation Plan & Test Checklist`, `Phase 2: Structural Dependency Analysis — Pillar Dimension Update`, `frameIntegration.test.ts`, `geometry3d.ts`?**
+  _High betweenness centrality (0.151) - this node is a cross-community bridge._
 - **Are the 39 inferred relationships involving `calculateProject()` (e.g. with `3. Relevant Files and Functions` and `4. Synchronization (2D vs. Context vs. 3D)`) actually correct?**
   _`calculateProject()` has 39 INFERRED edges - model-reasoned connections that need verification._
 - **Should `FoundationReport.test.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.1286549707602339 - nodes in this community are weakly interconnected._
-- **Why does `react` connect `react` to `FoundationReport.test.tsx`, `FoundationReport.tsx`, `types.ts`, `CalculatorContext.tsx`, `package.json`, `BuildingEditor`, `useCalculator`, `structuralCalculationService.ts`, `app/page.tsx`, `ScrollStoryScene.tsx`, `lucide-react`, `next`, `geometry3d.ts`, `VisualEstimator3D.tsx`, `EditHistory`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `FoundationReport.test.tsx`, `integration.ts`, `CalculatorContext.tsx`, `package.json`, `BuildingEditor`, `useCalculator`, `structuralCalculationService.ts`, `app/page.tsx`, `ScrollStoryScene.tsx`, `lucide-react`, `next`, `geometry3d.ts`, `VisualEstimator3D.tsx`, `EditHistory`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `BuildingEditor()` (e.g. with `4. Architecture Coverage & Boundary Analysis` and `6. Verification Summary Table`) actually correct?**
   _`BuildingEditor()` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **Should `basementDesignService.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11596638655462185 - nodes in this community are weakly interconnected._
+- **Should `2. Phase-by-Phase Completion Breakdown` be split into smaller, more focused modules?**
+  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
 - **Why does `splitWallByPillars()` connect `VisualEstimator3D.tsx` to `Full Building Construction Calculation & Structural Engineering Manual`, `brickCalculator.ts`, `BuildingEditor`, `3. Comprehensive Module Breakdown`, `brickCalculator.test.ts`, `trimWallByPillars`?**
-  _High betweenness centrality (0.095) - this node is a cross-community bridge._
+  _High betweenness centrality (0.089) - this node is a cross-community bridge._

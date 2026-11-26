@@ -284,6 +284,28 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
             onChange={(v) => setFd({ edgeThicknessMm: v === undefined ? undefined : Math.max(150, v) })} />
         </div>
 
+        <div className="rounded-lg border border-slate-200 p-3 space-y-3" data-testid="tie-beams">
+          <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
+            <input type="checkbox" data-testid="tie-beams-toggle" checked={!!fd.tieBeams}
+              onChange={(e) => setFd({ tieBeams: e.target.checked ? { widthMm: 300, depthMm: 450 } : undefined })} />
+            Tie / ground beams between footings (RCC grillage)
+          </label>
+          {fd.tieBeams && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <NumField label="Beam Width" unit="mm" value={fd.tieBeams.widthMm} step={25} min={200}
+                onChange={(v) => setFd({ tieBeams: { ...fd.tieBeams!, widthMm: Math.max(200, v ?? 300) } })} />
+              <NumField label="Beam Depth" unit="mm" value={fd.tieBeams.depthMm} step={25} min={250}
+                onChange={(v) => setFd({ tieBeams: { ...fd.tieBeams!, depthMm: Math.max(250, v ?? 450) } })} />
+              <NumField label="Wall Load on Beam" unit="kN/m" value={fd.tieBeams.wallLoadKnM} step={1} min={0}
+                hint="Wall resting on the beam (blank = none)"
+                onChange={(v) => setFd({ tieBeams: { ...fd.tieBeams!, wallLoadKnM: v } })} />
+              <NumField label="Tie Force" unit="% of column load" value={fd.tieBeams.tieForcePct} step={1} min={0}
+                hint="Your design criterion; blank = 5% assumed (WARNING)"
+                onChange={(v) => setFd({ tieBeams: { ...fd.tieBeams!, tieForcePct: v } })} />
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className={labelCls}>Soil Investigation Report Ref.</label>
