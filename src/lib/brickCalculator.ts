@@ -22,6 +22,7 @@ import { buildFoundationBasementQuantities, priceFoundationBasement, type Founda
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
 import { columnVolumeM3 } from './columnGeometry';
 import { isUpperSegment, isSegmented, segmentHeightM } from './columnSegments';
+import { applyBeamEdits, beamHasSizeEdit, editedBeamQuantities, type BeamEdit, type CustomBeam, type EditedBeam, type BeamQuantities } from './beamEdits';
 import { columnSurfaceAreaM2, steelColumnMassKg, timberColumnCft, hasAppliedFinish, type ColumnType, type ColumnFinish, type ColumnTexture } from './columnAppearance';
 import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
 
@@ -1113,6 +1114,28 @@ export const detectPillarToPillarBeams = (
 };
 
 /**
+ * Floor beams with the floor's per-beam edits and drawn beams applied (see beamEdits.ts). `frameOnly` skips the wall fallback
+ * (3D draws only pillar frame beams). Floors without edits get exactly the detected beams.
+ */
+export const getFloorBeams = (
+  floor: { beamEdits?: Record<string, BeamEdit>; customBeams?: CustomBeam[] } | undefined,
+  pillars: Pillar[] = [],
+  walls: Wall[] = [],
+  buildingUnit: Unit = 'ft',
+  options?: { includeDeleted?: boolean; frameOnly?: boolean }
+): EditedBeam[] => {
+  const base: StructuralBeam[] = options?.frameOnly
+    ? detectPillarToPillarBeams(pillars, buildingUnit, walls)
+    : getEffectiveFloorBeams(pillars, walls, buildingUnit);
+  if (!floor || (!floor.customBeams?.length && !(floor.beamEdits && Object.keys(floor.beamEdits).length))) return base;
+  const pos = (id: string): Coordinate | undefined => {
+    const p = pillars.find(x => x.id === id);
+    return p ? getEffectivePillarPosition(p, walls, buildingUnit) : undefined;
+  };
+  return applyBeamEdits(base, floor.beamEdits, floor.customBeams, pos, buildingUnit, { includeDeleted: options?.includeDeleted });
+};
+
+/**
  * Reusable single source of truth for floor beam geometry.
  * Detects structural pillar-to-pillar frame beams using effective pillar coordinates,
  * and falls back to perimeter walls only when no structural pillar frame exists.
@@ -1546,6 +1569,8 @@ export interface RCCElementBreakdown {
   cost: number;
   /** Pillars only: steel / timber columns and surface finishes (priced only where a rate was entered) */
   columnExtras?: { steelColumnKg: number; timberColumnCft: number; finishAreaM2: number; materialCost: number; finishCost: number; unpricedFinishAreaM2: number };
+  /** Ring / frame beams only: beams edited to steel / timber, finishes (priced only where a rate was entered) */
+  beamExtras?: { steelBeamKg: number; timberBeamCft: number; finishAreaM2: number; materialCost: number; finishCost: number; unpricedFinishAreaM2: number; formworkM2: number };
 }
 
 export interface RCCFloorEstimate {
@@ -2618,6 +2643,8 @@ export const calculateRingBeamsRcc = (
   steelKg: number;
   coverBlocks: number;
   lengthM: number;
+  /** Beams edited to a different size / section / material / bars, and applied finishes (priced only where a rate was entered) */
+  extras?: { steelBeamKg: number; timberBeamCft: number; finishAreaM2: number; materialCost: number; finishCost: number; unpricedFinishAreaM2: number; formworkM2: number };
 } => {
   if (!ringBeamConfig || ringBeamConfig.enabled === false) {
     return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, lengthM: 0 };
@@ -2630,13 +2657,27 @@ export const calculateRingBeamsRcc = (
   }
 
   let totalLengthM = 0;
+  // beams with a size / section / material / bar edit are quantified one by one
+  const customQ: BeamQuantities[] = [];
+  const customLengthM: number[] = [];
 
   // 1. Calculate beam volume from actual structural frame spans when provided
   if (structuralBeams && structuralBeams.length > 0) {
     structuralBeams.forEach(b => {
       const lenM = toMeters(b.length, b.unit || buildingUnit);
       if (lenM > 0.05) {
-        totalLengthM += lenM;
+        const eb = b as EditedBeam;
+        if (beamHasSizeEdit(eb.edit)) {
+          customQ.push(editedBeamQuantities(eb, {
+            defaultWidthMm: beamW_M * 1000, defaultDepthMm: beamH_M * 1000,
+            topBars: reinf.beamTopBarCount || 2, topDiaMm: reinf.beamTopBarDiaMm, bottomBars: reinf.beamBottomBarCount || 2, bottomDiaMm: reinf.beamBottomBarDiaMm,
+            stirrupDiaMm: reinf.beamStirrupDiaMm, stirrupSpacingMm: reinf.beamStirrupSpacingMm || 150, coverMm: reinf.beamCoverMm || 25, lapFactor: 1.10,
+            barKgPerM: getSteelBarWeightPerMeter,
+          }, buildingUnit));
+          customLengthM.push(lenM);
+        } else {
+          totalLengthM += lenM;
+        }
       }
     });
   } else if (walls.length > 0) {
@@ -2667,7 +2708,7 @@ export const calculateRingBeamsRcc = (
     });
   }
 
-  if (totalLengthM <= 0.05) {
+  if (totalLengthM <= 0.05 && customQ.length === 0) {
     return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, lengthM: 0 };
   }
 
@@ -2693,15 +2734,26 @@ export const calculateRingBeamsRcc = (
   const stirrupCutLengthM = (2 * (coreW + coreH)) + 0.15;
   const stirrupSteelKg = stirrupCount * stirrupCutLengthM * stirrupWeightPerM;
 
-  const totalSteelKg = topSteelKg + bottomSteelKg + stirrupSteelKg;
-  const coverBlocks = Math.max(2, Math.ceil(totalLengthM / coverBlockSpacingM) * 2);
+  const plainSteelKg = totalLengthM > 0.05 ? topSteelKg + bottomSteelKg + stirrupSteelKg : 0;
+  const plainConcrete = totalLengthM > 0.05 ? concreteVolumeM3 : 0;
+  const sumQ = (f: (q: BeamQuantities) => number) => customQ.reduce((s, q) => s + f(q), 0);
+  const totalLenAll = totalLengthM + customLengthM.reduce((s, v) => s + v, 0);
+  const customConcrete = sumQ(q => q.concreteM3);
+  const customSteel = sumQ(q => q.steelKg);
+  const coverBlocks = Math.max(2, Math.ceil(totalLenAll / coverBlockSpacingM) * 2);
+  const extras = customQ.length > 0 ? {
+    steelBeamKg: sumQ(q => q.steelBeamKg), timberBeamCft: sumQ(q => q.timberBeamCft), finishAreaM2: sumQ(q => q.finishAreaM2),
+    materialCost: sumQ(q => q.materialCost), finishCost: sumQ(q => q.finishCost), unpricedFinishAreaM2: sumQ(q => q.unpricedFinishAreaM2),
+    formworkM2: sumQ(q => q.formworkM2),
+  } : undefined;
 
   return {
-    concreteVolumeM3,
-    concreteVolumeCft: concreteVolumeM3 * 35.3147,
-    steelKg: totalSteelKg,
+    concreteVolumeM3: plainConcrete + customConcrete,
+    concreteVolumeCft: (plainConcrete + customConcrete) * 35.3147,
+    steelKg: plainSteelKg + customSteel,
     coverBlocks,
-    lengthM: totalLengthM
+    lengthM: totalLenAll,
+    extras,
   };
 };
 
@@ -2907,7 +2959,7 @@ export const calculateFloorRccEstimate = (
     depthUnit: 'in'
   };
 
-  const floorBeams = getEffectiveFloorBeams(floorPillars, allWalls, buildingUnit);
+  const floorBeams = getFloorBeams(floor, floorPillars, allWalls, buildingUnit);
 
   const ringBeamRes = isAnyBeamOn
     ? calculateRingBeamsRcc(allWalls, effectiveBeamConfig, buildingUnit, reinf, floorBeams)
@@ -2971,7 +3023,8 @@ export const calculateFloorRccEstimate = (
 
   const floorMatsBase = calculateRccMaterialsFromVolume(totalFloorConcreteM3, totalFloorSteelKg, totalFloorCoverBlocks, settings, reinf);
   const columnExtraCost = pillarRes.extras.materialCost + pillarRes.extras.finishCost;
-  const floorMats = columnExtraCost > 0 ? { ...floorMatsBase, costs: { ...floorMatsBase.costs, total: floorMatsBase.costs.total + columnExtraCost } } : floorMatsBase;
+  const beamExtraCost = (ringBeamRes.extras?.materialCost ?? 0) + (ringBeamRes.extras?.finishCost ?? 0);
+  const floorMats = (columnExtraCost + beamExtraCost) > 0 ? { ...floorMatsBase, costs: { ...floorMatsBase.costs, total: floorMatsBase.costs.total + columnExtraCost + beamExtraCost } } : floorMatsBase;
 
   return {
     floorId: floor.id,
@@ -3008,7 +3061,8 @@ export const calculateFloorRccEstimate = (
         waterLitres: ringBeamMats.waterLitres,
         bindingWireKg: ringBeamMats.bindingWireKg,
         coverBlocks: ringBeamRes.coverBlocks,
-        cost: ringBeamMats.costs.total
+        cost: ringBeamMats.costs.total + beamExtraCost,
+        beamExtras: ringBeamRes.extras
       },
       fullRccTop: {
         elementType: 'fullRccTop',
@@ -5637,7 +5691,7 @@ export const calculateProject = (
     const floorsWithBeams = (bModel.floors || []).map(fl => {
       const flPillars = fl.pillars || [];
       const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
-      const flBeams = getEffectiveFloorBeams(flPillars, flWalls, bModel.buildingUnit || 'ft');
+      const flBeams = getFloorBeams(fl, flPillars, flWalls, bModel.buildingUnit || 'ft');
       return {
         ...fl,
         detectedBeams: flBeams
@@ -6036,6 +6090,9 @@ export interface Floor {
   fullRoof?: RCCFullRoofConfig;
   slab?: RCCSlabConfig;
   plaster?: PlasterConfig;
+  /** Per-beam edits (keyed by beam id) and beams drawn by the user: see beamEdits.ts */
+  beamEdits?: Record<string, BeamEdit>;
+  customBeams?: CustomBeam[];
 }
 
 export interface RCCRingBeamConfig {
@@ -6832,7 +6889,7 @@ export function recalculateBuildingPillarSizing(
   const floorsWithBeams = (model.floors || []).map(fl => {
     const flPillars = fl.pillars || [];
     const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
-    const flBeams = getEffectiveFloorBeams(flPillars, flWalls, model.buildingUnit || 'ft');
+    const flBeams = getFloorBeams(fl, flPillars, flWalls, model.buildingUnit || 'ft');
     return {
       ...fl,
       detectedBeams: flBeams

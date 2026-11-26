@@ -106,7 +106,7 @@ function BeamRebarEditor({ beam, value, onChange, testId, design, onDesignChange
       <div className="mt-2 space-y-2">
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-[10px] text-slate-600" data-testid={`${testId}-design`}>
           <label>Support<select className={inp} data-testid={`${testId}-support`} value={dz.support ?? ''} onChange={e => setD({ support: (e.target.value || undefined) as BeamDesignInputs['support'] })}>
-            <option value="">Continuous (wL²/10)</option><option value="simply_supported">Simply supported (wL²/8)</option></select></label>
+            <option value="">Continuous (wL²/10)</option><option value="simply_supported">Simply supported (wL²/8)</option><option value="fixed">Fixed ends (wL²/12)</option><option value="cantilever">Cantilever (wL²/2)</option></select></label>
           <label>Extra UDL kN/m<input type="number" min={0} step={0.5} className={inp} data-testid={`${testId}-udl`} placeholder="0" value={dz.extraUdlKnM ?? ''} onChange={e => setD({ extraUdlKnM: num(e.target.value) })} /></label>
           <label>Point load kN<input type="number" min={0} step={1} className={inp} data-testid={`${testId}-point`} placeholder="0" value={dz.pointLoadKn ?? ''} onChange={e => setD({ pointLoadKn: num(e.target.value) })} /></label>
           <label>Concrete<select className={inp} value={dz.concreteGrade ?? ''} onChange={e => setD({ concreteGrade: (e.target.value || undefined) as BeamDesignInputs['concreteGrade'] })}>
@@ -114,7 +114,7 @@ function BeamRebarEditor({ beam, value, onChange, testId, design, onDesignChange
           <label>Steel<select className={inp} value={dz.steelGrade ?? ''} onChange={e => setD({ steelGrade: (e.target.value || undefined) as BeamDesignInputs['steelGrade'] })}>
             <option value="">{buildingSteel}</option>{['Fe415', 'Fe500', 'Fe550'].map(g => <option key={g} value={g}>{g}</option>)}</select></label>
         </div>
-        <div className="text-[10px] text-slate-500">Loads are service values (factored ×1.5). A point load is taken at mid-span with the simply supported moment PL/4 (conservative for a continuous beam). Cantilever and fixed-end beams are not designed here: their governing moment needs top steel.</div>
+        <div className="text-[10px] text-slate-500">Loads are service values (factored ×1.5). A point load is taken at mid-span with the simply supported moment PL/4 (conservative for a continuous beam); for a cantilever it acts at the free end. For fixed-end and cantilever beams the main steel goes on the top face: see the notes of the design.</div>
         <div className="text-[10px] text-slate-500">Bars: blank = automatic design. Your values are kept as entered and checked below (never corrected silently).</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] text-slate-600">
           <label>Bottom ⌀ <span className="text-slate-400">({beam.bottomMainBarDiaMm})</span><select className={inp} data-testid={`${testId}-bot-dia`} value={v.bottomBarDiaMm ?? ''} onChange={e => set({ bottomBarDiaMm: num(e.target.value) })}><option value="">Auto</option>{[10, 12, 16, 20, 25].map(d => <option key={d} value={d}>{d}</option>)}</select></label>

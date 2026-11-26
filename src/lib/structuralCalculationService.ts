@@ -17,6 +17,7 @@ import type { FoundationDetailsConfig, BasementConfig } from './foundation/types
 import { columnSectionAreaM2, columnSectionPolygon, columnVolumeM3, columnAxisLengthM, columnTaperRatio } from './columnGeometry';
 import { polygonPerimeter, polygonBounds } from './foundation/polygon';
 import { isSegmented, segmentHeightM } from './columnSegments';
+import { beamHasSizeEdit, beamVolumeM3, beamMemberLengthM, beamSectionPerimeterMm, type BeamEdit } from './beamEdits';
 import { columnRebarChecks, hasColumnRebarOverride, beamRebarChecks, hasBeamRebarOverride, type ColumnRebarOverride, type BeamRebarOverride, type RebarCheck } from './rebarChecks';
 
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
@@ -532,8 +533,8 @@ export interface FloorSlabStructuralCalculation {
 
 /** Per-floor beam design inputs entered by the user */
 export interface BeamDesignInputs {
-  /** 'continuous' (default, Mu = wL²/10) or 'simply_supported' (wL²/8) */
-  support?: 'continuous' | 'simply_supported';
+  /** 'continuous' (default, Mu = wL²/10), 'simply_supported' (wL²/8), 'fixed' (both ends fixed, wL²/12) or 'cantilever' (wL²/2, shear wL) */
+  support?: 'continuous' | 'simply_supported' | 'fixed' | 'cantilever';
   /** Extra service UDL on the beam, kN/m (treated as dead load) */
   extraUdlKnM?: number;
   /** Extra service point load at mid-span, kN */
@@ -629,6 +630,8 @@ export interface BuildingStructuralSummary {
   // Floor-wise Structural Analysis & Reinforcement Schedules (IS 456 & IS 875)
   floorSlabCalculations?: FloorSlabStructuralCalculation[];
   floorBeamCalculations?: FloorBeamStructuralCalculation[];
+  /** Beams edited to another size / end condition / extra bars, and cantilevers: each designed on its own span (IS 456) */
+  editedBeamCalculations?: Array<{ floorId: string; beamId: string; label: string; calc: FloorBeamStructuralCalculation }>;
   roofSlabCalculation?: FloorSlabStructuralCalculation;
   roofBeamCalculation?: FloorBeamStructuralCalculation;
   
@@ -1132,10 +1135,13 @@ export function calculateFloorBeamStructuralDetails(
   // A user point load P at mid-span adds 1.5 P L / 4 (the simply supported value: conservative for a continuous beam)
   // and 1.5 P / 2 of shear; a user extra UDL is part of wu.
   const support = bd?.support || 'continuous';
-  const momentCoeff = support === 'simply_supported' ? 8 : 10;
+  const momentCoeff = support === 'simply_supported' ? 8 : support === 'fixed' ? 12 : support === 'cantilever' ? 2 : 10;
   const pointLoadKn = Math.max(0, bd?.pointLoadKn || 0);
-  const designBendingMomentMuKnM = (factoredLoadWuPerM_Kn * spanM * spanM) / momentCoeff + (1.5 * pointLoadKn * spanM) / 4;
-  const designShearForceVuKn = (factoredLoadWuPerM_Kn * spanM) / 2 + (1.5 * pointLoadKn) / 2;
+  // cantilever: the user point load acts at the free end (M = 1.5 P L, V = 1.5 P); otherwise at mid-span
+  const designBendingMomentMuKnM = (factoredLoadWuPerM_Kn * spanM * spanM) / momentCoeff + (support === 'cantilever' ? 1.5 * pointLoadKn * spanM : (1.5 * pointLoadKn * spanM) / 4);
+  if (support === 'cantilever') notes.push('Cantilever beam: hogging moment wL²/2 and shear wL; the main tension bars (shown as the bottom bars) must be placed at the TOP face and anchored into the support (IS 456 Cl. 26.2.3.3).');
+  if (support === 'fixed') notes.push('Fixed-end beam: support moment wL²/12 governs (main tension steel at the TOP over the supports); the span (sagging) moment is wL²/24: provide at least half of the bottom steel in the span. Fixity assumes a rigid support.');
+  const designShearForceVuKn = support === 'cantilever' ? factoredLoadWuPerM_Kn * spanM + 1.5 * pointLoadKn : (factoredLoadWuPerM_Kn * spanM) / 2 + (1.5 * pointLoadKn) / 2;
 
   // Ru,max check
   const ruCoeff = fy <= 415 ? 0.138 : (fy <= 500 ? 0.133 : 0.130);
@@ -1222,7 +1228,7 @@ export function calculateFloorBeamStructuralDetails(
   const stirrupsSafe = nominalShearStressTauV_Mpa <= maxShearStressTauCMax_Mpa;
 
   // Deflection Check (IS 456 Cl. 23.2.1)
-  const basicLoverD = support === 'simply_supported' ? 20 : 26; // IS 456 Cl. 23.2.1
+  const basicLoverD = support === 'cantilever' ? 7 : support === 'simply_supported' ? 20 : 26; // IS 456 Cl. 23.2.1
   const allowableLoverD = Math.round(basicLoverD * 1.15 * 10) / 10;
   const actualLoverD = Math.round(((spanM * 1000) / effectiveDepthD_mm) * 10) / 10;
   const isDeflectionSafe = actualLoverD <= allowableLoverD;
@@ -2243,9 +2249,19 @@ export function calculateBuildingStructuralSummary(
       // 1. Check for explicit structural frame beams on this floor (e.g. from getEffectiveFloorBeams)
       const flBeams: any[] = (fl as any).detectedBeams || (fl as any).structuralBeams || [];
       if (flBeams.length > 0) {
-        const floorBeamLenM = flBeams.reduce((sum, b) => sum + toMeters(b.length, b.unit || 'ft'), 0);
+        // beams edited to another size / section / material are measured one by one; the rest share the floor beam size
+        const plain = flBeams.filter(b => !beamHasSizeEdit(b.edit));
+        const floorBeamLenM = plain.reduce((sum, b) => sum + toMeters(b.length, b.unit || 'ft'), 0);
         totalBeamRccM3 += floorBeamLenM * beamWidthM * beamDepthM;
         totalBeamFormworkM2 += floorBeamLenM * (beamWidthM + 2 * beamDepthM);
+        flBeams.filter(b => beamHasSizeEdit(b.edit)).forEach(b => {
+          const ed = b.edit as BeamEdit;
+          if ((ed.material ?? 'rcc') !== 'rcc') return; // steel / timber members carry no RCC
+          const dims = { widthMm: ed.widthMm ?? beamWidthM * 1000, depthMm: ed.depthMm ?? beamDepthM * 1000, section: ed.section };
+          const planM = toMeters(b.length, b.unit || 'ft');
+          totalBeamRccM3 += beamVolumeM3(dims, planM);
+          totalBeamFormworkM2 += (beamSectionPerimeterMm(dims) / 1000) * beamMemberLengthM(planM, ed.section);
+        });
       } else {
         // 2. Fallback to structural load-bearing walls on this floor (strictly excluding thin 4.5" partitions)
         const flWalls: any[] = [...((fl as any).externalWalls || []), ...((fl as any).internalWalls || [])];
@@ -2350,6 +2366,7 @@ export function calculateBuildingStructuralSummary(
   // Floor-wise Structural Analysis & Reinforcement Schedules (IS 456:2000 & IS 875)
   const floorSlabCalculations: FloorSlabStructuralCalculation[] = [];
   const floorBeamCalculations: FloorBeamStructuralCalculation[] = [];
+  const editedBeamCalculations: Array<{ floorId: string; beamId: string; label: string; calc: FloorBeamStructuralCalculation }> = [];
 
   const effectiveFloorsList = (Array.isArray(floorsData) && floorsData.length > 0)
     ? (floorsData as any[])
@@ -2476,6 +2493,32 @@ export function calculateBuildingStructuralSummary(
       }
     );
     floorBeamCalculations.push(beamCalc);
+
+    // beams edited to another size / end condition / extra bars, and cantilevers: designed one by one on their own span
+    flBeams.forEach((b: any) => {
+      const ed = b.edit as BeamEdit | undefined;
+      const wantsDesign = b.isCantilever || (ed && (ed.widthMm !== undefined || ed.depthMm !== undefined || ed.endCondition || ed.extraBars));
+      if (!wantsDesign || (ed?.material ?? 'rcc') !== 'rcc') return;
+      const spanB = toMeters(b.length, b.unit || 'ft');
+      const support: BeamDesignInputs['support'] = (b.isCantilever || ed?.endCondition === 'cantilever') ? 'cantilever'
+        : ed?.endCondition === 'fixed' ? 'fixed' : ed?.endCondition === 'simply_supported' ? 'simply_supported' : flOverrides?.beamDesign?.support;
+      const wMm = ed?.widthMm ?? customBeamWMm, dMm = ed?.depthMm ?? customBeamDMm;
+      const run = (rebarOverride?: BeamRebarOverride) => calculateFloorBeamStructuralDetails(
+        `${floorId}:${b.id}`, fIdx, `${floorName} · beam ${b.id}`, isTopStorey, spanB, spanB, flWallHeightM, flWallThickM, spanB / 2, slabCalc, config,
+        { customWidthMm: wMm, customDepthMm: dMm, isCustomSize: Boolean(wMm || dMm), rebarOverride, design: { ...flOverrides?.beamDesign, support } }
+      );
+      let calc = run(flOverrides?.beamRebar);
+      if (ed?.extraBars && (ed.extraBars.topCount || ed.extraBars.bottomCount)) {
+        // extra bars add to the automatic bars: expressed as a larger bar count of the automatic diameter
+        const area = (d: number) => (Math.PI * d * d) / 4;
+        const extraB = ed.extraBars.bottomCount ? Math.ceil((ed.extraBars.bottomCount * area(ed.extraBars.bottomDiaMm ?? calc.bottomMainBarDiaMm)) / area(calc.bottomMainBarDiaMm)) : 0;
+        const extraT = ed.extraBars.topCount ? Math.ceil((ed.extraBars.topCount * area(ed.extraBars.topDiaMm ?? calc.topAnchorBarDiaMm)) / area(calc.topAnchorBarDiaMm)) : 0;
+        calc = run({ ...flOverrides?.beamRebar,
+          bottomBarDiaMm: calc.bottomMainBarDiaMm, bottomBarCount: calc.bottomMainBarCount + extraB,
+          topBarDiaMm: calc.topAnchorBarDiaMm, topBarCount: calc.topAnchorBarCount + extraT });
+      }
+      editedBeamCalculations.push({ floorId, beamId: b.id, label: `${floorName} · beam ${b.id}`, calc });
+    });
   });
 
   // Independent Roof Slab calculation if configured or top roof slab
@@ -2687,6 +2730,7 @@ export function calculateBuildingStructuralSummary(
     pillarsCalculations,
     floorSlabCalculations,
     floorBeamCalculations,
+    editedBeamCalculations: editedBeamCalculations.length ? editedBeamCalculations : undefined,
     roofSlabCalculation,
     roofBeamCalculation,
     totalVerticalLoadKn,

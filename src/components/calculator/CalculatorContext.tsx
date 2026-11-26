@@ -23,7 +23,7 @@ import {
   calculateBuildingStructuralSummary,
   generateFootingsForPillars,
   getConcreteMixRatios,
-  getEffectiveFloorBeams
+  getFloorBeams
 } from "@/lib/brickCalculator";
 
 export type { CalculatorMode };
@@ -298,7 +298,7 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
       const updatedFloorsWithBeams = updatedFloors.map(fl => {
         const flPillars = allPillars.filter(p => p.floorId === fl.id || (!p.floorId && fl.level === 0));
         const flWalls = [...fl.externalWalls, ...fl.internalWalls];
-        const flBeams = getEffectiveFloorBeams(flPillars, flWalls, prevModel.buildingUnit || 'ft');
+        const flBeams = getFloorBeams(fl, flPillars, flWalls, prevModel.buildingUnit || 'ft');
         return {
           ...fl,
           detectedBeams: flBeams
