@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1795720860.3464842,
-    "seen": 1795721204.3979666,
-    "ast_hash": "63f38fa69a95109eea7ca23b73513698",
+    "mtime": 1795721227.7702625,
+    "seen": 1795722402.6091676,
+    "ast_hash": "2a3c35bf1e27929e1095a3f4b39eb483",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {
-    "mtime": 1795721090.7181,
-    "seen": 1795721204.3979838,
-    "ast_hash": "4561bb734f8113b208bb5961ce38d4b9",
+    "mtime": 1795722240.158879,
+    "seen": 1795722402.6091864,
+    "ast_hash": "66de98950c94d99ce3723f7f94628d6f",
     "semantic_hash": ""
   },
   "src/lib/foundation/basementDesignService.test.ts": {
@@ -594,15 +594,15 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.test.ts": {
-    "mtime": 1795721131.6729555,
-    "seen": 1795721204.3981094,
-    "ast_hash": "7e0450bfc0225ce2e6ee6ac84b4192a0",
+    "mtime": 1795722330.9737449,
+    "seen": 1795722402.609323,
+    "ast_hash": "98b6990391e3dc3d3c345ba7fc255790",
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795721090.8101926,
-    "seen": 1795721204.3981116,
-    "ast_hash": "fce11c60640fb57b74108dab94388e9b",
+    "mtime": 1795722312.1644669,
+    "seen": 1795722402.6093254,
+    "ast_hash": "9855bc794957da9a9cd0107a7381719d",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.ts": {
-    "mtime": 1795719345.89445,
-    "seen": 1795719494.5748327,
-    "ast_hash": "aae57c0db4a2add6c22e1e149263c28a",
+    "mtime": 1795722240.1578636,
+    "seen": 1795722402.6093416,
+    "ast_hash": "3c04a6090dfea85fa73db77742b551d7",
     "semantic_hash": ""
   },
   "src/lib/foundation/rcDesign.ts": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/types.ts": {
-    "mtime": 1795721045.1950479,
-    "seen": 1795721204.3981545,
-    "ast_hash": "55e92cf2558b9339985a038aea149cda",
+    "mtime": 1795722240.0362062,
+    "seen": 1795722402.6093707,
+    "ast_hash": "0d9f4eb4aed13bcbda9b2a0a0bceaa91",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.test.ts": {

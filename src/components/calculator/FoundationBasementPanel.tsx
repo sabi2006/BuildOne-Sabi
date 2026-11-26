@@ -410,6 +410,17 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
               <NumField label="Verified Pile Capacity" unit="kN" step={10} value={fd.investigation.pile?.verifiedPileCapacityKn}
                 hint="e.g. from a pile load test"
                 onChange={(v) => setInv({ pile: { ...fd.investigation.pile, verifiedPileCapacityKn: v } })} />
+              <NumField label="Allowable Lateral Load / Pile" unit="kN" step={5} value={fd.investigation.pile?.allowableLateralKn}
+                hint="From a lateral load test / the report; blank = lateral NOT_VERIFIED"
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, allowableLateralKn: v } })} />
+              <NumField label="Allowable Uplift / Pile" unit="kN" step={5} min={0} value={fd.investigation.pile?.allowableUpliftKn}
+                hint="Blank = no tension allowed"
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, allowableUpliftKn: v } })} />
+              <NumField label="Pile Cage: Bars" unit="nos" step={1} min={3} value={fd.investigation.pile?.cageBarCount}
+                hint="Longitudinal bars of the pile cage"
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, cageBarCount: v } })} />
+              <NumField label="Pile Cage: Bar Dia" unit="mm" step={2} min={10} value={fd.investigation.pile?.cageBarDiaMm}
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, cageBarDiaMm: v } })} />
               <NumField label="Group Efficiency" unit="0 - 1" step={0.05} min={0.3} value={fd.investigation.pile?.groupEfficiency}
                 hint="Blank = Converse-Labarre (friction piles); 1 for end-bearing piles"
                 onChange={(v) => setInv({ pile: { ...fd.investigation.pile, groupEfficiency: v === undefined ? undefined : Math.min(1, Math.max(0.3, v)) } })} />

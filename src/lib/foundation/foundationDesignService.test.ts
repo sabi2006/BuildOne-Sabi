@@ -372,7 +372,8 @@ describe('Pile foundation', () => {
     const e = designPileFoundation([col('a', 0, 0, 1600)], params({
       requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
     }))[0];
-    for (const id of ['block_failure', 'lateral', 'pile_settlement', 'pile_anchorage']) expect(e.checks.find(c => c.id === id)!.status).toBe('NOT_VERIFIED');
+    // without frame results, soil data and cage data these are reported as not verified, never assumed
+    for (const id of ['block_failure', 'lateral', 'settlement', 'pile_cage', 'pile_anchorage']) expect(e.checks.find(c => c.id === id)!.status).toBe('NOT_VERIFIED');
     expect(e.checks.find(c => c.id === 'group')!.status).toBe('PASS');
     expect(e.status).not.toBe('PASS');
   });
@@ -416,6 +417,87 @@ describe('Pile foundation', () => {
     const user = ignore.checks.find(c => c.id === 'group')!;
     expect(user.capacity).toBeCloseTo(ignore.pile!.pilesRequired! * 500, 0);
     expect(user.clause).toContain('user-entered');
+  });
+});
+
+describe('Pile group: moments, lateral, block failure, settlement, cage', () => {
+  const pileBase = { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12, groupEfficiency: 1 };
+  const withCases = (cases: NonNullable<FoundationColumnInput['caseForces']>, P = 900): FoundationColumnInput => ({ ...col('a', 0, 0, P), caseForces: cases });
+  const f = (axialKn: number, mx = 0, my = 0, vx = 0, vy = 0) => ({ axialKn, momentXKnM: mx, momentYKnM: my, shearXKn: vx, shearYKn: vy });
+  const run = (cols: FoundationColumnInput, pile = {}, extra = {}) => designPileFoundation([cols], params({ requestedType: 'pile', pile: { ...pileBase, ...pile }, ...extra }))[0];
+  const chk = (e: ReturnType<typeof run>, id: string) => e.checks.find(c => c.id === id)!;
+
+  it('column moments load the piles unequally: Rmax = N/n + Mx·ymax/Σy² + My·xmax/Σx² (hand value from the designed layout)', () => {
+    const e = run(withCases({ DL: f(1500, 150, 90), LL: f(900) }, 2400), { verifiedPileCapacityKn: 700 });
+    const { rows, cols, spacingMm } = e.pile!;
+    const s = spacingMm! / 1000, n = e.pile!.pilesRequired!;
+    const xs: number[] = [], ys: number[] = [];
+    for (let r = 0; r < rows!; r++) for (let k = 0; k < cols! && xs.length < n; k++) { xs.push((k - (cols! - 1) / 2) * s); ys.push((r - (rows! - 1) / 2) * s); }
+    expect(n).toBeGreaterThanOrEqual(4);
+    const sxx = xs.reduce((a, x) => a + x * x, 0), syy = ys.reduce((a, y) => a + y * y, 0);
+    const N = e.loads.serviceKn; // column + cap self-weight; the shears are zero, so the cap-base moment equals the column moment
+    expect(chk(e, 'pile_reaction').demand).toBeCloseTo(N / n + (150 * Math.max(...ys.map(Math.abs))) / syy + (90 * Math.max(...xs.map(Math.abs))) / sxx, 1);
+    expect(chk(e, 'pile_reaction').status).toBe('PASS');
+    expect(e.checks.find(c => c.id === 'moments')).toBeUndefined(); // moments are used, so the not-verified note is gone
+  });
+
+  it('a large moment adds piles (the same axial load without moments needs fewer)', () => {
+    const noM = run(withCases({ DL: f(600), LL: f(300) }));
+    const big = run(withCases({ DL: f(600, 900), LL: f(300) }));
+    expect(big.pile!.pilesRequired!).toBeGreaterThan(noM.pile!.pilesRequired!);
+    expect(chk(big, 'pile_reaction').demand!).toBeLessThanOrEqual(500);
+  });
+
+  it('uplift: no tension unless the user allows it', () => {
+    const cases = { DL: f(300, 0, 0), LL: f(0), EQX: f(0, 1500, 0, 0, 0) };
+    const none = run(withCases(cases, 300));
+    expect(chk(none, 'pile_reaction').note).not.toContain('uplift');
+    const allowed = run(withCases(cases, 300), { allowableUpliftKn: 400 });
+    expect(allowed.pile!.pilesRequired!).toBeLessThanOrEqual(none.pile!.pilesRequired!);
+  });
+
+  it('lateral: per-pile shear against the entered allowable lateral load; not verified without it', () => {
+    const cols = withCases({ DL: f(600, 0, 0, 40, 0), LL: f(300), EQX: f(0, 0, 0, 120, 0) });
+    expect(chk(run(cols), 'lateral').status).toBe('NOT_VERIFIED');
+    const ok = run(cols, { allowableLateralKn: 60 });
+    const n = ok.pile!.pilesRequired!;
+    expect(chk(ok, 'lateral').demand).toBeCloseTo(160 / n, 1);   // 40 + 120 kN shared by n piles
+    expect(chk(ok, 'lateral').status).toBe('PASS');
+    expect(chk(run(cols, { allowableLateralKn: 10 }), 'lateral').status).toBe('FAIL');
+  });
+
+  it('block failure (clay): Qb = (2 L (B + Lg) cu + 9 cu B Lg) / FS vs column + cap', () => {
+    const e = run(withCases({ DL: f(600), LL: f(300) }), {}, { cohesionKnM2: 40 });
+    const b = chk(e, 'block_failure');
+    const { rows, cols, spacingMm } = e.pile!;
+    const s = spacingMm! / 1000, d = 0.45;
+    const bg = (cols! - 1) * s + d, lg = (rows! - 1) * s + d;
+    expect(b.capacity).toBeCloseTo((2 * 12 * (bg + lg) * 40 + 9 * 40 * bg * lg) / 2.5, 0);
+    expect(b.status).toBe('PASS');
+    expect(chk(run(withCases({ DL: f(600), LL: f(300) })), 'block_failure').status).toBe('NOT_VERIFIED'); // no cohesion entered
+  });
+
+  it('group settlement uses the equivalent raft and the soil modulus; not verified without Es', () => {
+    const none = run(withCases({ DL: f(600), LL: f(300) }));
+    expect(chk(none, 'settlement').status).toBe('NOT_VERIFIED');
+    const e = run(withCases({ DL: f(600), LL: f(300) }), {}, { soilModulusKnM2: 30000, poissonRatio: 0.3, allowableSettlementMm: 40 });
+    const st = chk(e, 'settlement');
+    expect(st.label).toContain('Pile group settlement');
+    expect(st.demand!).toBeGreaterThan(0);
+    expect(['PASS', 'WARNING', 'FAIL']).toContain(st.status);
+  });
+
+  it('pile cage: section capacity 0.4 fck Ac + 0.67 fy Asc and bar anchorage into the cap', () => {
+    const e = run(withCases({ DL: f(600), LL: f(300) }), { cageBarCount: 8, cageBarDiaMm: 16 });
+    const cageChk = chk(e, 'pile_cage');
+    const Ag = Math.PI * 450 * 450 / 4, Asc = 8 * Math.PI * 16 * 16 / 4;
+    expect(cageChk.capacity).toBeCloseTo((0.4 * 25 * (Ag - Asc) + 0.67 * 500 * Asc) / 1000, 0);
+    expect(cageChk.status).toBe('PASS');
+    const anch = chk(e, 'pile_anchorage');
+    expect(anch.capacity).toBeCloseTo(e.depthMm! - 75 - 50, 0);
+    expect(['PASS', 'WARNING']).toContain(anch.status);
+    // a cage that is too light fails the section check
+    expect(chk(run(withCases({ DL: f(600), LL: f(300) }, 4000), { cageBarCount: 4, cageBarDiaMm: 10, verifiedPileCapacityKn: 5000 }), 'pile_cage').status).toBe('FAIL');
   });
 });
 

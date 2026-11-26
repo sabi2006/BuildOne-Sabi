@@ -61,6 +61,13 @@ export interface PileInvestigationData {
   verifiedPileCapacityKn?: number;
   /** Group efficiency (0 - 1) of the pile group, e.g. 1 for end-bearing piles in a firm stratum. Blank: the Converse-Labarre formula for friction piles is used. */
   groupEfficiency?: number;
+  /** Allowable lateral load per pile at the head, kN (from a lateral load test or the geotechnical report) */
+  allowableLateralKn?: number;
+  /** Allowable uplift (tension) per pile, kN (default 0: no tension allowed) */
+  allowableUpliftKn?: number;
+  /** Reinforcement cage of the pile (user data): number of longitudinal bars and their diameter, mm */
+  cageBarCount?: number;
+  cageBarDiaMm?: number;
 }
 
 export interface SoilInvestigationData {

@@ -132,6 +132,8 @@ export interface FoundationDesignParams {
   poissonRatio?: number;
   /** Cohesive soil (clay): consolidation settlement is not computed, so the settlement check is at best a WARNING */
   cohesiveSoil?: boolean;
+  /** Undrained cohesion cu, kN/m² (block failure of a pile group in clay) */
+  cohesionKnM2?: number;
   /** Soil friction angle φ (degrees) for base sliding resistance (absent → sliding NOT_VERIFIED) */
   frictionAngleDeg?: number;
   /** Isolated footing profile (default flat) and edge thickness for sloped / stepped footings (mm, ≥ 150, IS 456 Cl. 34.1.2) */
@@ -1714,6 +1716,28 @@ function designRaftWithProjection(
 
 // ------------------------------ PILE GROUP + PILE CAP ------------------------------
 
+/** Service combinations for a pile cap from the frame cases: DL + LL and DL + LL ± each lateral case (change of axial load, moments about x / y, shears) */
+function pileServiceCombos(c: FoundationColumnInput): Array<{ dAxial: number; mx: number; my: number; hx: number; hy: number }> {
+  const f = c.caseForces;
+  if (!f?.DL) return [];
+  const zero: CaseForces = { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 };
+  const dl = f.DL ?? zero, ll = f.LL ?? zero;
+  const gAxial = dl.axialKn + ll.axialKn;
+  const out = [{ dAxial: 0, mx: dl.momentXKnM + ll.momentXKnM, my: dl.momentYKnM + ll.momentYKnM, hx: dl.shearXKn + ll.shearXKn, hy: dl.shearYKn + ll.shearYKn }];
+  for (const id of ['EQX', 'EQZ', 'WX', 'WZ'] as CaseId[]) {
+    const l = f[id];
+    if (!l) continue;
+    for (const sg of [1, -1]) {
+      out.push({
+        dAxial: dl.axialKn + ll.axialKn + sg * l.axialKn - gAxial,
+        mx: dl.momentXKnM + ll.momentXKnM + sg * l.momentXKnM, my: dl.momentYKnM + ll.momentYKnM + sg * l.momentYKnM,
+        hx: dl.shearXKn + ll.shearXKn + sg * l.shearXKn, hy: dl.shearYKn + ll.shearYKn + sg * l.shearYKn,
+      });
+    }
+  }
+  return out;
+}
+
 export function designPileFoundation(
   columns: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options)
 ): FoundationElementResult[] {
@@ -1744,6 +1768,27 @@ export function designPileFoundation(
     }
     const dp = pile.pileDiameterMm / 1000;
     const sM = (opt.pileSpacingFactor * pile.pileDiameterMm) / 1000;
+    // service load combinations from the frame: DL + LL and DL + LL ± each lateral case (axial, moments about x / y, shears)
+    const svcCombos = pileServiceCombos(c);
+    const upliftCap = Math.max(0, pile.allowableUpliftKn ?? 0);
+    /** Largest and smallest pile reaction over the combinations, for a pile layout and total cap depth (m) with self-weight Wcap */
+    const reactions = (pts: Array<{ x: number; y: number }>, Wcap: number, depthM: number) => {
+      const n = pts.length;
+      const sxx = pts.reduce((s, q) => s + q.x * q.x, 0), syy = pts.reduce((s, q) => s + q.y * q.y, 0);
+      const xm = Math.max(...pts.map(q => Math.abs(q.x))), ym = Math.max(...pts.map(q => Math.abs(q.y)));
+      if (svcCombos.length === 0) return { rmax: (c.serviceLoadKn + Wcap) / n, rmin: (c.serviceLoadKn + Wcap) / n, combos: 0, hMax: 0 };
+      let rmax = -Infinity, rmin = Infinity, hMax = 0;
+      for (const k of svcCombos) {
+        const N = c.serviceLoadKn + k.dAxial + Wcap;
+        const Mx = Math.abs(k.mx) + Math.abs(k.hy) * depthM, My = Math.abs(k.my) + Math.abs(k.hx) * depthM; // shears act at the cap base
+        // a moment about an axis needs piles on both sides of it: piles in a line cannot resist the moment about their own line (a single pile is left to carry it in bending)
+        const unresisted = n > 1 && ((syy <= 1e-12 && Mx > 1e-9) || (sxx <= 1e-12 && My > 1e-9));
+        const dev = unresisted ? Infinity : (syy > 0 ? (Mx * ym) / syy : 0) + (sxx > 0 ? (My * xm) / sxx : 0);
+        rmax = Math.max(rmax, N / n + dev); rmin = Math.min(rmin, N / n - dev);
+        hMax = Math.max(hMax, Math.hypot(k.hx, k.hy));
+      }
+      return { rmax, rmin, combos: svcCombos.length, hMax };
+    };
     const edgeM = opt.pileCapEdgeMm / 1000;
     const layoutFor = (n: number) => {
       const cols = n <= 2 ? n : Math.ceil(Math.sqrt(n));
@@ -1767,6 +1812,14 @@ export function designPileFoundation(
       const theta = (Math.atan(dp / sM) * 180) / Math.PI;
       return Math.max(0.3, 1 - (theta * ((l.rows - 1) * l.cols + (l.cols - 1) * l.rows)) / (90 * l.rows * l.cols));
     };
+    // block failure (cohesive soil, textbook Terzaghi-Peck): Qb = (2 L (B + Lg) cu + 9 cu B Lg) / FS
+    const cu = p.cohesionKnM2 && p.cohesionKnM2 > 0 ? p.cohesionKnM2 : undefined;
+    const pileL = pile.pileLengthM ?? 0;
+    const blockCap = (l: { rows: number; cols: number }): number | undefined => {
+      if (cu === undefined || !(pileL > 0)) return undefined;
+      const bgx = (l.cols - 1) * sM + dp, lgx = (l.rows - 1) * sM + dp;
+      return (2 * pileL * (bgx + lgx) * cu + 9 * cu * bgx * lgx) / opt.pileSafetyFactor;
+    };
     type CapResult = { D: number; d: number; phi: number; bx: BarsPerMetre; by: BarsPerMetre; astX: number; astY: number; mX: number; mY: number; limX: number; limY: number; tvX: number; tcX: number; tvY: number; tcY: number; tvp: number; tcp: number };
     let lay = layoutFor(Math.max(1, Math.ceil(c.serviceLoadKn / safeCap)));
     let cap: CapResult | null = null;
@@ -1776,6 +1829,10 @@ export function designPileFoundation(
         const Wcap = RCC_UNIT_WEIGHT * lay.capX * lay.capY * (D / 1000);
         if ((c.serviceLoadKn + Wcap) / lay.n > safeCap) break; // more piles needed
         if (c.serviceLoadKn + Wcap > etaOf(lay) * lay.n * safeCap) break; // group capacity: more piles needed
+        const rx = reactions(piles, Wcap, D / 1000);
+        if (rx.rmax > safeCap || -rx.rmin > upliftCap + 1e-9) break; // moments overload a pile or lift one: more piles
+        const bc = blockCap(lay);
+        if (bc !== undefined && c.serviceLoadKn + Wcap > bc) break; // block failure: a larger group
         const R = (c.factoredLoadKn + 1.5 * Wcap) / lay.n; // factored reaction per pile
         for (const phi of [12, 16, 20, 25] as const) {
           const d = D - EMBED - 25 - 1.5 * phi;
@@ -1827,12 +1884,30 @@ export function designPileFoundation(
       ? { id: 'group', label: 'Pile group capacity = efficiency × n × single-pile capacity', clause: userEta !== undefined ? 'user-entered group efficiency' : 'Converse-Labarre (textbook formula, not an IS 2911 clause)', status: groupLoad <= eta * lay.n * safeCap + 1e-9 ? 'PASS' : 'FAIL', demand: round(groupLoad, 1), capacity: round(eta * lay.n * safeCap, 1), unit: 'kN',
           note: `η = ${round(eta, 3)} (${userEta !== undefined ? 'entered by the user' : `friction-pile assumption, spacing ${round(sM / dp, 2)} D`}). For end-bearing piles in a firm stratum enter η = 1.` }
       : { id: 'group', label: 'Pile group capacity', status: 'NOT_VERIFIED', note: 'No cap design found.' };
+    // block failure (cohesive soil, textbook Terzaghi-Peck): Qb = (2 L (B + Lg) cu + 9 cu B Lg) / FS, cu from the soil cohesion
+    const bg = (lay.cols - 1) * sM + dp, lg = (lay.rows - 1) * sM + dp;
+    const capW = cap ? RCC_UNIT_WEIGHT * lay.capX * lay.capY * (cap.D / 1000) : 0;
+    const blockLoad = c.serviceLoadKn + capW;
+    const blockCheck: DesignCheck = (cu !== undefined && pileL > 0 && cap)
+      ? (() => {
+        const qb = blockCap(lay) ?? 0;
+        return { id: 'block_failure', label: 'Block failure of the pile group (cohesive soil)', clause: 'textbook Terzaghi-Peck block formula, not an IS 2911 clause', status: blockLoad <= qb ? 'PASS' : 'FAIL', demand: round(blockLoad, 1), capacity: round(qb, 1), unit: 'kN',
+          note: `Block ${round(bg, 2)} × ${round(lg, 2)} m, length ${pileL} m, cu = ${cu} kN/m² along the shaft and at the base, Nc = 9, FS ${opt.pileSafetyFactor}. Valid for clay; not a sand check.` } as DesignCheck;
+      })()
+      : { id: 'block_failure', label: 'Block failure of the pile group', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Enter the soil cohesion cu (clay) in the geotechnical data to check block failure; the formula is not used for sand.' };
+    // lateral load per pile against the allowable lateral load entered by the user (load test / geotechnical report)
+    const rxFinal = cap ? reactions(pilePositions(lay), capW, cap.D / 1000) : undefined;
+    const lateralCheck: DesignCheck = (pile.allowableLateralKn && pile.allowableLateralKn > 0 && rxFinal && svcCombos.length > 0)
+      ? { id: 'lateral', label: 'Lateral load per pile ≤ allowable lateral load', clause: 'IS 2911 (allowable lateral load from a test / the report)', status: rxFinal.hMax / lay.n <= pile.allowableLateralKn ? 'PASS' : 'FAIL',
+          demand: round(rxFinal.hMax / lay.n, 1), capacity: pile.allowableLateralKn, unit: 'kN', note: `Largest service shear ${round(rxFinal.hMax, 1)} kN shared equally by ${lay.n} piles (rigid cap). Pile bending under the lateral load is not designed.` }
+      : { id: 'lateral', label: 'Lateral load per pile', clause: 'IS 2911', status: 'NOT_VERIFIED', note: svcCombos.length === 0 ? 'Needs the frame shears (Column Load Source: Frame analysis) and the allowable lateral load per pile.' : 'Enter the allowable lateral load per pile (lateral load test / geotechnical report).' };
+    // equivalent raft at 2/3 of the pile length for the group settlement (immediate elastic, textbook; the group plan is used without spread)
+    const settleGeom = cap ? { lengthM: Math.max(bg, lg), widthM: Math.min(bg, lg), qNetKnM2: blockLoad / Math.max(1e-6, bg * lg) } : undefined;
     const common: DesignCheck[] = [
       groupCheck,
-      { id: 'block_failure', label: 'Block failure of the pile group', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Needs the soil strength around and below the group: not computed.' },
-      { id: 'lateral', label: 'Lateral / moment capacity of piles', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Not implemented.' },
-      { id: 'pile_settlement', label: 'Pile group settlement', status: 'NOT_VERIFIED', note: 'Not implemented.' },
-      ...commonChecks(p, true),
+      blockCheck,
+      lateralCheck,
+      ...commonChecks(p, svcCombos.length > 0, settleGeom),
     ];
     if (!cap) {
       e.checks = [{ id: 'cap_design', label: 'Pile cap structural design', clause: 'IS 456 Cl. 34', status: 'FAIL', note: 'No pile cap depth up to 2500 mm satisfies flexure, shear and punching.' }, ...common];
@@ -1864,6 +1939,34 @@ export function designPileFoundation(
         developmentLengthMm: developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade), availableLengthMm: cap.D - cover - 2 * cap.phi,
       };
       const perPile = (c.serviceLoadKn + Wcap) / lay.n;
+      const rxs = reactions(pilePositions(lay), Wcap, Dm);
+      const pileReaction: DesignCheck = svcCombos.length === 0
+        ? { id: 'pile_reaction', label: 'Pile reactions with column moments', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'No frame moments (Column Load Source: Frame analysis): the piles are checked for the axial load only.' }
+        : { id: 'pile_reaction', label: 'Largest pile reaction incl. column moments and shears at the cap base ≤ single-pile capacity; no uplift beyond the allowable', clause: 'IS 2911 (rigid cap, linear reaction distribution)', status: rxs.rmax <= safeCap && -rxs.rmin <= upliftCap + 1e-9 ? 'PASS' : 'FAIL',
+            demand: round(rxs.rmax, 1), capacity: round(safeCap, 1), unit: 'kN',
+            note: `${rxs.combos} service combination${rxs.combos === 1 ? '' : 's'}; smallest reaction ${round(rxs.rmin, 1)} kN${rxs.rmin < 0 ? ` (uplift, allowable ${upliftCap} kN)` : ''}. No increase of the pile capacity for wind / earthquake is taken.` };
+      // pile cage: axial capacity of the pile section and anchorage of its bars into the cap (from the user's cage data)
+      const cageN = pile.cageBarCount ?? 0, cageDia = pile.cageBarDiaMm ?? 0;
+      const Rfac = (c.factoredLoadKn + 1.5 * Wcap) / lay.n * (rxs.combos > 0 ? Math.max(1, rxs.rmax / ((c.serviceLoadKn + Wcap) / lay.n)) : 1);
+      const pileCage: DesignCheck[] = (cageN >= 3 && cageDia > 0)
+        ? (() => {
+          const Ag = (Math.PI * pile.pileDiameterMm * pile.pileDiameterMm) / 4, Asc = cageN * barAreaMm2(cageDia);
+          const Pu = (0.4 * fck * (Ag - Asc) + 0.67 * fyOf(p.steelGrade) * Asc) / 1000;
+          const ld = developmentLengthTensionMm(cageDia, p.concreteGrade, p.steelGrade);
+          const avail = cap.D - EMBED - cover;
+          const spacingOk = ((Math.PI * (pile.pileDiameterMm - 2 * 50 - cageDia)) / cageN) - cageDia >= 100;
+          return [
+            { id: 'pile_cage', label: 'Pile section: axial capacity with the cage (0.4 fck Ac + 0.67 fy Asc)', clause: 'IS 456 Cl. 39.3 (pile treated as a short column)', status: Pu >= Rfac ? 'PASS' : 'FAIL', demand: round(Rfac, 1), capacity: round(Pu, 1), unit: 'kN',
+              note: `${cageN}-${cageDia}φ = ${round((100 * Asc) / Ag, 2)}% of the pile section (50 mm cover assumed). Slenderness, lateral bending and the minimum steel for piles (IS 2911) are not checked; the cage is not scheduled in the BBS.` } as DesignCheck,
+            { id: 'pile_cage_spacing', label: 'Clear spacing of the cage bars ≥ 100 mm', clause: 'IS 2911 (practical limit for concreting; confirm in the code)', status: spacingOk ? 'PASS' : 'WARNING', note: spacingOk ? undefined : 'Bars are closer than 100 mm: use fewer or smaller bars.' } as DesignCheck,
+            { id: 'pile_anchorage', label: 'Pile bar development length into the cap', clause: 'IS 456 Cl. 26.2.1', status: avail >= ld ? 'PASS' : 'WARNING', demand: round(ld, 0), capacity: round(avail, 0), unit: 'mm',
+              note: avail >= ld ? 'Bars run straight from the pile head to the cap top cover.' : 'Straight embedment is short: use hooks or L-bends at the top of the pile bars, or a deeper cap.' } as DesignCheck,
+          ];
+        })()
+        : [
+          { id: 'pile_cage', label: 'Pile reinforcement cage', clause: 'IS 456 Cl. 39.3', status: 'NOT_VERIFIED', note: 'Enter the cage (number and diameter of the longitudinal bars) to check the pile section and the bar anchorage into the cap.' } as DesignCheck,
+          { id: 'pile_anchorage', label: 'Pile reinforcement anchorage into the cap', clause: 'IS 456 Cl. 26.2.1', status: 'NOT_VERIFIED', note: 'Needs the pile cage data.' } as DesignCheck,
+        ];
       const bearingCap = (0.45 * fck * c.widthMm * c.depthMm) / 1000;
       const dowelOk = e.dowels.availableLengthMm >= e.dowels.developmentLengthMm;
       e.checks = [
@@ -1882,14 +1985,17 @@ export function designPileFoundation(
           demand: e.dowels.developmentLengthMm, capacity: e.dowels.availableLengthMm, unit: 'mm', note: dowelOk ? undefined : 'Provide L-bends or a deeper cap for the dowel anchorage.' },
         { id: 'pile_embedment', label: 'Pile head embedded into the cap', clause: 'IS 2911 (Part 1)', status: 'PASS', demand: EMBED, unit: 'mm',
           note: `Pile heads ${EMBED} mm into the cap; bottom cap bars 25 mm above the pile heads.` },
-        { id: 'pile_anchorage', label: 'Pile reinforcement anchorage into the cap', status: 'NOT_VERIFIED', note: 'Pile reinforcement is not designed here: provide its development length into the cap.' },
+        pileReaction,
+        ...pileCage,
         ...common,
       ];
+      const st = e.checks.find(k => k.id === 'settlement');
+      if (st) { st.label = 'Pile group settlement (equivalent raft, immediate elastic)'; st.note = `${st.note ? st.note + ' ' : ''}Equivalent raft = the plan of the pile group, load = column + cap; consolidation and the load spread below the pile toe are not included.`.trim(); }
     }
     e.status = overallStatus(e.checks);
     e.assumptions = [
       `${lay.rows} x ${lay.cols} grid at ${opt.pileSpacingFactor}D spacing (verify against IS 2911).`,
-      `Cap edge distance ${opt.pileCapEdgeMm} mm beyond the pile face; rigid cap, equal pile reactions under axial load (column moments not distributed to piles).`,
+      `Cap edge distance ${opt.pileCapEdgeMm} mm beyond the pile face; rigid cap. The cap bars use equal pile reactions (axial load); the pile reactions with column moments and shears are checked separately when frame results exist.`,
     ];
     e.warnings = e.checks.filter(k => k.status !== 'PASS' && k.note).map(k => `${k.label}: ${k.note}`);
     out.push(e);

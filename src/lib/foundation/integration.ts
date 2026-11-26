@@ -510,6 +510,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     soilModulusKnM2: details.soilModulusMpa ? details.soilModulusMpa * 1000 : undefined,
     poissonRatio: details.poissonRatio,
     cohesiveSoil: (details.cohesionKnM2 ?? 0) > 0,
+    cohesionKnM2: details.cohesionKnM2,
     frictionAngleDeg: details.frictionAngleDeg,
     isolatedShape: details.isolatedShape,
     edgeThicknessMm: details.edgeThicknessMm,
