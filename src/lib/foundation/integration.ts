@@ -359,7 +359,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     const lat = frameResult.lateral;
     checks.push({
       id: 'moments_shear', label: lat ? 'Column base moments and shear from the frame (gravity + lateral)' : 'Column base moments and shear from the gravity frame', status: 'WARNING',
-      note: `Used for the base pressure of isolated footings (with the load) and the raft contact pressure.${lat ? '' : ' Sway moments are absent (no lateral loads).'} Combined footings and piles do not use them.`,
+      note: `Used for the base pressure and design of isolated footings, combined footings (two aligned columns) and the raft.${lat ? '' : ' Sway moments are absent (no lateral loads).'} Piles do not use them.`,
     });
     if (lat) {
       const bits: string[] = [];
@@ -368,7 +368,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       const lateralSbc = Math.max(1, details.lateral?.sbcIncreaseFactor ?? 1);
       checks.push({
         id: 'lateral_loads', label: 'Wind / seismic load combinations', status: 'WARNING',
-        note: `${bits.join(' ')} Equivalent static forces on a rigid-diaphragm frame; IS 456 Table 18 combinations (1.5(DL+LL), 1.2(DL+LL±L), 1.5(DL±L), 0.9DL±1.5L) and service combinations DL+LL±L for the soil pressure${lateralSbc > 1 ? ` (available pressure ×${lateralSbc} for the lateral service combinations, user-entered)` : ' (no increase of the available pressure is taken)'}. Not modelled: accidental torsion, vertical earthquake, P-Δ, soil-structure interaction. Combined footings and piles still use the gravity loads only.`,
+        note: `${bits.join(' ')} Equivalent static forces on a rigid-diaphragm frame; IS 456 Table 18 combinations (1.5(DL+LL), 1.2(DL+LL±L), 1.5(DL±L), 0.9DL±1.5L) and service combinations DL+LL±L for the soil pressure${lateralSbc > 1 ? ` (available pressure ×${lateralSbc} for the lateral service combinations, user-entered)` : ' (no increase of the available pressure is taken)'}. Not modelled: accidental torsion, vertical earthquake, P-Δ, soil-structure interaction. Piles still use the gravity loads only.`,
       });
       const bsBad = Object.entries(lat.baseShearCheck).filter(([, v]) => v && Math.abs(v.appliedKn - v.reactionKn) > 0.5 + 0.001 * Math.abs(v.appliedKn));
       if (bsBad.length > 0) {

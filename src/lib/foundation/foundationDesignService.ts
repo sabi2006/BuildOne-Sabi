@@ -548,13 +548,30 @@ export function designCombinedFooting(
   const cu1 = alongX ? a.widthMm : a.depthMm, cu2 = alongX ? b.widthMm : b.depthMm;
   const ct1 = alongX ? a.depthMm : a.widthMm, ct2 = alongX ? b.depthMm : b.widthMm;
   const P1 = a.serviceLoadKn, P2 = b.serviceLoadKn, Pu1 = a.factoredLoadKn, Pu2 = b.factoredLoadKn;
-  const S = P1 + P2, Su = Pu1 + Pu2;
+  const S = P1 + P2;
   if (!(S > 0)) return unverified(id, 'combined_footing', 'combined', cols, p, 'Column loads are zero or missing.');
   const cover = p.clearCoverMm;
   const fck = fckOf(p.concreteGrade);
   const edge = opt.minEdgeBeyondColumnMm / 1000;
   const xbar = (P2 * s) / S;
   const e1 = Math.max(cu1 / 2000 + edge, cu2 / 2000 + edge - (s * (P2 - P1)) / S);
+
+  // Load combinations (wind / earthquake). Used only when both columns carry matching combinations; otherwise the
+  // original gravity design (uniform pressure, resultant at the centroid) is unchanged.
+  const hasCombos = !!a.combos?.length && !!b.combos?.length && a.combos.every(c => b.combos!.some(x => x.name === c.name));
+  const latF = Math.max(1, p.lateralSbcIncrease ?? 1);
+  // moments about the axis transverse to the line of the columns bend the footing lengthwise; about the line itself they tilt it sideways
+  const mU = (c: ColumnCombo) => Math.abs(alongX ? c.momentYKnM : c.momentXKnM);
+  const mV = (c: ColumnCombo) => Math.abs(alongX ? c.momentXKnM : c.momentYKnM);
+  type Scen = { name: string; P1: number; P2: number; Mu1: number; Mu2: number; Mv: number; f: number; uniform: boolean };
+  const scenOf = (limit: 'service' | 'ultimate'): Scen[] => a.combos!.filter(c => c.limit === limit).map(c => {
+    const d = b.combos!.find(x => x.name === c.name)!;
+    return { name: c.name, P1: c.axialKn, P2: d.axialKn, Mu1: mU(c), Mu2: mU(d), Mv: mV(c) + mV(d), f: limit === 'service' && c.lateral ? latF : 1, uniform: false };
+  });
+  const svcScen: Scen[] = hasCombos ? scenOf('service') : [];
+  const ultScen: Scen[] = hasCombos ? scenOf('ultimate') : [{ name: '1.5 × service load', P1: Pu1, P2: Pu2, Mu1: 0, Mu2: 0, Mv: 0, f: 1, uniform: true }];
+  const PuMax1 = hasCombos ? Math.max(Pu1, ...ultScen.map(c => c.P1)) : Pu1;
+  const PuMax2 = hasCombos ? Math.max(Pu2, ...ultScen.map(c => c.P2)) : Pu2;
 
   for (let D = Math.max(opt.minFootingDepthMm, 400); D <= MAX_DEPTH_MM; D += 25) {
     const Dm = D / 1000;
@@ -569,20 +586,59 @@ export function designCombinedFooting(
       L = round(L + 0.1, 2);
       B = Math.max(ceilTo(S / (qAvail * L), 0.05), minB);
     }
-    const qu = Su / (L * B);
-    const w = Su / L; // kN/m along length
+    // With combinations, enlarge the plan (about the gravity resultant) until every service combination keeps the
+    // pressure within the available pressure with no tension, and every ultimate combination has its resultant in the kern
+    // (so the linear pressure diagram used below has no negative part). Column moments are taken in magnitude and both
+    // senses are tried, so no sign convention is assumed.
+    let qmaxSvc = S / (L * B), govSvc = 'service load';
+    if (hasCombos) {
+      for (let it = 0; it < 300; it++) {
+        const uc1 = -(xbar - L / 2), uc2 = uc1 + s;
+        let ok = true, worst = -Infinity;
+        for (const sc of [...svcScen, ...ultScen]) for (const sg of [1, -1]) {
+          const Pt = sc.P1 + sc.P2;
+          const Mc = sc.P1 * (uc1 - L / 2) + sc.P2 * (uc2 - L / 2) - sg * (sc.Mu1 + sc.Mu2);
+          const q0 = Pt / (L * B), k = (6 * Math.abs(Mc)) / (Pt * L) + (6 * sc.Mv) / (Pt * B);
+          if (q0 * (1 - k) < 0) ok = false;
+          if (svcScen.includes(sc)) {
+            if (q0 * (1 + k) > qAvail * sc.f) ok = false;
+            if ((q0 * (1 + k)) / sc.f > worst) { worst = (q0 * (1 + k)) / sc.f; qmaxSvc = worst; govSvc = sc.name; }
+          }
+        }
+        if (ok) break;
+        L = round(L + 0.1, 2); B = round(B + 0.05, 2);
+      }
+    }
+
     const left = xbar - L / 2; // footing left edge relative to column a (negative)
     const u1 = -left, u2 = -left + s; // column positions measured from left edge
-    const Mf = (u: number) => (w * u * u) / 2 - (u > u1 ? Pu1 * (u - u1) : 0) - (u > u2 ? Pu2 * (u - u2) : 0);
-    const Vf = (u: number) => w * u - (u > u1 ? Pu1 : 0) - (u > u2 ? Pu2 : 0);
+    // Ultimate pressure profiles: line load w(u) = A0 + Bk (u − L/2), shear and bending moment from the left edge. Column
+    // moments act as point couples. Equilibrium: M(L) = 0 and V(L) = 0 by construction.
+    type Prof = { name: string; P1: number; P2: number; evF: number; w: (u: number) => number; V: (u: number) => number; M: (u: number) => number };
+    const profiles: Prof[] = ultScen.flatMap(sc => (sc.uniform ? [1] : [1, -1]).map(sg => {
+      const Pt = sc.P1 + sc.P2;
+      const c1 = sc.uniform ? 0 : sg * sc.Mu1, c2 = sc.uniform ? 0 : sg * sc.Mu2;
+      const Mc = sc.uniform ? 0 : sc.P1 * (u1 - L / 2) + sc.P2 * (u2 - L / 2) - (c1 + c2);
+      const A0 = Pt / L, Bk = (12 * Mc) / (L ** 3);
+      return {
+        name: sc.name, P1: sc.P1, P2: sc.P2,
+        evF: sc.uniform ? 1 : 1 + (6 * sc.Mv) / (Pt * B),
+        w: (u: number) => A0 + Bk * (u - L / 2),
+        V: (u: number) => A0 * u + Bk * (u * u / 2 - (L * u) / 2) - (u > u1 ? sc.P1 : 0) - (u > u2 ? sc.P2 : 0),
+        M: (u: number) => (A0 * u * u) / 2 + Bk * (u ** 3 / 6 - (L * u * u) / 4) - (u > u1 ? sc.P1 * (u - u1) + c1 : 0) - (u > u2 ? sc.P2 * (u - u2) + c2 : 0),
+      };
+    }));
+    const quProf = (pr: Prof) => (Math.max(pr.w(0), pr.w(L)) / B) * pr.evF;
+    const qu = Math.max(...profiles.map(quProf));
+    const govUlt = profiles.reduce((x, y) => (quProf(y) > quProf(x) ? y : x), profiles[0]).name;
 
     // moments: sagging at outer column faces, hogging between the columns
     const faces = [u1 - cu1 / 2000, u1 + cu1 / 2000, u2 - cu2 / 2000, u2 + cu2 / 2000];
-    const mSag = Math.max(0, ...faces.map(Mf));
+    const mSag = Math.max(0, ...profiles.flatMap(pr => faces.map(pr.M)));
     let mHog = 0;
-    for (let k = 0; k <= 2000; k++) {
+    for (const pr of profiles) for (let k = 0; k <= 2000; k++) {
       const u = u1 + (k / 2000) * (u2 - u1);
-      mHog = Math.max(mHog, -Mf(u));
+      mHog = Math.max(mHog, -pr.M(u));
     }
 
     for (const phi of [12, 16, 20, 25, 32] as const) {
@@ -610,7 +666,7 @@ export function designCombinedFooting(
       const tcShear = tauCMpa(ptShear, p.concreteGrade);
       const secs = [u1 - cu1 / 2000 - d / 1000, u1 + cu1 / 2000 + d / 1000, u2 - cu2 / 2000 - d / 1000, u2 + cu2 / 2000 + d / 1000]
         .filter(u => u > 0 && u < L);
-      const vMax = Math.max(0, ...secs.map(u => Math.abs(Vf(u))));
+      const vMax = Math.max(0, ...profiles.flatMap(pr => secs.map(u => Math.abs(pr.V(u)))));
       const tvShear = (vMax * 1000) / (bMm * d);
       if (tvShear > tcShear) break;
 
@@ -618,11 +674,11 @@ export function designCombinedFooting(
       const lMm = L * 1000;
       const bounds = { x0: 0, x1: lMm, y0: 0, y1: bMm };
       const pun = [
-        { P: Pu1, cu: cu1, ct: ct1, uc: u1 * 1000 },
-        { P: Pu2, cu: cu2, ct: ct2, uc: u2 * 1000 },
+        { k: 0, cu: cu1, ct: ct1, uc: u1 * 1000 },
+        { k: 1, cu: cu2, ct: ct2, uc: u2 * 1000 },
       ].map(c => {
         const cp = criticalPerimeter(c.cu, c.ct, c.uc, bMm / 2, d, bounds);
-        const vp = Math.max(0, c.P - qu * cp.areaM2);
+        const vp = Math.max(0, ...profiles.map(pr => (c.k === 0 ? pr.P1 : pr.P2) - ((pr.w(c.uc / 1000) / B) * pr.evF) * cp.areaM2));
         return {
           tv: (vp * 1000) / (cp.b0Mm * d),
           tc: punchingAllowableMpa(Math.min(c.cu, c.ct), Math.max(c.cu, c.ct), p.concreteGrade),
@@ -632,8 +688,8 @@ export function designCombinedFooting(
 
       // transverse bands: width cu + d under each column (textbook band method)
       const bands = [
-        { P: Pu1, cu: cu1, ct: ct1 },
-        { P: Pu2, cu: cu2, ct: ct2 },
+        { P: Math.max(...profiles.map(pr => pr.P1 * pr.evF)), cu: cu1, ct: ct1 },
+        { P: Math.max(...profiles.map(pr => pr.P2 * pr.evF)), cu: cu2, ct: ct2 },
       ].map((c, i) => {
         const bw = Math.min(c.cu + d, lMm);
         const aT = (bMm - c.ct) / 2000; // m
@@ -662,7 +718,7 @@ export function designCombinedFooting(
       e.sizeXM = e.plan.x1 - e.plan.x0; e.sizeYM = e.plan.y1 - e.plan.y0;
       e.depthMm = D; e.effectiveDepthMm = d;
       e.availablePressureKnM2 = round(qAvail, 2);
-      e.maxServicePressureKnM2 = round(S / (L * B), 2);
+      e.maxServicePressureKnM2 = round(hasCombos ? qmaxSvc : S / (L * B), 2);
       e.factoredPressureKnM2 = round(qu, 2);
 
       const dirLong: 'x' | 'y' = alongX ? 'x' : 'y';
@@ -697,7 +753,8 @@ export function designCombinedFooting(
       };
 
       const cks: DesignCheck[] = [];
-      cks.push({ id: 'bearing_pressure', label: 'Service base pressure ≤ available pressure (resultant at footing centroid)', clause: 'IS 6403', status: 'PASS', demand: round(S / (L * B), 2), capacity: round(qAvail, 2), unit: 'kN/m²' });
+      cks.push({ id: 'bearing_pressure', label: hasCombos ? 'Max service base pressure ≤ available pressure (every service combination)' : 'Service base pressure ≤ available pressure (resultant at footing centroid)', clause: 'IS 6403', status: 'PASS', demand: round(hasCombos ? qmaxSvc : S / (L * B), 2), capacity: round(qAvail, 2), unit: 'kN/m²',
+        note: hasCombos ? `Governing service combination: ${govSvc}${latF > 1 ? ` (lateral combinations: available pressure increased ×${latF}, pressure shown divided by that factor)` : ''}.` : undefined });
       cks.push({ id: 'flexure_sag', label: 'Longitudinal flexure – sagging (bottom steel)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(mSag, 2), capacity: round(lim, 2), unit: 'kN·m' });
       cks.push({ id: 'flexure_hog', label: 'Longitudinal flexure – hogging between columns (top steel)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(mHog, 2), capacity: round(lim, 2), unit: 'kN·m' });
       cks.push({ id: 'shear', label: 'One-way shear at d from column faces', clause: 'IS 456 Cl. 34.2.4, 40.2', status: 'PASS', demand: round(tvShear, 3), capacity: round(tcShear, 3), unit: 'N/mm²' });
@@ -705,11 +762,18 @@ export function designCombinedFooting(
       cks.push({ id: 'transverse', label: 'Transverse band flexure', clause: 'textbook band method', status: 'WARNING',
         note: 'Transverse reinforcement uses the textbook band method (width = column + d), not a clause-prescribed method. Verify.' });
       const bearingCap = (0.45 * fck * Math.min(colArea1, colArea2)) / 1000;
-      cks.push({ id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4.1', status: Math.min(Pu1, Pu2) <= bearingCap ? 'PASS' : 'WARNING', demand: round(Math.max(Pu1, Pu2), 1), capacity: round(bearingCap, 1), unit: 'kN' });
+      cks.push({ id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4.1', status: Math.min(PuMax1, PuMax2) <= bearingCap ? 'PASS' : 'WARNING', demand: round(Math.max(PuMax1, PuMax2), 1), capacity: round(bearingCap, 1), unit: 'kN' });
       cks.push({ id: 'dowels', label: 'Dowel development length into footing', clause: 'IS 456 Cl. 34.4.3', status: availDowel >= ldComp ? 'PASS' : 'WARNING', demand: ldComp, capacity: availDowel, unit: 'mm' });
-      cks.push({ id: 'moments', label: 'Column moments / eccentricity', status: 'NOT_VERIFIED', note: 'Moments are not included in combined footing design.' });
-      cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? 'PASS' : 'WARNING',
-        note: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
+      if (hasCombos) {
+        cks.push({ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS',
+          note: `${svcScen.length} service and ${ultScen.length} ultimate combinations evaluated; governing ultimate pressure from ${govUlt}.` });
+        cks.push({ id: 'moments', label: 'Column moments in the combined footing', status: 'WARNING',
+          note: 'Column moments are applied as point couples on the footing (magnitudes, both senses tried, all columns in the same sense). Moment transfer at the column (punching with moment) and the pressure across the width from sideways moments (taken as a linear increase of the band load) are simplified.' });
+      } else {
+        cks.push({ id: 'moments', label: 'Column moments / eccentricity', status: 'NOT_VERIFIED', note: 'Moments are not included in combined footing design.' });
+        cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? 'PASS' : 'WARNING',
+          note: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
+      }
       cks.push(...commonChecks(p, true));
 
       e.checks = cks;

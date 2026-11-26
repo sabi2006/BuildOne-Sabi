@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- test builds loose project/model shapes */
-import { designIsolatedFooting, designRaftFoundation, availablePressure, FoundationColumnInput, FoundationDesignParams } from './foundationDesignService';
+import { designIsolatedFooting, designCombinedFooting, designRaftFoundation, availablePressure, FoundationColumnInput, FoundationDesignParams } from './foundationDesignService';
 import { windStoreyForcesKn, ColumnCombo } from './lateral';
 import { DEFAULT_BUILDING_CONFIG, BuildingConfig } from '../structuralCalculationService';
 import { calculateProject, DEFAULT_RCC_SLAB, DEFAULT_RCC_RING_BEAM } from '../brickCalculator';
@@ -76,6 +76,57 @@ describe('Footing with combinations: engine', () => {
     const combos = [...gravityCombos(900), cb('1.2(DL+LL+EQX)', 'ultimate', true, 2200, 0, 0)];
     const e = designIsolatedFooting(column(900, combos), params());
     expect(e.checks.find(c => c.id === 'column_bearing')!.demand).toBeCloseTo(2200, 1);
+  });
+});
+
+describe('Combined footing with combinations: engine', () => {
+  const two = (c1?: ColumnCombo[], c2?: ColumnCombo[]) => [column(600, c1, 'a', 0, 0), column(600, c2, 'b', 4, 0)] as const;
+  const prm = params({ sbcKnM2: 180 });
+  const sway1 = [...gravityCombos(600), cb('DL+LL+EQX', 'service', true, 500, 0, 60), cb('DL+LL−EQX', 'service', true, 700, 0, -60), cb('1.2(DL+LL+EQX)', 'ultimate', true, 600, 0, 90), cb('0.9DL+1.5EQX', 'ultimate', true, 380, 0, 100)];
+  const sway2 = [...gravityCombos(600), cb('DL+LL+EQX', 'service', true, 700, 0, 60), cb('DL+LL−EQX', 'service', true, 500, 0, -60), cb('1.2(DL+LL+EQX)', 'ultimate', true, 900, 0, 90), cb('0.9DL+1.5EQX', 'ultimate', true, 700, 0, 100)];
+
+  it('gravity-only combinations without moments reproduce the no-combination combined footing', () => {
+    const [x, y] = two(); const [gx, gy] = two(gravityCombos(600), gravityCombos(600));
+    const a = designCombinedFooting(x, y, prm), b = designCombinedFooting(gx, gy, prm);
+    expect(b.sizeXM).toBe(a.sizeXM); expect(b.sizeYM).toBe(a.sizeYM); expect(b.depthMm).toBe(a.depthMm);
+    expect(b.reinforcement.map(r => r.astProvidedMm2)).toEqual(a.reinforcement.map(r => r.astProvidedMm2));
+  });
+
+  it('sway combinations enlarge or deepen the footing; every service combination then has 0 ≤ q ≤ qAvail (recomputed by hand)', () => {
+    const [x, y] = two(); const [sx, sy] = two(sway1, sway2);
+    const g = designCombinedFooting(x, y, prm), e = designCombinedFooting(sx, sy, prm);
+    expect(e.status).not.toBe('FAIL');
+    expect(e.sizeXM! * e.sizeYM! >= g.sizeXM! * g.sizeYM! - 1e-9).toBe(true);
+    const L = e.sizeXM!, B = e.sizeYM!, u1 = 0 - e.plan!.x0, u2 = 4 - e.plan!.x0;
+    const qAvail = availablePressure(prm, e.depthMm! / 1000).qAvail;
+    for (const [i, c] of sway1.entries()) {
+      if (c.limit !== 'service') continue;
+      const d = sway2[i];
+      const Pt = c.axialKn + d.axialKn;
+      const Mc = c.axialKn * (u1 - L / 2) + d.axialKn * (u2 - L / 2) - (Math.abs(c.momentYKnM) + Math.abs(d.momentYKnM));
+      const q0 = Pt / (L * B), k = (6 * Math.abs(Mc)) / (Pt * L);
+      expect(q0 * (1 + k)).toBeLessThanOrEqual(qAvail + 1e-6);
+      expect(q0 * (1 - k)).toBeGreaterThanOrEqual(-1e-6);
+    }
+    expect(e.checks.find(c => c.id === 'combinations')!.note).toContain('ultimate combinations evaluated');
+    expect(e.checks.find(c => c.id === 'moments')!.status).toBe('WARNING');
+    expect(e.checks.find(c => c.id === 'bearing_pressure')!.note).toContain('Governing service combination');
+  });
+
+  it('the swayed design is internally consistent: every check with a demand and a capacity has demand ≤ capacity unless it is flagged', () => {
+    const [sx, sy] = two(sway1, sway2);
+    const e = designCombinedFooting(sx, sy, prm);
+    for (const c of e.checks) if (c.status === 'PASS' && c.demand !== undefined && c.capacity !== undefined) expect(c.demand).toBeLessThanOrEqual(c.capacity + 1e-9);
+    // a larger plan is allowed to need less thickness, but the section must exist and carry reinforcement top and bottom
+    expect(e.depthMm).toBeGreaterThan(0);
+    expect(e.reinforcement.some(b => b.location === 'top')).toBe(true);
+  });
+
+  it('columns on the y axis work the same way', () => {
+    const a = column(600, sway1, 'a', 0, 0), b = column(600, sway2, 'b', 0, 4);
+    const e = designCombinedFooting(a, b, prm);
+    expect(e.status).not.toBe('FAIL');
+    expect(e.checks.find(c => c.id === 'combinations')).toBeDefined();
   });
 });
 
