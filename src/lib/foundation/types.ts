@@ -203,6 +203,7 @@ export interface StructuralElementIdentity {
   elementType:
     | 'isolated_footing'
     | 'combined_footing'
+    | 'strap_beam'
     | 'strip_footing'
     | 'raft'
     | 'pile_cap'

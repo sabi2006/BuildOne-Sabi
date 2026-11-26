@@ -200,6 +200,15 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
           pr.x0 = r.x0; pr.x1 = r.x1; pr.z0 = r.z0; pr.z1 = r.z1;
         }
       }
+      // a strap beam runs between two footings: trim its PCC at the ends where a footing's PCC already lies
+      if (el.elementType === 'strap_beam') {
+        const alongX = (r.x1 - r.x0) >= (r.z1 - r.z0);
+        for (const [oid, o] of pccRects) {
+          if (oid === el.id || !(Math.min(pr.x1, o.x1) - Math.max(pr.x0, o.x0) > 1e-6 && Math.min(pr.z1, o.z1) - Math.max(pr.z0, o.z0) > 1e-6)) continue;
+          if (alongX) { if (o.x0 <= pr.x0 + 1e-9) pr.x0 = Math.max(pr.x0, o.x1); else pr.x1 = Math.min(pr.x1, o.x0); }
+          else { if (o.z0 <= pr.z0 + 1e-9) pr.z0 = Math.max(pr.z0, o.z1); else pr.z1 = Math.min(pr.z1, o.z0); }
+        }
+      }
       pccRects.set(el.id, pr);
       boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
       boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label }));

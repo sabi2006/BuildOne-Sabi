@@ -15,7 +15,8 @@
 //    FE analysis, no settlement).
 //  - Pile: capacity/number-of-piles only when borehole data or a verified capacity
 //    is supplied; pile cap, group efficiency and settlement are NOT_VERIFIED.
-//  - Strip / strap footing: NOT_VERIFIED (not implemented).
+//  - Strap footing: boundary column on an eccentric footing tied by a strap beam to the nearest inward column.
+//  - Strip footing: NOT_VERIFIED (not implemented).
 //  - Settlement (IS 8009) is never verified: compressibility data is not captured.
 //  - Structural moments/shear in columns come from the caller; the host app has
 //    axial loads only, so moment-dependent checks are NOT_VERIFIED unless supplied.
@@ -144,7 +145,7 @@ export interface RebarLayer {
   location: 'bottom' | 'top';
   /** Direction the bars run along */
   direction: 'x' | 'y';
-  role: 'main' | 'distribution' | 'band';
+  role: 'main' | 'distribution' | 'band' | 'stirrup';
   diaMm: number;
   spacingMm?: number;
   /** Number of bars (for banded / counted layers) */
@@ -916,6 +917,341 @@ export function designCombinedFooting(
   return failed(id, 'combined_footing', 'combined', cols, p, `No combined footing section found up to ${MAX_DEPTH_MM} mm thickness.`);
 }
 
+// ------------------------------ STRAP (eccentric boundary footing + strap beam + interior footing) ------------------------------
+
+/** IS 456 Table 20: maximum shear stress τc,max, N/mm² */
+const TAU_C_MAX_MPA: Record<string, number> = { M15: 2.5, M20: 2.8, M25: 3.1, M30: 3.5, M35: 3.7 };
+
+export interface StrapDesign {
+  elements: FoundationElementResult[];
+  /** Service / factored reduction of the interior column's footing load (relief from the strap) */
+  interiorReliefKn: number;
+  interiorReliefFactoredKn: number;
+}
+
+/**
+ * Strap footing for a column on the building boundary (textbook strap method, IS 456 member design):
+ *  - Exterior footing (along the strap: L1, across: B1) has its outer edge at the boundary; eccentricity
+ *    e = L1/2 − (boundary → column centre). Moments about the interior column: R1 = P1 s / (s − e), R2 = P1 + P2 − R1.
+ *  - The strap beam is assumed not to bear on the soil; it carries the constant shear V = R1 − P1 between the footings and
+ *    the hogging moment that peaks where the shear is zero inside footing 1: M = P1 (u0/2 − u1), u0 = P1 L1 / R1.
+ *  - Footing 1 is designed as a slab cantilevering either side of the strap under the uniform pressure R1/(L1 B1).
+ *  - The interior footing is returned as a load reduction (designed by the isolated-footing routine with P2 − (R1 − P1)).
+ * Column moments are not used (axial loads only). The strap self-weight is neglected.
+ */
+export function designStrapFooting(
+  ext: FoundationColumnInput, int: FoundationColumnInput, p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options)
+): StrapDesign | { failed: FoundationElementResult; noStrapNeeded?: boolean } {
+  const tol = 0.05;
+  const dx = Math.abs(int.xM - ext.xM), dy = Math.abs(int.yM - ext.yM);
+  const alongX = dx >= dy;
+  const idBase = `${ext.name ?? ext.id}-${int.name ?? int.id}`;
+  if ((alongX ? dy : dx) > tol) {
+    return { failed: unverified(`SF-${ext.name ?? ext.id}`, 'isolated_footing', 'strap', [ext], p, 'Columns are not on one grid line: strap footing needs the boundary column and its interior partner aligned.') };
+  }
+  const dir = alongX ? Math.sign(int.xM - ext.xM) : Math.sign(int.yM - ext.yM); // +1: interior column is at larger x / y
+  const s = alongX ? dx : dy;
+  const cu = alongX ? ext.widthMm / 1000 : ext.depthMm / 1000;   // exterior column size along the strap
+  const ct = alongX ? ext.depthMm / 1000 : ext.widthMm / 1000;   // across the strap
+  const fp = opt.buildingFootprint;
+  // distance from the boundary to the exterior column centre (along the strap): footing cannot cross the boundary
+  let u1 = cu / 2;
+  if (fp) {
+    const boundary = alongX ? (dir > 0 ? fp.x0 : fp.x1) : (dir > 0 ? fp.y0 : fp.y1);
+    const c = alongX ? ext.xM : ext.yM;
+    u1 = Math.max(cu / 2, Math.abs(c - boundary));
+  }
+  const P1 = ext.serviceLoadKn, Pu1 = ext.factoredLoadKn;
+  const cover = p.clearCoverMm;
+  const fy = p.steelGrade === 'Fe415' ? 415 : p.steelGrade === 'Fe550' ? 550 : 500;
+  const bS = Math.max(ct, 0.23);   // strap width: at least the column width across the strap (min 230 mm)
+
+  for (let D = Math.max(opt.minFootingDepthMm, 300); D <= MAX_DEPTH_MM; D += 25) {
+    const Dm = D / 1000;
+    const { qAvail } = availablePressure(p, Dm);
+    if (qAvail <= 0) return { failed: failed(`SF-${ext.name ?? ext.id}`, 'isolated_footing', 'strap', [ext], p, 'Bearing capacity consumed by overburden at this founding depth.') };
+    // size footing 1: B1 ≈ 2 L1 (L1 along the strap); iterate because e depends on L1
+    let L1 = Math.max(u1 + cu / 2 + opt.minEdgeBeyondColumnMm / 1000, ceilTo(Math.sqrt(P1 / qAvail / 2), 0.05));
+    let R1 = P1, B1 = 0, ok = false;
+    for (let it = 0; it < 60; it++) {
+      const e = L1 / 2 - u1;
+      if (s - e <= 0.3) break;
+      R1 = (P1 * s) / (s - e);
+      const A1 = R1 / qAvail;
+      const L1n = Math.max(u1 + cu / 2 + opt.minEdgeBeyondColumnMm / 1000, ceilTo(Math.sqrt(A1 / 2), 0.05));
+      B1 = Math.max(ceilTo(A1 / L1n, 0.05), ceilTo(bS + 0.3, 0.05));
+      if (Math.abs(L1n - L1) < 1e-9) { ok = true; break; }
+      L1 = L1n;
+    }
+    if (!ok) continue;
+    const e = L1 / 2 - u1;
+    if (e <= 1e-6) {
+      return { failed: unverified(`SF-${ext.name ?? ext.id}`, 'isolated_footing', 'strap', [ext], p, 'The column is far enough from the boundary for a concentric isolated footing: no strap needed.'), noStrapNeeded: true };
+    }
+    const Ru1 = (Pu1 * s) / (s - e);
+    const q1 = R1 / (L1 * B1);
+    const qu1 = Ru1 / (L1 * B1);
+
+    // ---- footing 1: cantilever slab either side of the strap
+    const a = (B1 - bS) / 2; // m
+    const muSlab = (qu1 * a * a) / 2; // kN·m per m
+    let slab: { phi: number; d: number; bars: BarsPerMetre; ast: number; tv: number; tc: number } | null = null;
+    for (const phi of [10, 12, 16, 20] as const) {
+      const d = D - cover - phi / 2;
+      if (d <= 100) continue;
+      if (muSlab > muLimitKnM(1000, d, p.concreteGrade, p.steelGrade)) break;
+      const ast = Math.max(flexureAstMm2(muSlab, 1000, d, p.concreteGrade, p.steelGrade).astMm2, MIN_STEEL_FRACTION_HYSD * 1000 * D);
+      const bars = selectBarsPerMetre(ast, d, [phi]);
+      if (!bars) continue;
+      const tv = (qu1 * Math.max(0, a - d / 1000)) / d; // N/mm² (kN per m / mm)
+      const tc = tauCMpa((100 * bars.astProvidedMm2PerM) / (1000 * d), p.concreteGrade);
+      if (tv > tc) break;
+      slab = { phi, d, bars, ast, tv, tc };
+      break;
+    }
+    if (!slab) continue;
+
+    // ---- strap beam: shear constant between the footings, peak hogging moment inside footing 1
+    const Vu = Ru1 - Pu1;
+    const u0 = (Pu1 * L1) / Ru1;
+    const Mu = Math.abs(Pu1 * (u1 - u0 / 2));
+    const stirrupDia = 8;
+    let strap: { Ds: number; d: number; phi: number; nTop: number; astReq: number; sv: number; tv: number; tc: number; lim: number } | null = null;
+    for (let Ds = Math.max(D, 300); Ds <= 1500; Ds += 25) {
+      const phi = 16;
+      const d = Ds - cover - stirrupDia - phi / 2;
+      const bMm = bS * 1000;
+      const lim = muLimitKnM(bMm, d, p.concreteGrade, p.steelGrade);
+      if (Mu > lim) continue;
+      const tv = (Vu * 1000) / (bMm * d);
+      if (tv > (TAU_C_MAX_MPA[p.concreteGrade] ?? 2.8)) continue;
+      const astReq = Math.max(flexureAstMm2(Mu, bMm, d, p.concreteGrade, p.steelGrade).astMm2, (0.85 * bMm * d) / fy);
+      let nTop = Math.max(2, Math.ceil(astReq / barAreaMm2(phi)));
+      let usePhi: number = phi;
+      if ((bMm - 2 * cover - 2 * stirrupDia - nTop * phi) / Math.max(nTop - 1, 1) < 25) { usePhi = 20; nTop = Math.max(2, Math.ceil(astReq / barAreaMm2(20))); }
+      if ((bMm - 2 * cover - 2 * stirrupDia - nTop * usePhi) / Math.max(nTop - 1, 1) < 25) continue; // bars do not fit: deeper strap
+      const tc = tauCMpa((100 * nTop * barAreaMm2(usePhi)) / (bMm * d), p.concreteGrade);
+      const Asv = 2 * barAreaMm2(stirrupDia);
+      const vus = Vu - (tc * bMm * d) / 1000;
+      const svShear = vus > 0 ? (0.87 * fy * Asv * d) / (vus * 1000) : Infinity;
+      const svMin = (0.87 * fy * Asv) / (0.4 * bMm);
+      const sv = Math.max(75, Math.floor(Math.min(svShear, svMin, 0.75 * d, 300) / 5) * 5);
+      strap = { Ds, d, phi: usePhi, nTop, astReq, sv, tv, tc, lim };
+      break;
+    }
+    if (!strap) continue;
+
+    // ---- global plan coordinates
+    const cExt = alongX ? ext.xM : ext.yM;
+    const uStartGlobal = cExt - dir * u1;              // boundary-side edge of footing 1
+    const uEndGlobal = uStartGlobal + dir * L1;        // inner edge of footing 1
+    const vC = alongX ? ext.yM : ext.xM;
+    const span = (u0g: number, u1g: number, v0: number, v1: number) => {
+      const [ua, ub] = u0g < u1g ? [u0g, u1g] : [u1g, u0g];
+      return alongX ? { x0: ua, x1: ub, y0: v0, y1: v1 } : { x0: v0, x1: v1, y0: ua, y1: ub };
+    };
+    const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
+
+    // footing 1 element
+    const e1 = baseElement(`SF-${ext.name ?? ext.id}`, 'isolated_footing', 'strap', [ext], p);
+    e1.plan = span(uStartGlobal, uEndGlobal, vC - B1 / 2, vC + B1 / 2);
+    e1.sizeXM = e1.plan.x1 - e1.plan.x0; e1.sizeYM = e1.plan.y1 - e1.plan.y0;
+    e1.depthMm = D; e1.effectiveDepthMm = slab.d;
+    e1.availablePressureKnM2 = round(qAvail, 2); e1.maxServicePressureKnM2 = round(q1, 2); e1.factoredPressureKnM2 = round(qu1, 2);
+    e1.loads = { serviceKn: round(R1, 1), factoredKn: round(Ru1, 1) };
+    const dirT: 'x' | 'y' = alongX ? 'y' : 'x', dirL: 'x' | 'y' = alongX ? 'x' : 'y';
+    const L1mm = L1 * 1000, B1mm = B1 * 1000;
+    const distBars = selectBarsPerMetre(MIN_STEEL_FRACTION_HYSD * 1000 * D, slab.d, [10, 12])!;
+    const ldT = developmentLengthTensionMm(slab.phi, p.concreteGrade, p.steelGrade);
+    e1.reinforcement = [
+      { id: `${e1.id}-BT`, location: 'bottom', direction: dirT, role: 'main', diaMm: slab.phi, spacingMm: slab.bars.spacingMm,
+        count: Math.floor((L1mm - 2 * cover) / slab.bars.spacingMm) + 1, astRequiredMm2PerM: round(slab.ast, 1), astProvidedMm2PerM: round(slab.bars.astProvidedMm2PerM, 1),
+        straightLengthMm: B1mm - 2 * cover, zoneWidthMm: L1mm, developmentLengthMm: ldT, note: 'Main bars across the strap (footing cantilevers either side of the strap beam).' },
+      { id: `${e1.id}-BL`, location: 'bottom', direction: dirL, role: 'distribution', diaMm: distBars.diaMm, spacingMm: distBars.spacingMm,
+        count: Math.floor((B1mm - 2 * cover) / distBars.spacingMm) + 1, astRequiredMm2PerM: round(MIN_STEEL_FRACTION_HYSD * 1000 * D, 1),
+        astProvidedMm2PerM: round(distBars.astProvidedMm2PerM, 1), straightLengthMm: L1mm - 2 * cover, zoneWidthMm: B1mm, note: 'Distribution steel along the strap (0.12 % minimum).' },
+    ];
+    const availAnch = a * 1000 - cover;
+    e1.quantities = {
+      concreteM3: round(L1 * B1 * Dm, 3), pccM3: round((L1 + 2 * pp) * (B1 + 2 * pp) * p.pccThicknessMm / 1000, 3),
+      excavationM3: round((L1 + 2 * ws) * (B1 + 2 * ws) * p.foundationDepthM, 3), formworkM2: round(2 * (L1 + B1) * Dm, 3),
+    };
+    const colArea = ext.widthMm * ext.depthMm;
+    const dowelDia = p.columnBarDiaMm ?? 16;
+    const ldComp = developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade);
+    e1.dowels = { requiredAreaMm2: Math.round(0.005 * colArea), diaMm: dowelDia, minBars: Math.max(4, Math.ceil((0.005 * colArea) / barAreaMm2(dowelDia))), developmentLengthMm: ldComp, availableLengthMm: D - cover - 2 * slab.phi };
+    const fpCross = fp ? Math.max(0, (alongX ? fp.y0 - e1.plan.y0 : fp.x0 - e1.plan.x0), (alongX ? e1.plan.y1 - fp.y1 : e1.plan.x1 - fp.x1)) : 0;
+    const c1: DesignCheck[] = [
+      { id: 'bearing_pressure', label: 'Pressure under the eccentric footing ≤ available pressure', clause: 'IS 6403', status: q1 <= qAvail + 1e-9 ? 'PASS' : 'FAIL', demand: round(q1, 2), capacity: round(qAvail, 2), unit: 'kN/m²',
+        note: `R1 = P1·s/(s − e) = ${round(P1, 1)}·${round(s, 3)}/(${round(s, 3)} − ${round(e, 3)}) = ${round(R1, 1)} kN (uniform pressure assumed).` },
+      { id: 'boundary', label: 'Footing within the building boundary along the strap', status: 'PASS', note: `Outer edge at the boundary; column centre ${round(u1, 3)} m from it; eccentricity e = ${round(e, 3)} m.` },
+      { id: 'boundary_cross', label: 'Footing within the building boundary across the strap', status: fpCross > 0.005 ? 'WARNING' : 'PASS', demand: round(fpCross, 3), capacity: 0, unit: 'm',
+        note: fpCross > 0.005 ? 'The footing extends past the boundary across the strap (corner column): a two-way strap, a combined footing or a raft is needed there.' : undefined },
+      { id: 'flexure', label: 'Footing cantilever flexure (either side of the strap)', clause: 'IS 456 Cl. 34.2.3, Annex G', status: 'PASS', demand: round(muSlab, 2), capacity: round(muLimitKnM(1000, slab.d, p.concreteGrade, p.steelGrade), 2), unit: 'kN·m/m' },
+      { id: 'steel', label: 'Provided steel ≥ required', clause: 'IS 456 Annex G-1.1', status: 'PASS', demand: round(slab.ast, 0), capacity: round(slab.bars.astProvidedMm2PerM, 0), unit: 'mm²/m' },
+      { id: 'shear', label: 'One-way shear at d from the strap face', clause: 'IS 456 Cl. 34.2.4, 40.2', status: 'PASS', demand: round(slab.tv, 3), capacity: round(slab.tc, 3), unit: 'N/mm²' },
+      { id: 'dev_length', label: 'Development length of the cantilever bars', clause: 'IS 456 Cl. 26.2.1', status: availAnch >= ldT ? 'PASS' : 'WARNING', demand: ldT, capacity: Math.round(availAnch), unit: 'mm',
+        note: availAnch >= ldT ? undefined : 'Straight length not available: bend the bar ends.' },
+      { id: 'punching', label: 'Punching shear at the column', status: 'NOT_VERIFIED', note: 'The column sits on the strap/footing junction at the footing edge; punching around a partial perimeter is not checked. The strap carries the column into the footing.' },
+      { id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED', note: 'Strap footing designed for axial loads only.' },
+      ...commonChecks(p, true, { lengthM: L1, widthM: B1, qNetKnM2: q1 }),
+    ];
+    e1.checks = c1;
+    e1.status = overallStatus(c1);
+    e1.assumptions = [...COMMON_ASSUMPTIONS, 'Strap footing: uniform soil pressure under each footing; strap beam does not bear on the soil; strap self-weight neglected.'];
+    e1.warnings = c1.filter(c => c.status !== 'PASS' && c.note).map(c => `${c.label}: ${c.note}`);
+
+    // strap beam element: clear span between the footings (the interior footing edge is applied by the caller)
+    const sb = baseElement(`STRAP-${idBase}`, 'strap_beam', 'strap', [], p);
+    sb.depthMm = strap.Ds; sb.effectiveDepthMm = strap.d;
+    sb.loads = { serviceKn: round(R1 - P1, 1), factoredKn: round(Vu, 1) };
+    const topLen = (u1 + s) * 1000 - cover; // from the boundary end to the interior column centre
+    const ldTop = developmentLengthTensionMm(strap.phi, p.concreteGrade, p.steelGrade);
+    sb.reinforcement = [
+      { id: `${sb.id}-T`, location: 'top', direction: dirL, role: 'main', diaMm: strap.phi, count: strap.nTop, astRequiredMm2: round(strap.astReq, 0),
+        astProvidedMm2: round(strap.nTop * barAreaMm2(strap.phi), 0), straightLengthMm: Math.round(topLen + ldTop), developmentLengthMm: ldTop,
+        note: 'Main (tension) bars at the top, run from the boundary end over footing 1 to the interior column plus Ld.' },
+      { id: `${sb.id}-B`, location: 'bottom', direction: dirL, role: 'distribution', diaMm: 12, count: 2, straightLengthMm: Math.round(topLen), note: 'Hanger bars (detailing minimum, not a design requirement).' },
+    ];
+    sb.checks = [
+      { id: 'flexure', label: 'Strap moment ≤ Mu,lim (singly reinforced)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(Mu, 1), capacity: round(strap.lim, 1), unit: 'kN·m',
+        note: `Peak hogging moment where the shear is zero inside footing 1: Pu1·(u1 − u0/2), u0 = ${round(u0, 3)} m.` },
+      { id: 'steel', label: 'Top steel ≥ required (≥ 0.85 b d / fy)', clause: 'IS 456 Cl. 26.5.1.1', status: 'PASS', demand: round(strap.astReq, 0), capacity: round(strap.nTop * barAreaMm2(strap.phi), 0), unit: 'mm²' },
+      { id: 'shear_section', label: 'Shear stress ≤ τc,max', clause: 'IS 456 Cl. 40.2.3, Table 20', status: 'PASS', demand: round(strap.tv, 3), capacity: TAU_C_MAX_MPA[p.concreteGrade] ?? 2.8, unit: 'N/mm²' },
+      { id: 'stirrups', label: `Stirrups 2L-${stirrupDia} @ ${strap.sv} mm`, clause: 'IS 456 Cl. 40.4, 26.5.1.5, 26.5.1.6', status: 'PASS', demand: round(Vu, 1), unit: 'kN',
+        note: `Vu = Ru1 − Pu1 = ${round(Vu, 1)} kN (constant between the footings); τc = ${round(strap.tc, 3)} N/mm².` },
+    ];
+    sb.status = overallStatus(sb.checks);
+    sb.assumptions = ['Strap beam is cast separately from the soil (no bearing); designed as a singly reinforced rectangular beam.'];
+    sb.warnings = [];
+    // the plan/quantities are completed once the interior footing edge is known
+    (sb as FoundationElementResult & { _strap?: object })._strap = { uEndGlobal, dir, alongX, vC, bS, Ds: strap.Ds, sv: strap.sv, stirrupDia, cover, ws, pp };
+    return { elements: [e1, sb], interiorReliefKn: R1 - P1, interiorReliefFactoredKn: Ru1 - Pu1 };
+  }
+  return { failed: failed(`SF-${ext.name ?? ext.id}`, 'isolated_footing', 'strap', [ext], p, `No strap footing found up to ${MAX_DEPTH_MM} mm thickness (footing 1 or the strap beam could not be designed).`) };
+}
+
+/** Complete the strap beam plan, quantities and stirrups once the interior footing plan is known */
+function finishStrapBeam(sb: FoundationElementResult, interior: FoundationElementResult, p: FoundationDesignParams): void {
+  const g = (sb as FoundationElementResult & { _strap?: { uEndGlobal: number; dir: number; alongX: boolean; vC: number; bS: number; Ds: number; sv: number; stirrupDia: number; cover: number; ws: number; pp: number } })._strap;
+  delete (sb as FoundationElementResult & { _strap?: object })._strap;
+  if (!g || !interior.plan) return;
+  const nearEdge = g.alongX ? (g.dir > 0 ? interior.plan.x0 : interior.plan.x1) : (g.dir > 0 ? interior.plan.y0 : interior.plan.y1);
+  const clear = (nearEdge - g.uEndGlobal) * g.dir;
+  if (clear <= 0.01) {
+    sb.checks.push({ id: 'footing_gap', label: 'Clear gap between the two footings', status: 'FAIL', demand: round(clear, 3), capacity: 0, unit: 'm',
+      note: 'The eccentric footing and the interior footing meet or overlap: use a combined footing.' });
+    sb.status = 'FAIL';
+    return;
+  }
+  const [ua, ub] = g.dir > 0 ? [g.uEndGlobal, nearEdge] : [nearEdge, g.uEndGlobal];
+  sb.plan = g.alongX ? { x0: ua, x1: ub, y0: g.vC - g.bS / 2, y1: g.vC + g.bS / 2 } : { x0: g.vC - g.bS / 2, x1: g.vC + g.bS / 2, y0: ua, y1: ub };
+  sb.sizeXM = sb.plan.x1 - sb.plan.x0; sb.sizeYM = sb.plan.y1 - sb.plan.y0;
+  const Dm = g.Ds / 1000;
+  sb.quantities = {
+    concreteM3: round(clear * g.bS * Dm, 3),
+    pccM3: round(clear * (g.bS + 2 * g.pp) * p.pccThicknessMm / 1000, 3),
+    excavationM3: round(clear * (g.bS + 2 * g.ws) * p.foundationDepthM, 3),
+    formworkM2: round(2 * clear * Dm, 3),
+  };
+  const coreW = g.bS * 1000 - 2 * g.cover, coreD = g.Ds - 2 * g.cover;
+  const cut = 2 * (coreW + coreD) + 20 * g.stirrupDia; // two 10φ hooks; bend deductions not applied (convention)
+  sb.reinforcement.push({ id: `${sb.id}-S`, location: 'bottom', direction: g.alongX ? 'x' : 'y', role: 'stirrup', diaMm: g.stirrupDia,
+    spacingMm: g.sv, count: Math.floor((clear * 1000) / g.sv) + 1, straightLengthMm: Math.round(cut),
+    note: 'Closed 2-legged stirrups over the clear span; cut length 2(a + b) + 20φ (hooks), bend deductions not applied.' });
+  sb.checks.push({ id: 'footing_gap', label: 'Clear gap between the two footings', status: 'PASS', demand: round(clear, 3), unit: 'm' });
+  sb.status = overallStatus(sb.checks);
+}
+
+/**
+ * Strap layout: every column on the building boundary gets a strap to the nearest column inward on the same grid line
+ * (perpendicular to its boundary edge); the interior footings are designed for the reduced load. Columns without a
+ * strap get isolated footings.
+ */
+function designStrapLayout(cols: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved, warnings: string[]): FoundationElementResult[] {
+  const fp = opt.buildingFootprint;
+  if (!fp) {
+    return [unverified('STRAP-1', 'strap_beam', 'strap', cols, p, 'The building footprint is needed to find the boundary columns for strap footings.')];
+  }
+  const tolEdge = 0.6; // m: column centre within this distance of the boundary counts as a boundary column
+  const onBoundary = (c: FoundationColumnInput) =>
+    Math.min(c.xM - fp.x0, fp.x1 - c.xM, c.yM - fp.y0, fp.y1 - c.yM) <= tolEdge;
+  const pairs: Array<{ ext: FoundationColumnInput; int: FoundationColumnInput }> = [];
+  const used = new Set<string>();
+  for (const c of cols) {
+    const dists = [
+      { axis: 'x' as const, d: c.xM - fp.x0, inward: 1 }, { axis: 'x' as const, d: fp.x1 - c.xM, inward: -1 },
+      { axis: 'y' as const, d: c.yM - fp.y0, inward: 1 }, { axis: 'y' as const, d: fp.y1 - c.yM, inward: -1 },
+    ].filter(x => x.d <= tolEdge).sort((a, b) => a.d - b.d);
+    if (!dists.length) continue;
+    // nearest inward partner on the same line, trying the closest boundary first
+    let best: { int: FoundationColumnInput; dist: number } | null = null;
+    for (const b of dists) {
+      for (const o of cols) {
+        // the partner must be an interior column: the strap formula assumes its footing is concentric
+        if (o.id === c.id || onBoundary(o)) continue;
+        const along = b.axis === 'x' ? (o.xM - c.xM) * b.inward : (o.yM - c.yM) * b.inward;
+        const off = b.axis === 'x' ? Math.abs(o.yM - c.yM) : Math.abs(o.xM - c.xM);
+        if (along > 0.5 && off <= 0.05 && (!best || along < best.dist)) best = { int: o, dist: along };
+      }
+      if (best) break;
+    }
+    if (best) { pairs.push({ ext: c, int: best.int }); used.add(c.id); }
+  }
+  const relief = new Map<string, { s: number; u: number }>();
+  const strapEls: FoundationElementResult[] = [];
+  const beams: Array<{ sb: FoundationElementResult; intId: string }> = [];
+  for (const { ext, int } of pairs) {
+    const r = designStrapFooting(ext, int, p, opt);
+    if ('failed' in r) {
+      if (r.noStrapNeeded) used.delete(ext.id); // concentric isolated footing instead
+      else strapEls.push(r.failed);
+      continue;
+    }
+    strapEls.push(r.elements[0]);
+    beams.push({ sb: r.elements[1], intId: int.id });
+    const cur = relief.get(int.id) ?? { s: 0, u: 0 };
+    relief.set(int.id, { s: cur.s + r.interiorReliefKn, u: cur.u + r.interiorReliefFactoredKn });
+  }
+  // interior / remaining footings
+  const others: FoundationElementResult[] = [];
+  const byId = new Map<string, FoundationElementResult>();
+  for (const c of cols) {
+    if (used.has(c.id)) continue; // has its strap element (designed or failed)
+    const rel = relief.get(c.id);
+    // the relief is only taken when the column is not itself an exterior strap column
+    const reduced: FoundationColumnInput = rel && !used.has(c.id)
+      ? { ...c, serviceLoadKn: Math.max(0, c.serviceLoadKn - rel.s), factoredLoadKn: Math.max(0, c.factoredLoadKn - rel.u), combos: undefined, momentXKnM: undefined, momentYKnM: undefined }
+      : c;
+    const el = designIsolatedFooting(reduced, p, opt);
+    if (rel && !used.has(c.id)) {
+      el.checks.unshift({ id: 'strap_relief', label: 'Load reduced by the strap', status: 'WARNING', demand: round(rel.s, 1), unit: 'kN',
+        note: `Designed for ${round(reduced.serviceLoadKn, 1)} kN = column load − strap relief (textbook strap method). The relief relies on a stiff strap; moments are not used.` });
+      el.status = overallStatus(el.checks);
+      el.loads = { serviceKn: round(reduced.serviceLoadKn, 1), factoredKn: round(reduced.factoredLoadKn, 1) };
+    }
+    // an isolated footing must not cross the building boundary either
+    if (el.plan) {
+      const cross = Math.max(0, fp.x0 - el.plan.x0, el.plan.x1 - fp.x1, fp.y0 - el.plan.y0, el.plan.y1 - fp.y1);
+      if (cross > 0.005) {
+        el.checks.push({ id: 'boundary_cross', label: 'Footing within the building boundary', status: 'WARNING', demand: round(cross, 3), capacity: 0, unit: 'm',
+          note: 'The footing extends past the building boundary and no interior column is on the same grid line to strap to (corner columns need a two-way strap, which is not implemented): use a combined footing or a raft here.' });
+        el.status = overallStatus(el.checks);
+      }
+    }
+    others.push(el);
+    byId.set(c.id, el);
+  }
+  for (const { sb, intId } of beams) {
+    const interior = byId.get(intId) ?? strapEls.find(e => e.columnIds.includes(intId));
+    if (interior) finishStrapBeam(sb, interior, p);
+    else { sb.checks.push({ id: 'footing_gap', label: 'Interior footing', status: 'NOT_VERIFIED', note: 'Interior footing not found.' }); sb.status = overallStatus(sb.checks); }
+    strapEls.push(sb);
+  }
+  if (pairs.length === 0) warnings.push('No boundary column with an inward partner on the same grid line: isolated footings used.');
+  return [...strapEls, ...others];
+}
+
 // ------------------------------ RAFT (rigid, conservative strip method) ------------------------------
 
 function gridSpans(vals: number[], tolM = 0.3): number[] {
@@ -1288,6 +1624,7 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
       }
       break;
     }
+    case 'strap': elements = designStrapLayout(cols, params, opt, warnings); break;
     case 'raft': elements = [designRaftFoundation(cols, params, opt)]; break;
     case 'pile': elements = designPileFoundation(cols, params, opt); break;
     default:
@@ -1295,7 +1632,7 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
   }
 
   // plan-overlap check across all footing elements (not for raft/pile)
-  if (selected === 'isolated' || selected === 'combined') {
+  if (selected === 'isolated' || selected === 'combined' || selected === 'strap') {
     for (let i = 0; i < elements.length; i++) {
       for (let j = i + 1; j < elements.length; j++) {
         const a = elements[i], b = elements[j];

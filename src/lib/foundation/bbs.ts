@@ -44,7 +44,7 @@ export interface BBSOptions {
   unitWeightDivisor?: number;
 }
 
-export type BarShape = 'straight' | 'L_both_ends' | 'ring' | 'dowel_L' | 'L_one_end';
+export type BarShape = 'straight' | 'L_both_ends' | 'ring' | 'dowel_L' | 'L_one_end' | 'stirrup';
 
 export interface BBSRow {
   /** Unique bar mark, e.g. "F-c1/B1" */
@@ -150,6 +150,15 @@ export function buildFoundationBBS(
   const bendEnds = el.system === 'isolated' ? devCheck?.status === 'WARNING' : true;
 
   el.reinforcement.forEach(layer => {
+    if (layer.role === 'stirrup') {
+      // closed stirrups: the layer carries the full cut length (hooks included by the designer's convention)
+      rows.push(makeRow({
+        mark: `${layer.id}`, member: el.id, description: 'closed 2-legged stirrups', diaMm: layer.diaMm, shape: 'stirrup',
+        noOfBars: layer.count ?? 0, spacingMm: layer.spacingMm, segmentsMm: [layer.straightLengthMm], bendDeductionMm: 0, lapAddedMm: 0,
+        cuttingLengthMm: layer.straightLengthMm, designStatus: el.status, notes: [layer.note ?? 'Closed stirrups.'],
+      }, o.wDiv));
+      return;
+    }
     const phi = layer.diaMm;
     const run = layer.straightLengthMm;
     const ld = layer.developmentLengthMm ?? developmentLengthTensionMm(phi, concrete, steel);

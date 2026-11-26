@@ -322,3 +322,29 @@ describe('Robustness', () => {
     expect(copy.length).toBe(g.boxes.length);
   });
 });
+
+describe('Strap footings through the building pipeline (3 × 3 grid)', () => {
+  const GRID: Array<[number, number]> = [[0, 0], [20, 0], [40, 0], [0, 15], [20, 15], [40, 15], [0, 30], [20, 30], [40, 30]];
+  const d = designOf({ foundationType: 'strap', foundationDetails: { selectionMode: 'manual', columnLoadSource: 'frame', groundwaterDepthM: 8 } as any }, 2, GRID);
+  const els = d.foundation!.elements;
+
+  it('mid-edge columns get eccentric footings strapped to the centre column; corners get isolated footings with a boundary warning', () => {
+    const straps = els.filter(e => e.elementType === 'strap_beam');
+    expect(straps.length).toBe(4);
+    const corner = els.find(e => e.columnIds.includes('c1'))!;
+    expect(corner.system).toBe('isolated');
+    expect(corner.checks.find(c => c.id === 'boundary_cross')?.status).toBe('WARNING');
+    const centre = els.find(e => e.columnIds.includes('c5'))!;
+    expect(centre.checks.find(c => c.id === 'strap_relief')).toBeDefined();
+  });
+
+  it('3D geometry has no overlapping solids; strap beams are drawn between the footings', () => {
+    const g = geo(d, sceneCols(d));
+    expect(findBoxOverlaps(g.boxes)).toEqual([]);
+    expect(g.boxes.filter(b => b.elementId.startsWith('STRAP-') && b.kind === 'footing').length).toBe(4);
+  });
+
+  it('the BBS and BOQ include the strap beams (stirrups scheduled)', () => {
+    expect(d.bbs!.rows.some(r => r.member.startsWith('STRAP-') && r.shape === 'stirrup')).toBe(true);
+  });
+});
