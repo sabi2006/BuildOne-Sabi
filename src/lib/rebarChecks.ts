@@ -48,6 +48,10 @@ export interface ColumnRebarInput {
   fyMpa: number;
   /** Factored axial load Pu, kN */
   factoredLoadKn: number;
+  /** Effective length / least lateral dimension (IS 456 Cl. 25.1.2) */
+  slenderness?: number;
+  /** Unsupported length / least lateral dimension (IS 456 Cl. 25.3.1) */
+  unsupportedRatio?: number;
 }
 
 /**
@@ -98,6 +102,11 @@ export function columnRebarChecks(c: ColumnRebarInput): RebarCheck[] {
       status: c.tieDiaMm >= minTie - 1e-9 ? 'PASS' : 'FAIL', demand: c.tieDiaMm, capacity: r(minTie, 1), unit: 'mm' },
     { id: 'cover', label: 'Cover to longitudinal bars ≥ 40 mm and ≥ bar diameter', clause: 'IS 456 Cl. 26.4.2.1',
       status: c.coverMm >= minCover ? 'PASS' : 'FAIL', demand: c.coverMm, capacity: minCover, unit: 'mm' },
+    ...(c.slenderness !== undefined ? [{ id: 'slenderness', label: 'Short column: effective length ≤ 12 × least dimension', clause: 'IS 456 Cl. 25.1.2',
+      status: (c.slenderness <= 12 ? 'PASS' : 'WARNING') as RebarCheckStatus, demand: r(c.slenderness, 1), capacity: 12,
+      note: c.slenderness > 12 ? 'Slender column: the additional moments of IS 456 Cl. 39.7 are not designed by this app. Increase the section or have it designed.' : undefined }] : []),
+    ...(c.unsupportedRatio !== undefined ? [{ id: 'unsupported_length', label: 'Unsupported length ≤ 60 × least dimension', clause: 'IS 456 Cl. 25.3.1',
+      status: (c.unsupportedRatio <= 60 ? 'PASS' : 'FAIL') as RebarCheckStatus, demand: r(c.unsupportedRatio, 1), capacity: 60 }] : []),
   ];
 }
 

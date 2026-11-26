@@ -39,6 +39,7 @@ import {
   calculateFloorBeamStructuralDetails,
   FloorSlabStructuralCalculation,
   FloorBeamStructuralCalculation,
+  BeamDesignInputs,
   toMeters,
   BOQProductItem
 } from '@/lib/brickCalculator';
@@ -67,12 +68,22 @@ interface StructuralConfigModalProps {
 
 
 /** Per-floor beam reinforcement override with the IS 456 checks of the bars provided */
-function BeamRebarEditor({ beam, value, onChange, testId }: {
+function BeamRebarEditor({ beam, value, onChange, testId, design, onDesignChange, buildingConcrete, buildingSteel }: {
   beam: FloorBeamStructuralCalculation;
   value?: BeamRebarOverride;
   onChange: (next: BeamRebarOverride | undefined) => void;
   testId: string;
+  design?: BeamDesignInputs;
+  onDesignChange: (next: BeamDesignInputs | undefined) => void;
+  buildingConcrete: string;
+  buildingSteel: string;
 }) {
+  const dz = design || {};
+  const setD = (patch: Partial<BeamDesignInputs>) => {
+    const next: BeamDesignInputs = { ...dz, ...patch };
+    (Object.keys(next) as (keyof BeamDesignInputs)[]).forEach(k => { if (next[k] === undefined || (typeof next[k] === 'number' && Number.isNaN(next[k] as number))) delete next[k]; });
+    onDesignChange(Object.keys(next).length ? next : undefined);
+  };
   const v = value || {};
   const set = (patch: Partial<BeamRebarOverride>) => {
     const next: BeamRebarOverride = { ...v, ...patch };
@@ -86,14 +97,25 @@ function BeamRebarEditor({ beam, value, onChange, testId }: {
   const inp = 'w-full text-center text-xs font-bold text-slate-900 px-1 py-1 rounded border border-slate-300 bg-white';
   const badge = (st?: string) => st === 'PASS' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : st === 'WARNING' ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-red-100 text-red-800 border-red-300';
   return (
-    <details className="pt-2 border-t border-slate-200/80" open={overridden || worst === 'FAIL'} data-testid={testId}>
+    <details className="pt-2 border-t border-slate-200/80" open={overridden || worst === 'FAIL' || Object.keys(dz).length > 0} data-testid={testId}>
       <summary className="cursor-pointer text-[11px] font-semibold text-slate-600 flex items-center gap-1.5">
-        <span>Beam reinforcement & IS 456 checks</span>
+        <span>Beam design inputs, reinforcement & IS 456 checks</span>
         {worst && <span data-testid={`${testId}-status`} className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${badge(worst)}`}>{worst}</span>}
         {overridden && <span className="text-[10px] text-blue-700">user values</span>}
       </summary>
       <div className="mt-2 space-y-2">
-        <div className="text-[10px] text-slate-500">Blank = automatic design. Your values are kept as entered and checked below (never corrected silently).</div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-[10px] text-slate-600" data-testid={`${testId}-design`}>
+          <label>Support<select className={inp} data-testid={`${testId}-support`} value={dz.support ?? ''} onChange={e => setD({ support: (e.target.value || undefined) as BeamDesignInputs['support'] })}>
+            <option value="">Continuous (wL²/10)</option><option value="simply_supported">Simply supported (wL²/8)</option></select></label>
+          <label>Extra UDL kN/m<input type="number" min={0} step={0.5} className={inp} data-testid={`${testId}-udl`} placeholder="0" value={dz.extraUdlKnM ?? ''} onChange={e => setD({ extraUdlKnM: num(e.target.value) })} /></label>
+          <label>Point load kN<input type="number" min={0} step={1} className={inp} data-testid={`${testId}-point`} placeholder="0" value={dz.pointLoadKn ?? ''} onChange={e => setD({ pointLoadKn: num(e.target.value) })} /></label>
+          <label>Concrete<select className={inp} value={dz.concreteGrade ?? ''} onChange={e => setD({ concreteGrade: (e.target.value || undefined) as BeamDesignInputs['concreteGrade'] })}>
+            <option value="">{buildingConcrete}</option>{['M15', 'M20', 'M25', 'M30', 'M35'].map(g => <option key={g} value={g}>{g}</option>)}</select></label>
+          <label>Steel<select className={inp} value={dz.steelGrade ?? ''} onChange={e => setD({ steelGrade: (e.target.value || undefined) as BeamDesignInputs['steelGrade'] })}>
+            <option value="">{buildingSteel}</option>{['Fe415', 'Fe500', 'Fe550'].map(g => <option key={g} value={g}>{g}</option>)}</select></label>
+        </div>
+        <div className="text-[10px] text-slate-500">Loads are service values (factored ×1.5). A point load is taken at mid-span with the simply supported moment PL/4 (conservative for a continuous beam). Cantilever and fixed-end beams are not designed here: their governing moment needs top steel.</div>
+        <div className="text-[10px] text-slate-500">Bars: blank = automatic design. Your values are kept as entered and checked below (never corrected silently).</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10px] text-slate-600">
           <label>Bottom ⌀ <span className="text-slate-400">({beam.bottomMainBarDiaMm})</span><select className={inp} data-testid={`${testId}-bot-dia`} value={v.bottomBarDiaMm ?? ''} onChange={e => set({ bottomBarDiaMm: num(e.target.value) })}><option value="">Auto</option>{[10, 12, 16, 20, 25].map(d => <option key={d} value={d}>{d}</option>)}</select></label>
           <label>Bottom no.<input type="number" min={2} className={inp} data-testid={`${testId}-bot-count`} placeholder={String(beam.bottomMainBarCount)} value={v.bottomBarCount ?? ''} onChange={e => set({ bottomBarCount: num(e.target.value) })} /></label>
@@ -217,6 +239,13 @@ export function StructuralConfigModal({
     });
   };
 
+  const handleFloorBeamDesign = (floorId: string, next: BeamDesignInputs | undefined) => {
+    setLocalConfig(prev => {
+      const existing = prev.floorOverrides?.[floorId] || {};
+      return { ...prev, floorOverrides: { ...(prev.floorOverrides || {}), [floorId]: { ...existing, beamDesign: next } } };
+    });
+  };
+
   const handleResetFloorOverride = (floorId: string) => {
     setLocalConfig(prev => {
       if (!prev.floorOverrides) return prev;
@@ -284,7 +313,8 @@ export function StructuralConfigModal({
           customWidthMm: override?.customBeamWidthIn ? Math.round(override.customBeamWidthIn * 25.4) : undefined,
           customDepthMm: override?.customBeamDepthIn ? Math.round(override.customBeamDepthIn * 25.4) : undefined,
           isCustomSize: Boolean(override?.isCustomBeam),
-          rebarOverride: override?.beamRebar
+          rebarOverride: override?.beamRebar,
+          design: override?.beamDesign
         }
       );
 
@@ -324,7 +354,8 @@ export function StructuralConfigModal({
         customWidthMm: roofOverride?.customBeamWidthIn ? Math.round(roofOverride.customBeamWidthIn * 25.4) : undefined,
         customDepthMm: roofOverride?.customBeamDepthIn ? Math.round(roofOverride.customBeamDepthIn * 25.4) : undefined,
         isCustomSize: Boolean(roofOverride?.isCustomBeam),
-        rebarOverride: roofOverride?.beamRebar
+        rebarOverride: roofOverride?.beamRebar,
+        design: roofOverride?.beamDesign
       }
     );
 
@@ -948,7 +979,9 @@ export function StructuralConfigModal({
                                   </div>
 
                                   <BeamRebarEditor beam={beam} value={override?.beamRebar} testId={`beam-rebar-${floorId}`}
-                                    onChange={(next) => handleFloorBeamRebarOverride(floorId, next)} />
+                                    onChange={(next) => handleFloorBeamRebarOverride(floorId, next)}
+                                    design={override?.beamDesign} onDesignChange={(next) => handleFloorBeamDesign(floorId, next)}
+                                    buildingConcrete={localConfig.concreteGrade} buildingSteel={localConfig.steelGrade} />
                                 </div>
                               </div>
                             </div>
@@ -1133,7 +1166,9 @@ export function StructuralConfigModal({
                                   </div>
 
                                   <BeamRebarEditor beam={beam} value={override?.beamRebar} testId={`beam-rebar-${'roof'}`}
-                                    onChange={(next) => handleFloorBeamRebarOverride('roof', next)} />
+                                    onChange={(next) => handleFloorBeamRebarOverride('roof', next)}
+                                    design={override?.beamDesign} onDesignChange={(next) => handleFloorBeamDesign('roof', next)}
+                                    buildingConcrete={localConfig.concreteGrade} buildingSteel={localConfig.steelGrade} />
                                 </div>
                               </div>
                             </div>

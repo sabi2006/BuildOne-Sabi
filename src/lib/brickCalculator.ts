@@ -12,6 +12,7 @@ import {
   ColumnRole,
   SoilClassification,
   ConcreteGrade,
+  SteelGrade,
   CONCRETE_MIX_DATABASE,
   StructuralRatesConfig
 } from './structuralCalculationService';
@@ -150,6 +151,12 @@ export interface Pillar {
   };
   /** User reinforcement override (bar diameter / count, tie diameter / spacing, cover); kept and checked, never auto-corrected */
   rebarOverride?: ColumnRebarOverride;
+  /** This column's steel grade (default: the building's) */
+  steelGrade?: SteelGrade;
+  /** Extra service load carried by this column, kN (added to the accumulated floor loads) */
+  extraServiceLoadKn?: number;
+  /** Effective length factor k of IS 456 Table 28 (default 0.85) */
+  effectiveLengthFactor?: number;
   calculatedFooting?: {
     lengthM: number;
     widthM: number;

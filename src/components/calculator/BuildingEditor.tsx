@@ -2653,7 +2653,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   /** A locked pillar keeps its geometry: only these view/lock flags may change */
   const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
   /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
-  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes', 'rebarOverride']);
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor']);
   const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
   const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
 
@@ -6948,8 +6948,44 @@ if (activeMode === 'foundation') {
                       <option value="M30">M30 (1:0.75:1.5 - High Strength)</option>
                       <option value="M35">M35 (1:0.65:1.3 - Multi-Storey)</option>
                     </select>
+                    <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">Used for this column&apos;s design and concrete cost.</span>
                   </div>
                 )}
+
+                {selectedPillarId && (() => {
+                  const sp = findPillarById(selectedPillarId);
+                  return (
+                    <div className="grid grid-cols-2 gap-2" data-testid="pillar-design-inputs">
+                      <div>
+                        <label className="block text-[10px] font-medium text-gray-500 mb-1">Steel Grade</label>
+                        <select data-testid="pillar-steel-grade" value={sp?.steelGrade || ''} onChange={e => updateActiveFloorPillar({ steelGrade: (e.target.value || undefined) as Pillar['steelGrade'] })}
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs">
+                          <option value="">Building ({model.buildingConfig?.steelGrade || 'Fe500'})</option>
+                          <option value="Fe415">Fe415</option><option value="Fe500">Fe500</option><option value="Fe550">Fe550</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-medium text-gray-500 mb-1">Extra load (kN)</label>
+                        <input type="number" min={0} step={5} placeholder="0" data-testid="pillar-extra-load" value={sp?.extraServiceLoadKn ?? ''}
+                          onChange={e => updateActiveFloorPillar({ extraServiceLoadKn: e.target.value === '' ? undefined : Math.max(0, Number(e.target.value)) })}
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs" title="Service load not in the floor loads (tank, machine, cantilever reaction)" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-[10px] font-medium text-gray-500 mb-1">End conditions (effective length, IS 456 Table 28)</label>
+                        <select data-testid="pillar-end-condition" value={sp?.effectiveLengthFactor ?? ''} onChange={e => updateActiveFloorPillar({ effectiveLengthFactor: e.target.value === '' ? undefined : Number(e.target.value) })}
+                          className="block w-full px-2 py-1 rounded border border-gray-300 text-xs">
+                          <option value="">Default frame (0.85 L)</option>
+                          <option value="0.65">Both ends held and fixed (0.65 L)</option>
+                          <option value="0.8">Both ends held, one end fixed (0.80 L)</option>
+                          <option value="1">Both ends held, pinned (1.00 L)</option>
+                          <option value="1.2">One end fixed, other fixed but sways (1.20 L)</option>
+                          <option value="2">One end fixed, other end free (2.00 L)</option>
+                        </select>
+                        <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">Extra load goes into this column&apos;s design and footing. Slenderness is checked in the Reinforcement section.</span>
+                      </div>
+                    </div>
+                  );
+                })()}
                 
                 <div>
                   <label className="block text-[10px] font-medium text-gray-500 mb-1">Name / ID</label>

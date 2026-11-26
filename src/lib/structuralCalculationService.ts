@@ -203,6 +203,8 @@ export interface BuildingConfig {
     isCustomBeam?: boolean;
     /** User beam reinforcement for this floor: kept as entered and checked against IS 456 */
     beamRebar?: BeamRebarOverride;
+    /** User beam design inputs for this floor */
+    beamDesign?: BeamDesignInputs;
   }>;
   customRates?: StructuralRatesConfig;
   /** Extended geotechnical/foundation inputs (optional; defaults via resolveFoundationDetails) */
@@ -396,6 +398,11 @@ export interface ColumnStructuralCalculation {
   rebarOverridden: boolean;
   /** IS 456 detailing and axial-capacity checks on the bars actually provided */
   rebarChecks: RebarCheck[];
+  /** Grades actually used for this column */
+  concreteGrade: ConcreteGrade;
+  steelGrade: SteelGrade;
+  extraServiceLoadKn: number;
+  effectiveLengthFactor: number;
 
   // Concrete Quantity (Handbook Section 6.1)
   concreteVolumeM3: number;
@@ -499,6 +506,18 @@ export interface FloorSlabStructuralCalculation {
 
   status: 'SAFE' | 'WARNING';
   notes: string[];
+}
+
+/** Per-floor beam design inputs entered by the user */
+export interface BeamDesignInputs {
+  /** 'continuous' (default, Mu = wL²/10) or 'simply_supported' (wL²/8) */
+  support?: 'continuous' | 'simply_supported';
+  /** Extra service UDL on the beam, kN/m (treated as dead load) */
+  extraUdlKnM?: number;
+  /** Extra service point load at mid-span, kN */
+  pointLoadKn?: number;
+  concreteGrade?: ConcreteGrade;
+  steelGrade?: SteelGrade;
 }
 
 export interface FloorBeamStructuralCalculation {
@@ -1010,8 +1029,13 @@ export function calculateFloorBeamStructuralDetails(
     customDepthMm?: number;
     isCustomSize?: boolean;
     rebarOverride?: BeamRebarOverride;
+    design?: BeamDesignInputs;
   }
 ): FloorBeamStructuralCalculation {
+  const bd = overrides?.design;
+  if (bd?.concreteGrade || bd?.steelGrade) {
+    config = { ...config, concreteGrade: bd.concreteGrade || config.concreteGrade, steelGrade: bd.steelGrade || config.steelGrade };
+  }
   const spanM = Math.max(1.0, effectiveSpanM);
   const fck = CONCRETE_MIX_DATABASE[config.concreteGrade]?.fckMpa || 20;
   const fy = STEEL_YIELD_STRENGTH[config.steelGrade] || 500;
@@ -1076,14 +1100,20 @@ export function calculateFloorBeamStructuralDetails(
   const slabDeadLoadPerM_Kn = tributarySlabWidth * slabCalculation.totalDeadLoadKnM2;
   const slabLiveLoadPerM_Kn = tributarySlabWidth * slabCalculation.liveLoadKnM2;
 
-  const totalDeadLoadPerM_Kn = beamSelfWeightPerM_Kn + wallLoadPerM_Kn + slabDeadLoadPerM_Kn;
+  const extraUdlKnM = Math.max(0, bd?.extraUdlKnM || 0); // user extra service load (treated as dead load)
+  const totalDeadLoadPerM_Kn = beamSelfWeightPerM_Kn + wallLoadPerM_Kn + slabDeadLoadPerM_Kn + extraUdlKnM;
   const totalLiveLoadPerM_Kn = slabLiveLoadPerM_Kn;
   const totalServiceLoadPerM_Kn = totalDeadLoadPerM_Kn + totalLiveLoadPerM_Kn;
   const factoredLoadWuPerM_Kn = 1.5 * totalServiceLoadPerM_Kn;
 
-  // Design Bending Moment & Shear (Continuous frame: Mu = wu * L^2 / 10, Vu = wu * L / 2)
-  const designBendingMomentMuKnM = (factoredLoadWuPerM_Kn * spanM * spanM) / 10;
-  const designShearForceVuKn = (factoredLoadWuPerM_Kn * spanM) / 2;
+  // Design Bending Moment & Shear: continuous frame Mu = wu L² / 10 (default) or simply supported wu L² / 8; Vu = wu L / 2.
+  // A user point load P at mid-span adds 1.5 P L / 4 (the simply supported value: conservative for a continuous beam)
+  // and 1.5 P / 2 of shear; a user extra UDL is part of wu.
+  const support = bd?.support || 'continuous';
+  const momentCoeff = support === 'simply_supported' ? 8 : 10;
+  const pointLoadKn = Math.max(0, bd?.pointLoadKn || 0);
+  const designBendingMomentMuKnM = (factoredLoadWuPerM_Kn * spanM * spanM) / momentCoeff + (1.5 * pointLoadKn * spanM) / 4;
+  const designShearForceVuKn = (factoredLoadWuPerM_Kn * spanM) / 2 + (1.5 * pointLoadKn) / 2;
 
   // Ru,max check
   const ruCoeff = fy <= 415 ? 0.138 : (fy <= 500 ? 0.133 : 0.130);
@@ -1170,7 +1200,7 @@ export function calculateFloorBeamStructuralDetails(
   const stirrupsSafe = nominalShearStressTauV_Mpa <= maxShearStressTauCMax_Mpa;
 
   // Deflection Check (IS 456 Cl. 23.2.1)
-  const basicLoverD = 26; // continuous beam
+  const basicLoverD = support === 'simply_supported' ? 20 : 26; // IS 456 Cl. 23.2.1
   const allowableLoverD = Math.round(basicLoverD * 1.15 * 10) / 10;
   const actualLoverD = Math.round(((spanM * 1000) / effectiveDepthD_mm) * 10) / 10;
   const isDeflectionSafe = actualLoverD <= allowableLoverD;
@@ -1327,6 +1357,13 @@ export function calculatePillarStructuralDetails(
     /** User reinforcement override: kept as entered (never auto-upsized) and checked against IS 456 */
     rebarOverride?: ColumnRebarOverride;
     circular?: boolean;
+    /** This column's own grades (default: the building's grades) */
+    concreteGrade?: ConcreteGrade;
+    steelGrade?: SteelGrade;
+    /** Extra service load on this column (machinery, tank, cantilever reaction...), kN, added to the accumulated load */
+    extraServiceLoadKn?: number;
+    /** Effective length factor k (IS 456 Table 28): l_eff = k × storey height (default 0.85) */
+    effectiveLengthFactor?: number;
   }
 ): ColumnStructuralCalculation {
   // 1. Determine Surrounding Spans & Tributary Area (Handbook Section 3.3)
@@ -1466,15 +1503,18 @@ export function calculatePillarStructuralDetails(
 
   // Total Accumulated Load across floors (Handbook Section 7.2)
   const numFloors = Math.max(1, overrides?.supportedFloors !== undefined ? overrides.supportedFloors : config.floorCount);
-  const totalServiceLoadKn = (numFloors * storeyServiceLoadKn) + roofLoadKn;
+  const extraServiceLoadKn = Math.max(0, overrides?.extraServiceLoadKn || 0);
+  const totalServiceLoadKn = (numFloors * storeyServiceLoadKn) + roofLoadKn + extraServiceLoadKn;
   const factoredUltimateLoadKn = 1.5 * totalServiceLoadKn; // Limit State factored design load Pu
 
   // 3. Preliminary Column Section Sizing (IS 456 Cl. 39.3 & Handbook Section 7.3)
   // Puz = 0.4 * fck * Ac + 0.67 * fy * Asc
   // Where Ac = Ag - Asc, with trial steel ratio p = 1.0% (Asc = 0.01 * Ag)
-  const mix = CONCRETE_MIX_DATABASE[config.concreteGrade];
+  const columnConcreteGrade: ConcreteGrade = overrides?.concreteGrade && CONCRETE_MIX_DATABASE[overrides.concreteGrade] ? overrides.concreteGrade : config.concreteGrade;
+  const columnSteelGrade: SteelGrade = overrides?.steelGrade && STEEL_YIELD_STRENGTH[overrides.steelGrade] ? overrides.steelGrade : config.steelGrade;
+  const mix = CONCRETE_MIX_DATABASE[columnConcreteGrade];
   const fck = mix.fckMpa;
-  const fy = STEEL_YIELD_STRENGTH[config.steelGrade];
+  const fy = STEEL_YIELD_STRENGTH[columnSteelGrade];
 
   // Required Ag (mm²) = Pu * 10^3 / [ 0.4 * fck * (1 - p) + 0.67 * fy * p ]
   const denominator = (0.4 * fck * 0.99) + (0.67 * fy * 0.01);
@@ -1549,7 +1589,8 @@ export function calculatePillarStructuralDetails(
   const providedGrossAreaAgMm2 = providedWidthMm * providedDepthMm;
 
   // Check slenderness ratio (effective length / lateral dimension)
-  const effectiveLengthM = 0.85 * floorHeightM; // partially restrained frame
+  const effectiveLengthFactor = overrides?.effectiveLengthFactor && overrides.effectiveLengthFactor > 0 ? overrides.effectiveLengthFactor : 0.85;
+  const effectiveLengthM = effectiveLengthFactor * floorHeightM; // default 0.85: partially restrained frame
   const minDimM = Math.min(providedWidthMm, providedDepthMm) * 0.001;
   const slendernessRatioLambda = effectiveLengthM / minDimM;
   const isShortColumn = slendernessRatioLambda <= 12.0;
@@ -1799,7 +1840,13 @@ export function calculatePillarStructuralDetails(
       widthMm: providedWidthMm, depthMm: providedDepthMm, circular: overrides?.circular,
       mainBarDiaMm: providedBarDiaMm, mainBarCount: providedBarCount, tieDiaMm: stirrupDiaMm, tieSpacingMm: stirrupSpacingMm,
       coverMm, fckMpa: fck, fyMpa: fy, factoredLoadKn: factoredUltimateLoadKn,
+      slenderness: slendernessRatioLambda,
+      unsupportedRatio: floorHeightM / minDimM,
     }),
+    concreteGrade: columnConcreteGrade,
+    steelGrade: columnSteelGrade,
+    extraServiceLoadKn,
+    effectiveLengthFactor,
 
     concreteVolumeM3,
     concreteVolumeCft,
@@ -1845,6 +1892,10 @@ export function calculateBuildingStructuralSummary(
     connectedWallIds?: string[];
     shape?: 'square' | 'rectangle' | 'circular';
     rebarOverride?: ColumnRebarOverride;
+    concreteGrade?: ConcreteGrade;
+    steelGrade?: SteelGrade;
+    extraServiceLoadKn?: number;
+    effectiveLengthFactor?: number;
   }>,
   walls: Array<{
     id: string;
@@ -2004,7 +2055,11 @@ export function calculateBuildingStructuralSummary(
         customBeamDepthMm: configuredBeamDepthMm,
         customSlabThicknessMm: configuredSlabThicknessMm,
         rebarOverride: p.rebarOverride,
-        circular: p.shape === 'circular'
+        circular: p.shape === 'circular',
+        concreteGrade: p.concreteGrade,
+        steelGrade: p.steelGrade,
+        extraServiceLoadKn: p.extraServiceLoadKn,
+        effectiveLengthFactor: p.effectiveLengthFactor
       }
     );
   });
@@ -2061,8 +2116,10 @@ export function calculateBuildingStructuralSummary(
         widthMm: calc.providedWidthMm, depthMm: calc.providedDepthMm, circular: p.shape === 'circular',
         mainBarDiaMm: calc.providedBarDiaMm, mainBarCount: calc.providedBarCount, tieDiaMm: calc.stirrupDiaMm,
         tieSpacingMm: calc.stirrupSpacingMm, coverMm: calc.coverMm,
-        fckMpa: CONCRETE_MIX_DATABASE[config.concreteGrade].fckMpa, fyMpa: STEEL_YIELD_STRENGTH[config.steelGrade],
+        fckMpa: CONCRETE_MIX_DATABASE[calc.concreteGrade].fckMpa, fyMpa: STEEL_YIELD_STRENGTH[calc.steelGrade],
         factoredLoadKn: calc.factoredUltimateLoadKn,
+        slenderness: (calc.effectiveLengthFactor * (p.height ? toMeters(p.height, p.heightUnit || 'ft') : 3.0)) / (Math.min(calc.providedWidthMm, calc.providedDepthMm) / 1000),
+        unsupportedRatio: ((p.height ? toMeters(p.height, p.heightUnit || 'ft') : 3.0)) / (Math.min(calc.providedWidthMm, calc.providedDepthMm) / 1000),
       });
 
       const colWidthM = calc.providedWidthMm * 0.001;
@@ -2346,7 +2403,8 @@ export function calculateBuildingStructuralSummary(
         customWidthMm: customBeamWMm,
         customDepthMm: customBeamDMm,
         isCustomSize: Boolean(customBeamWMm || customBeamDMm),
-        rebarOverride: flOverrides?.beamRebar
+        rebarOverride: flOverrides?.beamRebar,
+        design: flOverrides?.beamDesign
       }
     );
     floorBeamCalculations.push(beamCalc);
@@ -2391,7 +2449,8 @@ export function calculateBuildingStructuralSummary(
       maxRoofSpanM / 2,
       roofSlabCalculation,
       config,
-      { rebarOverride: (config.floorOverrides?.['roof'] || config.floorOverrides?.[`floor-${numFloors}`])?.beamRebar }
+      { rebarOverride: (config.floorOverrides?.['roof'] || config.floorOverrides?.[`floor-${numFloors}`])?.beamRebar,
+        design: (config.floorOverrides?.['roof'] || config.floorOverrides?.[`floor-${numFloors}`])?.beamDesign }
     );
   }
 
@@ -2437,11 +2496,13 @@ export function calculateBuildingStructuralSummary(
   const foundationTotal = costExcavation + costSandFill + costPcc + costFootingRcc + costFootingSteel + costBackfill;
 
   // 2. Column Costs
-  const columnConcreteMaterial = totalColumnRccM3 * (
-    ((mix.cementKgPerM3 / 50) * cementBagRate) +
-    ((mix.fineAggKgPerM3 / 1600) * 35.3147 * sandRatePerCft) +
-    ((mix.coarseAggKgPerM3 / 1500) * 35.3147 * aggRatePerCft)
-  );
+  const concreteCostPerM3 = (m: typeof mix) =>
+    ((m.cementKgPerM3 / 50) * cementBagRate) +
+    ((m.fineAggKgPerM3 / 1600) * 35.3147 * sandRatePerCft) +
+    ((m.coarseAggKgPerM3 / 1500) * 35.3147 * aggRatePerCft);
+  // each column at its own grade (a column without its own grade uses the building grade)
+  const columnConcreteMaterial = pillarsCalculations.reduce(
+    (sum, c) => sum + c.concreteVolumeM3 * concreteCostPerM3(CONCRETE_MIX_DATABASE[c.concreteGrade] || mix), 0);
   const columnMainSteelCost = pillarsCalculations.reduce((sum, c) => sum + c.mainSteelWeightKg, 0) * steelRatePerKg;
   const columnStirrupSteelCost = pillarsCalculations.reduce((sum, c) => sum + c.stirrupWeightKg, 0) * steelRatePerKg;
   const columnFormworkCost = columnFormworkM2 * (rates.formworkRatePerM2 || 350);
