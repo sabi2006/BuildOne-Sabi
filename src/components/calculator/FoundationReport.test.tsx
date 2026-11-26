@@ -178,3 +178,20 @@ describe('FoundationReport – wind and earthquake', () => {
     expect(g).not.toContain('lateral-summary');
   });
 });
+
+describe('FoundationReport – element levels and self-weight', () => {
+  const d = design({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any });
+  const out = html(d);
+
+  it('shows bottom/top level, PCC underside and self-weight for each designed footing (hand check of one)', () => {
+    const e = d.foundation!.elements.find(x => x.depthMm && x.quantities)!;
+    expect(out).toContain(`data-testid="report-element-levels-${e.id}"`);
+    const Df = d.summary.foundationDepthM, pcc = d.summary.pccThicknessMm / 1000, D = e.depthMm! / 1000;
+    const bottom = -Df + pcc, top = bottom + D;
+    const f2 = (v: number, d = 2) => v.toLocaleString(undefined, { maximumFractionDigits: d }); // same as the report
+    expect(out).toContain(`${f2(bottom)} / ${f2(top)} m`);
+    expect(out).toContain(`${f2(-Df)} m`);
+    expect(out).toContain(`${f2(e.quantities!.concreteM3 * 2500 * 9.81 / 1000, 1)} kN`);
+  });
+});
+

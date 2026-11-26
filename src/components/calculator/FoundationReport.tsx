@@ -5,6 +5,7 @@ import type { FoundationBasementIntegration } from '@/lib/foundation/integration
 import type { DesignCheck, FoundationElementResult } from '@/lib/foundation/foundationDesignService';
 import type { BasementElementResult } from '@/lib/foundation/basementDesignService';
 import type { DesignStatus } from '@/lib/foundation/types';
+import { footingLevels, memberWeight } from '../../lib/elementMeasurements';
 
 /**
  * Detailed design report for the foundation and basement elements.
@@ -86,7 +87,7 @@ function List({ title, items, tone = 'slate' }: { title: string; items: string[]
   );
 }
 
-function FoundationElementCard({ e }: { e: FoundationElementResult }) {
+function FoundationElementCard({ e, founding }: { e: FoundationElementResult; founding?: { depthM: number; pccThicknessMm: number } }) {
   const loc = e.plan ? `x ${fmt(e.plan.x0)}–${fmt(e.plan.x1)} m, y ${fmt(e.plan.y0)}–${fmt(e.plan.y1)} m` : 'not placed (not designed)';
   return (
     <details className="border border-slate-200 rounded-lg bg-white" data-testid={`report-element-${e.id}`}>
@@ -150,6 +151,19 @@ function FoundationElementCard({ e }: { e: FoundationElementResult }) {
             <KV k="Shuttering" v={`${fmt(e.quantities.formworkM2, 2)} m²`} />
           </div>
         )}
+
+        {e.quantities && e.depthMm && founding && (() => {
+          const lv = footingLevels(founding.depthM, founding.pccThicknessMm / 1000, e.depthMm / 1000);
+          const wt = memberWeight(e.quantities.concreteM3);
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" data-testid={`report-element-levels-${e.id}`}>
+              <KV k="Bottom / top level" v={`${fmt(lv.bottomM)} / ${fmt(lv.topM)} m`} />
+              <KV k="PCC underside" v={`${fmt(lv.pccBottomM)} m`} />
+              <KV k="Bearing area" v={e.sizeXM !== undefined && e.sizeYM !== undefined ? `${fmt(e.sizeXM * e.sizeYM)} m²` : '—'} />
+              <KV k="Self-weight (RCC 25 kN/m³)" v={`${fmt(wt.concreteKg * 9.81 / 1000, 1)} kN`} />
+            </div>
+          );
+        })()}
 
         <ChecksTable checks={e.checks} />
         <List title="Assumptions" items={e.assumptions} />
@@ -332,7 +346,7 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
             </div>
             <List title="Why this system" items={f.selectionReasons} />
             <div className="space-y-2 mt-2">
-              {f.elements.map(e => <FoundationElementCard key={e.id} e={e} />)}
+              {f.elements.map(e => <FoundationElementCard key={e.id} e={e} founding={{ depthM: design.summary.foundationDepthM, pccThicknessMm: design.summary.pccThicknessMm }} />)}
             </div>
           </section>
         )}

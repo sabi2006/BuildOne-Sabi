@@ -55,11 +55,15 @@ import {
   getConcreteMixRatios,
   recalculateBuildingPillarSizing
 } from '@/lib/brickCalculator';
-import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw } from 'lucide-react';
+import { MousePointer2, Square, DoorOpen, LayoutGrid, Trash2, X, Info, ShieldAlert, Sparkles, CheckCircle2, Layers, Box, LandPlot, Hammer, RotateCcw, Check, Plus, AlertTriangle, Compass, FolderClock, Save, Paintbrush, Sliders, SlidersHorizontal, Lock, Unlock, Eraser, RefreshCw, Undo2, Redo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUndoableState } from '../../hooks/useUndoableState';
 import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { SaveProjectModal } from './SaveProjectModal';
 import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
+
+/** Unique id suffix for new elements (module scope: called from event handlers only) */
+const uniqueIdSuffix = () => `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
 interface BuildingEditorProps {
   initialDetails: any;
@@ -176,8 +180,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     };
   };
 
-  const [model, setModel] = useState<BuildingModel>(() => {
-    if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
+  const [model, setModel, modelHistory] = useUndoableState<BuildingModel>(() => {
+if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
       const baseModel = {
         ...buildingModel,
         ringBeam: buildingModel.ringBeam || DEFAULT_RCC_RING_BEAM,
@@ -238,6 +242,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   useEffect(() => {
     setBuildingModel(model);
   }, [model, setBuildingModel]);
+
 
   // Synchronize Floor-Level Pillar dimensions when switching floors
   useEffect(() => {
@@ -1527,6 +1532,34 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   const [canvasCursor, setCanvasCursor] = useState<Coordinate | null>(null);
   const [pillarPreview, setPillarPreview] = useState<{valid: boolean; coord: Coordinate | null; message?: string}>({ valid: true, coord: null });
   const svgRef = useRef<SVGSVGElement>(null);
+  const pillarPressRef = useRef<{ id: string; wasSelected: boolean; x: number; y: number } | null>(null);
+
+  // ---------------- undo / redo (Ctrl+Z, Ctrl+Y / Ctrl+Shift+Z) ----------------
+  const { undo: historyUndo, redo: historyRedo } = modelHistory;
+  const clearSelectionAfterHistoryStep = () => {
+    // the selected element may not exist in the restored model, and the panel fields would show stale values
+    setSelectedPillarId(null);
+    setSelectedFootingId(null);
+    setDrawingStart(null);
+    setCurrentMouse(null);
+  };
+  const handleUndo = () => { if (historyUndo()) clearSelectionAfterHistoryStep(); };
+  const handleRedo = () => { if (historyRedo()) clearSelectionAfterHistoryStep(); };
+  const historyKeyRef = useRef({ handleUndo, handleRedo });
+  useEffect(() => { historyKeyRef.current = { handleUndo, handleRedo }; });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      // inside a text field the browser's own undo applies
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      const k = e.key.toLowerCase();
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); historyKeyRef.current.handleUndo(); }
+      else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); historyKeyRef.current.handleRedo(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -1876,7 +1909,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
           ...fl,
           pillarWidth: w,
           pillarDepth: d,
-          pillars: (fl.pillars || []).map(p => ({
+          pillars: (fl.pillars || []).map(p => p.isLocked ? p : ({
             ...p,
             width: w,
             depth: p.shape === 'circular' ? w : d,
@@ -1888,7 +1921,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
 
       const updatedPillars = (prev.pillars || []).map(p => {
         const matches = (!p.floorId && activeFloorId === prev.floors[0]?.id) || (p.floorId === activeFloorId);
-        if (!matches) return p;
+        if (!matches || p.isLocked) return p;
         return {
           ...p,
           width: w,
@@ -1902,7 +1935,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       if (activeFloorId === prev.floors[0]?.id && updatedFoundation?.footings) {
         updatedFoundation = {
           ...updatedFoundation,
-          footings: updatedFoundation.footings.map(f => ({
+          footings: updatedFoundation.footings.map(f => (prev.pillars || []).some(p => p.isLocked && p.id === f.pillarId) ? f : ({
             ...f,
             columnStubWidth: w,
             columnStubDepth: d
@@ -1924,6 +1957,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
   };
 
   const promptRemovePillar = (pillar: Pillar) => {
+    if (pillar.isLocked || findPillarById(pillar.id)?.isLocked) { lockedNotice('delete it'); return; }
     setPillarRemovalModal({
       isOpen: true,
       targetPillar: pillar,
@@ -2583,9 +2617,75 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     };
   };
 
+  // ---------------- pillar lock / duplicate / reset ----------------
+  const findPillarById = (id: string | null): Pillar | undefined => {
+    if (!id) return undefined;
+    return model.floors.flatMap(f => f.pillars || []).find(p => p.id === id) || (model.pillars || []).find(p => p.id === id);
+  };
+  /** A locked pillar keeps its geometry: only these view/lock flags may change */
+  const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
+  /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'concreteGrade', 'notes']);
+  const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
+  const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
+
+  const handleDuplicatePillar = () => {
+    const src = findPillarById(selectedPillarId);
+    if (!src) return;
+    const unit = model.buildingUnit;
+    const step = unit === 'm' ? 1 : 3; // 1 m or 3 ft beside the original
+    const sx = src.position?.x ?? src.x ?? 0, sy = src.position?.y ?? src.y ?? 0;
+    const nx = sx + step <= model.buildingLength ? sx + step : Math.max(0, sx - step);
+    const placeCoord = { x: Number(nx.toFixed(2)), y: sy };
+    const check = validatePillarPlacement({ ...src, position: placeCoord, placementType: 'custom', alignment: 'centre' }, allWalls, model);
+    if (!check.isValid) {
+      setPillarNotice({ msg: `Cannot duplicate here: ${check.errors.join(' ')}`, type: 'error' });
+      return;
+    }
+    const nameBase = `P${(model.pillars?.length || 0) + 1}`;
+    const copy: Pillar = {
+      ...src,
+      id: `pillar-${activeFloorId}-${uniqueIdSuffix()}`,
+      name: nameBase,
+      floorId: activeFloorId,
+      verticalColumnId: `col-${uniqueIdSuffix()}`,
+      position: placeCoord,
+      placementType: 'custom',
+      alignment: 'centre',
+      customOffsetX: undefined,
+      customOffsetY: undefined,
+      isLocked: false,
+      isStoreyOverride: false,
+      connectedWallIds: [],
+      structuralData: undefined,
+      calculatedFooting: undefined,
+    };
+    commitNewPillar(copy, src.continueToFloors === 'current' ? 'current' : 'all', placeCoord);
+    setPillarNotice({ msg: `Duplicated ${src.name || 'column'} as ${nameBase} ${step} ${unit} to the side: drag it into place.`, type: 'success' });
+  };
+
+  const handleResetPillar = () => {
+    const src = findPillarById(selectedPillarId);
+    if (!src) return;
+    if (src.isLocked) { lockedNotice('reset it'); return; }
+    // geometry follows the structural auto-sizing again; position, placement, name and lock are kept
+    updateActiveFloorPillar({
+      shape: 'square', finish: 'raw', isCustomSize: false, isStoreyOverride: false,
+      concreteGrade: undefined, showRebar: false, showBeam: false, includeInEstimate: true,
+    });
+    setModel(prev => recalculateBuildingPillarSizing(prev, settings, 'general').updatedModel);
+    setPillarShape('square'); setPillarFinish('raw'); setPillarShowRebar(false); setPillarShowBeam(false); setPillarIncludeEst(true);
+    setPillarNotice({ msg: `${src.name || 'Column'} reset to defaults (auto-sized from the structural loads).`, type: 'success' });
+  };
+
   const updateActiveFloorPillar = (changes: Partial<Pillar>) => {
     if (!selectedPillarId) return;
-    setModel(prev => {
+    if (findPillarById(selectedPillarId)?.isLocked && Object.keys(changes).some(k => !LOCK_EXEMPT_KEYS.has(k))) {
+      lockedNotice('edit it');
+      return;
+    }
+    const metaOnly = Object.keys(changes).every(k => META_ONLY_KEYS.has(k));
+setModel(prev => {
       const isSizeChange = changes.width !== undefined || changes.depth !== undefined;
       const isGround = (activeFloor?.level === 0) || (activeFloorId === 'floor-0') || (prev.floors[0]?.id === activeFloorId);
 
@@ -2688,8 +2788,8 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 ...p,
                 ...changes,
                 unit: newUnit,
-                isStoreyOverride: changes.isStoreyOverride !== undefined ? changes.isStoreyOverride : true,
-                isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
+                isStoreyOverride: changes.isStoreyOverride !== undefined ? changes.isStoreyOverride : (metaOnly ? p.isStoreyOverride : true),
+isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? changes.isCustomSize : p.isCustomSize)
               };
             })
           };
@@ -3448,7 +3548,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     setModel(applyRes.model);
     setShowApplyAllConfirm(false);
     const scopeLabel = applyPillarScope === 'all' ? 'across all floors' : (activeFloor?.name || 'current floor');
-    setApplyAllSuccessNotice(`✓ Pillar settings applied to ${applyRes.affectedCount} RCC pillars on ${scopeLabel}. Positions and IDs preserved.`);
+    setApplyAllSuccessNotice(`✓ Pillar settings applied to ${applyRes.affectedCount} RCC pillars on ${scopeLabel}. Positions and IDs preserved.${applyRes.skippedLockedIds.length ? ` ${applyRes.skippedLockedIds.length} locked pillar(s) left unchanged.` : ""}`);
     setTimeout(() => {
       setApplyAllSuccessNotice(null);
     }, 6000);
@@ -3516,8 +3616,130 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
     }
   };
 
+  /**
+   * Add a new pillar (placed with the pillar tool or duplicated) to the active floor, or to every floor when
+   * continueMode is 'all'; creates its ground footing stub and re-runs the structural pillar sizing.
+   */
+  const commitNewPillar = (newPillar: Pillar, continueMode: Pillar['continueToFloors'] | string, placeCoord: Coordinate) => {
+    // If continue is all, add to all floors at the exact same location
+    let addedToastData: { count: number; w: number; d: number; changed: boolean } | null = null;
+
+    setModel(prev => {
+      const targetFloors = continueMode === 'all' 
+        ? prev.floors 
+        : prev.floors.filter(f => f.id === activeFloorId);
+      
+      const newPillarsToAdd: Pillar[] = targetFloors.map(fl => ({
+        ...newPillar,
+        id: `pillar-${fl.id}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        floorId: fl.id,
+        height: fl.height
+      }));
+
+      // Propagate to foundation if pillar added to ground floor
+      let updatedFoundation = prev.foundation;
+      if (targetFloors.some(f => f.id === 'floor-0' || f.level === 0) && autoCreateStub && prev.foundation && prev.foundation.enabled) {
+        const gfInstance = newPillarsToAdd.find(p => p.floorId === 'floor-0' || prev.floors.find(f => f.id === p.floorId)?.level === 0) || newPillar;
+        const newFooting: FoundationFooting = {
+          id: `footing-${gfInstance.id}`,
+          pillarId: gfInstance.id,
+          pillarName: gfInstance.name,
+          floorId: 'floor-0',
+          hasFoundationPillar: true,
+          foundationPillarId: `FP-${gfInstance.name || gfInstance.id}`,
+          position: placeCoord,
+          foundationType: 'isolated',
+          excavationLength: 5,
+          excavationWidth: 5,
+          excavationDepth: 3.83,
+          excavationUnit: model.buildingUnit,
+          sandFillLength: 4,
+          sandFillWidth: 4,
+          sandFillDepth: 0.5,
+          sandFillUnit: model.buildingUnit,
+          sandCompactionFactor: 1.15,
+          sandFillCompactionFactor: 1.15,
+          pccLength: 4,
+          pccWidth: 4,
+          pccThickness: 0.33,
+          pccUnit: model.buildingUnit,
+          pccMixRatio: '1:4:8',
+          footingLength: 3,
+          footingWidth: 3,
+          footingDepth: 1,
+          footingUnit: model.buildingUnit,
+          concreteGrade: 'M20',
+          footingMixRatio: '1:1.5:3',
+          columnStubHeight: 2,
+          columnStubWidth: newPillar.width,
+          columnStubDepth: newPillar.depth,
+          columnStubUnit: newPillar.unit,
+          columnStubConcreteGrade: 'M20',
+          columnStubMixRatio: '1:1.5:3',
+          columnStubRebar: {
+            mainBarDiaMm: 16,
+            mainBarCount: 4,
+            stirrupDiaMm: 8,
+            stirrupSpacingMm: 150,
+            coverMm: 40
+          },
+          plinthLevel: 0,
+          foundationBedLevel: -3.83,
+          rebar: {
+            mainBarDiaMm: 12,
+            mainBarCount: 6,
+            distBarDiaMm: 12,
+            distBarCount: 6,
+            coverMm: 50,
+            hookLengthMm: 150
+          },
+          enabled: true,
+          includeInEstimate: true
+        };
+        updatedFoundation = {
+          ...prev.foundation,
+          footings: [...(prev.foundation.footings || []), newFooting]
+        };
+      }
+
+      const rawAddedModel: BuildingModel = {
+        ...prev,
+        pillars: [...(prev.pillars || []), ...newPillarsToAdd],
+        floors: prev.floors.map(fl => {
+          const addedForFloor = newPillarsToAdd.filter(np => np.floorId === fl.id);
+          return addedForFloor.length > 0
+            ? { ...fl, pillars: [...(fl.pillars || []), ...addedForFloor] }
+            : fl;
+        }),
+        foundation: updatedFoundation
+      };
+
+      const recalc = recalculateBuildingPillarSizing(rawAddedModel, settings, 'pillar_added');
+      addedToastData = {
+        count: recalc.totalPillarsCount,
+        w: recalc.appliedWidthIn,
+        d: recalc.appliedDepthIn,
+        changed: recalc.changed
+      };
+
+      return recalc.updatedModel;
+    });
+
+    if (addedToastData) {
+      const { count, w, d } = addedToastData;
+      const storeyCount = model.floors.length || 1;
+      const storeyLabel = storeyCount === 1 ? 'Single Storey (G+0)' : `Multi-Storey (G+${storeyCount - 1})`;
+      triggerToast(
+        "Pillar Added & Weight Distributed",
+        `Building weight equally distributed across ${count} pillars (re-sized to ${w}"×${d}") for ${storeyLabel}.`,
+        "success"
+      );
+    }
+
+  };
+
   const handleSvgClick = (e: React.MouseEvent) => {
-    if (activeMode === 'foundation') {
+if (activeMode === 'foundation') {
       if (isPlacingFooting) {
         const fCoords = getFoundationCoords(e, foundationSnapMode);
         if (fCoords) {
@@ -3606,120 +3828,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         connectedWallIds: connectedWallIds
       };
 
-      // If continue is all, add to all floors at the exact same location
-      let addedToastData: { count: number; w: number; d: number; changed: boolean } | null = null;
-
-      setModel(prev => {
-        const targetFloors = pillarContinue === 'all' 
-          ? prev.floors 
-          : prev.floors.filter(f => f.id === activeFloorId);
-        
-        const newPillarsToAdd: Pillar[] = targetFloors.map(fl => ({
-          ...newPillar,
-          id: `pillar-${fl.id}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-          floorId: fl.id,
-          height: fl.height
-        }));
-
-        // Propagate to foundation if pillar added to ground floor
-        let updatedFoundation = prev.foundation;
-        if (targetFloors.some(f => f.id === 'floor-0' || f.level === 0) && autoCreateStub && prev.foundation && prev.foundation.enabled) {
-          const gfInstance = newPillarsToAdd.find(p => p.floorId === 'floor-0' || prev.floors.find(f => f.id === p.floorId)?.level === 0) || newPillar;
-          const newFooting: FoundationFooting = {
-            id: `footing-${gfInstance.id}`,
-            pillarId: gfInstance.id,
-            pillarName: gfInstance.name,
-            floorId: 'floor-0',
-            hasFoundationPillar: true,
-            foundationPillarId: `FP-${gfInstance.name || gfInstance.id}`,
-            position: placeCoord,
-            foundationType: 'isolated',
-            excavationLength: 5,
-            excavationWidth: 5,
-            excavationDepth: 3.83,
-            excavationUnit: model.buildingUnit,
-            sandFillLength: 4,
-            sandFillWidth: 4,
-            sandFillDepth: 0.5,
-            sandFillUnit: model.buildingUnit,
-            sandCompactionFactor: 1.15,
-            sandFillCompactionFactor: 1.15,
-            pccLength: 4,
-            pccWidth: 4,
-            pccThickness: 0.33,
-            pccUnit: model.buildingUnit,
-            pccMixRatio: '1:4:8',
-            footingLength: 3,
-            footingWidth: 3,
-            footingDepth: 1,
-            footingUnit: model.buildingUnit,
-            concreteGrade: 'M20',
-            footingMixRatio: '1:1.5:3',
-            columnStubHeight: 2,
-            columnStubWidth: pillarWidth,
-            columnStubDepth: pillarDepth,
-            columnStubUnit: pillarWdUnit,
-            columnStubConcreteGrade: 'M20',
-            columnStubMixRatio: '1:1.5:3',
-            columnStubRebar: {
-              mainBarDiaMm: 16,
-              mainBarCount: 4,
-              stirrupDiaMm: 8,
-              stirrupSpacingMm: 150,
-              coverMm: 40
-            },
-            plinthLevel: 0,
-            foundationBedLevel: -3.83,
-            rebar: {
-              mainBarDiaMm: 12,
-              mainBarCount: 6,
-              distBarDiaMm: 12,
-              distBarCount: 6,
-              coverMm: 50,
-              hookLengthMm: 150
-            },
-            enabled: true,
-            includeInEstimate: true
-          };
-          updatedFoundation = {
-            ...prev.foundation,
-            footings: [...(prev.foundation.footings || []), newFooting]
-          };
-        }
-
-        const rawAddedModel: BuildingModel = {
-          ...prev,
-          pillars: [...(prev.pillars || []), ...newPillarsToAdd],
-          floors: prev.floors.map(fl => {
-            const addedForFloor = newPillarsToAdd.filter(np => np.floorId === fl.id);
-            return addedForFloor.length > 0
-              ? { ...fl, pillars: [...(fl.pillars || []), ...addedForFloor] }
-              : fl;
-          }),
-          foundation: updatedFoundation
-        };
-
-        const recalc = recalculateBuildingPillarSizing(rawAddedModel, settings, 'pillar_added');
-        addedToastData = {
-          count: recalc.totalPillarsCount,
-          w: recalc.appliedWidthIn,
-          d: recalc.appliedDepthIn,
-          changed: recalc.changed
-        };
-
-        return recalc.updatedModel;
-      });
-
-      if (addedToastData) {
-        const { count, w, d } = addedToastData;
-        const storeyCount = model.floors.length || 1;
-        const storeyLabel = storeyCount === 1 ? 'Single Storey (G+0)' : `Multi-Storey (G+${storeyCount - 1})`;
-        triggerToast(
-          "Pillar Added & Weight Distributed",
-          `Building weight equally distributed across ${count} pillars (re-sized to ${w}"×${d}") for ${storeyLabel}.`,
-          "success"
-        );
-      }
+      commitNewPillar(newPillar, pillarContinue, placeCoord);
 
       setPillarName(`P${(model.pillars?.length || 0) + 2}`);
     }
@@ -3849,6 +3958,28 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
         </div>
 
         <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+          <button
+            type="button"
+            onClick={handleUndo}
+            disabled={!modelHistory.canUndo}
+            data-testid="editor-undo"
+            className="inline-flex items-center px-2 py-1.5 border border-slate-300 bg-white hover:bg-slate-50 rounded-lg shadow-2xs text-xs font-semibold text-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 className="w-3.5 h-3.5 mr-1" />
+            <span>Undo</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleRedo}
+            disabled={!modelHistory.canRedo}
+            data-testid="editor-redo"
+            className="inline-flex items-center px-2 py-1.5 border border-slate-300 bg-white hover:bg-slate-50 rounded-lg shadow-2xs text-xs font-semibold text-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
+          >
+            <Redo2 className="w-3.5 h-3.5 mr-1" />
+            <span>Redo</span>
+          </button>
           <button
             type="button"
             onClick={() => setIsClearModalOpen(true)}
@@ -6646,6 +6777,26 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                     </button>
                   )}
                 </div>
+                {selectedPillarId && (
+                  <div className="flex gap-1.5" data-testid="pillar-actions">
+                    <button type="button" onClick={handleDuplicatePillar}
+                      className="flex-1 px-2 py-0.5 bg-white hover:bg-orange-50 text-orange-700 border border-orange-200 rounded text-[10px] font-semibold"
+                      title="Copy this column (size, shape, finish, floors) and place the copy beside it">
+                      Duplicate
+                    </button>
+                    <button type="button" onClick={handleResetPillar} disabled={selectedPillarLocked}
+                      className="flex-1 px-2 py-0.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded text-[10px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Restore default shape/finish and return to structural auto-sizing (position kept)">
+                      Reset Properties
+                    </button>
+                  </div>
+                )}
+                {selectedPillarId && pillarNotice && (
+                  <div className={cn('text-[10px] px-2 py-1 rounded border',
+                    pillarNotice.type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : pillarNotice.type === 'info' ? 'bg-sky-50 text-sky-800 border-sky-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200')}>
+                    {pillarNotice.msg}
+                  </div>
+                )}
 
                 {/* Lock Position Toggle for Selected Pillar */}
                 {selectedPillarId && (() => {
@@ -6672,6 +6823,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   );
                 })()}
 
+                <fieldset disabled={selectedPillarLocked} className={cn('space-y-3 min-w-0', selectedPillarLocked && 'opacity-60')}>
+                {selectedPillarLocked && (
+                  <div className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1">Locked: size, shape, position and placement cannot be changed, and the column cannot be moved or deleted.</div>
+                )}
                 {/* Concrete Grade Selection for Pillar */}
                 {selectedPillarId && (
                   <div>
@@ -6719,6 +6874,25 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                     <option value="rectangle">Rectangle</option>
                     <option value="circular">Circular</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-500 mb-1">Surface Finish</label>
+                  <select
+                    value={pillarFinish}
+                    data-testid="pillar-finish"
+                    onChange={e => {
+                      const val = e.target.value as Pillar['finish'];
+                      setPillarFinish(val || 'raw');
+                      updateActiveFloorPillar({ finish: val });
+                    }}
+                    className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500"
+                  >
+                    <option value="raw">Raw concrete</option>
+                    <option value="smooth">Smooth / fair-face concrete</option>
+                    <option value="painted">Painted</option>
+                  </select>
+                  <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">3D appearance only: painting is not priced in the estimate.</span>
                 </div>
 
                 {/* Selected Pillar Cross-Section Presets */}
@@ -6859,17 +7033,16 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                 })()}
                 
                 <div>
-                  <label className="block text-[10px] font-medium text-gray-500 mb-1">Height ({model.buildingUnit})</label>
-                  <input 
-                    type="number" 
-                    value={pillarHeight} 
-                    onChange={e => {
-                      const val = Number(e.target.value);
-                      setPillarHeight(val);
-                      updateActiveFloorPillar({ height: val });
-                    }} 
-                    className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" 
+                  <label className="block text-[10px] font-medium text-gray-500 mb-1">Height ({activeFloor?.unit || model.buildingUnit})</label>
+                  <input
+                    type="number"
+                    value={activeFloor?.height ?? pillarHeight}
+                    readOnly
+                    data-testid="pillar-height"
+                    className="block w-full px-2 py-1 rounded border border-gray-200 bg-gray-50 text-xs text-gray-600 cursor-not-allowed"
+                    title="A frame column runs the full storey height up to the beam"
                   />
+                  <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">Set by the storey height (change it in the floor/storey settings). The 3D model, the estimate and the structural design all use it.</span>
                 </div>
                 
                 <div>
@@ -6977,8 +7150,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                   </div>
                 )}
 
+                </fieldset>
+
                 <div className="space-y-1.5 pt-1 border-t">
-                  <label className="flex items-center space-x-2 text-[10px] text-gray-700 cursor-pointer">
+<label className="flex items-center space-x-2 text-[10px] text-gray-700 cursor-pointer">
                     <input 
                       type="checkbox" 
                       checked={pillarIncludeEst} 
@@ -8734,7 +8909,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                         if (isDeleteMode) return;
                         e.stopPropagation();
                         const mouse = getMouseCoords(e);
-                        if (mouse) {
+                        // remembered for the click that follows: a click selects; only a click (not a drag) on an
+                        // already-selected column deselects it
+                        pillarPressRef.current = { id: p.id, wasSelected: isSelected, x: e.clientX, y: e.clientY };
+                        if (mouse && !isLocked) {
                           setDraggingPillarId(p.id);
                           setDragStartPillarMouse(mouse);
                           setDragStartPillarPos(p.position ? { ...p.position } : { x: 0, y: 0 });
@@ -8762,7 +8940,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                         if (isDeleteMode) {
                           promptRemovePillar(p);
                         } else {
-                          const willSelect = !isSelected;
+                          const press = pillarPressRef.current;
+                          pillarPressRef.current = null;
+                          const moved = !!press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 4;
+                          const willSelect = press && press.id === p.id ? !(press.wasSelected && !moved) : !isSelected;
                           setSelectedPillarId(willSelect ? p.id : null);
                           if (willSelect) {
                             setPillarName(p.name || '');
@@ -8894,7 +9075,10 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
                       const columnId = p.verticalColumnId || `col-${Date.now()}`;
                       const multiPillars: Pillar[] = [];
                       model.floors.forEach(fl => {
-                        if (fl.id !== p.floorId) {
+                        // a locked column on another floor at this position is not overwritten
+                        const lockedThere = [...(fl.pillars || []), ...(model.pillars || []).filter(q => q.floorId === fl.id)]
+                          .some(q => q.isLocked && q.position?.x === p.position?.x && q.position?.y === p.position?.y);
+                        if (fl.id !== p.floorId && !lockedThere) {
                           multiPillars.push({
                             ...p,
                             id: `pillar-${fl.id}-${Date.now()}`,
@@ -9247,7 +9431,7 @@ export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorPro
       <ProjectHistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
-        onLoadModel={(loadedModel) => setModel(loadedModel)}
+        onLoadModel={(loadedModel) => modelHistory.resetHistory(loadedModel)}
       />
 
       {/* Clean Graph Multi-Select Modal */}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '../../lib/elementMeasurements';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, Html } from '@react-three/drei';
 import { 
@@ -1523,6 +1524,7 @@ function Foundation3DSystem({
   isGhosted = false,
   selectedFooting,
   onSelectFooting,
+  hiddenIds,
   reinf
 }: {
   model: BuildingModel;
@@ -1536,6 +1538,8 @@ function Foundation3DSystem({
   isGhosted?: boolean;
   selectedFooting: any;
   onSelectFooting: (f: any) => void;
+  /** Footing ids hidden in the view only */
+  hiddenIds?: Set<string>;
   reinf?: Partial<RCCReinforcementConfig>;
 }) {
   const bUnit = model.buildingUnit || 'ft';
@@ -1644,7 +1648,7 @@ function Foundation3DSystem({
 
       {/* TYPE A: ISOLATED SPREAD FOOTINGS */}
       {foundationType === 'isolated' && (
-        effectiveFootings.map(footing => (
+        effectiveFootings.filter(f => !hiddenIds?.has(f.id)).map(footing => (
           <Footing3DGroup
             key={`3d-footing-${footing.id}`}
             footing={footing}
@@ -1862,7 +1866,7 @@ function Foundation3DSystem({
       {/* TYPE D: STRAP FOOTINGS (Isolated pads linked by heavy RCC strap beams) */}
       {foundationType === 'strap' && (
         <group name="strapFootingsGroup">
-          {effectiveFootings.map(footing => (
+          {effectiveFootings.filter(f => !hiddenIds?.has(f.id)).map(footing => (
             <Footing3DGroup
               key={`strap-f-${footing.id}`}
               footing={footing}
@@ -2152,6 +2156,8 @@ interface SelectedBeamInfo {
   beamSizingRule?: string;
   concreteGrade?: string;
   steelGrade?: string;
+  /** Level of the beam centre above the ground-floor floor level (3D datum), m */
+  centreLevelM?: number;
 }
 
 interface SelectedSlabInfo {
@@ -2214,6 +2220,9 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const [selectedPillar, setSelectedPillar] = useState<Pillar | null>(null);
   const [selectedFooting, setSelectedFooting] = useState<FoundationFooting | null>(null);
   const [selectedBeam, setSelectedBeam] = useState<SelectedBeamInfo | null>(null);
+  // View-only visibility: elements hidden here are still in the model and the estimate
+  const [hiddenInView, setHiddenInView] = useState<Set<string>>(() => new Set());
+  const hideInView = (id: string) => setHiddenInView(prev => { const n = new Set(prev); n.add(id); return n; });
   const [selectedSlab, setSelectedSlab] = useState<SelectedSlabInfo | null>(null);
   const [structuralView, setStructuralView] = useState(false);
   const [showHint, setShowHint] = useState(true);
@@ -2699,6 +2708,17 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 <input type="checkbox" checked={showPillars} onChange={(e) => setShowPillars(e.target.checked)} className="rounded text-orange-600 focus:ring-orange-500" />
                 <span>Show Solid RCC Columns</span>
               </label>
+              {hiddenInView.size > 0 && (
+                <button
+                  type="button"
+                  data-testid="show-hidden-elements"
+                  onClick={() => setHiddenInView(new Set())}
+                  className="w-full text-left text-[11px] font-semibold px-1.5 py-1 rounded bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100"
+                  title="Elements hidden from the view are still in the model and the estimate"
+                >
+                  Show {hiddenInView.size} hidden element{hiddenInView.size === 1 ? '' : 's'} (view only)
+                </button>
+              )}
               <label className="flex items-center space-x-2 cursor-pointer text-cyan-800 font-semibold bg-cyan-50/90 px-1.5 py-0.5 rounded border border-cyan-200/60">
                 <input type="checkbox" checked={showPillarRebar} onChange={(e) => setShowPillarRebar(e.target.checked)} className="rounded text-cyan-600 focus:ring-cyan-500" />
                 <span>Show Pillar Rebar Cage</span>
@@ -3044,6 +3064,39 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 </div>
               )}
 
+              {/* Measurements: shaft over the storey height (the beam junction is counted in the beam volume) */}
+              {(() => {
+                const unit = floorObj?.unit || model.buildingUnit || 'ft';
+                const hM = toMeters(floorObj?.height ?? 10, unit);
+                const pwM = toMeters(selectedPillar.width, selectedPillar.unit || 'in');
+                const pdM = selectedPillar.shape === 'circular' ? pwM : toMeters(selectedPillar.depth, selectedPillar.unit || 'in');
+                const exposed = getColumnExposedFaces(toMeters(worldPos.effective2D.x, model.buildingUnit), toMeters(worldPos.effective2D.y, model.buildingUnit), pwM, pdM, floorAllWalls, model.buildingUnit);
+                const m = columnMeasurements({ widthM: pwM, depthM: pdM, shape: selectedPillar.shape, heightM: hM, exposed });
+                const steelKg = rConfig?.mainSteelWeightKg !== undefined ? rConfig.mainSteelWeightKg + (rConfig.stirrupSteelWeightKg || 0) : undefined;
+                const wt = memberWeight(m.volumeM3, steelKg ?? 0);
+                return (
+                  <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300" data-testid="pillar-measurements">
+                    <div className="text-[11px] font-bold text-emerald-300">Measurements</div>
+                    <div><span className="text-slate-400">Height (storey): </span><span className="font-mono text-white">{hM.toFixed(2)} m ({(hM * 3.28084).toFixed(2)} ft)</span></div>
+                    <div><span className="text-slate-400">Concrete Volume: </span><span className="font-mono text-cyan-300">{m.volumeM3.toFixed(3)} m³ ({(m.volumeM3 * 35.3147).toFixed(2)} cft)</span></div>
+                    <div><span className="text-slate-400">Exposed Surface: </span><span className="font-mono text-white">{m.exposedSurfaceM2.toFixed(2)} m²</span><span className="text-slate-500 text-[10px]"> of {m.sideSurfaceM2.toFixed(2)} m² side area</span></div>
+                    <div><span className="text-slate-400">Concrete Weight: </span><span className="font-mono text-white">{Math.round(wt.concreteKg)} kg</span></div>
+                    {steelKg !== undefined && (
+                      <div><span className="text-slate-400">Total Weight (concrete + steel): </span><span className="font-mono text-emerald-300 font-semibold">{Math.round(wt.totalKg)} kg</span></div>
+                    )}
+                    <div className="text-[9.5px] text-slate-500">Shaft over the storey height; the beam junction above is counted in the beam. RCC 25 kN/m³.</div>
+                  </div>
+                );
+              })()}
+
+              <button
+                type="button"
+                onClick={() => { hideInView(selectedPillar.id); setSelectedPillar(null); }}
+                className="w-full text-[10.5px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200"
+              >
+                Hide this column in the 3D view
+              </button>
+
               {/* Sized Footing Details */}
               {fData && (
                 <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300">
@@ -3149,6 +3202,30 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   <span className="font-mono text-emerald-300 font-bold">{totalBeamSteelKg.toFixed(1)} kg</span>
                 </div>
               </div>
+
+              {(() => {
+                const wt = memberWeight(selectedBeam.concreteVolumeM3, totalBeamSteelKg);
+                const lv = selectedBeam.centreLevelM !== undefined ? memberLevels(selectedBeam.centreLevelM, selectedBeam.depthM) : undefined;
+                return (
+                  <div className="pt-1.5 border-t border-slate-800 space-y-1 text-slate-300" data-testid="beam-measurements">
+                    <div className="text-[11px] font-bold text-emerald-300">Weight & Level</div>
+                    <div><span className="text-slate-400">Concrete Weight: </span><span className="font-mono text-white">{Math.round(wt.concreteKg)} kg</span></div>
+                    <div><span className="text-slate-400">Total Weight (concrete + steel): </span><span className="font-mono text-emerald-300 font-semibold">{Math.round(wt.totalKg)} kg</span></div>
+                    {lv && (
+                      <div><span className="text-slate-400">Beam Bottom / Top Level: </span><span className="font-mono text-white">{lv.bottomM >= 0 ? '+' : ''}{lv.bottomM.toFixed(2)} m / {lv.topM >= 0 ? '+' : ''}{lv.topM.toFixed(2)} m</span></div>
+                    )}
+                    <div className="text-[9.5px] text-slate-500">Levels from the ground-floor floor level (±0.00). RCC 25 kN/m³.</div>
+                  </div>
+                );
+              })()}
+
+              <button
+                type="button"
+                onClick={() => { hideInView(selectedBeam.id); setSelectedBeam(null); }}
+                className="w-full text-[10.5px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200"
+              >
+                Hide this beam in the 3D view
+              </button>
             </div>
           );
         })()}
@@ -3283,6 +3360,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 isConcreteSolid={isConcreteSolid}
                 isGhosted={isGhosted}
                 selectedFooting={selectedFooting}
+                hiddenIds={hiddenInView}
                 onSelectFooting={(f) => {
                   setSelectedFooting(f);
                   if (f) {
@@ -3599,6 +3677,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                   {i === 0 && (showFullRingBeam || showRingBeamRebar) && (() => {
                                     const plinthId = `plinth-${floor.id}-${beam.id}`;
                                     const isPlinthSelected = selectedBeam?.id === plinthId;
+                                    if (hiddenInView.has(plinthId)) return null;
                                     return (
                                       <group position={[extMidX, yOffset - actualBeamHeightM / 2, -extMidY]} rotation={[0, -ang, 0]}>
                                         {showFullRingBeam && (
@@ -3614,6 +3693,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               } else {
                                                 setSelectedBeam({
                                                   id: plinthId,
+                                                  centreLevelM: yOffset - actualBeamHeightM / 2,
                                                   floorId: floor.id,
                                                   floorName: floor.name || `Floor ${i}`,
                                                   isPlinth: true,
@@ -3667,6 +3747,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                   {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (() => {
                                     const ringId = `ring-${floor.id}-${beam.id}`;
                                     const isRingSelected = selectedBeam?.id === ringId;
+                                    if (hiddenInView.has(ringId)) return null;
                                     return (
                                       <group position={[extMidX, junction.fullRingBeamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
                                         {showFullRingBeam && (
@@ -3682,6 +3763,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               } else {
                                                 setSelectedBeam({
                                                   id: ringId,
+                                                  centreLevelM: junction.fullRingBeamCenterY,
                                                   floorId: floor.id,
                                                   floorName: floor.name || `Floor ${i}`,
                                                   isPlinth: false,
@@ -3877,6 +3959,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                   {i === 0 && (showFullRingBeam || showRingBeamRebar) && (() => {
                                     const wallPlinthId = `wall-plinth-${floor.id}-${w.id}`;
                                     const isWallPlinthSelected = selectedBeam?.id === wallPlinthId;
+                                    if (hiddenInView.has(wallPlinthId)) return null;
                                     return (
                                       <group position={[wallBeamMidX, yOffset - actualBeamHeightM / 2, -wallBeamMidY]} rotation={[0, -ang, 0]}>
                                         {showFullRingBeam && (
@@ -3892,6 +3975,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               } else {
                                                 setSelectedBeam({
                                                   id: wallPlinthId,
+                                                  centreLevelM: yOffset - actualBeamHeightM / 2,
                                                   floorId: floor.id,
                                                   floorName: floor.name || `Floor ${i}`,
                                                   isPlinth: true,
@@ -3944,6 +4028,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                   {(showFullRingBeam || (isRebarActive && showRingBeamRebar)) && (() => {
                                     const wallRingId = `wall-ring-${floor.id}-${w.id}`;
                                     const isWallRingSelected = selectedBeam?.id === wallRingId;
+                                    if (hiddenInView.has(wallRingId)) return null;
                                     return (
                                       <group position={[wallBeamMidX, junction.fullRingBeamCenterY, -wallBeamMidY]} rotation={[0, -ang, 0]}>
                                         {showFullRingBeam && (
@@ -3959,6 +4044,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               } else {
                                                 setSelectedBeam({
                                                   id: wallRingId,
+                                                  centreLevelM: junction.fullRingBeamCenterY,
                                                   floorId: floor.id,
                                                   floorName: floor.name || `Floor ${i}`,
                                                   isPlinth: false,
@@ -4171,7 +4257,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                       })()}
 
                       {/* Solid Concrete Pillars (RCC Columns) & Exposed Pillar Rebar Cage (Continuous through joint) */}
-                      {(showPillars || showPillarRebar) && floorPillars.filter(p => (p.position || p.x !== undefined) && p.showIn3D !== false).map((p, pIdx) => {
+                      {(showPillars || showPillarRebar) && floorPillars.filter(p => (p.position || p.x !== undefined) && p.showIn3D !== false && !hiddenInView.has(p.id)).map((p, pIdx) => {
                         const matchGf = findMatchingGfPillar(p);
                         const effectivePillarForRender = (matchGf && !p.isStoreyOverride)
                           ? {
@@ -4442,6 +4528,33 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   • Starter Ties: 4×16mm Column Anchor Dowels
                 </div>
               </div>
+
+              {(() => {
+                const u = selectedFooting.footingUnit || model.buildingUnit || 'ft';
+                const L = toMeters(effSize.length, u), W = toMeters(effSize.width, u), D = toMeters(effSize.depth, u);
+                const exc = toMeters(selectedFooting.excavationDepth || 4, selectedFooting.excavationUnit || u);
+                const sand = toMeters(selectedFooting.sandFillDepth || 0.5, selectedFooting.sandFillUnit || u);
+                const pcc = toMeters(selectedFooting.pccThickness || 0.33, selectedFooting.pccUnit || u);
+                const lv = footingLevels(exc - sand, pcc, D);
+                const wt = memberWeight(L * W * D);
+                return (
+                  <div className="bg-slate-800/80 p-1.5 rounded text-[10px] space-y-0.5" data-testid="footing-measurements">
+                    <span className="text-slate-400">Levels & Weight:</span>
+                    <div className="font-mono text-slate-200">Footing bottom / top: {lv.bottomM.toFixed(2)} m / {lv.topM.toFixed(2)} m</div>
+                    <div className="font-mono text-slate-200">Bearing area: {(L * W).toFixed(2)} m² · Concrete: {(L * W * D).toFixed(3)} m³</div>
+                    <div className="font-mono text-emerald-300">Footing self-weight: {Math.round(wt.concreteKg)} kg ({(wt.concreteKg * 9.81 / 1000).toFixed(1)} kN)</div>
+                    <div className="text-[9px] text-slate-500">Levels from ground-floor level (±0.00); PCC sits on the sand bed at the excavation base.</div>
+                  </div>
+                );
+              })()}
+
+              <button
+                type="button"
+                onClick={() => { hideInView(selectedFooting.id); setSelectedFooting(null); }}
+                className="w-full text-[10.5px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200"
+              >
+                Hide this footing in the 3D view
+              </button>
 
               <div className="text-[9px] text-amber-300/80 italic flex items-center gap-1 border-t border-slate-800 pt-1">
                 <ShieldAlert className="w-3 h-3 flex-shrink-0" />

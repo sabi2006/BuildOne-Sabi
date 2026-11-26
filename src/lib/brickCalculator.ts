@@ -2457,9 +2457,9 @@ export const calculatePillarsRcc = (
   activePillars.forEach(p => {
     const pW_M = toMeters(p.width, p.unit || 'in');
     const pD_M = p.shape === 'circular' ? pW_M : toMeters(p.depth, p.unit || 'in');
-    // Height is in p.heightUnit or buildingUnit (never default to p.unit which is in/inches for cross section)
-    const hUnit = p.heightUnit || (p.unit === 'in' || p.unit === 'cm' || p.unit === 'mm' ? buildingUnit : p.unit) || 'ft';
-    const pH_M = p.height ? toMeters(p.height, hUnit) : toMeters(floorHeight, buildingUnit || 'ft');
+    // A frame column runs the full storey height (as drawn in 3D and used by the structural design), so the storey
+    // height is used, not a separately stored pillar height that can go stale when the floor height changes.
+    const pH_M = toMeters(floorHeight, buildingUnit || 'ft');
     const pCount = p.count || 1;
 
     // Concrete volume
@@ -6472,6 +6472,8 @@ export interface ApplyPillarConfigResult {
   model: BuildingModel;
   affectedCount: number;
   affectedPillarIds: string[];
+  /** Locked pillars in the scope that were left unchanged */
+  skippedLockedIds: string[];
 }
 
 /**
@@ -6495,9 +6497,14 @@ export function applyPillarConfigToAll(
 
   const allPillars = model.pillars || [];
   const affectedPillarIds: string[] = [];
+  const skippedLockedIds: string[] = [];
 
   const updatePillarProps = (p: Pillar): Pillar => {
     if (!isTargetPillar(p)) return p;
+    if (p.isLocked) {
+      if (!skippedLockedIds.includes(p.id)) skippedLockedIds.push(p.id);
+      return p;
+    }
     if (!affectedPillarIds.includes(p.id)) {
       affectedPillarIds.push(p.id);
     }
@@ -6596,7 +6603,8 @@ export function applyPillarConfigToAll(
   return {
     model: updatedModel,
     affectedCount: affectedPillarIds.length,
-    affectedPillarIds
+    affectedPillarIds,
+    skippedLockedIds
   };
 }
 

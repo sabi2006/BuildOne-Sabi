@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "src/components/3d/VisualEstimator3D.tsx": {
-    "mtime": 1795335198.029027,
-    "seen": 1795335365.454966,
-    "ast_hash": "cc71e8030bfcba7cae98aba26b1cb4eb",
+    "mtime": 1795677042.6730127,
+    "seen": 1795677879.1701934,
+    "ast_hash": "343e46214ecc75916a999ca0268c1d16",
     "semantic_hash": ""
   },
   "src/components/calculator/AIAnalysisResults.tsx": {
@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1794893564.1003387,
-    "seen": 1794893641.1906886,
-    "ast_hash": "328ef01f388445aa743a9490e9008a1e",
+    "mtime": 1795677616.7909012,
+    "seen": 1795677879.1701992,
+    "ast_hash": "8963e115993be1d02e0e976a2f027dca",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/lib/brickCalculator.ts": {
-    "mtime": 1795336860.0839794,
-    "seen": 1795338109.1349127,
-    "ast_hash": "e2dd8bb29d81ed1e5e7cc5f1c09df93f",
+    "mtime": 1795676732.5166335,
+    "seen": 1795677879.1702564,
+    "ast_hash": "f6683e7f83714e6c81df998793121368",
     "semantic_hash": ""
   },
   "src/lib/prisma.ts": {
@@ -660,15 +660,15 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationReport.test.tsx": {
-    "mtime": 1795337843.8772867,
-    "seen": 1795338109.1348794,
-    "ast_hash": "2e5ecf4e868f0105f78ee085536dec65",
+    "mtime": 1795677823.9558578,
+    "seen": 1795677879.1702104,
+    "ast_hash": "ea0916b040345666d4d72ba6bcd33c57",
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationReport.tsx": {
-    "mtime": 1795337717.176354,
-    "seen": 1795338109.1348813,
-    "ast_hash": "6e3290ed2c397575b91b2ae1564b12af",
+    "mtime": 1795677800.6639736,
+    "seen": 1795677879.1702127,
+    "ast_hash": "1af7296956c7bdf9b7ddf418fdb87f79",
     "semantic_hash": ""
   },
   "src/lib/foundation/buildingFrame.test.ts": {
@@ -723,6 +723,42 @@
     "mtime": 1795674351.901144,
     "seen": 1795674398.0362177,
     "ast_hash": "abcfd4719e31c5024bca3dec39bab68d",
+    "semantic_hash": ""
+  },
+  "src/hooks/useUndoableState.ts": {
+    "mtime": 1795677517.2549107,
+    "seen": 1795677879.1702516,
+    "ast_hash": "1d7e5ef0af819656977bbc312072c028",
+    "semantic_hash": ""
+  },
+  "src/lib/editHistory.test.ts": {
+    "mtime": 1795677517.256918,
+    "seen": 1795677879.1702588,
+    "ast_hash": "c4879993b5b829451b1410eeab2256bf",
+    "semantic_hash": ""
+  },
+  "src/lib/editHistory.ts": {
+    "mtime": 1795677517.253968,
+    "seen": 1795677879.170261,
+    "ast_hash": "b65ec015381854a368515b3745343833",
+    "semantic_hash": ""
+  },
+  "src/lib/editorBatchA.test.ts": {
+    "mtime": 1795676788.7227695,
+    "seen": 1795677879.1702628,
+    "ast_hash": "d93ca1ba24462809111a3bc0c49662d6",
+    "semantic_hash": ""
+  },
+  "src/lib/elementMeasurements.test.ts": {
+    "mtime": 1795676457.5941923,
+    "seen": 1795677879.1702647,
+    "ast_hash": "a176e35be6b81ba776ad0d171ed31c20",
+    "semantic_hash": ""
+  },
+  "src/lib/elementMeasurements.ts": {
+    "mtime": 1795676457.52283,
+    "seen": 1795677879.1702669,
+    "ast_hash": "e4b7cfb8baa4fa0bcd1390b05556a69b",
     "semantic_hash": ""
   },
   "package-lock.json": {
