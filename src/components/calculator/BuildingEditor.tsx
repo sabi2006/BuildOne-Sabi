@@ -70,6 +70,7 @@ import { SaveProjectModal } from './SaveProjectModal';
 import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
 
 import { isSpecialColumn, columnTaperRatio, rotatedSectionPolygon } from '@/lib/columnGeometry';
+import { columnAppearance } from '@/lib/columnAppearance';
 /** Unique id suffix for new elements (module scope: called from event handlers only) */
 /** Plan outline of a shaped column (rotation applied) in building units as an SVG points string; `top` gives the top face (taper + incline) */
 function specialColumnPlanPoints(p: Pillar, c: { x: number; y: number }, bUnit: Unit, top: boolean): string {
@@ -692,7 +693,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   const [pillarWdUnit, setPillarWdUnit] = useState<Unit>('in');
   const [pillarPlacement, setPillarPlacement] = useState<'corner' | 'wall_joint' | 'wall_end' | 'wall' | 'central' | 'custom'>('corner');
   const [pillarAlignment, setPillarAlignment] = useState<'outside_corner' | 'centre' | 'inside_corner' | 'flush_exterior' | 'flush_interior' | 'custom_offset'>('outside_corner');
-  const [pillarFinish, setPillarFinish] = useState<'raw' | 'smooth' | 'painted'>('raw');
+  const [pillarFinish, setPillarFinish] = useState<NonNullable<Pillar['finish']>>('raw');
   const [pillarContinue, setPillarContinue] = useState<'current' | 'all'>('all');
   const [pillarIncludeEst, setPillarIncludeEst] = useState<boolean>(true);
   const [pillarShowRebar, setPillarShowRebar] = useState<boolean>(false);
@@ -2672,7 +2673,7 @@ if (buildingModel && buildingModel.floors && buildingModel.floors.length > 0) {
   /** A locked pillar keeps its geometry: only these view/lock flags may change */
   const LOCK_EXEMPT_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel']);
   /** Changes that do not decouple an upper-floor pillar from the vertical shaft */
-  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'loadBearing', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor']);
+  const META_ONLY_KEYS = new Set<string>(['isLocked', 'showRebar', 'showBeam', 'showLabel', 'finish', 'name', 'includeInEstimate', 'loadBearing', 'concreteGrade', 'notes', 'rebarOverride', 'steelGrade', 'extraServiceLoadKn', 'effectiveLengthFactor', 'columnType', 'colour', 'texture', 'roughness', 'metalness', 'steelWallMm', 'materialRate', 'finishRatePerM2']);
   const selectedPillarLocked = !!findPillarById(selectedPillarId)?.isLocked;
   const lockedNotice = (what: string) => setPillarNotice({ msg: `Column is locked: unlock it to ${what}.`, type: 'error' });
 
@@ -7180,9 +7181,74 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                     <option value="raw">Raw concrete</option>
                     <option value="smooth">Smooth / fair-face concrete</option>
                     <option value="painted">Painted</option>
+                    <option value="steel">Steel finish</option>
+                    <option value="wood">Wood finish</option>
+                    <option value="marble">Marble cladding</option>
+                    <option value="stone">Stone cladding</option>
                   </select>
-                  <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">3D appearance only: painting is not priced in the estimate.</span>
+                  <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">Paint / cladding / steel / wood finishes add an applied area; priced only when a finish rate is entered below.</span>
                 </div>
+
+                {/* ---------------- Material & appearance ---------------- */}
+                {selectedPillarId && (() => {
+                  const mp = findPillarById(selectedPillarId);
+                  if (!mp) return null;
+                  const type = mp.columnType ?? 'rcc';
+                  const applied = !!mp.finish && ['painted', 'steel', 'wood', 'marble', 'stone'].includes(mp.finish);
+                  const look = columnAppearance(mp);
+                  const num = (label: string, key: keyof Pillar, value: number | undefined, hint: string, min?: number, max?: number, step?: number) => (
+                    <div>
+                      <label className="block text-[10px] font-medium text-gray-500 mb-1">{label}</label>
+                      <input type="number" step={step ?? 'any'} min={min} max={max} value={value ?? ''} title={hint} data-testid={`pillar-${String(key)}`}
+                        onChange={e => updateActiveFloorPillar({ [key]: e.target.value === '' ? undefined : Number(e.target.value) } as Partial<Pillar>)}
+                        className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" />
+                    </div>
+                  );
+                  return (
+                    <div className="space-y-2 pt-1 border-t" data-testid="pillar-material">
+                      <label className="block text-[10px] font-bold text-gray-600">Material & appearance</label>
+                      <select value={type} data-testid="pillar-column-type"
+                        onChange={e => updateActiveFloorPillar({ columnType: e.target.value === 'rcc' ? undefined : (e.target.value as Pillar['columnType']) })}
+                        className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500">
+                        <option value="rcc">RCC column</option>
+                        <option value="steel">Steel column (hollow box)</option>
+                        <option value="timber">Timber column</option>
+                      </select>
+                      {type !== 'rcc' && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {type === 'steel' && num('Wall thickness (mm)', 'steelWallMm', mp.steelWallMm, 'Hollow box wall, default 6 mm', 1)}
+                          {num(type === 'steel' ? 'Rate (INR / kg)' : 'Rate (INR / cft)', 'materialRate', mp.materialRate, 'Priced only when entered', 0)}
+                          <span className="col-span-2 text-[9px] text-amber-700 leading-tight">No concrete or reinforcement is estimated for this column and its capacity is NOT VERIFIED (IS 456 does not apply); the load still goes to the foundation.</span>
+                        </div>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-500 mb-1">Colour</label>
+                          <div className="flex items-center gap-1">
+                            <input type="color" data-testid="pillar-colour" value={mp.colour || look.color} onChange={e => updateActiveFloorPillar({ colour: e.target.value })} className="h-6 w-8 p-0 border border-gray-300 rounded" />
+                            {mp.colour && <button type="button" onClick={() => updateActiveFloorPillar({ colour: undefined })} className="text-[9px] text-gray-500 underline">reset</button>}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-500 mb-1">Texture</label>
+                          <select value={mp.texture ?? ''} data-testid="pillar-texture" onChange={e => updateActiveFloorPillar({ texture: (e.target.value || undefined) as Pillar['texture'] })}
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500">
+                            <option value="">Default for the finish</option>
+                            <option value="none">None</option>
+                            <option value="brick">Brick</option>
+                            <option value="stone">Stone</option>
+                            <option value="wood">Wood grain</option>
+                            <option value="ribbed">Ribbed</option>
+                          </select>
+                        </div>
+                        {num('Roughness (0-1)', 'roughness', mp.roughness, 'Blank = default of the finish', 0, 1, 0.05)}
+                        {num('Metalness (0-1)', 'metalness', mp.metalness, 'Blank = default of the finish', 0, 1, 0.05)}
+                        {applied && num('Finish rate (INR / m²)', 'finishRatePerM2', mp.finishRatePerM2, 'Priced only when entered', 0)}
+                      </div>
+                      <span className="text-[9px] text-gray-500 leading-tight block">Appearance changes the 3D view only. Colour, texture, roughness and metalness are not priced.</span>
+                    </div>
+                  );
+                })()}
 
                 {/* ---------------- Section profile, rotation, taper, incline ---------------- */}
                 {selectedPillarId && (() => {

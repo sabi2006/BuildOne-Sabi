@@ -18,11 +18,30 @@ export interface PillarPropertyClipboard {
   rebarOverride?: Pillar['rebarOverride'];
   includeInEstimate?: boolean;
   isCustomSize?: boolean;
+  sectionKind?: Pillar['sectionKind'];
+  sectionLegThickness?: number;
+  sectionPolygon?: Pillar['sectionPolygon'];
+  rotationDeg?: number;
+  taperTopRatio?: number;
+  inclineX?: number;
+  inclineY?: number;
+  columnType?: Pillar['columnType'];
+  colour?: string;
+  texture?: Pillar['texture'];
+  roughness?: number;
+  metalness?: number;
+  steelWallMm?: number;
+  materialRate?: number;
+  finishRatePerM2?: number;
 }
 
 export const copyPillarProperties = (p: Pillar): PillarPropertyClipboard => ({
   shape: p.shape, width: p.width, depth: p.depth, unit: p.unit, finish: p.finish, concreteGrade: p.concreteGrade,
   rebarOverride: p.rebarOverride ? { ...p.rebarOverride } : undefined, includeInEstimate: p.includeInEstimate, isCustomSize: p.isCustomSize,
+  sectionKind: p.sectionKind, sectionLegThickness: p.sectionLegThickness, sectionPolygon: p.sectionPolygon ? p.sectionPolygon.map(v => [...v] as [number, number]) : undefined,
+  rotationDeg: p.rotationDeg, taperTopRatio: p.taperTopRatio, inclineX: p.inclineX, inclineY: p.inclineY,
+  columnType: p.columnType, colour: p.colour, texture: p.texture, roughness: p.roughness, metalness: p.metalness,
+  steelWallMm: p.steelWallMm, materialRate: p.materialRate, finishRatePerM2: p.finishRatePerM2,
 });
 
 export interface BulkResult { model: BuildingModel; changedIds: string[]; skippedLockedIds: string[] }

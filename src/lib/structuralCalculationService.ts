@@ -1916,6 +1916,7 @@ export function calculateBuildingStructuralSummary(
     taperTopRatio?: number;
     inclineX?: number;
     inclineY?: number;
+    columnType?: 'rcc' | 'steel' | 'timber';
     rebarOverride?: ColumnRebarOverride;
     concreteGrade?: ConcreteGrade;
     steelGrade?: SteelGrade;
@@ -2167,6 +2168,15 @@ export function calculateBuildingStructuralSummary(
       calc.rebarChecks = [...(calc.rebarChecks || []), {
         id: 'shaped_section', label: 'Shaped / tapered / inclined column', clause: 'IS 456 Cl. 25, 26.5.3', status: 'WARNING',
         note: 'Capacity and bar fit are checked on a rectangle of the same area as the smallest section (width / depth ratio kept); biaxial bending, the real centroid and the skew of an inclined axis are not analysed.',
+      }];
+    }
+    // steel / timber columns: no RCC quantities; capacity is not designed (the load still travels to the foundation)
+    if (p.columnType === 'steel' || p.columnType === 'timber') {
+      calc.concreteVolumeM3 = 0; calc.concreteVolumeCft = 0; calc.formworkAreaM2 = 0;
+      calc.mainSteelWeightKg = 0; calc.stirrupWeightKg = 0; calc.totalSteelWeightKg = 0;
+      calc.rebarChecks = [{
+        id: 'column_type', label: `${p.columnType === 'steel' ? 'Steel' : 'Timber'} column: capacity NOT VERIFIED`, clause: p.columnType === 'steel' ? 'IS 800' : 'IS 883', status: 'WARNING',
+        note: 'The capacity of a non-RCC column is not designed here (the IS 456 checks do not apply); its load is still carried to the foundation. Estimate = section mass / volume at the entered rate.',
       }];
     }
   });

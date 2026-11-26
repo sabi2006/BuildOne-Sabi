@@ -3,6 +3,8 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '../../lib/elementMeasurements';
 import { isSpecialColumn } from '../../lib/columnGeometry';
+import { columnAppearance } from '../../lib/columnAppearance';
+import { getColumnTexture } from './columnTextures';
 import { ColumnGeometry } from './ColumnSolid';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, Html } from '@react-three/drei';
@@ -4306,9 +4308,11 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                         const isPillarSelected = selectedPillar?.id === p.id;
                         const isPillarRebarActive = (renderMode === 'rebar' || renderMode === 'combined') && (showPillarRebar || p.showRebar);
 
-                        const pillarMatColor = isPillarSelected ? "#0284c7" : (isPillarRebarActive ? RCC_CONCRETE_MATERIAL_CONFIG.color : (p.finish === 'painted' ? '#cbd5e1' : RCC_CONCRETE_MATERIAL_CONFIG.color));
-                        const pillarMatRoughness = isPillarRebarActive ? 0.3 : (p.finish === 'smooth' ? 0.4 : RCC_CONCRETE_MATERIAL_CONFIG.roughness);
-                        const pillarMatMetalness = isPillarRebarActive ? 0.1 : RCC_CONCRETE_MATERIAL_CONFIG.metalness;
+                        const pillarLook = columnAppearance(p);
+                        const pillarMatColor = isPillarSelected ? "#0284c7" : (isPillarRebarActive ? RCC_CONCRETE_MATERIAL_CONFIG.color : pillarLook.color);
+                        const pillarMatRoughness = isPillarRebarActive ? 0.3 : pillarLook.roughness;
+                        const pillarMatMetalness = isPillarRebarActive ? 0.1 : pillarLook.metalness;
+                        const pillarMatMap = isPillarSelected || isPillarRebarActive ? null : getColumnTexture(pillarLook.texture);
                         const pillarMatTransparent = isConcreteTransparent;
                         const pillarMatOpacity = concreteOpacity;
                         const pillarMatDepthWrite = isConcreteDepthWrite;
@@ -4331,7 +4335,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                 <mesh castShadow={!isPillarRebarActive} receiveShadow={!isPillarRebarActive} renderOrder={isPillarRebarActive ? 2 : 1}>
                                   <ColumnGeometry pillar={p} heightM={totalColumnHeightM} toM={(v) => toMeters(v, p.unit || 'in')} />
                                   <meshStandardMaterial
-                                    color={pillarMatColor}
+                                    key={pillarMatMap ? pillarLook.texture : "none"} color={pillarMatColor} map={pillarMatMap}
                                     roughness={pillarMatRoughness}
                                     metalness={pillarMatMetalness}
                                     transparent={pillarMatTransparent}
@@ -4345,7 +4349,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                 <mesh position={[0, totalColumnHeightM / 2, 0]} castShadow={!isPillarRebarActive} receiveShadow={!isPillarRebarActive} renderOrder={isPillarRebarActive ? 2 : 1}>
                                   <cylinderGeometry args={[Math.max(pW_M, pD_M)/2, Math.max(pW_M, pD_M)/2, totalColumnHeightM, 32]} />
                                   <meshStandardMaterial 
-                                    color={pillarMatColor} 
+                                    key={pillarMatMap ? pillarLook.texture : "none"} color={pillarMatColor} map={pillarMatMap} 
                                     roughness={pillarMatRoughness} 
                                     metalness={pillarMatMetalness}
                                     transparent={pillarMatTransparent}
@@ -4359,7 +4363,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                 <mesh position={[0, totalColumnHeightM / 2, 0]} castShadow={!isPillarRebarActive} receiveShadow={!isPillarRebarActive} renderOrder={isPillarRebarActive ? 2 : 1}>
                                   <boxGeometry args={[pW_M, totalColumnHeightM, pD_M]} />
                                   <meshStandardMaterial 
-                                    color={pillarMatColor} 
+                                    key={pillarMatMap ? pillarLook.texture : "none"} color={pillarMatColor} map={pillarMatMap} 
                                     roughness={pillarMatRoughness} 
                                     metalness={pillarMatMetalness}
                                     transparent={pillarMatTransparent}

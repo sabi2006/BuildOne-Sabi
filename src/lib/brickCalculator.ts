@@ -21,6 +21,7 @@ import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
 import { columnVolumeM3 } from './columnGeometry';
+import { columnSurfaceAreaM2, steelColumnMassKg, timberColumnCft, hasAppliedFinish, type ColumnType, type ColumnFinish, type ColumnTexture } from './columnAppearance';
 import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
@@ -107,7 +108,19 @@ export interface Pillar {
   placementType?: 'corner' | 'wall_joint' | 'wall_end' | 'wall' | 'custom' | 'central';
   alignment?: 'centre' | 'outside_corner' | 'inside_corner' | 'flush_exterior' | 'flush_interior' | 'custom_offset';
   shape?: 'square' | 'rectangle' | 'circular';
-  finish?: 'raw' | 'smooth' | 'painted';
+  finish?: ColumnFinish;
+  /** Column material (default RCC). Steel / timber are estimated by section mass / volume; capacity is NOT_VERIFIED */
+  columnType?: ColumnType;
+  /** Appearance overrides (3D): colour (hex), texture, roughness and metalness (0-1) */
+  colour?: string;
+  texture?: ColumnTexture;
+  roughness?: number;
+  metalness?: number;
+  /** Steel column: wall thickness of the hollow box (mm, default 6) */
+  steelWallMm?: number;
+  /** Rate of the column material (INR per kg for steel, per cft for timber) and of a surface finish (INR per m²): priced only when entered */
+  materialRate?: number;
+  finishRatePerM2?: number;
   showIn3D?: boolean;
   showLabel?: boolean;
   showRebar?: boolean;
@@ -1523,6 +1536,8 @@ export interface RCCElementBreakdown {
   bindingWireKg: number;
   coverBlocks: number;
   cost: number;
+  /** Pillars only: steel / timber columns and surface finishes (priced only where a rate was entered) */
+  columnExtras?: { steelColumnKg: number; timberColumnCft: number; finishAreaM2: number; materialCost: number; finishCost: number; unpricedFinishAreaM2: number };
 }
 
 export interface RCCFloorEstimate {
@@ -2474,10 +2489,13 @@ export const calculatePillarsRcc = (
   steelKg: number;
   coverBlocks: number;
   count: number;
+  /** Non-RCC columns and surface finishes (priced only where a rate was entered) */
+  extras: { steelColumnKg: number; timberColumnCft: number; finishAreaM2: number; materialCost: number; finishCost: number; unpricedFinishAreaM2: number };
 } => {
   const activePillars = pillars.filter(p => p.includeInEstimate !== false && p.showIn3D !== false);
+  const extras = { steelColumnKg: 0, timberColumnCft: 0, finishAreaM2: 0, materialCost: 0, finishCost: 0, unpricedFinishAreaM2: 0 };
   if (activePillars.length === 0) {
-    return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, count: 0 };
+    return { concreteVolumeM3: 0, concreteVolumeCft: 0, steelKg: 0, coverBlocks: 0, count: 0, extras };
   }
 
   let totalConcreteM3 = 0;
@@ -2498,6 +2516,27 @@ export const calculatePillarsRcc = (
     // height is used, not a separately stored pillar height that can go stale when the floor height changes.
     const pH_M = toMeters(floorHeight, buildingUnit || 'ft');
     const pCount = p.count || 1;
+
+    // surface finish (paint, cladding, steel / wood finish): applied area, priced only with a rate
+    if (hasAppliedFinish(p)) {
+      const area = columnSurfaceAreaM2(p, pH_M, v => toMeters(v, p.unit || 'in')) * pCount;
+      extras.finishAreaM2 += area;
+      if (p.finishRatePerM2 && p.finishRatePerM2 > 0) extras.finishCost += area * p.finishRatePerM2; else extras.unpricedFinishAreaM2 += area;
+    }
+    // steel / timber columns are not RCC: no concrete or reinforcement
+    if (p.columnType === 'steel' || p.columnType === 'timber') {
+      const tm = (v: number) => toMeters(v, p.unit || 'in');
+      if (p.columnType === 'steel') {
+        const kg = steelColumnMassKg(p, pH_M, tm) * pCount;
+        extras.steelColumnKg += kg;
+        if (p.materialRate && p.materialRate > 0) extras.materialCost += kg * p.materialRate;
+      } else {
+        const cft = timberColumnCft(p, pH_M, tm) * pCount;
+        extras.timberColumnCft += cft;
+        if (p.materialRate && p.materialRate > 0) extras.materialCost += cft * p.materialRate;
+      }
+      return;
+    }
 
     // Concrete volume
     let volM3 = 0;
@@ -2551,7 +2590,8 @@ export const calculatePillarsRcc = (
     concreteVolumeCft: totalConcreteM3 * 35.3147,
     steelKg: totalSteelKg,
     coverBlocks: totalCoverBlocks,
-    count: activePillars.reduce((sum, p) => sum + (p.count || 1), 0)
+    count: activePillars.reduce((sum, p) => sum + (p.count || 1), 0),
+    extras
   };
 };
 
@@ -2919,7 +2959,9 @@ export const calculateFloorRccEstimate = (
   const totalFloorSteelKg = pillarRes.steelKg + ringBeamRes.steelKg + slabRes.steelKg;
   const totalFloorCoverBlocks = pillarRes.coverBlocks + ringBeamRes.coverBlocks + slabRes.coverBlocks;
 
-  const floorMats = calculateRccMaterialsFromVolume(totalFloorConcreteM3, totalFloorSteelKg, totalFloorCoverBlocks, settings, reinf);
+  const floorMatsBase = calculateRccMaterialsFromVolume(totalFloorConcreteM3, totalFloorSteelKg, totalFloorCoverBlocks, settings, reinf);
+  const columnExtraCost = pillarRes.extras.materialCost + pillarRes.extras.finishCost;
+  const floorMats = columnExtraCost > 0 ? { ...floorMatsBase, costs: { ...floorMatsBase.costs, total: floorMatsBase.costs.total + columnExtraCost } } : floorMatsBase;
 
   return {
     floorId: floor.id,
@@ -2940,7 +2982,8 @@ export const calculateFloorRccEstimate = (
         waterLitres: pillarMats.waterLitres,
         bindingWireKg: pillarMats.bindingWireKg,
         coverBlocks: pillarRes.coverBlocks,
-        cost: pillarMats.costs.total
+        cost: pillarMats.costs.total + columnExtraCost,
+        columnExtras: pillarRes.extras
       },
       ringBeams: {
         elementType: 'ringBeam',
@@ -6538,7 +6581,7 @@ export interface CommonPillarConfig {
   heightUnit?: Unit;
   placementType?: 'corner' | 'wall_joint' | 'wall_end' | 'wall' | 'central' | 'custom';
   alignment?: 'outside_corner' | 'centre' | 'inside_corner' | 'flush_exterior' | 'flush_interior' | 'custom_offset';
-  finish?: 'raw' | 'smooth' | 'painted';
+  finish?: ColumnFinish;
   customOffsetX?: number;
   customOffsetY?: number;
 }
