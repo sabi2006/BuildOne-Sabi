@@ -1484,7 +1484,8 @@ export function StructuralConfigModal({
                     { id: 'strip' as FoundationType, label: 'Continuous Strip Footing' },
                     { id: 'strap' as FoundationType, label: 'Strap / Cantilever Footing' },
                     { id: 'raft' as FoundationType, label: 'Raft / Mat Slab' },
-                    { id: 'pile' as FoundationType, label: 'Piled Foundation' }
+                    { id: 'pile' as FoundationType, label: 'Piled Foundation' },
+                    { id: 'custom' as FoundationType, label: 'Custom Shape (L / Trapezoid / Polygon)' }
                   ].map((ft) => (
                     <button
                       key={ft.id}

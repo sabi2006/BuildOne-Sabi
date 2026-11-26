@@ -29,7 +29,9 @@ export interface BoxSpec {
   elementId: string;
   kind: BoxKind;
   group: GeometryGroup;
-  shape: 'box' | 'cylinder' | 'frustum';
+  shape: 'box' | 'cylinder' | 'frustum' | 'prism';
+  /** prism only: plan outline (x, z) relative to the box centre; extruded over size[1] */
+  outline?: Array<[number, number]>;
   /** frustum only: plan size of the top face (x, z); the base is size[0] × size[2] */
   topSize?: [number, number];
   center: [number, number, number];
@@ -147,6 +149,11 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   };
 
   // plan rectangles (scene frame) used for PCC overlap handling
+  /** custom footing outline in scene coordinates (x, z), relative to the centre of its bounding rectangle */
+  const outlineOf = (el: FoundationElementResult, dx: number, dz: number, r: { x0: number; x1: number; z0: number; z1: number }): Array<[number, number]> => {
+    const mx = (r.x0 + r.x1) / 2, mz = (r.z0 + r.z1) / 2;
+    return el.polygon!.map(([x, y]) => [r4(x + dx - mx), r4(-y + dz - mz)] as [number, number]);
+  };
   const sceneRect = (el: FoundationElementResult, dx: number, dz: number) => {
     const p = el.plan!;
     return { x0: p.x0 + dx, x1: p.x1 + dx, z0: -p.y1 + dz, z1: -p.y0 + dz };
@@ -213,7 +220,11 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       }
       pccRects.set(el.id, pr);
       // pile heads pierce the levelling bed: the bed is counted in the quantities but not drawn as a solid under pile caps
-      if (el.system !== 'pile') boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
+      if (el.polygon) {
+        const pcc = box(`${el.id}-pcc`, el.id, 'pcc', group, r.x0, r.x1, yPccBottom, yRccBottom, r.z0, r.z1, el.status, { label: 'PCC (outline of the footing, no projection drawn)' });
+        pcc.shape = 'prism'; pcc.outline = outlineOf(el, dx, dz, r);
+        boxes.push(pcc);
+      } else if (el.system !== 'pile') boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
       if (el.profile && el.system === 'isolated') {
         // sloped / stepped: lower slab of the edge thickness + frustum (sloped) or upper step (stepped)
         const De = el.profile.edgeThicknessMm / 1000;
@@ -228,7 +239,9 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
           boxes.push(fr);
         }
       } else {
-        boxes.push(box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label }));
+        const rc = box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, yRccBottom, yRccTop, r.z0, r.z1, el.status, { label });
+        if (el.polygon) { rc.shape = 'prism'; rc.outline = outlineOf(el, dx, dz, r); }
+        boxes.push(rc);
       }
     } else {
       // union with the base slab: only the part of the footing that rises above the slab is drawn
@@ -346,6 +359,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
 
   for (const el of drawable) {
     if (el.reinforcement.length === 0) continue;
+    if (el.polygon) { warnings.push(`${el.id}: reinforcement is scheduled (BBS) but not drawn in 3D for a custom-shaped footing.`); continue; }
     const { dx, dz } = offsets.get(el.id)!;
     const r = sceneRect(el, dx, dz);
     const D = el.depthMm! / 1000;

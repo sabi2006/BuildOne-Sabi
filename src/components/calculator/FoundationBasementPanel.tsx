@@ -105,6 +105,7 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
     setLateral({ wind: { enabled: false, designPressureKnM2: 0, ...(lat.wind ?? {}), ...patch } });
 
   const isPile = config.foundationType === 'pile';
+  const isCustom = config.foundationType === 'custom';
   const sbcAssumed = fd.investigation.sbcSource === 'assumed_preliminary';
 
   return (
@@ -318,6 +319,45 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
           <NumField label="SPT N-value" value={fd.investigation.sptNValue} step={1} min={0}
             onChange={(v) => setInv({ sptNValue: v })} />
         </div>
+
+        {isCustom && (
+          <div className="rounded-lg border border-slate-200 p-3 space-y-3" data-testid="custom-footing">
+            <SelectField
+              label="Custom Footing Shape"
+              value={fd.customFooting?.kind ?? 'L'}
+              onChange={(v) => setFd({ customFooting: { ...fd.customFooting, kind: v as 'L' | 'trapezoid' | 'polygon' } })}
+              options={[
+                { id: 'L', label: 'L-shaped (sized by the design)' },
+                { id: 'trapezoid', label: 'Trapezoid (sized by the design)' },
+                { id: 'polygon', label: 'Polygon outline (your vertices, checked as given)' },
+              ]}
+              hint="One footing per column; the column sits at the centre of the template or at the origin of your polygon"
+            />
+            {(fd.customFooting?.kind ?? 'L') === 'L' && (
+              <NumField label="Notch Size" unit="fraction of each side" value={fd.customFooting?.notchRatio} min={0.1} step={0.05}
+                hint="0.1 - 0.45; blank = 0.4"
+                onChange={(v) => setFd({ customFooting: { ...fd.customFooting!, kind: 'L', notchRatio: v === undefined ? undefined : Math.min(0.45, Math.max(0.1, v)) } })} />
+            )}
+            {fd.customFooting?.kind === 'trapezoid' && (
+              <NumField label="Narrow / Wide End" unit="ratio" value={fd.customFooting.endRatio} min={0.2} step={0.1}
+                hint="0.2 - 1; blank = 0.5"
+                onChange={(v) => setFd({ customFooting: { ...fd.customFooting!, kind: 'trapezoid', endRatio: v === undefined ? undefined : Math.min(1, Math.max(0.2, v)) } })} />
+            )}
+            {fd.customFooting?.kind === 'polygon' && (
+              <div>
+                <label className={labelCls}>Vertices (m, relative to the column centre; x,y per line)</label>
+                <textarea data-testid="custom-vertices" rows={5} className={inputCls}
+                  defaultValue={(fd.customFooting.vertices ?? []).map(v => v.join(',')).join('\n')}
+                  placeholder={'-1.5,-1.5\n1.5,-1.5\n1.5,1.5\n-1.5,1.5'}
+                  onBlur={(e) => {
+                    const vs = e.target.value.split('\n').map(l => l.split(',').map(Number)).filter(a => a.length === 2 && a.every(Number.isFinite)) as Array<[number, number]>;
+                    setFd({ customFooting: { ...fd.customFooting!, kind: 'polygon', vertices: vs } });
+                  }} />
+                <p className="text-[10px] text-slate-500 mt-1">The outline must enclose the column and not cross itself. It is checked as given and never resized.</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {isPile && (
           <div className="rounded-lg border border-slate-300 bg-slate-50 p-3 space-y-3">

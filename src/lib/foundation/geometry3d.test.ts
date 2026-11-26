@@ -384,3 +384,21 @@ describe('Sloped and stepped footings in 3D', () => {
     });
   }
 });
+
+describe('Custom-shaped footing', () => {
+  const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', customFooting: { kind: 'L' } } as any, foundationType: 'custom' });
+  const g = geo(d);
+
+  it('is drawn as an extruded L outline with the designed thickness, and PCC follows the outline', () => {
+    const el = d.foundation!.elements.find(e => e.polygon)!;
+    const rcc = g.boxes.find(b => b.id === `${el.id}-rcc`)!;
+    expect(rcc.shape).toBe('prism');
+    expect(rcc.outline!.length).toBe(6);
+    expect(rcc.size[1]).toBeCloseTo(el.depthMm! / 1000, 3);
+    expect(g.boxes.find(b => b.id === `${el.id}-pcc`)!.shape).toBe('prism');
+  });
+
+  it('rebar is not drawn for custom shapes and the model says so', () => {
+    expect(g.warnings.join(' ')).toContain('not drawn in 3D for a custom-shaped footing');
+  });
+});

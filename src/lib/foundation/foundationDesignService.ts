@@ -25,6 +25,7 @@
 import type { ConcreteGrade, SteelGrade } from '../structuralCalculationService';
 import type { DesignStatus, PileInvestigationData, SbcBasis, StructuralElementIdentity } from './types';
 import type { ColumnCombo, CaseForces, CaseId } from './lateral';
+import { polygonBounds, polygonPerimeter, polygonProperties, pointInPolygon, isSimplePolygon, chordLength, overhangs, type Pt } from './polygon';
 import { elasticSettlementMm, slidingFactorOfSafety, upliftCheck } from './stability';
 import {
   fyOf, fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
@@ -32,7 +33,19 @@ import {
   barAreaMm2, MIN_STEEL_FRACTION_HYSD, RCC_UNIT_WEIGHT, type BarsPerMetre,
 } from './rcDesign';
 
-export type FoundationSystem = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | 'tie';
+export type FoundationSystem = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | 'tie' | 'custom';
+
+/** Custom-shaped footing: L / trapezoid templates (scaled by the design) or a user polygon (vertices in metres relative to the column centre) */
+export interface CustomFootingConfig {
+  kind: 'L' | 'trapezoid' | 'polygon';
+  /** L: size of the notch as a fraction of each side (0.1 - 0.45, default 0.4) */
+  notchRatio?: number;
+  /** trapezoid: width of the narrow end / width of the wide end (0.2 - 1, default 0.5) */
+  endRatio?: number;
+  /** length / width of the template bounding box (default 1 for L, 1.2 for trapezoid) */
+  aspect?: number;
+  vertices?: Array<[number, number]>;
+}
 
 export interface FoundationColumnInput {
   id: string;
@@ -126,6 +139,8 @@ export interface FoundationDesignParams {
   edgeThicknessMm?: number;
   /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
   tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
+  /** Plan shape used when the requested type is 'custom' */
+  customFooting?: CustomFootingConfig;
   options?: FoundationDesignOptions;
 }
 
@@ -173,6 +188,8 @@ export interface FoundationElementResult extends StructuralElementIdentity {
   /** Sloped / stepped isolated footing: thickness at the edge and the plan of the top platform / upper step (m) */
   profile?: { kind: 'sloped' | 'stepped'; edgeThicknessMm: number; topXM: number; topYM: number };
   plan?: { x0: number; x1: number; y0: number; y1: number };
+  /** Custom-shaped footing: plan outline in project coordinates (m); `plan` is its bounding box */
+  polygon?: Array<[number, number]>;
   sizeXM?: number;
   sizeYM?: number;
   /** Overall thickness, mm */
@@ -1994,6 +2011,190 @@ export function designTieBeams(elements: FoundationElementResult[], cols: Founda
   return out;
 }
 
+// ------------------------------ CUSTOM-SHAPED (L / TRAPEZOID / POLYGON) FOOTING ------------------------------
+
+/** Plan polygon (column-centred, metres) of a custom footing template at scale k, or the user's fixed polygon */
+export function customFootingPolygon(cfg: CustomFootingConfig, k: number): Pt[] {
+  if (cfg.kind === 'polygon') return (cfg.vertices ?? []).map(v => [v[0], v[1]] as Pt);
+  const asp = cfg.aspect ?? (cfg.kind === 'L' ? 1 : 1.2);
+  if (cfg.kind === 'L') {
+    const nr = Math.min(0.45, Math.max(0.1, cfg.notchRatio ?? 0.4));
+    const Lx = k, Ly = k * asp;
+    return [[-Lx / 2, -Ly / 2], [Lx / 2, -Ly / 2], [Lx / 2, Ly / 2 - nr * Ly], [Lx / 2 - nr * Lx, Ly / 2 - nr * Ly], [Lx / 2 - nr * Lx, Ly / 2], [-Lx / 2, Ly / 2]];
+  }
+  const er = Math.min(1, Math.max(0.2, cfg.endRatio ?? 0.5));
+  const Lx = k * asp, W0 = k, W1 = k * er;
+  return [[-Lx / 2, -W0 / 2], [Lx / 2, -W1 / 2], [Lx / 2, W1 / 2], [-Lx / 2, W0 / 2]];
+}
+
+/**
+ * Footing of an irregular plan under ONE column. L and trapezoid templates are scaled up until the soil pressure
+ * (axial load, resultant eccentric to the plan centroid, linear pressure by the unsymmetrical-bending formula) is within
+ * the available pressure with no tension; a user polygon is checked as given and never resized. The thickness is found
+ * with the cantilever method on the governing overhang beyond the column face in each direction, loaded with the MAXIMUM
+ * factored contact pressure (conservative for any shape): flexure at the column face, one-way shear at d, punching at d/2.
+ */
+export function designCustomFooting(col: FoundationColumnInput, cfg: CustomFootingConfig, p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options)): FoundationElementResult {
+  const id = `CF-${col.name ?? col.id}`;
+  const type = 'custom_footing' as const;
+  const fixed = cfg.kind === 'polygon';
+  const cxM = col.widthMm / 1000, cyM = col.depthMm / 1000;
+  if (fixed) {
+    const v = cfg.vertices ?? [];
+    if (v.length < 3 || !isSimplePolygon(v as Pt[])) return unverified(id, type, 'custom', [col], p, 'The custom polygon needs at least 3 distinct, non-self-intersecting vertices (metres, relative to the column centre).');
+    const inside = ([[-cxM / 2, -cyM / 2], [cxM / 2, -cyM / 2], [cxM / 2, cyM / 2], [-cxM / 2, cyM / 2]] as Pt[]).every(q => pointInPolygon(q, v as Pt[]));
+    if (!inside) return failed(id, type, 'custom', [col], p, 'The polygon does not contain the column section: draw the footing outline around the column (vertices are relative to the column centre).');
+  }
+  const cover = p.clearCoverMm;
+  const fck = fckOf(p.concreteGrade);
+  const ratio = col.factoredLoadKn / Math.max(col.serviceLoadKn, 1e-9);
+  const evalPressure = (poly: Pt[]) => {
+    const g = polygonProperties(poly);
+    const Mx = col.serviceLoadKn * (0 - g.cy), My = col.serviceLoadKn * (0 - g.cx);
+    const det = g.iyy * g.ixx - g.ixy * g.ixy;
+    const b = (My * g.ixx - Mx * g.ixy) / det, c = (Mx * g.iyy - My * g.ixy) / det;
+    const qs = poly.map(([x, y]) => col.serviceLoadKn / g.area + b * (x - g.cx) + c * (y - g.cy));
+    return { g, qmax: Math.max(...qs), qmin: Math.min(...qs) };
+  };
+  type Sol = { poly: Pt[]; D: number; d: number; phi: number; pr: ReturnType<typeof evalPressure>; qAvail: number; quMax: number;
+    bx: BarsPerMetre; by: BarsPerMetre; astX: number; astY: number; mX: number; mY: number; limX: number; limY: number; vX: number; vY: number; tcX: number; tcY: number;
+    tvp: number | null; tcp: number; ov: ReturnType<typeof overhangs>; pressureFail?: string };
+  let sol: Sol | null = null;
+  let pressureMsg = '';
+  const ks = fixed ? [0] : Array.from({ length: 280 }, (_, i) => 0.8 + i * 0.05);
+  outer:
+  for (const k of ks) {
+    const poly = customFootingPolygon(cfg, k);
+    const pr = evalPressure(poly);
+    if (!fixed && !([[-cxM / 2, -cyM / 2], [cxM / 2, cyM / 2]] as Pt[]).every(q => pointInPolygon(q, poly))) continue;
+    for (let D = Math.max(300, opt.minFootingDepthMm); D <= MAX_DEPTH_MM; D += 25) {
+      const Dm = D / 1000;
+      const { qAvail } = availablePressure(p, Dm);
+      if (qAvail <= 0) { pressureMsg = 'Bearing capacity consumed by overburden at this founding depth.'; break outer; }
+      if (pr.qmax > qAvail + 1e-9 || pr.qmin < -1e-9) {
+        pressureMsg = pr.qmin < -1e-9 ? `The resultant falls outside the kern: part of the base would lift off (min pressure ${round(pr.qmin, 1)} kN/m²).` : `Max pressure ${round(pr.qmax, 1)} kN/m² exceeds the available ${round(qAvail, 1)} kN/m².`;
+        break; // a thicker footing only lowers the available pressure
+      }
+      const quMax = pr.qmax * ratio;
+      const ov = overhangs(poly, cxM / 2, cyM / 2);
+      const extX = Math.max(ov.xPos, ov.xNeg, 0), extY = Math.max(ov.yPos, ov.yNeg, 0);
+      for (const phi of [10, 12, 16, 20, 25] as const) {
+        const d = D - cover - 1.5 * phi;
+        if (d < 150) continue;
+        const mX = (quMax * extX * extX) / 2, mY = (quMax * extY * extY) / 2; // kN·m per m
+        const limX = muLimitKnM(1000, d, p.concreteGrade, p.steelGrade);
+        if (mX > limX || mY > limX) break; // deeper
+        const minAst = MIN_STEEL_FRACTION_HYSD * 1000 * D;
+        const astX = Math.max(flexureAstMm2(mX, 1000, d, p.concreteGrade, p.steelGrade).astMm2, minAst);
+        const astY = Math.max(flexureAstMm2(mY, 1000, d, p.concreteGrade, p.steelGrade).astMm2, minAst);
+        const bx = selectBarsPerMetre(astX, d, [phi]), by = selectBarsPerMetre(astY, d, [phi]);
+        if (!bx || !by) continue;
+        const vX = quMax * Math.max(0, extX - d / 1000), vY = quMax * Math.max(0, extY - d / 1000); // kN per m
+        const tcX = tauCMpa((100 * bx.astProvidedMm2PerM) / (1000 * d), p.concreteGrade), tcY = tauCMpa((100 * by.astProvidedMm2PerM) / (1000 * d), p.concreteGrade);
+        if ((vX * 1000) / (1000 * d) > tcX || (vY * 1000) / (1000 * d) > tcY) continue;
+        // punching at d/2: needs the whole critical rectangle inside the plan
+        const hx = (col.widthMm + d) / 2000, hy = (col.depthMm + d) / 2000;
+        const rectIn = ([[-hx, -hy], [hx, -hy], [hx, hy], [-hx, hy]] as Pt[]).every(q => pointInPolygon(q, poly));
+        const tcp = punchingAllowableMpa(Math.min(col.widthMm, col.depthMm), Math.max(col.widthMm, col.depthMm), p.concreteGrade);
+        let tvp: number | null = null;
+        if (rectIn) {
+          const b0 = 2 * (2 * hx + 2 * hy) * 1000;
+          tvp = ((col.factoredLoadKn - quMax * (2 * hx) * (2 * hy)) * 1000) / (b0 * d);
+          if (tvp > tcp) continue;
+        }
+        sol = { poly, D, d, phi, pr, qAvail, quMax, bx, by, astX, astY, mX, mY, limX, limY: limX, vX, vY, tcX, tcY, tvp, tcp, ov };
+        break outer;
+      }
+    }
+    if (fixed) break;
+  }
+  if (!sol) {
+    return failed(id, type, 'custom', [col], p, fixed
+      ? `The given polygon cannot carry the column: ${(pressureMsg || 'no thickness up to ' + MAX_DEPTH_MM + ' mm satisfies flexure, shear and punching').replace(/\.$/, '')}. Enlarge the outline (it is never resized silently).`
+      : `No ${cfg.kind === 'L' ? 'L-shaped' : 'trapezoidal'} footing found up to 14.75 m scale and ${MAX_DEPTH_MM} mm thickness. ${pressureMsg}`);
+  }
+  const { D, d, phi, pr, qAvail, quMax, bx, by, ov } = sol;
+  // global coordinates
+  const gpoly: Pt[] = sol.poly.map(([x, y]) => [round(col.xM + x, 4), round(col.yM + y, 4)] as Pt);
+  const bb = polygonBounds(gpoly);
+  const e = baseElement(id, type, 'custom', [col], p);
+  e.polygon = gpoly;
+  e.plan = { x0: bb.x0, x1: bb.x1, y0: bb.y0, y1: bb.y1 };
+  e.sizeXM = bb.x1 - bb.x0; e.sizeYM = bb.y1 - bb.y0;
+  e.depthMm = D; e.effectiveDepthMm = d;
+  const A = pr.g.area, perim = polygonPerimeter(sol.poly), Dm = D / 1000;
+  e.availablePressureKnM2 = round(qAvail, 2); e.maxServicePressureKnM2 = round(pr.qmax, 2); e.factoredPressureKnM2 = round(quMax, 2);
+  // bars: chord lengths at each bar position
+  const H = (axis: 'x' | 'y') => (axis === 'x' ? (bb.y1 - bb.y0) : (bb.x1 - bb.x0)) * 1000;
+  const layer = (axis: 'x' | 'y', bars: BarsPerMetre, astReq: number): RebarLayer | null => {
+    const span = H(axis);
+    const n = Math.floor((span - 2 * cover) / bars.spacingMm) + 1;
+    const off = (span - 2 * cover - (n - 1) * bars.spacingMm) / 2;
+    const lens: number[] = [];
+    const lb = polygonBounds(sol!.poly);
+    for (let j = 0; j < n; j++) {
+      const pos = (axis === 'x' ? lb.y0 : lb.x0) + (cover + off + j * bars.spacingMm) / 1000;
+      const len = chordLength(sol!.poly, axis, pos) * 1000 - 2 * cover;
+      if (len > 150) lens.push(len);
+    }
+    if (!lens.length) return null;
+    const avg = lens.reduce((s, v) => s + v, 0) / lens.length;
+    return { id: `${id}-B${axis.toUpperCase()}`, location: 'bottom', direction: axis, role: 'main', diaMm: phi, spacingMm: bars.spacingMm, count: lens.length,
+      astRequiredMm2PerM: round(astReq, 1), astProvidedMm2PerM: round(bars.astProvidedMm2PerM, 1), straightLengthMm: Math.round(avg), zoneWidthMm: span,
+      developmentLengthMm: developmentLengthTensionMm(phi, p.concreteGrade, p.steelGrade),
+      note: 'Bars are cut to the footing outline; the length is the average chord of the bars in this layer.' };
+  };
+  e.reinforcement = [layer('x', bx, sol.astX), layer('y', by, sol.astY)].filter((l): l is RebarLayer => !!l);
+  // dowels
+  const dowelDia = p.columnBarDiaMm ?? 16;
+  const dowelReq = 0.005 * col.widthMm * col.depthMm;
+  e.dowels = { requiredAreaMm2: Math.round(dowelReq), diaMm: dowelDia, minBars: Math.max(4, Math.ceil(dowelReq / barAreaMm2(dowelDia))),
+    developmentLengthMm: developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade), availableLengthMm: D - cover - 2 * phi };
+  const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
+  e.loads = { serviceKn: col.serviceLoadKn, factoredKn: col.factoredLoadKn };
+  e.quantities = {
+    concreteM3: round(A * Dm, 3),
+    pccM3: round((A + perim * pp + Math.PI * pp * pp) * (p.pccThicknessMm / 1000), 3),
+    excavationM3: round((A + perim * ws + Math.PI * ws * ws) * p.foundationDepthM, 3),
+    formworkM2: round(perim * Dm, 3),
+  };
+  const ld = developmentLengthTensionMm(phi, p.concreteGrade, p.steelGrade);
+  const availAnch = Math.min(Math.max(ov.xPos, ov.xNeg), Math.max(ov.yPos, ov.yNeg)) * 1000 - cover;
+  const dowelOk = e.dowels.availableLengthMm >= e.dowels.developmentLengthMm;
+  const bearingCap = (0.45 * fck * col.widthMm * col.depthMm) / 1000;
+  const extX = Math.max(ov.xPos, ov.xNeg), extY = Math.max(ov.yPos, ov.yNeg);
+  e.checks = [
+    { id: 'bearing_pressure', label: 'Max service base pressure ≤ available pressure; no tension', clause: 'IS 6403', status: 'PASS', demand: round(pr.qmax, 2), capacity: round(qAvail, 2), unit: 'kN/m²',
+      note: `Plan area ${round(A, 2)} m², centroid ${round(pr.g.cx, 3)}, ${round(pr.g.cy, 3)} m from the column; min pressure ${round(pr.qmin, 1)} kN/m² (unsymmetrical-bending formula on the polygon).` },
+    { id: 'flexure_x', label: 'Flexure at the column face, x direction (cantilever, max contact pressure)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(sol.mX, 1), capacity: round(sol.limX, 1), unit: 'kN·m/m',
+      note: `Governing overhang ${round(extX, 3)} m × qu,max ${round(quMax, 1)} kN/m²: conservative for a shape whose width varies.` },
+    { id: 'flexure_y', label: 'Flexure at the column face, y direction', clause: 'IS 456 Annex G', status: 'PASS', demand: round(sol.mY, 1), capacity: round(sol.limY, 1), unit: 'kN·m/m', note: `Governing overhang ${round(extY, 3)} m.` },
+    { id: 'steel', label: 'Tension steel ≥ required', clause: 'IS 456 Annex G', status: 'PASS', demand: round(Math.max(sol.astX, sol.astY), 0), capacity: round(Math.min(bx.astProvidedMm2PerM, by.astProvidedMm2PerM), 0), unit: 'mm²/m' },
+    { id: 'min_steel', label: 'Minimum steel 0.12% of the gross section', clause: 'IS 456 Cl. 26.5.2.1', status: 'PASS', demand: round(MIN_STEEL_FRACTION_HYSD * 1000 * D, 0), unit: 'mm²/m' },
+    { id: 'bar_spacing', label: 'Bar spacing ≤ min(3d, 300 mm)', clause: 'IS 456 Cl. 26.3.3(b)', status: Math.max(bx.spacingMm, by.spacingMm) <= Math.min(3 * d, 300) ? 'PASS' : 'FAIL', demand: Math.max(bx.spacingMm, by.spacingMm), capacity: Math.min(3 * d, 300), unit: 'mm' },
+    { id: 'shear_x', label: 'One-way shear at d from the column face, x', clause: 'IS 456 Cl. 34.2.4.1(a), 40.2', status: 'PASS', demand: round((sol.vX * 1000) / (1000 * d), 3), capacity: round(sol.tcX, 3), unit: 'N/mm²' },
+    { id: 'shear_y', label: 'One-way shear at d from the column face, y', clause: 'IS 456 Cl. 34.2.4.1(a), 40.2', status: 'PASS', demand: round((sol.vY * 1000) / (1000 * d), 3), capacity: round(sol.tcY, 3), unit: 'N/mm²' },
+    sol.tvp === null
+      ? { id: 'punching', label: 'Punching shear at d/2 around the column', clause: 'IS 456 Cl. 31.6.3', status: 'NOT_VERIFIED', note: 'The critical perimeter reaches the footing edge (an edge / corner condition): the reduced perimeter is not computed for custom shapes.' }
+      : { id: 'punching', label: 'Punching shear at d/2 around the column', clause: 'IS 456 Cl. 31.6.3', status: 'PASS', demand: round(sol.tvp, 3), capacity: round(sol.tcp, 3), unit: 'N/mm²' },
+    { id: 'dev_length', label: 'Bar development length from the column face', clause: 'IS 456 Cl. 26.2.1', status: availAnch >= ld ? 'PASS' : 'WARNING', demand: round(ld, 0), capacity: round(availAnch, 0), unit: 'mm',
+      note: availAnch >= ld ? undefined : 'The shortest overhang is below the development length: provide end bends / 90° hooks.' },
+    { id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4', status: col.factoredLoadKn <= bearingCap ? 'PASS' : 'WARNING', demand: round(col.factoredLoadKn, 1), capacity: round(bearingCap, 1), unit: 'kN' },
+    { id: 'dowels', label: 'Dowel development length into the footing', clause: 'IS 456 Cl. 34.4.3, 26.2.1.1', status: dowelOk ? 'PASS' : 'WARNING', demand: e.dowels.developmentLengthMm, capacity: e.dowels.availableLengthMm, unit: 'mm' },
+    { id: 'stability', label: 'Sliding / overturning / uplift', clause: 'IS 456 Cl. 20', status: 'NOT_VERIFIED', note: 'Not computed for custom-shaped footings.' },
+    ...commonChecks(p, false),
+  ];
+  e.status = overallStatus(e.checks);
+  e.assumptions = [
+    ...COMMON_ASSUMPTIONS.slice(1),
+    fixed ? 'Polygon given by the user (vertices relative to the column centre); it is checked, never resized.' : `${cfg.kind === 'L' ? 'L-shaped' : 'Trapezoidal'} template scaled until the pressure checks pass; column at the centre of the bounding box.`,
+    'Contact pressure: axial service load acting at the column, linear distribution on the polygon (no column moments).',
+    'Flexure and one-way shear use the governing overhang beyond the column face with the maximum factored contact pressure acting over the whole overhang (conservative).',
+  ];
+  e.warnings = e.checks.filter(k => k.status !== 'PASS' && k.note).map(k => `${k.label}: ${k.note}`);
+  return e;
+}
+
 // ------------------------------ ORCHESTRATOR ------------------------------
 
 type Plan = { x0: number; x1: number; y0: number; y1: number };
@@ -2107,12 +2308,16 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
     case 'strip': elements = designStripLayout(cols, params, opt, warnings); break;
     case 'raft': elements = [designRaftFoundation(cols, params, opt)]; break;
     case 'pile': elements = designPileFoundation(cols, params, opt); break;
+    case 'custom':
+      // no shape chosen yet: the panel shows (and the design uses) the L template
+      elements = cols.map(c => designCustomFooting(c, params.customFooting ?? { kind: 'L' }, params, opt));
+      break;
     default:
       elements = [unverified(`${String(selected).toUpperCase()}-1`, 'strip_footing', selected as FoundationSystem, cols, params, `${String(selected)} footing design is not implemented.`)];
   }
 
   // plan-overlap check across all footing elements (not for raft/pile)
-  if (selected === 'isolated' || selected === 'combined' || selected === 'strap' || selected === 'strip') {
+  if (selected === 'isolated' || selected === 'combined' || selected === 'strap' || selected === 'strip' || selected === 'custom') {
     for (let i = 0; i < elements.length; i++) {
       for (let j = i + 1; j < elements.length; j++) {
         const a = elements[i], b = elements[j];

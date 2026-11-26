@@ -407,3 +407,13 @@ describe('Non-load-bearing columns', () => {
     expect(r.foundation!.elements.some(e => e.columnIds.includes('c1'))).toBe(false);
   });
 });
+
+describe('Custom-shaped footings through the full pipeline', () => {
+  for (const kind of ['L', 'trapezoid'] as const) {
+    it(`${kind}: invariants hold (load path, BBS, geometry, BOQ)`, () => {
+      const d = invariants(run({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary', customFooting: { kind } }), foundationType: 'custom' }), `custom-${kind}`);
+      expect(d.foundation!.elements.every(e => e.elementType === 'custom_footing')).toBe(true);
+      expect(d.bbs!.rows.length).toBeGreaterThan(0);
+    });
+  }
+});

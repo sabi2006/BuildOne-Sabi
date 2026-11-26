@@ -63,6 +63,19 @@ function FrustumGeometry({ base, top, height }: { base: [number, number]; top: [
   return <primitive object={geom} attach="geometry" />;
 }
 
+/** Extruded plan outline (custom-shaped footing): outline (x, z) relative to the centre, height h centred on y = 0 */
+function PrismGeometry({ outline, height }: { outline: Array<[number, number]>; height: number }) {
+  const geom = React.useMemo(() => {
+    const shape = new THREE.Shape(outline.map(([x, z]) => new THREE.Vector2(x, z)));
+    const g = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false });
+    g.rotateX(Math.PI / 2); // extrusion z -> -y, shape y -> z
+    g.translate(0, height / 2, 0);
+    g.computeVertexNormals();
+    return g;
+  }, [outline, height]);
+  return <primitive object={geom} attach="geometry" />;
+}
+
 function InstancedBars({ bars, color }: { bars: BarSpec[]; color: string }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => new THREE.CylinderGeometry(1, 1, 1, 8), []);
@@ -141,6 +154,8 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
           <mesh key={b.id} position={b.center} castShadow={b.kind !== 'pcc'} receiveShadow>
             {b.shape === 'cylinder'
               ? <cylinderGeometry args={[b.size[0] / 2, b.size[0] / 2, b.size[1], 16]} />
+              : b.shape === 'prism' && b.outline
+                ? <PrismGeometry outline={b.outline} height={b.size[1]} />
               : b.shape === 'frustum' && b.topSize
                 ? <FrustumGeometry base={[b.size[0], b.size[2]]} top={b.topSize} height={b.size[1]} />
                 : <boxGeometry args={b.size} />}

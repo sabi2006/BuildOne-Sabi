@@ -102,6 +102,8 @@ export interface FoundationDetailsConfig {
   edgeThicknessMm?: number;
   /** RCC tie (ground) beams joining neighbouring single-column footings / pile caps: user section, wall load and tie force % */
   tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
+  /** Plan shape for the 'custom' foundation type */
+  customFooting?: { kind: 'L' | 'trapezoid' | 'polygon'; notchRatio?: number; endRatio?: number; aspect?: number; vertices?: Array<[number, number]> };
   poissonRatio?: number;
   investigation: SoilInvestigationData;
 
@@ -210,6 +212,7 @@ export interface StructuralElementIdentity {
     | 'combined_footing'
     | 'strap_beam'
     | 'tie_beam'
+    | 'custom_footing'
     | 'strip_footing'
     | 'raft'
     | 'pile_cap'

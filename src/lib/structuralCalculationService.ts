@@ -38,7 +38,7 @@ export function toMeters(val: number, unit?: Unit): number {
 export type ConcreteGrade = 'M15' | 'M20' | 'M25' | 'M30' | 'M35';
 export type SteelGrade = 'Fe415' | 'Fe500' | 'Fe550';
 export type FineAggregateType = 'river_sand' | 'm_sand' | 'specified_fine_aggregate';
-export type FoundationType = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile';
+export type FoundationType = 'isolated' | 'combined' | 'strip' | 'strap' | 'raft' | 'pile' | 'custom';
 
 export type SoilClassification = 
   | 'dense_sand_gravel'

@@ -478,6 +478,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     isolatedShape: details.isolatedShape,
     edgeThicknessMm: details.edgeThicknessMm,
     tieBeams: details.tieBeams,
+    customFooting: details.customFooting,
     basement: basementOn
       ? { depthM: basementCfg.depthM, wallWeightKnM2: basementWallWeightKnM2(basement, args.buildingLengthM * args.buildingWidthM, warnings) }
       : undefined,
