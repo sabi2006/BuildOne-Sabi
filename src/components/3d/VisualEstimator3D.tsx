@@ -102,6 +102,24 @@ export const SHARED_FOOTING_REBAR_MAT = new THREE.MeshStandardMaterial({
   depthWrite: true,
 });
 
+/**
+ * three.js does not rebuild a material when its `transparent` flag changes at runtime, so switching the render mode
+ * (solid ↔ X-ray / reinforcement) left the concrete opaque and hid the bar cages. Mark every material for update
+ * whenever the render mode changes (runs after the scene props for that mode have been applied).
+ */
+function MaterialRefresher({ trigger }: { trigger: string }) {
+  const { scene, invalidate } = useThree();
+  useEffect(() => {
+    scene.traverse(obj => {
+      const m = (obj as THREE.Mesh).material;
+      if (!m) return;
+      (Array.isArray(m) ? m : [m]).forEach(mat => { mat.needsUpdate = true; });
+    });
+    invalidate();
+  }, [trigger, scene, invalidate]);
+  return null;
+}
+
 interface VisualEstimator3DProps {
   model: BuildingModel;
 }
@@ -2604,6 +2622,18 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
         {/* Top-Right: Camera Controls & Collapsible Scene Elements Toggle */}
         <div className="absolute top-3 right-3 z-30 flex items-center gap-2">
+          {/* Elements hidden from the view only (still in the model and the estimate) */}
+          {hiddenInView.size > 0 && (
+            <button
+              type="button"
+              data-testid="show-hidden-elements"
+              onClick={() => setHiddenInView(new Set())}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow-md border bg-amber-500 text-amber-950 border-amber-400 hover:bg-amber-400 cursor-pointer"
+              title="Elements hidden from the view are still in the model and the estimate"
+            >
+              Show {hiddenInView.size} hidden
+            </button>
+          )}
           {/* Compact Horizontal Camera Controls Pill */}
           <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700/80 backdrop-blur-md shadow-md">
             <button onClick={() => handleZoom(-10)} className="p-1.5 hover:bg-slate-800 rounded text-slate-300 hover:text-white transition-colors cursor-pointer" title="Zoom In">
@@ -2708,17 +2738,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 <input type="checkbox" checked={showPillars} onChange={(e) => setShowPillars(e.target.checked)} className="rounded text-orange-600 focus:ring-orange-500" />
                 <span>Show Solid RCC Columns</span>
               </label>
-              {hiddenInView.size > 0 && (
-                <button
-                  type="button"
-                  data-testid="show-hidden-elements"
-                  onClick={() => setHiddenInView(new Set())}
-                  className="w-full text-left text-[11px] font-semibold px-1.5 py-1 rounded bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100"
-                  title="Elements hidden from the view are still in the model and the estimate"
-                >
-                  Show {hiddenInView.size} hidden element{hiddenInView.size === 1 ? '' : 's'} (view only)
-                </button>
-              )}
               <label className="flex items-center space-x-2 cursor-pointer text-cyan-800 font-semibold bg-cyan-50/90 px-1.5 py-0.5 rounded border border-cyan-200/60">
                 <input type="checkbox" checked={showPillarRebar} onChange={(e) => setShowPillarRebar(e.target.checked)} className="rounded text-cyan-600 focus:ring-cyan-500" />
                 <span>Show Pillar Rebar Cage</span>
@@ -3326,6 +3345,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
             }}
           >
             <CameraController viewMode={viewMode} viewPreset={viewPreset} controlsRef={controlsRef} />
+            <MaterialRefresher trigger={renderMode} />
             <color attach="background" args={['#020617']} />
             <ambientLight intensity={0.65} />
             <hemisphereLight args={['#ffffff', '#334155', 0.6]} />
