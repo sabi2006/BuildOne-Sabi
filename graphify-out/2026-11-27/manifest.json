@@ -1,0 +1,890 @@
+{
+  ".claude/settings/kfc-settings.json": {
+    "mtime": 1794417387.0602794,
+    "seen": 1794664666.4854584,
+    "ast_hash": "ca897acebf52144b74300a641e6f7789",
+    "semantic_hash": "ca897acebf52144b74300a641e6f7789"
+  },
+  "eslint.config.mjs": {
+    "mtime": 1786891418.5064116,
+    "seen": 1794664666.485466,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "next.config.ts": {
+    "mtime": 1786891418.597852,
+    "seen": 1794664666.4854686,
+    "ast_hash": "9b77af189a21a7a64e4bd7a426f64176",
+    "semantic_hash": "9b77af189a21a7a64e4bd7a426f64176"
+  },
+  "package.json": {
+    "mtime": 1795335598.6946764,
+    "seen": 1795336834.650649,
+    "ast_hash": "863a4e898513f8029190ca40f0697446",
+    "semantic_hash": ""
+  },
+  "postcss.config.mjs": {
+    "mtime": 1786891418.5336182,
+    "seen": 1794664666.4854715,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "prisma/migrations/0001_init/migration.sql": {
+    "mtime": 1790966386.4310534,
+    "seen": 1794685497.211094,
+    "ast_hash": "1aca5169487a7fd4f5808764836cec3d",
+    "semantic_hash": ""
+  },
+  "src/app/about/page.tsx": {
+    "mtime": 1787332075.4316704,
+    "seen": 1794664666.4854934,
+    "ast_hash": "a9a71f65ed896cde4592d3a6bde2e9aa",
+    "semantic_hash": "a9a71f65ed896cde4592d3a6bde2e9aa"
+  },
+  "src/app/api/generate-pdf/route.ts": {
+    "mtime": 1793979856.7168539,
+    "seen": 1794664666.4854946,
+    "ast_hash": "abecbf9076c9234842819aa393c34f65",
+    "semantic_hash": "abecbf9076c9234842819aa393c34f65"
+  },
+  "src/app/api/projects/[id]/route.ts": {
+    "mtime": 1789392183.996136,
+    "seen": 1794664666.4854956,
+    "ast_hash": "269c917fabd68cde1593502625504da8",
+    "semantic_hash": "269c917fabd68cde1593502625504da8"
+  },
+  "src/app/api/projects/route.ts": {
+    "mtime": 1789394046.7719946,
+    "seen": 1794664666.4854963,
+    "ast_hash": "e5101a5f1ff5dc7704f41ed050d4a458",
+    "semantic_hash": "e5101a5f1ff5dc7704f41ed050d4a458"
+  },
+  "src/app/bulk-orders/page.tsx": {
+    "mtime": 1787417200.7963765,
+    "seen": 1794664666.4854972,
+    "ast_hash": "1e86048e5018b6c807354d1aebfd0eff",
+    "semantic_hash": "1e86048e5018b6c807354d1aebfd0eff"
+  },
+  "src/app/calculator/page.tsx": {
+    "mtime": 1794642900.577005,
+    "seen": 1794664666.4854984,
+    "ast_hash": "4db004e017bddb63da6de2e98fd7f057",
+    "semantic_hash": "4db004e017bddb63da6de2e98fd7f057"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1786893736.1143384,
+    "seen": 1794664666.4854994,
+    "ast_hash": "56638ab2fd427661f5cdff958e165242",
+    "semantic_hash": "56638ab2fd427661f5cdff958e165242"
+  },
+  "src/app/page.tsx": {
+    "mtime": 1788695044.852628,
+    "seen": 1794664666.4855,
+    "ast_hash": "c0e4f99f5fc0f2d777ae7d83b597212f",
+    "semantic_hash": "c0e4f99f5fc0f2d777ae7d83b597212f"
+  },
+  "src/app/products/[id]/page.tsx": {
+    "mtime": 1786970018.529152,
+    "seen": 1794664666.4855013,
+    "ast_hash": "9c4d9535ccd58291ec6142c23fc0004f",
+    "semantic_hash": "9c4d9535ccd58291ec6142c23fc0004f"
+  },
+  "src/app/products/page.tsx": {
+    "mtime": 1787332075.4348998,
+    "seen": 1794664666.4855022,
+    "ast_hash": "d40cc1838eaf9db82268895d26a6cd78",
+    "semantic_hash": "d40cc1838eaf9db82268895d26a6cd78"
+  },
+  "src/components/3d/BrickScene.tsx": {
+    "mtime": 1786897173.5337107,
+    "seen": 1794664666.485503,
+    "ast_hash": "26c3d2a611dec5db6361a2782747f9ae",
+    "semantic_hash": "26c3d2a611dec5db6361a2782747f9ae"
+  },
+  "src/components/3d/Hero3DScene.tsx": {
+    "mtime": 1787223576.229204,
+    "seen": 1794664666.485504,
+    "ast_hash": "66fd8aa210494f6b51de39c1b4d91ca0",
+    "semantic_hash": "66fd8aa210494f6b51de39c1b4d91ca0"
+  },
+  "src/components/3d/ScrollStoryScene.tsx": {
+    "mtime": 1787202119.6782055,
+    "seen": 1794664666.485505,
+    "ast_hash": "adf9a50c20f94d057d4a5c94cdc4bb86",
+    "semantic_hash": "adf9a50c20f94d057d4a5c94cdc4bb86"
+  },
+  "src/components/3d/SharedBrickWall.tsx": {
+    "mtime": 1794849284.5831995,
+    "seen": 1794850058.0439856,
+    "ast_hash": "196ca90305f99804a90bb34c6ba52124",
+    "semantic_hash": ""
+  },
+  "src/components/3d/VisualEstimator3D.tsx": {
+    "mtime": 1795679501.3950071,
+    "seen": 1795679648.6081896,
+    "ast_hash": "4afa30824fc650f19e02312161195f62",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/AIAnalysisResults.tsx": {
+    "mtime": 1787119961.0163345,
+    "seen": 1794664666.4855082,
+    "ast_hash": "66dc87c8bf8d724995f25f1e701c901b",
+    "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
+  },
+  "src/components/calculator/BuildingEditor.tsx": {
+    "mtime": 1795716420.5968697,
+    "seen": 1795716445.0836885,
+    "ast_hash": "bb0999a77362ae76380c245c5bc840a7",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/CalculatorContext.tsx": {
+    "mtime": 1794837683.7318401,
+    "seen": 1794838914.302661,
+    "ast_hash": "4abda5b1064206936e5984c2684713e7",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/CalculatorSettings.tsx": {
+    "mtime": 1788695306.1410327,
+    "seen": 1794664666.4855168,
+    "ast_hash": "21b2ecb1fc70d9e0ffc23625017a2500",
+    "semantic_hash": "21b2ecb1fc70d9e0ffc23625017a2500"
+  },
+  "src/components/calculator/ImageUpload.tsx": {
+    "mtime": 1787332075.4070947,
+    "seen": 1794664666.4855177,
+    "ast_hash": "8ed1ca69091c2c21db90ef15e3db2f8c",
+    "semantic_hash": "8ed1ca69091c2c21db90ef15e3db2f8c"
+  },
+  "src/components/calculator/ProjectForms.tsx": {
+    "mtime": 1787332075.4326842,
+    "seen": 1794664666.485519,
+    "ast_hash": "4841867bc66bd8e7feb61b5040c8daf9",
+    "semantic_hash": "4841867bc66bd8e7feb61b5040c8daf9"
+  },
+  "src/components/calculator/ProjectHistoryModal.tsx": {
+    "mtime": 1789394286.8519049,
+    "seen": 1794664666.48552,
+    "ast_hash": "4742eaf7b2190e32b1c0587550304462",
+    "semantic_hash": "4742eaf7b2190e32b1c0587550304462"
+  },
+  "src/components/calculator/ResultDashboard.tsx": {
+    "mtime": 1789964465.5288224,
+    "seen": 1794664666.4855206,
+    "ast_hash": "c5345109e80b3f22fade610e7679b720",
+    "semantic_hash": "c5345109e80b3f22fade610e7679b720"
+  },
+  "src/components/calculator/SaveProjectModal.tsx": {
+    "mtime": 1789392252.7435126,
+    "seen": 1794664666.4855216,
+    "ast_hash": "cc40302ff300257e1ed7cbaa032c128b",
+    "semantic_hash": "cc40302ff300257e1ed7cbaa032c128b"
+  },
+  "src/components/calculator/StructuralConfigModal.tsx": {
+    "mtime": 1795716868.2969544,
+    "seen": 1795717168.6749425,
+    "ast_hash": "46c23ffc5f86ee06b21cc005c3e41c23",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/StructurePreview3D.tsx": {
+    "mtime": 1788695089.0921667,
+    "seen": 1794664666.4855237,
+    "ast_hash": "5186b1b1111915460d53094fbcd70374",
+    "semantic_hash": "5186b1b1111915460d53094fbcd70374"
+  },
+  "src/components/calculator/VisualEstimator.tsx": {
+    "mtime": 1794642925.5554998,
+    "seen": 1794664666.4855247,
+    "ast_hash": "8c2b640aeeb62b60044e141e237a1a5b",
+    "semantic_hash": "8c2b640aeeb62b60044e141e237a1a5b"
+  },
+  "src/components/calculator/VisualEstimatorResults.tsx": {
+    "mtime": 1795333460.3892996,
+    "seen": 1795333672.7961693,
+    "ast_hash": "9a91efaf44dd80ade238a4705934e4d0",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/VisualPreviews.tsx": {
+    "mtime": 1786975360.3014386,
+    "seen": 1794664666.4855266,
+    "ast_hash": "3084dc2c8464cec73130bc1d77a2737e",
+    "semantic_hash": "3084dc2c8464cec73130bc1d77a2737e"
+  },
+  "src/components/home/AIVisualEstimatePromoSection.tsx": {
+    "mtime": 1787220675.0758884,
+    "seen": 1794664666.4855275,
+    "ast_hash": "4e4ce026b216da74fa84564d2350f48f",
+    "semantic_hash": "4e4ce026b216da74fa84564d2350f48f"
+  },
+  "src/components/layout/Footer.tsx": {
+    "mtime": 1787332075.4943333,
+    "seen": 1794664666.4855285,
+    "ast_hash": "5b39b549adfb01153bb2200e1193086c",
+    "semantic_hash": "5b39b549adfb01153bb2200e1193086c"
+  },
+  "src/components/layout/Navbar.tsx": {
+    "mtime": 1787332075.5185347,
+    "seen": 1794664666.4855297,
+    "ast_hash": "b0a0707d02b6aca125b6e8c7d23f6e67",
+    "semantic_hash": "b0a0707d02b6aca125b6e8c7d23f6e67"
+  },
+  "src/components/layout/SmoothScroll.tsx": {
+    "mtime": 1788694802.599954,
+    "seen": 1794664666.4855306,
+    "ast_hash": "66cc1e171a37185bac1df604a514e011",
+    "semantic_hash": "66cc1e171a37185bac1df604a514e011"
+  },
+  "src/lib/brickCalculator.test.ts": {
+    "mtime": 1795335617.4290607,
+    "seen": 1795336834.650771,
+    "ast_hash": "44fa10eb194391dce2d18d5dad8c0a6c",
+    "semantic_hash": ""
+  },
+  "src/lib/brickCalculator.ts": {
+    "mtime": 1795717278.9213672,
+    "seen": 1795717454.222157,
+    "ast_hash": "457ce30e5938521f7196de6c3d8270c8",
+    "semantic_hash": ""
+  },
+  "src/lib/prisma.ts": {
+    "mtime": 1789392160.8551,
+    "seen": 1794664666.4855337,
+    "ast_hash": "8bfd262ca94e78391447fb8b23833add",
+    "semantic_hash": "8bfd262ca94e78391447fb8b23833add"
+  },
+  "src/lib/projectStorage.ts": {
+    "mtime": 1789392238.7983737,
+    "seen": 1794664666.4855347,
+    "ast_hash": "44c42c7ffc2c1ee197915c1d0c76765d",
+    "semantic_hash": "44c42c7ffc2c1ee197915c1d0c76765d"
+  },
+  "src/lib/structuralCalculationService.test.ts": {
+    "mtime": 1793983061.865727,
+    "seen": 1794664666.4855354,
+    "ast_hash": "4cd33526cd836f2f5018803ebf1bbd11",
+    "semantic_hash": "4cd33526cd836f2f5018803ebf1bbd11"
+  },
+  "src/lib/structuralCalculationService.ts": {
+    "mtime": 1795716717.5946035,
+    "seen": 1795717168.6750255,
+    "ast_hash": "873e03a22e9dfda5e482f13b46fb902e",
+    "semantic_hash": ""
+  },
+  "src/lib/utils.ts": {
+    "mtime": 1786892058.8861709,
+    "seen": 1794664666.4855375,
+    "ast_hash": "618d00bf4537ce84f9ba62c5b215fb30",
+    "semantic_hash": "618d00bf4537ce84f9ba62c5b215fb30"
+  },
+  "tsconfig.json": {
+    "mtime": 1788694937.6366608,
+    "seen": 1794664666.4855385,
+    "ast_hash": "671e523e6d604326a36bd4d89a977040",
+    "semantic_hash": "671e523e6d604326a36bd4d89a977040"
+  },
+  ".claude/agents/kfc/spec-design.md": {
+    "mtime": 1794045606.9998755,
+    "seen": 1794669588.8764699,
+    "ast_hash": "cc50f7539325f297c7724f4f15a8df2b",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-impl.md": {
+    "mtime": 1794045606.9988787,
+    "seen": 1794669588.8764713,
+    "ast_hash": "e4be787836833cccdf0e39de851b1947",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-judge.md": {
+    "mtime": 1794045606.9958746,
+    "seen": 1794669588.8764725,
+    "ast_hash": "89c9bd50cc465ed3f2a237f20678d304",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-requirements.md": {
+    "mtime": 1794045606.9938757,
+    "seen": 1794669588.876474,
+    "ast_hash": "ee03a8712efbe63e06e005040ffa1746",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-system-prompt-loader.md": {
+    "mtime": 1794045606.991877,
+    "seen": 1794669588.8764749,
+    "ast_hash": "01c8b0981826f9a1b4545066e9697e69",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-tasks.md": {
+    "mtime": 1794045606.989876,
+    "seen": 1794669588.876476,
+    "ast_hash": "e73fc6cde4a32046a3d45895e269a84c",
+    "semantic_hash": ""
+  },
+  ".claude/agents/kfc/spec-test.md": {
+    "mtime": 1794045606.9878652,
+    "seen": 1794669588.8764777,
+    "ast_hash": "b3151f644d422328502dd8f3855fcaf7",
+    "semantic_hash": ""
+  },
+  ".claude/system-prompts/spec-workflow-starter.md": {
+    "mtime": 1794045606.985401,
+    "seen": 1794669588.876479,
+    "ast_hash": "0e43f6138e734487ef6530481ba179f2",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1786891693.5199492,
+    "seen": 1794669588.8764803,
+    "ast_hash": "01e8142356e15c3404e0d84c48187cd0",
+    "semantic_hash": ""
+  },
+  "CIVIL_FORMULAS_MANUAL.html": {
+    "mtime": 1793111112.4597263,
+    "seen": 1794669588.8764815,
+    "ast_hash": "cb19668b0b455bd6c13b3be655e4e1d6",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1795325884.5189114,
+    "seen": 1795327050.9051301,
+    "ast_hash": "ffb31ba6167db159c640f1d3821e0501",
+    "semantic_hash": ""
+  },
+  "CONSTRUCTION_CALCULATION_MANUAL.md": {
+    "mtime": 1793983938.087069,
+    "seen": 1794669588.8764844,
+    "ast_hash": "d4867a76f5f41c69ef464b2a529cec9a",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_DOMAIN_MODEL.md": {
+    "mtime": 1794666115.8159685,
+    "seen": 1794669588.8764858,
+    "ast_hash": "c5aa783ff2f999e500b5d60dd3b3b7d0",
+    "semantic_hash": ""
+  },
+  "PILLAR_DEPENDENCY_ANALYSIS.md": {
+    "mtime": 1794672887.871603,
+    "seen": 1794679167.5635035,
+    "ast_hash": "4c2181ea8a2ccef00b6fba30daf65825",
+    "semantic_hash": ""
+  },
+  "PROJECT_FULL_DETAILS.md": {
+    "mtime": 1793983938.4563112,
+    "seen": 1794669588.876488,
+    "ast_hash": "1808fd1cd14a98b8b4861ba46dfca48f",
+    "semantic_hash": ""
+  },
+  "PROJECT_FULL_DETAILS.txt": {
+    "mtime": 1794894404.2603846,
+    "seen": 1795327050.9051678,
+    "ast_hash": "e632fda738b8c9f50e3517f5fc689ee8",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786891418.4764683,
+    "seen": 1794669588.8764997,
+    "ast_hash": "f15aaa42d5d299d091b1171097ea56ad",
+    "semantic_hash": ""
+  },
+  "TODAYS_WORK_REPORT.txt": {
+    "mtime": 1790048590.8773048,
+    "seen": 1794669588.876506,
+    "ast_hash": "695864e8f0c1d927626f2eafa7623ce9",
+    "semantic_hash": ""
+  },
+  "project_overview.md": {
+    "mtime": 1787035347.9160278,
+    "seen": 1794669588.876512,
+    "ast_hash": "194c47c660825b105827f3225e37c984",
+    "semantic_hash": ""
+  },
+  "CIVIL_FORMULAS_MANUAL.pdf": {
+    "mtime": 1793110628.666272,
+    "seen": 1794669588.8765135,
+    "ast_hash": "86a5faf3ba3c010a20544b4d60ae733a",
+    "semantic_hash": ""
+  },
+  "public/file.svg": {
+    "mtime": 1786891418.5336182,
+    "seen": 1794669588.876515,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": ""
+  },
+  "public/globe.svg": {
+    "mtime": 1786891418.5426862,
+    "seen": 1794669588.876516,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": ""
+  },
+  "public/next.svg": {
+    "mtime": 1786891418.5590372,
+    "seen": 1794669588.876517,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": ""
+  },
+  "public/vercel.svg": {
+    "mtime": 1786891418.5638785,
+    "seen": 1794669588.8765185,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": ""
+  },
+  "public/window.svg": {
+    "mtime": 1786891418.578251,
+    "seen": 1794669588.8765197,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  },
+  "RCC_RING_BEAM_REGRESSION_REPORT.md": {
+    "mtime": 1794670435.2554238,
+    "seen": 1794672852.5467584,
+    "ast_hash": "ac72f4cc65efb0c69e28b67bfc23020c",
+    "semantic_hash": ""
+  },
+  "BEAM_DEPENDENCY_ANALYSIS.md": {
+    "mtime": 1794674820.3668168,
+    "seen": 1794679167.5629663,
+    "ast_hash": "923a39caabe9f292e4627947a1befc41",
+    "semantic_hash": ""
+  },
+  "FINAL_INTEGRATION_REVIEW.md": {
+    "mtime": 1794673364.3037686,
+    "seen": 1794679167.5633678,
+    "ast_hash": "34f3b70d2561d5cb30c2cfec29b55e2e",
+    "semantic_hash": ""
+  },
+  "FOUNDATION_DEPENDENCY_ANALYSIS.md": {
+    "mtime": 1794678777.304424,
+    "seen": 1794679167.56337,
+    "ast_hash": "34a74050d19a093d354fd756b148e187",
+    "semantic_hash": ""
+  },
+  "FOUNDATION_IMPLEMENTATION_REPORT.md": {
+    "mtime": 1794678788.0917077,
+    "seen": 1794679167.5633714,
+    "ast_hash": "e485d59b490255f65f033baa5fda027f",
+    "semantic_hash": ""
+  },
+  "MASTER_PHASE_A_VERIFICATION.md": {
+    "mtime": 1794677020.3279164,
+    "seen": 1794679167.5634978,
+    "ast_hash": "8e66016d22522d8325f11941cb168810",
+    "semantic_hash": ""
+  },
+  "PHASE5_BEAM_COMPLETION_REPORT.md": {
+    "mtime": 1794677713.7784493,
+    "seen": 1794679167.5634992,
+    "ast_hash": "8088eeca4e4ca90ccbe82bb4d9c566d5",
+    "semantic_hash": ""
+  },
+  "PHASE5_STAGE1_FINAL_VERIFICATION.md": {
+    "mtime": 1794676582.7666295,
+    "seen": 1794679167.5635006,
+    "ast_hash": "5ecdbeafe40a235b5e7c206a36377e9c",
+    "semantic_hash": ""
+  },
+  "PHASE5_STAGE1_REPORT.md": {
+    "mtime": 1794675970.9796772,
+    "seen": 1794679167.563502,
+    "ast_hash": "7b569196ca8334b151afa613dbfa4915",
+    "semantic_hash": ""
+  },
+  "SLAB_DEPENDENCY_ANALYSIS.md": {
+    "mtime": 1794678244.6861994,
+    "seen": 1794679167.5639393,
+    "ast_hash": "70e0a36e10fac670253664b01f993fa0",
+    "semantic_hash": ""
+  },
+  "SLAB_IMPLEMENTATION_REPORT.md": {
+    "mtime": 1794678254.3443475,
+    "seen": 1794679167.5639405,
+    "ast_hash": "d095b60007801013136470daf02627a5",
+    "semantic_hash": ""
+  },
+  "FINAL_ARCHITECTURE_COMPLETION_REPORT.md": {
+    "mtime": 1794679262.6621614,
+    "seen": 1794680787.5684566,
+    "ast_hash": "ebdafece745ead47ee2f3664ba65bb78",
+    "semantic_hash": ""
+  },
+  "FINAL_GRAPHIFY_DOMAIN_MODEL.md": {
+    "mtime": 1794684887.0404685,
+    "seen": 1794685088.0201893,
+    "ast_hash": "7eff1a2028b7ae8f275393bc995cd6dd",
+    "semantic_hash": ""
+  },
+  "FINAL_GRAPH_REPORT.md": {
+    "mtime": 1794684951.222584,
+    "seen": 1794685088.0201914,
+    "ast_hash": "f57bc7b1fcc17250119774f416206019",
+    "semantic_hash": ""
+  },
+  "FINAL_POST_IMPLEMENTATION_VALIDATION.md": {
+    "mtime": 1794680741.0874202,
+    "seen": 1794680787.5685837,
+    "ast_hash": "29bd2c037ebf8dfc9cb091e24df00c02",
+    "semantic_hash": ""
+  },
+  "FINAL_AUDIT_REPORT.md": {
+    "mtime": 1794681945.0430634,
+    "seen": 1794684282.8866231,
+    "ast_hash": "7c7b0f4b16d9fd4e89d9e58c63f2f498",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_CHANGELOG.md": {
+    "mtime": 1794684449.8234396,
+    "seen": 1794684796.5734253,
+    "ast_hash": "d18f8ff551ffe15f725780c4ba2004e6",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_AUTOMATION_GUIDE.md": {
+    "mtime": 1794684872.8190978,
+    "seen": 1794685088.0204759,
+    "ast_hash": "798325637b2726e90e12e5cde1dd2c3d",
+    "semantic_hash": ""
+  },
+  "GRAPHIFY_SETUP_STATUS.md": {
+    "mtime": 1794684847.215167,
+    "seen": 1794685088.0206144,
+    "ast_hash": "3027d3cf6f9e45b21852b2a59eeb6d49",
+    "semantic_hash": ""
+  },
+  "src/lib/slabBeamRoofSteel.test.ts": {
+    "mtime": 1794813597.5446527,
+    "seen": 1794832644.4573598,
+    "ast_hash": "208626fe738b65b3ae92efb057fcce43",
+    "semantic_hash": ""
+  },
+  ".claude/settings.json": {
+    "mtime": 1795325884.5209186,
+    "seen": 1795327050.9049916,
+    "ast_hash": "d7d9d7669fbba6e4e17518be9e971fe6",
+    "semantic_hash": ""
+  },
+  "src/components/3d/FoundationBasement3D.tsx": {
+    "mtime": 1795716821.7990446,
+    "seen": 1795717168.6749196,
+    "ast_hash": "ca3cd336fb962c3f30a9fcac61bbb042",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/FoundationBasementPanel.tsx": {
+    "mtime": 1795717317.789021,
+    "seen": 1795717454.2220888,
+    "ast_hash": "5063746bc2fc5dc181d7ad97b8e896ef",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/basementDesignService.test.ts": {
+    "mtime": 1795332473.5843928,
+    "seen": 1795333326.645871,
+    "ast_hash": "ab588877f0fc86ffc38a10dc78f89a31",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/basementDesignService.ts": {
+    "mtime": 1795332473.5843928,
+    "seen": 1795333326.645872,
+    "ast_hash": "207c51c6635836ffe632129c7fdb71d8",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/bbs.test.ts": {
+    "mtime": 1795330939.6872654,
+    "seen": 1795332235.8777788,
+    "ast_hash": "c271e2457914b3a4bb17e57755b4a09b",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/bbs.ts": {
+    "mtime": 1795714877.2364995,
+    "seen": 1795714973.3816047,
+    "ast_hash": "a689f75c758c85c5cbf212b0395b5a69",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/foundationDesignService.test.ts": {
+    "mtime": 1795715461.7292824,
+    "seen": 1795715542.7048733,
+    "ast_hash": "480a45fd14f8dad55e3467083c0720eb",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/foundationDesignService.ts": {
+    "mtime": 1795717278.9166386,
+    "seen": 1795717454.2222385,
+    "ast_hash": "5600115f54bc280a821ad1985ff69c6c",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/geometry3d.test.ts": {
+    "mtime": 1795716842.4021542,
+    "seen": 1795717168.6749978,
+    "ast_hash": "2bd3c4603929b7aa72cab46a10fd3535",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/geometry3d.ts": {
+    "mtime": 1795716821.7979956,
+    "seen": 1795717168.6749988,
+    "ast_hash": "0ac7d8744ab7e467cdcc327f19e0e70c",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/integration.test.ts": {
+    "mtime": 1795336901.8376694,
+    "seen": 1795338109.134943,
+    "ast_hash": "0a7ee3722b9b8ddd9595c83da9223bf5",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/integration.ts": {
+    "mtime": 1795717278.919517,
+    "seen": 1795717454.2222557,
+    "ast_hash": "61fdfd2b037b62a0023a40747293987a",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/rcDesign.ts": {
+    "mtime": 1795329838.2681777,
+    "seen": 1795332235.8777869,
+    "ast_hash": "6798060a7668cd9325ea02ef7bd2b235",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/types.ts": {
+    "mtime": 1795717278.9185102,
+    "seen": 1795717454.222293,
+    "ast_hash": "d96b971ef392807c73ef1c6b75892865",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/boq.test.ts": {
+    "mtime": 1795336901.838648,
+    "seen": 1795338109.134923,
+    "ast_hash": "3fa3ed471a614bd4de71eee240d3b195",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/boq.ts": {
+    "mtime": 1795333168.5387223,
+    "seen": 1795333326.6458778,
+    "ast_hash": "1e74cce58144e3761896855568f23909",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/scenarios.test.ts": {
+    "mtime": 1795716850.7074473,
+    "seen": 1795717168.675011,
+    "ast_hash": "93d16d7eba7951af251e490457ce0689",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/FoundationReport.test.tsx": {
+    "mtime": 1795677823.9558578,
+    "seen": 1795677879.1702104,
+    "ast_hash": "ea0916b040345666d4d72ba6bcd33c57",
+    "semantic_hash": ""
+  },
+  "src/components/calculator/FoundationReport.tsx": {
+    "mtime": 1795677800.6639736,
+    "seen": 1795677879.1702127,
+    "ast_hash": "1af7296956c7bdf9b7ddf418fdb87f79",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/buildingFrame.test.ts": {
+    "mtime": 1795337391.790806,
+    "seen": 1795338109.1349266,
+    "ast_hash": "6db02b0942b902bf58f9580e91951e1d",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/buildingFrame.ts": {
+    "mtime": 1795698069.250926,
+    "seen": 1795698301.2770648,
+    "ast_hash": "44ae6c1793af90a3bdea3eb0e3dd05cd",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/frame.test.ts": {
+    "mtime": 1795336027.1634398,
+    "seen": 1795336834.6508083,
+    "ast_hash": "25ee07044537d42fa156d85f36fca09f",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/frame.ts": {
+    "mtime": 1795337037.0550673,
+    "seen": 1795338109.1349359,
+    "ast_hash": "e6a27e8f17eddc7dbf65c5c2f934c387",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/frameIntegration.test.ts": {
+    "mtime": 1795336920.4137967,
+    "seen": 1795338109.1349375,
+    "ast_hash": "2f5d496af7323f99eedc8b7dd1fc529d",
+    "semantic_hash": ""
+  },
+  "vitest.config.mts": {
+    "mtime": 1795335617.6199677,
+    "seen": 1795336834.6508512,
+    "ast_hash": "2f7588506187aac19f1300cc57a75443",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateral.test.ts": {
+    "mtime": 1795337186.4661055,
+    "seen": 1795338109.134947,
+    "ast_hash": "5918814c0f890c4a49708bcfab052d0c",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateral.ts": {
+    "mtime": 1795337140.2903433,
+    "seen": 1795338109.1349494,
+    "ast_hash": "080ddf062e19d3c242ec7f2610c3ff23",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/lateralFoundation.test.ts": {
+    "mtime": 1795698239.9799445,
+    "seen": 1795698301.2771008,
+    "ast_hash": "2c226d702664e43c247b481e3fc16a1b",
+    "semantic_hash": ""
+  },
+  "src/hooks/useUndoableState.ts": {
+    "mtime": 1795677517.2549107,
+    "seen": 1795677879.1702516,
+    "ast_hash": "1d7e5ef0af819656977bbc312072c028",
+    "semantic_hash": ""
+  },
+  "src/lib/editHistory.test.ts": {
+    "mtime": 1795677517.256918,
+    "seen": 1795677879.1702588,
+    "ast_hash": "c4879993b5b829451b1410eeab2256bf",
+    "semantic_hash": ""
+  },
+  "src/lib/editHistory.ts": {
+    "mtime": 1795677517.253968,
+    "seen": 1795677879.170261,
+    "ast_hash": "b65ec015381854a368515b3745343833",
+    "semantic_hash": ""
+  },
+  "src/lib/editorBatchA.test.ts": {
+    "mtime": 1795676788.7227695,
+    "seen": 1795677879.1702628,
+    "ast_hash": "d93ca1ba24462809111a3bc0c49662d6",
+    "semantic_hash": ""
+  },
+  "src/lib/elementMeasurements.test.ts": {
+    "mtime": 1795676457.5941923,
+    "seen": 1795677879.1702647,
+    "ast_hash": "a176e35be6b81ba776ad0d171ed31c20",
+    "semantic_hash": ""
+  },
+  "src/lib/elementMeasurements.ts": {
+    "mtime": 1795676457.52283,
+    "seen": 1795677879.1702669,
+    "ast_hash": "e4b7cfb8baa4fa0bcd1390b05556a69b",
+    "semantic_hash": ""
+  },
+  "src/lib/beamRebarOverride.test.ts": {
+    "mtime": 1795682144.2676952,
+    "seen": 1795682955.4244776,
+    "ast_hash": "b1a2005236d9c0b48b75a39849fd837a",
+    "semantic_hash": ""
+  },
+  "src/lib/columnRebarOverride.test.ts": {
+    "mtime": 1795681682.6955366,
+    "seen": 1795682955.4244819,
+    "ast_hash": "8e88597cae94edfd51f21a00c38a7737",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/footingBarOverride.test.ts": {
+    "mtime": 1795700194.9383268,
+    "seen": 1795700275.7799647,
+    "ast_hash": "86b5f5c80716903e0eb60d6058700179",
+    "semantic_hash": ""
+  },
+  "src/lib/rebarChecks.test.ts": {
+    "mtime": 1795682429.0776067,
+    "seen": 1795682955.4245243,
+    "ast_hash": "aed0c088f4ad67a35473106a3079f13e",
+    "semantic_hash": ""
+  },
+  "src/lib/rebarChecks.ts": {
+    "mtime": 1795696791.9873827,
+    "seen": 1795697080.8911352,
+    "ast_hash": "4ff06e86227d74433764ade83eed5265",
+    "semantic_hash": ""
+  },
+  "src/lib/editorBulkOps.test.ts": {
+    "mtime": 1795696322.8787937,
+    "seen": 1795696670.5526984,
+    "ast_hash": "48ae0aa45bc03a11c809f3c590fc7b66",
+    "semantic_hash": ""
+  },
+  "src/lib/editorBulkOps.ts": {
+    "mtime": 1795696366.92588,
+    "seen": 1795696670.5526996,
+    "ast_hash": "01fb01f93559b35a486e578de7618a59",
+    "semantic_hash": ""
+  },
+  "src/lib/elementDesignInputs.test.ts": {
+    "mtime": 1795696891.6238823,
+    "seen": 1795697080.891097,
+    "ast_hash": "f536fa68426e7418cc525d552f98b0d9",
+    "semantic_hash": ""
+  },
+  "src/lib/foundationLayers.test.ts": {
+    "mtime": 1795697262.939739,
+    "seen": 1795697421.2118726,
+    "ast_hash": "b7ea19be9c8075cd2cfef610ec73f855",
+    "semantic_hash": ""
+  },
+  "src/lib/foundationLayers.ts": {
+    "mtime": 1795697167.0839036,
+    "seen": 1795697421.2118738,
+    "ast_hash": "e22ed16b5e588ee5976c5d9be46dd52a",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/footingStability.test.ts": {
+    "mtime": 1795717306.3246045,
+    "seen": 1795717454.2222335,
+    "ast_hash": "7214fa82a21b468e2d1a77e5c34e7c44",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/stability.test.ts": {
+    "mtime": 1795717306.3466847,
+    "seen": 1795717454.2222836,
+    "ast_hash": "c04ff2c3274772953c872b9eb4636b92",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/stability.ts": {
+    "mtime": 1795717278.9166386,
+    "seen": 1795717454.2222857,
+    "ast_hash": "6259d973c3f32938661dcc1f80708ec7",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/strapFooting.test.ts": {
+    "mtime": 1795699126.0775695,
+    "seen": 1795699389.3984544,
+    "ast_hash": "f08dc289de616e3301d764e1b993aaa6",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/continuousFooting.test.ts": {
+    "mtime": 1795699794.0978065,
+    "seen": 1795699885.512413,
+    "ast_hash": "22193f0c3091144cda92264fe3137150",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/footingShape.test.ts": {
+    "mtime": 1795701092.510775,
+    "seen": 1795701191.7639742,
+    "ast_hash": "f098eabc00f5bdb40d14e50419e188a7",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/tieBeams.test.ts": {
+    "mtime": 1795715461.7350101,
+    "seen": 1795715542.7049088,
+    "ast_hash": "943c473c44603dd2b0b887fd8e481be2",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/customFooting.test.ts": {
+    "mtime": 1795717072.4782467,
+    "seen": 1795717168.6749861,
+    "ast_hash": "dcacbc868cae6a04751ab60c60b00204",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/polygon.test.ts": {
+    "mtime": 1795716919.7727256,
+    "seen": 1795717168.6750066,
+    "ast_hash": "35cf8eb0812307595be7563586945902",
+    "semantic_hash": ""
+  },
+  "src/lib/foundation/polygon.ts": {
+    "mtime": 1795716620.0420432,
+    "seen": 1795717168.675008,
+    "ast_hash": "07d44c4b04de057c7f52fba40ba50e6d",
+    "semantic_hash": ""
+  },
+  "package-lock.json": {
+    "mtime": 1795335598.7481675,
+    "seen": 1795336834.6509833,
+    "ast_hash": "21605ca6276b4bf08f70941e85cad853",
+    "semantic_hash": ""
+  }
+}

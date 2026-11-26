@@ -70,6 +70,9 @@ import { SaveProjectModal } from './SaveProjectModal';
 import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
 
 /** Unique id suffix for new elements (module scope: called from event handlers only) */
+/** Current time in ms (kept out of the component so event handlers can use it) */
+const nowMs = (): number => Date.now();
+
 const uniqueIdSuffix = () => `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
 interface BuildingEditorProps {
@@ -3772,6 +3775,40 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
       );
     }
 
+  };
+
+  /** Touch support: a touch release places like a click, and the synthesised mouse events that follow it are ignored */
+  const lastTouchRef = useRef(0);
+  const touchGuard = () => nowMs() - lastTouchRef.current < 800;
+  const svgTouchPlacing = activeMode === 'foundation' ? isPlacingFooting : (activeTool === 'pillar' || activeTool === 'wall');
+  const svgPointerMove = (e: React.MouseEvent) => {
+    if (footDrawStartRef.current) {
+      const c = getFoundationCoords(e, foundationSnapMode);
+      if (c) setFootDrawRect({ a: footDrawStartRef.current, b: c });
+    }
+    handleSvgMouseMove(e);
+  };
+  const svgPointerDown = (e: React.MouseEvent) => {
+    if (activeMode === 'foundation' && isPlacingFooting) {
+      const c = getFoundationCoords(e, foundationSnapMode);
+      if (c) { footDrawStartRef.current = c; setFootDrawRect({ a: c, b: c }); }
+    }
+  };
+  /** Finishes a footing drag; returns true when a footing was drawn (the click that follows must not add a second one) */
+  const svgPointerUp = (e: React.MouseEvent): boolean => {
+    const a = footDrawStartRef.current;
+    footDrawStartRef.current = null;
+    setFootDrawRect(null);
+    if (!a) return false;
+    const b = getFoundationCoords(e, foundationSnapMode);
+    if (!b) return false;
+    const len = Math.abs(b.x - a.x), wid = Math.abs(b.y - a.y);
+    if (len >= 1 && wid >= 1) {
+      suppressFootClickRef.current = true;
+      handleCreateManualFooting({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, { length: len, width: wid });
+      return true;
+    }
+    return false;
   };
 
   const handleSvgClick = (e: React.MouseEvent) => {
@@ -8312,34 +8349,26 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
             viewBox={`-20 -20 ${model.buildingLength + 40} ${model.buildingWidth + 40}`} 
             className="w-full h-full" 
             preserveAspectRatio="xMidYMid meet"
-            onClick={handleSvgClick}
-            onMouseMove={(e) => {
-              if (footDrawStartRef.current) {
-                const c = getFoundationCoords(e, foundationSnapMode);
-                if (c) setFootDrawRect({ a: footDrawStartRef.current, b: c });
-              }
-              handleSvgMouseMove(e);
+            style={svgTouchPlacing ? { touchAction: 'none' } : undefined}
+            onClick={(e) => { if (touchGuard()) return; handleSvgClick(e); }}
+            onMouseMove={(e) => { if (touchGuard()) return; svgPointerMove(e); }}
+            onMouseDown={(e) => { if (touchGuard()) return; svgPointerDown(e); }}
+            onMouseUp={(e) => { if (touchGuard()) return; svgPointerUp(e); }}
+            onPointerDown={(e) => {
+              if (e.pointerType !== 'touch') return;
+              lastTouchRef.current = nowMs();
+              try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* capture is optional */ }
+              svgPointerDown(e); svgPointerMove(e);
             }}
-            onMouseDown={(e) => {
-              if (activeMode === 'foundation' && isPlacingFooting) {
-                const c = getFoundationCoords(e, foundationSnapMode);
-                if (c) { footDrawStartRef.current = c; setFootDrawRect({ a: c, b: c }); }
-              }
+            onPointerMove={(e) => { if (e.pointerType !== 'touch') return; lastTouchRef.current = nowMs(); svgPointerMove(e); }}
+            onPointerUp={(e) => {
+              if (e.pointerType !== 'touch') return;
+              lastTouchRef.current = nowMs();
+              // a touch release places / finishes exactly like the mouse: the finger shows the snap preview until it is lifted
+              if (svgPointerUp(e)) suppressFootClickRef.current = false; else handleSvgClick(e);
+              setCanvasCursor(null);
             }}
-            onMouseUp={(e) => {
-              const a = footDrawStartRef.current;
-              footDrawStartRef.current = null;
-              setFootDrawRect(null);
-              if (!a) return;
-              const b = getFoundationCoords(e, foundationSnapMode);
-              if (!b) return;
-              const len = Math.abs(b.x - a.x), wid = Math.abs(b.y - a.y);
-              if (len >= 1 && wid >= 1) {
-                // a drag draws the footing; the click that follows must not add a second, default-size footing
-                suppressFootClickRef.current = true;
-                handleCreateManualFooting({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, { length: len, width: wid });
-              }
-            }}
+            onPointerCancel={() => { footDrawStartRef.current = null; setFootDrawRect(null); setCanvasCursor(null); }}
             onMouseLeave={() => { setCanvasCursor(null); footDrawStartRef.current = null; setFootDrawRect(null); }}
           >
             <g transform={`scale(1, -1) translate(0, -${model.buildingWidth})`}>
