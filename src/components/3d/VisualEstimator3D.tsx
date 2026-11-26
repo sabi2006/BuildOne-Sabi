@@ -2,6 +2,8 @@
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '../../lib/elementMeasurements';
+import { isSpecialColumn } from '../../lib/columnGeometry';
+import { ColumnGeometry } from './ColumnSolid';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, Grid, Html } from '@react-three/drei';
 import { 
@@ -4325,7 +4327,21 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                           >
                             {/* 1. Monolithic Solid Pillar Column (Continuous structural column from floor base to top structural line, zero joint gaps) */}
                             {showPillars && (
-                              p.shape === 'circular' ? (
+                              isSpecialColumn(p) ? (
+                                <mesh castShadow={!isPillarRebarActive} receiveShadow={!isPillarRebarActive} renderOrder={isPillarRebarActive ? 2 : 1}>
+                                  <ColumnGeometry pillar={p} heightM={totalColumnHeightM} toM={(v) => toMeters(v, p.unit || 'in')} />
+                                  <meshStandardMaterial
+                                    color={pillarMatColor}
+                                    roughness={pillarMatRoughness}
+                                    metalness={pillarMatMetalness}
+                                    transparent={pillarMatTransparent}
+                                    opacity={pillarMatOpacity}
+                                    depthWrite={pillarMatDepthWrite}
+                                    depthTest={true}
+                                    wireframe={isWireframe}
+                                  />
+                                </mesh>
+                              ) : p.shape === 'circular' ? (
                                 <mesh position={[0, totalColumnHeightM / 2, 0]} castShadow={!isPillarRebarActive} receiveShadow={!isPillarRebarActive} renderOrder={isPillarRebarActive ? 2 : 1}>
                                   <cylinderGeometry args={[Math.max(pW_M, pD_M)/2, Math.max(pW_M, pD_M)/2, totalColumnHeightM, 32]} />
                                   <meshStandardMaterial 
@@ -4357,7 +4373,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                             )}
 
                             {/* 1b. 6mm RCC Surface Plaster Finish Layer: Exposed Faces ONLY, never embedded faces */}
-                            {showRccPlaster && (() => {
+                            {showRccPlaster && !isSpecialColumn(p) && (() => {
                               const colPlasterThickMm = (floor.plaster?.rcc?.thickness ?? model.plaster?.rcc?.thickness ?? (floor.plaster as any)?.rccSurfaces?.thickness ?? 6);
                               const colPlasterUnit = (floor.plaster?.rcc?.unit ?? model.plaster?.rcc?.unit ?? 'mm');
                               const colPlasterThickM = Math.max(0.002, toMetersPlaster(colPlasterThickMm, colPlasterUnit));
@@ -4430,7 +4446,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                             )}
 
                             {/* Exposed Rebar Cage Mode: Shaft + Joint Pillar Reinforcement + 35cm Starter Lap */}
-                            {isPillarRebarActive && (
+                            {isPillarRebarActive && !isSpecialColumn(p) && (
                               <group position={[0, totalColumnHeightM / 2, 0]}>
                                 <PillarRebarCage 
                                   wM={pW_M} 

@@ -69,7 +69,17 @@ import { ProjectHistoryModal } from './ProjectHistoryModal';
 import { SaveProjectModal } from './SaveProjectModal';
 import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfigModal';
 
+import { isSpecialColumn, columnTaperRatio, rotatedSectionPolygon } from '@/lib/columnGeometry';
 /** Unique id suffix for new elements (module scope: called from event handlers only) */
+/** Plan outline of a shaped column (rotation applied) in building units as an SVG points string; `top` gives the top face (taper + incline) */
+function specialColumnPlanPoints(p: Pillar, c: { x: number; y: number }, bUnit: Unit, top: boolean): string {
+  const toB = (v: number) => convertUnit(v, p.unit, bUnit);
+  const poly = rotatedSectionPolygon(p, toB);
+  const r = top ? columnTaperRatio(p) : 1;
+  const ox = top ? toB(p.inclineX ?? 0) : 0, oy = top ? toB(p.inclineY ?? 0) : 0;
+  return poly.map(([x, y]) => `${c.x + x * r + ox},${c.y + y * r + oy}`).join(' ');
+}
+
 /** Current time in ms (kept out of the component so event handlers can use it) */
 const nowMs = (): number => Date.now();
 
@@ -7174,6 +7184,57 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                   <span className="text-[9px] text-gray-500 leading-tight block mt-0.5">3D appearance only: painting is not priced in the estimate.</span>
                 </div>
 
+                {/* ---------------- Section profile, rotation, taper, incline ---------------- */}
+                {selectedPillarId && (() => {
+                  const sp = findPillarById(selectedPillarId);
+                  if (!sp) return null;
+                  const kind = sp.sectionKind ?? 'rect';
+                  const numIn = (label: string, value: number | undefined, key: keyof Pillar, hint: string, min?: number, max?: number, scale = 1) => (
+                    <div>
+                      <label className="block text-[10px] font-medium text-gray-500 mb-1">{label}</label>
+                      <input type="number" step="any" min={min} max={max} value={value === undefined ? '' : Math.round(value * scale * 1000) / 1000} title={hint}
+                        data-testid={`pillar-${String(key)}`}
+                        onChange={e => { const v = e.target.value === '' ? undefined : Number(e.target.value) / scale; updateActiveFloorPillar({ [key]: v } as Partial<Pillar>); }}
+                        className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500" />
+                    </div>
+                  );
+                  return (
+                    <div className="space-y-2 pt-1 border-t" data-testid="pillar-geometry">
+                      <label className="block text-[10px] font-bold text-gray-600">Section & geometry</label>
+                      <select value={kind} data-testid="pillar-section-kind"
+                        onChange={e => updateActiveFloorPillar({ sectionKind: e.target.value === 'rect' ? undefined : (e.target.value as Pillar['sectionKind']) })}
+                        className="block w-full px-2 py-1 rounded border border-gray-300 text-xs focus:ring-orange-500">
+                        <option value="rect">Rectangle / circle (from width, depth, shape)</option>
+                        <option value="L">L-shaped</option>
+                        <option value="T">T-shaped</option>
+                        <option value="custom">Custom outline</option>
+                      </select>
+                      {(kind === 'L' || kind === 'T') && numIn(`Leg thickness (${sp.unit})`, sp.sectionLegThickness, 'sectionLegThickness', 'Default 40% of the smaller side', 0.1)}
+                      {kind === 'custom' && (
+                        <div>
+                          <label className="block text-[10px] font-medium text-gray-500 mb-1">Outline vertices ({sp.unit}, relative to the centre; x,y per line)</label>
+                          <textarea rows={4} data-testid="pillar-section-polygon" key={sp.id + (sp.sectionPolygon?.length ?? 0)}
+                            defaultValue={(sp.sectionPolygon ?? []).map(v => v.join(',')).join('\n')}
+                            placeholder={'-6,-6\n6,-6\n0,6'}
+                            onBlur={e => {
+                              const vs = e.target.value.split('\n').map(l => l.split(',').map(Number)).filter(a => a.length === 2 && a.every(Number.isFinite)) as Array<[number, number]>;
+                              updateActiveFloorPillar({ sectionPolygon: vs.length >= 3 ? vs : undefined });
+                            }}
+                            className="block w-full px-2 py-1 rounded border border-gray-300 text-xs font-mono focus:ring-orange-500" />
+                          <span className="text-[9px] text-gray-500">At least 3 vertices; fewer falls back to the rectangle.</span>
+                        </div>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        {numIn('Rotation (deg)', sp.rotationDeg, 'rotationDeg', 'Plan rotation about the vertical axis')}
+                        {numIn('Top size (% of base)', sp.taperTopRatio, 'taperTopRatio', 'Taper: 30 - 100%', 30, 100, 100)}
+                        {numIn(`Top offset X (${sp.unit})`, sp.inclineX, 'inclineX', 'Incline: horizontal offset of the top')}
+                        {numIn(`Top offset Y (${sp.unit})`, sp.inclineY, 'inclineY', 'Incline: horizontal offset of the top')}
+                      </div>
+                      <span className="text-[9px] text-gray-500 leading-tight block">Concrete and formwork use the real geometry. Capacity is checked on a rectangle of the same area (WARNING). Plaster and the rebar cage are not drawn for shaped columns.</span>
+                    </div>
+                  );
+                })()}
+
                 {/* ---------------- Reinforcement (automatic, with optional user override) ---------------- */}
                 {selectedPillarId && (() => {
                   const calc = result?.structuralSummary?.pillarsCalculations?.find(c => c.pillarId === selectedPillarId);
@@ -9280,7 +9341,9 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                     const drawD = convertUnit(p.depth, p.unit, model.buildingUnit);
                     return (
                       <g key={`foundation-pillar-ref-${p.id}`} className="pointer-events-none opacity-85">
-                        {p.shape === 'circular' ? (
+                        {isSpecialColumn(p) ? (
+                          <polygon points={specialColumnPlanPoints(p, effPos, model.buildingUnit, false)} fill="#475569" stroke="#1e293b" strokeWidth="0.18" />
+                        ) : p.shape === 'circular' ? (
                           <circle cx={effPos.x} cy={effPos.y} r={Math.max(drawW, drawD) / 2} fill="#475569" stroke="#1e293b" strokeWidth="0.18" />
                         ) : (
                           <rect x={effPos.x - drawW / 2} y={effPos.y - drawD / 2} width={drawW} height={drawD} fill="#475569" stroke="#1e293b" strokeWidth="0.18" />
@@ -9408,7 +9471,20 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                           className="animate-pulse"
                         />
                       )}
-                      {p.shape === 'circular' ? (
+                      {isSpecialColumn(p) ? (
+                        <>
+                          {(columnTaperRatio(p) < 1 || p.inclineX || p.inclineY) && (
+                            <polygon points={specialColumnPlanPoints(p, effPos, model.buildingUnit, true)} fill="none" stroke="#f97316" strokeWidth="0.12" strokeDasharray="0.3,0.3" className="pointer-events-none" />
+                          )}
+                          <polygon
+                            points={specialColumnPlanPoints(p, effPos, model.buildingUnit, false)}
+                            fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : (isLocked ? "#b45309" : "#475569"))}
+                            stroke={isDeleteMode ? "#f87171" : (isSelected ? "#38bdf8" : (isLocked ? "#f59e0b" : "#1e293b"))}
+                            strokeWidth={isSelected || isDeleteMode || isLocked ? "0.25" : "0.15"}
+                            className={isDeleteMode ? "hover:fill-red-700 transition-colors" : "hover:fill-slate-600 transition-colors"}
+                          />
+                        </>
+                      ) : p.shape === 'circular' ? (
                         <circle
                           cx={effPos.x} cy={effPos.y} r={Math.max(drawW, drawD) / 2}
                           fill={isDeleteMode ? "#ef4444" : (isSelected ? "#0284c7" : (isLocked ? "#b45309" : "#475569"))} 

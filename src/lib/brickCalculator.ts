@@ -20,6 +20,7 @@ import { computeFoundationBasementDesign, isDetailedDesignRequested, type Founda
 import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
+import { columnVolumeM3 } from './columnGeometry';
 import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
 
 export function getConcreteMixRatios(grade: ConcreteGrade = 'M20'): { cement: number; sand: number; aggregate: number; ratioString: string } {
@@ -111,6 +112,16 @@ export interface Pillar {
   showLabel?: boolean;
   showRebar?: boolean;
   showBeam?: boolean;
+  /** Cross-section profile (default: the rectangle / circle given by width, depth and shape) */
+  sectionKind?: 'rect' | 'L' | 'T' | 'custom';
+  /** L / T leg thickness (same unit as width); custom outline vertices relative to the centre (same unit) */
+  sectionLegThickness?: number;
+  sectionPolygon?: Array<[number, number]>;
+  /** Plan rotation about the vertical axis (degrees), taper (top size / base size) and incline (top offset, same unit as width) */
+  rotationDeg?: number;
+  taperTopRatio?: number;
+  inclineX?: number;
+  inclineY?: number;
   includeInEstimate?: boolean;
   /** Load-bearing (structural) column. Default true; false = non-structural post: no footing is designed for it */
   loadBearing?: boolean;
@@ -2490,7 +2501,9 @@ export const calculatePillarsRcc = (
 
     // Concrete volume
     let volM3 = 0;
-    if (p.shape === 'circular') {
+    if ((p.sectionKind && p.sectionKind !== 'rect') || (p.taperTopRatio ?? 1) < 1 || p.inclineX || p.inclineY) {
+      volM3 = columnVolumeM3(p, pH_M, v => toMeters(v, p.unit || 'in')) * pCount;
+    } else if (p.shape === 'circular') {
       const r = Math.max(pW_M, pD_M) / 2;
       volM3 = Math.PI * r * r * pH_M * pCount;
     } else {

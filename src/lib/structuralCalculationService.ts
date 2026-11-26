@@ -14,6 +14,8 @@
  */
 
 import type { FoundationDetailsConfig, BasementConfig } from './foundation/types';
+import { columnSectionAreaM2, columnSectionPolygon, columnVolumeM3, columnAxisLengthM, columnTaperRatio } from './columnGeometry';
+import { polygonPerimeter, polygonBounds } from './foundation/polygon';
 import { columnRebarChecks, hasColumnRebarOverride, beamRebarChecks, hasBeamRebarOverride, type ColumnRebarOverride, type BeamRebarOverride, type RebarCheck } from './rebarChecks';
 
 export type Unit = 'mm' | 'cm' | 'm' | 'in' | 'ft';
@@ -347,6 +349,23 @@ export interface ColumnLoadBreakdown {
   columnSelfWeightKn: number;
   storeyServiceLoadKn: number; // per storey
 }
+
+/** True when the column has a non-rectangular section, a taper or an incline */
+const isShapedColumn = (p: { sectionKind?: string; taperTopRatio?: number; inclineX?: number; inclineY?: number }): boolean =>
+  (!!p.sectionKind && p.sectionKind !== 'rect') || (p.taperTopRatio ?? 1) < 1 || !!p.inclineX || !!p.inclineY;
+
+/** Rectangle of the same area as the smallest section of a shaped column, keeping the bounding-box ratio (mm) */
+const equivalentRectMm = (p: { width?: number; depth?: number; unit?: string; shape?: 'square' | 'rectangle' | 'circular'; sectionKind?: 'rect' | 'L' | 'T' | 'custom'; sectionLegThickness?: number; sectionPolygon?: Array<[number, number]>; taperTopRatio?: number; inclineX?: number; inclineY?: number }): { widthMm: number; depthMm: number } | undefined => {
+  if (!isShapedColumn(p)) return undefined;
+  const tm = (v: number) => toMeters(v, (p.unit as 'in') || 'in');
+  const geo = { ...p, width: p.width ?? 9, depth: p.depth ?? 9, unit: undefined };
+  const area = columnSectionAreaM2(geo, tm) * columnTaperRatio(p) ** 2;
+  const b = polygonBounds(columnSectionPolygon(geo, tm));
+  const w = b.x1 - b.x0, d = b.y1 - b.y0;
+  if (!(w > 0 && d > 0 && area > 0)) return undefined;
+  const k = Math.sqrt(area / (w * d));
+  return { widthMm: Math.round(w * k * 1000), depthMm: Math.round(d * k * 1000) };
+};
 
 export interface ColumnStructuralCalculation {
   pillarId: string;
@@ -1891,6 +1910,12 @@ export function calculateBuildingStructuralSummary(
     unit?: Unit;
     connectedWallIds?: string[];
     shape?: 'square' | 'rectangle' | 'circular';
+    sectionKind?: 'rect' | 'L' | 'T' | 'custom';
+    sectionLegThickness?: number;
+    sectionPolygon?: Array<[number, number]>;
+    taperTopRatio?: number;
+    inclineX?: number;
+    inclineY?: number;
     rebarOverride?: ColumnRebarOverride;
     concreteGrade?: ConcreteGrade;
     steelGrade?: SteelGrade;
@@ -2034,6 +2059,7 @@ export function calculateBuildingStructuralSummary(
       ? Math.round(toMeters(flSlab.thickness, flSlab.thicknessUnit || 'in') * 1000)
       : undefined;
 
+    const eqRect = equivalentRectMm(p);
     return calculatePillarStructuralDetails(
       p.id,
       p.name || `C${idx + 1}`,
@@ -2045,8 +2071,8 @@ export function calculateBuildingStructuralSummary(
       wallLenConnected,
       config,
       {
-        customWidthMm: (p.isCustomSize && p.width) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
-        customDepthMm: (p.isCustomSize && p.depth) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
+        customWidthMm: eqRect ? eqRect.widthMm : (p.isCustomSize && p.width) ? Math.round(toMeters(p.width, p.unit || 'in') * 1000) : undefined,
+        customDepthMm: eqRect ? eqRect.depthMm : (p.isCustomSize && p.depth) ? Math.round(toMeters(p.depth, p.unit || 'in') * 1000) : undefined,
         floorHeights: floorHeightsM,
         isGroundLevel: isGround,
         supportedFloors,
@@ -2128,6 +2154,20 @@ export function calculateBuildingStructuralSummary(
       calc.concreteVolumeM3 = colWidthM * colDepthM * storeyH;
       calc.concreteVolumeCft = calc.concreteVolumeM3 * 35.3147;
       calc.formworkAreaM2 = 2 * (colWidthM + colDepthM) * storeyH;
+    }
+    // non-rectangular / tapered / inclined columns: actual concrete and formwork from the real geometry
+    if (isShapedColumn(p)) {
+      const tm = (v: number) => toMeters(v, p.unit || 'in');
+      const H = p.height ? toMeters(p.height, p.heightUnit || 'ft') : 3.0;
+      const gp = { ...p, width: p.width ?? 9, depth: p.depth ?? 9, unit: undefined };
+      calc.concreteVolumeM3 = columnVolumeM3(gp, H, tm);
+      calc.concreteVolumeCft = calc.concreteVolumeM3 * 35.3147;
+      const per = p.shape === 'circular' && (p.sectionKind ?? 'rect') === 'rect' ? Math.PI * tm(gp.width) : polygonPerimeter(columnSectionPolygon(gp, tm));
+      calc.formworkAreaM2 = per * columnAxisLengthM(gp, H, tm) * ((1 + columnTaperRatio(p)) / 2);
+      calc.rebarChecks = [...(calc.rebarChecks || []), {
+        id: 'shaped_section', label: 'Shaped / tapered / inclined column', clause: 'IS 456 Cl. 25, 26.5.3', status: 'WARNING',
+        note: 'Capacity and bar fit are checked on a rectangle of the same area as the smallest section (width / depth ratio kept); biaxial bending, the real centroid and the skew of an inclined axis are not analysed.',
+      }];
     }
   });
 

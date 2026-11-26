@@ -132,9 +132,9 @@
     "semantic_hash": "66dc87c8bf8d724995f25f1e701c901b"
   },
   "src/components/calculator/BuildingEditor.tsx": {
-    "mtime": 1795716420.5968697,
-    "seen": 1795716445.0836885,
-    "ast_hash": "bb0999a77362ae76380c245c5bc840a7",
+    "mtime": 1795717847.8798895,
+    "seen": 1795717889.4679422,
+    "ast_hash": "416000cc46b7f26dfe63a1ae7d29e506",
     "semantic_hash": ""
   },
   "src/components/calculator/CalculatorContext.tsx": {
