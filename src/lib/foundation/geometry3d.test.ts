@@ -348,3 +348,20 @@ describe('Strap footings through the building pipeline (3 × 3 grid)', () => {
     expect(d.bbs!.rows.some(r => r.member.startsWith('STRAP-') && r.shape === 'stirrup')).toBe(true);
   });
 });
+
+describe('Strip footings through the building pipeline (3 × 3 grid)', () => {
+  const GRID: Array<[number, number]> = [[0, 0], [20, 0], [40, 0], [0, 15], [20, 15], [40, 15], [0, 30], [20, 30], [40, 30]];
+  const d = designOf({ foundationType: 'strip', foundationDetails: { selectionMode: 'manual', columnLoadSource: 'frame', groundwaterDepthM: 8 } as any }, 2, GRID);
+
+  it('three strips along x, drawn without overlapping solids, with a pedestal per column', () => {
+    const strips = d.foundation!.elements.filter(e => e.elementType === 'strip_footing');
+    expect(strips.length).toBe(3);
+    const g = geo(d, sceneCols(d));
+    expect(findBoxOverlaps(g.boxes)).toEqual([]);
+    expect(g.boxes.filter(b => b.kind === 'pedestal').length).toBe(9);
+  });
+
+  it('BBS schedules transverse distribution steel between the column bands', () => {
+    expect(d.bbs!.rows.some(r => r.member.startsWith('SF-ROW-') && r.mark.endsWith('-TD'))).toBe(true);
+  });
+});

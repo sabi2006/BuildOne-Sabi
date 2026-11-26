@@ -416,9 +416,10 @@ describe('designFoundation – automatic selection and orchestration', () => {
     expect(r.elements.every(e => e.checks.some(c => c.id === 'footing_overlap'))).toBe(true);
   });
 
-  it('strip and strap footings are NOT_VERIFIED, not guessed', () => {
+  it('a strip layout with a single column falls back to an isolated footing (nothing to make continuous)', () => {
     const r = designFoundation([col('a', 0, 0, 600)], params({ requestedType: 'strip' }));
-    expect(r.status).toBe('NOT_VERIFIED');
+    expect(r.elements.length).toBe(1);
+    expect(r.elements[0].elementType).toBe('isolated_footing');
   });
 
   it('missing SBC or foundation depth is NOT_VERIFIED, not a made-up size', () => {

@@ -190,8 +190,8 @@ export function buildFoundationBBS(
     }, o.wDiv));
   });
 
-  // combined footing: minimum transverse distribution steel outside the column bands (not part of the design layers)
-  if (el.system === 'combined' && el.sizeXM && el.sizeYM && el.effectiveDepthMm) {
+  // combined / strip footing: minimum transverse distribution steel outside the column bands (not part of the design layers)
+  if ((el.system === 'combined' || el.system === 'strip') && el.sizeXM && el.sizeYM && el.effectiveDepthMm) {
     const longLayer = el.reinforcement.find(l => l.role === 'main');
     const bands = el.reinforcement.filter(l => l.role === 'band');
     if (longLayer && bands.length) {

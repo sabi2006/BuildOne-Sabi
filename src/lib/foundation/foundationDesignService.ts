@@ -662,72 +662,83 @@ export function designCombinedFooting(
   c1In: FoundationColumnInput, c2In: FoundationColumnInput, p: FoundationDesignParams,
   opt: Resolved = resolveOptions(p.options)
 ): FoundationElementResult {
-  const cols = [c1In, c2In];
-  const id = `CF-${c1In.name ?? c1In.id}+${c2In.name ?? c2In.id}`;
-  const dx = Math.abs(c2In.xM - c1In.xM), dy = Math.abs(c2In.yM - c1In.yM);
+  return designContinuousFooting([c1In, c2In], p, opt, 'combined');
+}
+
+/**
+ * Combined / strip (continuous) footing under two or more columns on one grid line, analysed as an inverted continuous
+ * beam on a linearly varying soil pressure (rigid footing). Transverse bending by the textbook band method.
+ *  kind 'combined': elementType combined_footing; kind 'strip': elementType strip_footing (excavated as a trench).
+ */
+export function designContinuousFooting(
+  colsIn: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options),
+  kind: 'combined' | 'strip' = 'combined'
+): FoundationElementResult {
+  const n = colsIn.length;
+  const isStrip = kind === 'strip';
+  const elType: StructuralElementIdentity['elementType'] = isStrip ? 'strip_footing' : 'combined_footing';
+  const system: FoundationSystem = isStrip ? 'strip' : 'combined';
+  const id = isStrip ? `SF-ROW-${colsIn.map(c => c.name ?? c.id).join('+')}` : `CF-${colsIn.map(c => c.name ?? c.id).join('+')}`;
+  if (n < 2) return unverified(id, elType, system, colsIn, p, 'A combined / strip footing needs at least two columns.');
+  const xs = colsIn.map(c => c.xM), ys = colsIn.map(c => c.yM);
+  const spanX = Math.max(...xs) - Math.min(...xs), spanY = Math.max(...ys) - Math.min(...ys);
   const tol = 0.05;
-  const alongX = dx >= dy;
-  if ((alongX ? dy : dx) > tol) {
-    return unverified(id, 'combined_footing', 'combined', cols, p, 'Columns are not aligned along a grid axis: combined footing design is only implemented for two axis-aligned columns. Consider a raft.');
+  const alongX = spanX >= spanY;
+  if ((alongX ? spanY : spanX) > tol) {
+    return unverified(id, elType, system, colsIn, p, n === 2
+      ? 'Columns are not aligned along a grid axis: combined footing design is only implemented for two axis-aligned columns. Consider a raft.'
+      : 'Columns are not on one grid line: a combined / strip footing needs collinear columns. Consider a raft.');
   }
-  // local axes: u along the line joining the columns, v transverse
-  const [a, b] = alongX
-    ? (c1In.xM <= c2In.xM ? [c1In, c2In] : [c2In, c1In])
-    : (c1In.yM <= c2In.yM ? [c1In, c2In] : [c2In, c1In]);
-  const s = alongX ? Math.abs(b.xM - a.xM) : Math.abs(b.yM - a.yM);
-  const cu1 = alongX ? a.widthMm : a.depthMm, cu2 = alongX ? b.widthMm : b.depthMm;
-  const ct1 = alongX ? a.depthMm : a.widthMm, ct2 = alongX ? b.depthMm : b.widthMm;
-  const P1 = a.serviceLoadKn, P2 = b.serviceLoadKn, Pu1 = a.factoredLoadKn, Pu2 = b.factoredLoadKn;
-  const S = P1 + P2;
-  if (!(S > 0)) return unverified(id, 'combined_footing', 'combined', cols, p, 'Column loads are zero or missing.');
+  // local axes: u along the line of the columns, v transverse; columns sorted along u
+  const cols = [...colsIn].sort((a, b) => (alongX ? a.xM - b.xM : a.yM - b.yM));
+  const u0 = alongX ? cols[0].xM : cols[0].yM;
+  const xr = cols.map(c => (alongX ? c.xM : c.yM) - u0);          // positions from the first column
+  const cu = cols.map(c => (alongX ? c.widthMm : c.depthMm));       // sizes along u, mm
+  const ct = cols.map(c => (alongX ? c.depthMm : c.widthMm));       // sizes across, mm
+  const P = cols.map(c => c.serviceLoadKn), Pu = cols.map(c => c.factoredLoadKn);
+  const S = P.reduce((a, b) => a + b, 0);
+  if (!(S > 0)) return unverified(id, elType, system, colsIn, p, 'Column loads are zero or missing.');
   const cover = p.clearCoverMm;
   const fck = fckOf(p.concreteGrade);
   const edge = opt.minEdgeBeyondColumnMm / 1000;
-  const xbar = (P2 * s) / S;
-  const e1 = Math.max(cu1 / 2000 + edge, cu2 / 2000 + edge - (s * (P2 - P1)) / S);
+  const xbar = P.reduce((s, pi, i) => s + pi * xr[i], 0) / S;
+  const last = n - 1;
+  const halfL0 = Math.max(xbar + cu[0] / 2000 + edge, xr[last] - xbar + cu[last] / 2000 + edge);
 
-  // Load combinations (wind / earthquake). Used only when both columns carry matching combinations; otherwise the
-  // original gravity design (uniform pressure, resultant at the centroid) is unchanged.
-  const hasCombos = !!a.combos?.length && !!b.combos?.length && a.combos.every(c => b.combos!.some(x => x.name === c.name));
+  // Load combinations (wind / earthquake), used only when every column carries the same combinations
+  const hasCombos = cols.every(c => c.combos?.length) && cols[0].combos!.every(cb => cols.every(c => c.combos!.some(x => x.name === cb.name)));
   const latF = Math.max(1, p.lateralSbcIncrease ?? 1);
-  // moments about the axis transverse to the line of the columns bend the footing lengthwise; about the line itself they tilt it sideways
   const mU = (c: ColumnCombo) => Math.abs(alongX ? c.momentYKnM : c.momentXKnM);
   const mV = (c: ColumnCombo) => Math.abs(alongX ? c.momentXKnM : c.momentYKnM);
-  type Scen = { name: string; P1: number; P2: number; Mu1: number; Mu2: number; Mv: number; f: number; uniform: boolean };
-  const scenOf = (limit: 'service' | 'ultimate'): Scen[] => a.combos!.filter(c => c.limit === limit).map(c => {
-    const d = b.combos!.find(x => x.name === c.name)!;
-    return { name: c.name, P1: c.axialKn, P2: d.axialKn, Mu1: mU(c), Mu2: mU(d), Mv: mV(c) + mV(d), f: limit === 'service' && c.lateral ? latF : 1, uniform: false };
+  type Scen = { name: string; P: number[]; Mu: number[]; Mv: number; f: number; uniform: boolean };
+  const scenOf = (limit: 'service' | 'ultimate'): Scen[] => cols[0].combos!.filter(c => c.limit === limit).map(c => {
+    const per = cols.map(col => col.combos!.find(x => x.name === c.name)!);
+    return { name: c.name, P: per.map(x => x.axialKn), Mu: per.map(mU), Mv: per.reduce((s, x) => s + mV(x), 0), f: limit === 'service' && c.lateral ? latF : 1, uniform: false };
   });
   const svcScen: Scen[] = hasCombos ? scenOf('service') : [];
-  const ultScen: Scen[] = hasCombos ? scenOf('ultimate') : [{ name: '1.5 × service load', P1: Pu1, P2: Pu2, Mu1: 0, Mu2: 0, Mv: 0, f: 1, uniform: true }];
-  const PuMax1 = hasCombos ? Math.max(Pu1, ...ultScen.map(c => c.P1)) : Pu1;
-  const PuMax2 = hasCombos ? Math.max(Pu2, ...ultScen.map(c => c.P2)) : Pu2;
+  const ultScen: Scen[] = hasCombos ? scenOf('ultimate') : [{ name: '1.5 × service load', P: Pu, Mu: Pu.map(() => 0), Mv: 0, f: 1, uniform: true }];
+  const PuMax = cols.map((_, i) => (hasCombos ? Math.max(Pu[i], ...ultScen.map(c => c.P[i])) : Pu[i]));
 
   for (let D = Math.max(opt.minFootingDepthMm, 400); D <= MAX_DEPTH_MM; D += 25) {
     const Dm = D / 1000;
     const { qAvail } = availablePressure(p, Dm);
-    if (qAvail <= 0) return failed(id, 'combined_footing', 'combined', cols, p, 'Bearing capacity consumed by overburden at this founding depth.');
-    // Start from the minimum length that puts the resultant at the centroid. Extend symmetrically
-    // (centroid stays on the resultant) until the footing is no wider than it is long.
-    let L = ceilTo(2 * (xbar + e1), 0.05);
-    const minB = ceilTo(Math.max(ct1, ct2) / 1000 + 0.3, 0.05);
+    if (qAvail <= 0) return failed(id, elType, system, colsIn, p, 'Bearing capacity consumed by overburden at this founding depth.');
+    // minimum length with the resultant at the centroid; for two columns extend until the footing is no wider than long
+    let L = ceilTo(2 * halfL0, 0.05);
+    const minB = ceilTo(Math.max(...ct) / 1000 + 0.3, 0.05);
     let B = Math.max(ceilTo(S / (qAvail * L), 0.05), minB);
     for (let it = 0; it < 400 && B > L; it++) {
       L = round(L + 0.1, 2);
       B = Math.max(ceilTo(S / (qAvail * L), 0.05), minB);
     }
-    // With combinations, enlarge the plan (about the gravity resultant) until every service combination keeps the
-    // pressure within the available pressure with no tension, and every ultimate combination has its resultant in the kern
-    // (so the linear pressure diagram used below has no negative part). Column moments are taken in magnitude and both
-    // senses are tried, so no sign convention is assumed.
     let qmaxSvc = S / (L * B), govSvc = 'service load';
     if (hasCombos) {
       for (let it = 0; it < 300; it++) {
-        const uc1 = -(xbar - L / 2), uc2 = uc1 + s;
+        const uc = xr.map(x => -(xbar - L / 2) + x);
         let ok = true, worst = -Infinity;
         for (const sc of [...svcScen, ...ultScen]) for (const sg of [1, -1]) {
-          const Pt = sc.P1 + sc.P2;
-          const Mc = sc.P1 * (uc1 - L / 2) + sc.P2 * (uc2 - L / 2) - sg * (sc.Mu1 + sc.Mu2);
+          const Pt = sc.P.reduce((a, b) => a + b, 0);
+          const Mc = sc.P.reduce((s, pi, i) => s + pi * (uc[i] - L / 2), 0) - sg * sc.Mu.reduce((a, b) => a + b, 0);
           const q0 = Pt / (L * B), k = (6 * Math.abs(Mc)) / (Pt * L) + (6 * sc.Mv) / (Pt * B);
           if (q0 * (1 - k) < 0) ok = false;
           if (svcScen.includes(sc)) {
@@ -740,34 +751,32 @@ export function designCombinedFooting(
       }
     }
 
-    const left = xbar - L / 2; // footing left edge relative to column a (negative)
-    const u1 = -left, u2 = -left + s; // column positions measured from left edge
-    // Ultimate pressure profiles: line load w(u) = A0 + Bk (u − L/2), shear and bending moment from the left edge. Column
-    // moments act as point couples. Equilibrium: M(L) = 0 and V(L) = 0 by construction.
-    type Prof = { name: string; P1: number; P2: number; evF: number; w: (u: number) => number; V: (u: number) => number; M: (u: number) => number };
+    const left = xbar - L / 2; // footing start relative to the first column (negative)
+    const uPos = xr.map(x => -left + x); // column positions from the footing start
+    type Prof = { name: string; P: number[]; evF: number; w: (u: number) => number; V: (u: number) => number; M: (u: number) => number };
     const profiles: Prof[] = ultScen.flatMap(sc => (sc.uniform ? [1] : [1, -1]).map(sg => {
-      const Pt = sc.P1 + sc.P2;
-      const c1 = sc.uniform ? 0 : sg * sc.Mu1, c2 = sc.uniform ? 0 : sg * sc.Mu2;
-      const Mc = sc.uniform ? 0 : sc.P1 * (u1 - L / 2) + sc.P2 * (u2 - L / 2) - (c1 + c2);
+      const Pt = sc.P.reduce((a, b) => a + b, 0);
+      const cpl = sc.Mu.map(m => (sc.uniform ? 0 : sg * m));
+      const Mc = sc.uniform ? 0 : sc.P.reduce((s, pi, i) => s + pi * (uPos[i] - L / 2), 0) - cpl.reduce((a, b) => a + b, 0);
       const A0 = Pt / L, Bk = (12 * Mc) / (L ** 3);
       return {
-        name: sc.name, P1: sc.P1, P2: sc.P2,
+        name: sc.name, P: sc.P,
         evF: sc.uniform ? 1 : 1 + (6 * sc.Mv) / (Pt * B),
         w: (u: number) => A0 + Bk * (u - L / 2),
-        V: (u: number) => A0 * u + Bk * (u * u / 2 - (L * u) / 2) - (u > u1 ? sc.P1 : 0) - (u > u2 ? sc.P2 : 0),
-        M: (u: number) => (A0 * u * u) / 2 + Bk * (u ** 3 / 6 - (L * u * u) / 4) - (u > u1 ? sc.P1 * (u - u1) + c1 : 0) - (u > u2 ? sc.P2 * (u - u2) + c2 : 0),
+        V: (u: number) => A0 * u + Bk * (u * u / 2 - (L * u) / 2) - sc.P.reduce((s, pi, i) => s + (u > uPos[i] ? pi : 0), 0),
+        M: (u: number) => (A0 * u * u) / 2 + Bk * (u ** 3 / 6 - (L * u * u) / 4)
+          - sc.P.reduce((s, pi, i) => s + (u > uPos[i] ? pi * (u - uPos[i]) + cpl[i] : 0), 0),
       };
     }));
     const quProf = (pr: Prof) => (Math.max(pr.w(0), pr.w(L)) / B) * pr.evF;
     const qu = Math.max(...profiles.map(quProf));
     const govUlt = profiles.reduce((x, y) => (quProf(y) > quProf(x) ? y : x), profiles[0]).name;
 
-    // moments: sagging at outer column faces, hogging between the columns
-    const faces = [u1 - cu1 / 2000, u1 + cu1 / 2000, u2 - cu2 / 2000, u2 + cu2 / 2000];
+    const faces = uPos.flatMap((u, i) => [u - cu[i] / 2000, u + cu[i] / 2000]);
     const mSag = Math.max(0, ...profiles.flatMap(pr => faces.map(pr.M)));
     let mHog = 0;
     for (const pr of profiles) for (let k = 0; k <= 2000; k++) {
-      const u = u1 + (k / 2000) * (u2 - u1);
+      const u = uPos[0] + (k / 2000) * (uPos[last] - uPos[0]);
       mHog = Math.max(mHog, -pr.M(u));
     }
 
@@ -785,63 +794,50 @@ export function designCombinedFooting(
       const spBot = nBot > 1 ? (bMm - 2 * cover) / (nBot - 1) : Infinity;
       const spTop = nTop > 1 ? (bMm - 2 * cover) / (nTop - 1) : Infinity;
       if ((nBot > 1 && spBot < 100) || (nTop > 1 && spTop < 100)) continue;
-      // spacing cap: widen count so spacing <= min(3d, 300)
       const maxSp = Math.min(3 * d, 300);
       const nBotF = Math.max(nBot, Math.ceil((bMm - 2 * cover) / maxSp) + 1);
       const nTopF = Math.max(nTop, Math.ceil((bMm - 2 * cover) / maxSp) + 1);
       const astBotProv = nBotF * area, astTopProv = nTopF * area;
 
-      // one-way shear at d from column faces (use least provided long. steel for pt)
       const ptShear = (100 * Math.min(astBotProv, astTopProv)) / (bMm * d);
       const tcShear = tauCMpa(ptShear, p.concreteGrade);
-      const secs = [u1 - cu1 / 2000 - d / 1000, u1 + cu1 / 2000 + d / 1000, u2 - cu2 / 2000 - d / 1000, u2 + cu2 / 2000 + d / 1000]
-        .filter(u => u > 0 && u < L);
+      const secs = uPos.flatMap((u, i) => [u - cu[i] / 2000 - d / 1000, u + cu[i] / 2000 + d / 1000]).filter(u => u > 0 && u < L);
       const vMax = Math.max(0, ...profiles.flatMap(pr => secs.map(u => Math.abs(pr.V(u)))));
       const tvShear = (vMax * 1000) / (bMm * d);
       if (tvShear > tcShear) break;
 
-      // punching at d/2 around each column
       const lMm = L * 1000;
       const bounds = { x0: 0, x1: lMm, y0: 0, y1: bMm };
-      const pun = [
-        { k: 0, cu: cu1, ct: ct1, uc: u1 * 1000 },
-        { k: 1, cu: cu2, ct: ct2, uc: u2 * 1000 },
-      ].map(c => {
-        const cp = criticalPerimeter(c.cu, c.ct, c.uc, bMm / 2, d, bounds);
-        const vp = Math.max(0, ...profiles.map(pr => (c.k === 0 ? pr.P1 : pr.P2) - ((pr.w(c.uc / 1000) / B) * pr.evF) * cp.areaM2));
-        return {
-          tv: (vp * 1000) / (cp.b0Mm * d),
-          tc: punchingAllowableMpa(Math.min(c.cu, c.ct), Math.max(c.cu, c.ct), p.concreteGrade),
-        };
+      const pun = cols.map((_, i) => {
+        const cp = criticalPerimeter(cu[i], ct[i], uPos[i] * 1000, bMm / 2, d, bounds);
+        const vp = Math.max(0, ...profiles.map(pr => pr.P[i] - ((pr.w(uPos[i]) / B) * pr.evF) * cp.areaM2));
+        return { tv: (vp * 1000) / (cp.b0Mm * d), tc: punchingAllowableMpa(Math.min(cu[i], ct[i]), Math.max(cu[i], ct[i]), p.concreteGrade) };
       });
       if (pun.some(x => x.tv > x.tc)) break;
 
-      // transverse bands: width cu + d under each column (textbook band method)
-      const bands = [
-        { P: Math.max(...profiles.map(pr => pr.P1 * pr.evF)), cu: cu1, ct: ct1 },
-        { P: Math.max(...profiles.map(pr => pr.P2 * pr.evF)), cu: cu2, ct: ct2 },
-      ].map((c, i) => {
-        const bw = Math.min(c.cu + d, lMm);
-        const aT = (bMm - c.ct) / 2000; // m
-        const Mt = (c.P / B) * aT * aT / 2;
-        const dT = d; // transverse bars lie on top of longitudinal: same inner depth (conservative)
-        const limT = muLimitKnM(bw, dT, p.concreteGrade, p.steelGrade);
-        const fl = flexureAstMm2(Mt, bw, dT, p.concreteGrade, p.steelGrade);
+      // transverse bands: width column + d, not more than the distance to the neighbouring columns
+      const gapTo = (i: number) => Math.min(i > 0 ? (uPos[i] - uPos[i - 1]) * 1000 : Infinity, i < last ? (uPos[i + 1] - uPos[i]) * 1000 : Infinity);
+      const bands = cols.map((_, i) => {
+        const bw = Math.min(cu[i] + d, lMm, gapTo(i));
+        const aT = (bMm - ct[i]) / 2000;
+        const Pb = Math.max(...profiles.map(pr => pr.P[i] * pr.evF));
+        const Mt = (Pb / B) * aT * aT / 2;
+        const limT = muLimitKnM(bw, d, p.concreteGrade, p.steelGrade);
+        const fl = flexureAstMm2(Mt, bw, d, p.concreteGrade, p.steelGrade);
         const ast = Math.max(fl.astMm2, MIN_STEEL_FRACTION_HYSD * bw * D);
         return { i, bw, Mt, ast, ok: Mt <= limT && isFinite(ast) };
       });
       if (bands.some(x => !x.ok)) break;
       const bandLayers = bands.map(bd => {
-        const n = Math.max(Math.ceil(bd.ast / area), 2);
-        return { ...bd, n, astProv: n * area, spacing: (bd.bw - 2 * cover) / Math.max(n - 1, 1) };
+        const nb = Math.max(Math.ceil(bd.ast / area), 2);
+        return { ...bd, n: nb, astProv: nb * area, spacing: (bd.bw - 2 * cover) / Math.max(nb - 1, 1) };
       });
       if (bandLayers.some(x => x.spacing < 100)) continue;
 
       // ------------------------- build result -------------------------
-      const e = baseElement(id, 'combined_footing', 'combined', cols, p);
-      // plan rectangle in global coords
-      const uStart = (alongX ? a.xM : a.yM) + left;
-      const vCentre = alongX ? (a.yM + b.yM) / 2 : (a.xM + b.xM) / 2;
+      const e = baseElement(id, elType, system, colsIn, p);
+      const uStart = u0 + left;
+      const vCentre = alongX ? ys.reduce((a, b) => a + b, 0) / n : xs.reduce((a, b) => a + b, 0) / n;
       e.plan = alongX
         ? { x0: uStart, x1: uStart + L, y0: vCentre - B / 2, y1: vCentre + B / 2 }
         : { x0: vCentre - B / 2, x1: vCentre + B / 2, y0: uStart, y1: uStart + L };
@@ -867,11 +863,11 @@ export function designCombinedFooting(
         })),
       ];
 
-      const colArea1 = cu1 * ct1, colArea2 = cu2 * ct2;
+      const colAreas = cols.map((_, i) => cu[i] * ct[i]);
       const dowelDia = p.columnBarDiaMm ?? 16;
       const ldComp = developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade);
       const availDowel = D - cover - 2 * phi;
-      const dowelReq = 0.005 * Math.max(colArea1, colArea2);
+      const dowelReq = 0.005 * Math.max(...colAreas);
       e.dowels = { requiredAreaMm2: Math.round(dowelReq), diaMm: dowelDia, minBars: Math.max(4, Math.ceil(dowelReq / barAreaMm2(dowelDia))), developmentLengthMm: ldComp, availableLengthMm: availDowel };
 
       const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
@@ -891,8 +887,8 @@ export function designCombinedFooting(
       pun.forEach((x, i) => cks.push({ id: `punching_${i + 1}`, label: `Punching shear column ${i + 1}`, clause: 'IS 456 Cl. 31.6.3', status: 'PASS', demand: round(x.tv, 3), capacity: round(x.tc, 3), unit: 'N/mm²' }));
       cks.push({ id: 'transverse', label: 'Transverse band flexure', clause: 'textbook band method', status: 'WARNING',
         note: 'Transverse reinforcement uses the textbook band method (width = column + d), not a clause-prescribed method. Verify.' });
-      const bearingCap = (0.45 * fck * Math.min(colArea1, colArea2)) / 1000;
-      cks.push({ id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4.1', status: Math.min(PuMax1, PuMax2) <= bearingCap ? 'PASS' : 'WARNING', demand: round(Math.max(PuMax1, PuMax2), 1), capacity: round(bearingCap, 1), unit: 'kN' });
+      const bearingCap = (0.45 * fck * Math.min(...colAreas)) / 1000;
+      cks.push({ id: 'column_bearing', label: 'Bearing at column–footing interface', clause: 'IS 456 Cl. 34.4.1', status: Math.min(...PuMax) <= bearingCap ? 'PASS' : 'WARNING', demand: round(Math.max(...PuMax), 1), capacity: round(bearingCap, 1), unit: 'kN' });
       cks.push({ id: 'dowels', label: 'Dowel development length into footing', clause: 'IS 456 Cl. 34.4.3', status: availDowel >= ldComp ? 'PASS' : 'WARNING', demand: ldComp, capacity: availDowel, unit: 'mm' });
       if (hasCombos) {
         cks.push({ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS',
@@ -901,20 +897,25 @@ export function designCombinedFooting(
           note: 'Column moments are applied as point couples on the footing (magnitudes, both senses tried, all columns in the same sense). Moment transfer at the column (punching with moment) and the pressure across the width from sideways moments (taken as a linear increase of the band load) are simplified.' });
       } else {
         cks.push({ id: 'moments', label: 'Column moments / eccentricity', status: 'NOT_VERIFIED', note: 'Moments are not included in combined footing design.' });
-        cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? 'PASS' : 'WARNING',
-          note: Math.abs(Pu1 / P1 - Pu2 / P2) < 0.02 ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
+        const ratios = cols.map((_, i) => Pu[i] / P[i]);
+        const uniformRatio = Math.max(...ratios) - Math.min(...ratios) < 0.02;
+        cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: uniformRatio ? 'PASS' : 'WARNING',
+          note: uniformRatio ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
       }
       cks.push({ id: 'stability', label: 'Sliding / overturning / uplift', clause: 'IS 456 Cl. 20', status: 'NOT_VERIFIED', note: 'Checked for isolated footings only.' });
       cks.push(...commonChecks(p, true, { lengthM: L, widthM: B, qNetKnM2: S / (L * B) }));
 
       e.checks = cks;
       e.status = overallStatus(cks);
-      e.assumptions = [...COMMON_ASSUMPTIONS, 'Two axis-aligned columns; rectangular footing with load resultant at plan centroid; uniform factored pressure; footing analysed as an inverted beam.'];
+      e.assumptions = [...COMMON_ASSUMPTIONS, n === 2
+        ? 'Two axis-aligned columns; rectangular footing with load resultant at plan centroid; uniform factored pressure; footing analysed as an inverted beam.'
+        : `${n} columns on one grid line; rectangular ${isStrip ? 'strip' : 'combined'} footing with the load resultant at the plan centroid; rigid footing (linear soil pressure); analysed as an inverted continuous beam.`];
+      if (isStrip) e.assumptions.push('Excavated as one continuous trench (working space each side) along the strip.');
       e.warnings = cks.filter(c => c.status !== 'PASS' && c.note).map(c => `${c.label}: ${c.note}`);
       return e;
     }
   }
-  return failed(id, 'combined_footing', 'combined', cols, p, `No combined footing section found up to ${MAX_DEPTH_MM} mm thickness.`);
+  return failed(id, elType, system, colsIn, p, `No ${isStrip ? 'strip' : 'combined'} footing section found up to ${MAX_DEPTH_MM} mm thickness.`);
 }
 
 // ------------------------------ STRAP (eccentric boundary footing + strap beam + interior footing) ------------------------------
@@ -1250,6 +1251,29 @@ function designStrapLayout(cols: FoundationColumnInput[], p: FoundationDesignPar
   }
   if (pairs.length === 0) warnings.push('No boundary column with an inward partner on the same grid line: isolated footings used.');
   return [...strapEls, ...others];
+}
+
+/**
+ * Strip (continuous) footings: the columns are grouped into rows along the longer plan direction; every row of two or more
+ * columns gets one continuous footing (excavated as a trench); single columns get isolated footings.
+ */
+function designStripLayout(cols: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved, warnings: string[]): FoundationElementResult[] {
+  const fp = opt.buildingFootprint;
+  const xs = cols.map(c => c.xM), ys = cols.map(c => c.yM);
+  const lenX = fp ? fp.x1 - fp.x0 : Math.max(...xs) - Math.min(...xs);
+  const lenY = fp ? fp.y1 - fp.y0 : Math.max(...ys) - Math.min(...ys);
+  const rowsAlongX = lenX >= lenY;
+  const key = (c: FoundationColumnInput) => (rowsAlongX ? c.yM : c.xM);
+  const sorted = [...cols].sort((a, b) => key(a) - key(b));
+  const rows: FoundationColumnInput[][] = [];
+  for (const c of sorted) {
+    const r = rows.find(row => Math.abs(key(row[0]) - key(c)) <= 0.05);
+    if (r) r.push(c); else rows.push([c]);
+  }
+  const out: FoundationElementResult[] = [];
+  for (const r of rows) out.push(r.length >= 2 ? designContinuousFooting(r, p, opt, 'strip') : designIsolatedFooting(r[0], p, opt));
+  warnings.push(`Strip footings run along ${rowsAlongX ? 'x' : 'y'} (the longer plan direction): ${rows.filter(r => r.length >= 2).length} strip(s), ${rows.filter(r => r.length === 1).length} isolated footing(s).`);
+  return out;
 }
 
 // ------------------------------ RAFT (rigid, conservative strip method) ------------------------------
@@ -1603,8 +1627,7 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
       for (const g of overlapClusters(cols, isolatedMap)) {
         if (g.length === 1) elements.push(isolatedMap.get(g[0].id)!);
         else if (g.length === 2) elements.push(designCombinedFooting(g[0], g[1], params, opt));
-        else elements.push(unverified(`CF-${g.map(c => c.name ?? c.id).join('+')}`, 'combined_footing', 'combined', g, params,
-          `${g.length} columns have overlapping footings: combined footing design is only implemented for two columns. Use a raft.`));
+        else elements.push(designContinuousFooting(g, params, opt, 'combined')); // collinear groups; non-collinear → NOT_VERIFIED (use a raft)
       }
       // Auto mode: a combined footing that is larger than the isolated pair can now overlap a neighbouring footing.
       // Escalate to a raft rather than return a layout that overlaps.
@@ -1625,14 +1648,15 @@ export function designFoundation(columns: FoundationColumnInput[], params: Found
       break;
     }
     case 'strap': elements = designStrapLayout(cols, params, opt, warnings); break;
+    case 'strip': elements = designStripLayout(cols, params, opt, warnings); break;
     case 'raft': elements = [designRaftFoundation(cols, params, opt)]; break;
     case 'pile': elements = designPileFoundation(cols, params, opt); break;
     default:
-      elements = [unverified(`${selected.toUpperCase()}-1`, 'strip_footing', selected, cols, params, `${selected} footing design is not implemented.`)];
+      elements = [unverified(`${String(selected).toUpperCase()}-1`, 'strip_footing', selected as FoundationSystem, cols, params, `${String(selected)} footing design is not implemented.`)];
   }
 
   // plan-overlap check across all footing elements (not for raft/pile)
-  if (selected === 'isolated' || selected === 'combined' || selected === 'strap') {
+  if (selected === 'isolated' || selected === 'combined' || selected === 'strap' || selected === 'strip') {
     for (let i = 0; i < elements.length; i++) {
       for (let j = i + 1; j < elements.length; j++) {
         const a = elements[i], b = elements[j];
