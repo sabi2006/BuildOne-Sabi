@@ -25,7 +25,7 @@
 import type { ConcreteGrade, SteelGrade } from '../structuralCalculationService';
 import type { DesignStatus, PileInvestigationData, SbcBasis, StructuralElementIdentity } from './types';
 import type { ColumnCombo, CaseForces, CaseId } from './lateral';
-import { elasticSettlementMm, slidingFactorOfSafety, overturningCheck, upliftCheck } from './stability';
+import { elasticSettlementMm, slidingFactorOfSafety, upliftCheck } from './stability';
 import {
   fckOf, muLimitKnM, flexureAstMm2, tauCMpa, punchingAllowableMpa,
   developmentLengthTensionMm, developmentLengthCompressionMm, selectBarsPerMetre,
@@ -292,12 +292,14 @@ function settlementCheck(p: FoundationDesignParams, geom?: { lengthM: number; wi
 }
 
 /**
- * Sliding, overturning and uplift of an isolated footing (IS 456 Cl. 20), from the frame's per-case column base forces.
- * Footing weight and the soil on top of it resist (no soil above when a basement is excavated).
+ * Sliding, overturning and uplift of a footing / raft carrying one or more columns (IS 456 Cl. 20), from the frame's
+ * per-case column base forces. Footing weight and the soil on top of it resist (no soil above when a basement is
+ * excavated). Overturning about each footing edge: restoring = 0.9 × (Σ dead load × its distance from that edge + footing
+ * and soil weight × half the width); overturning = 1.2 × dead + 1.4 × imposed (wind / earthquake treated as imposed) column
+ * base moments + shears × footing depth, summed in magnitude.
  */
-function footingStabilityChecks(col: FoundationColumnInput, p: FoundationDesignParams, L: number, B: number, Dmm: number): DesignCheck[] {
-  const cf = col.caseForces;
-  if (!cf?.DL) {
+function footingStabilityChecks(cols: FoundationColumnInput[], p: FoundationDesignParams, plan: { x0: number; x1: number; y0: number; y1: number }, Dmm: number): DesignCheck[] {
+  if (!cols.length || !cols.every(c => c.caseForces?.DL)) {
     const note = 'Needs the frame analysis load cases (Column Load Source: Frame analysis).';
     return [
       { id: 'sliding', label: 'Sliding (FS ≥ 1.4, 0.9 × dead load)', clause: 'IS 456 Cl. 20.2', status: 'NOT_VERIFIED', note },
@@ -305,22 +307,28 @@ function footingStabilityChecks(col: FoundationColumnInput, p: FoundationDesignP
       { id: 'uplift', label: 'Uplift (0.9 × weight ≥ 1.2 × uplift)', clause: 'IS 456 Cl. 20.1 (applied to uplift)', status: 'NOT_VERIFIED', note },
     ];
   }
+  const L = plan.x1 - plan.x0, B = plan.y1 - plan.y0;
   const Dm = Dmm / 1000;
   const Wf = RCC_UNIT_WEIGHT * L * B * Dm;
   const soilH = p.basement ? 0 : Math.max(0, p.foundationDepthM - (Dmm + p.pccThicknessMm) / 1000);
   const Ws = p.soilUnitWeightKnM3 * L * B * soilH;
-  const dl = cf.DL, ll = cf.LL ?? { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 };
-  const lats = (['EQX', 'EQZ', 'WX', 'WZ'] as CaseId[]).filter(id => cf[id]).map(id => ({ id, f: cf[id]! }));
+  const zero: CaseForces = { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 };
+  const sumCase = (id: CaseId): CaseForces => cols.reduce((a, c) => {
+    const f = c.caseForces![id] ?? zero;
+    return { axialKn: a.axialKn + f.axialKn, momentXKnM: a.momentXKnM + f.momentXKnM, momentYKnM: a.momentYKnM + f.momentYKnM, shearXKn: a.shearXKn + f.shearXKn, shearYKn: a.shearYKn + f.shearYKn };
+  }, zero);
+  const dl = sumCase('DL'), ll = sumCase('LL');
+  const lats = (['EQX', 'EQZ', 'WX', 'WZ'] as CaseId[]).filter(id => cols.some(c => c.caseForces![id])).map(id => ({ id, f: sumCase(id) }));
   const hasLateral = lats.length > 0;
   const comb = (parts: Array<[CaseForces, number]>): CaseForces => parts.reduce((a, [f, k]) => ({
     axialKn: a.axialKn + k * f.axialKn, momentXKnM: a.momentXKnM + k * f.momentXKnM, momentYKnM: a.momentYKnM + k * f.momentYKnM,
     shearXKn: a.shearXKn + k * f.shearXKn, shearYKn: a.shearYKn + k * f.shearYKn,
-  }), { axialKn: 0, momentXKnM: 0, momentYKnM: 0, shearXKn: 0, shearYKn: 0 });
+  }), zero);
   const lateralNote = hasLateral ? '' : ' No wind/earthquake defined: horizontal forces are the gravity frame shears only.';
   const NDL = Math.max(0, dl.axialKn) + Wf + Ws;
   const cks: DesignCheck[] = [];
 
-  // sliding: worst service horizontal force
+  // sliding: worst service horizontal force on the whole footing
   const svc = [comb([[dl, 1], [ll, 1]]), ...lats.flatMap(l => [1, -1].map(sg => comb([[dl, 1], [ll, 1], [l.f, sg]])))];
   const H = Math.max(...svc.map(f => Math.hypot(f.shearXKn, f.shearYKn)));
   if (p.frictionAngleDeg === undefined) {
@@ -333,28 +341,33 @@ function footingStabilityChecks(col: FoundationColumnInput, p: FoundationDesignP
       note: `μ = tan φ (concrete cast on soil, δ = φ assumed; adhesion ignored). H = ${round(H, 1)} kN, dead load incl. footing and soil = ${round(NDL, 1)} kN.${lateralNote}` });
   }
 
-  // overturning about each footing axis: column base moment + shear × footing thickness
+  // overturning about each of the four footing edges
   const otAbout = (f: CaseForces, axis: 'x' | 'y') => axis === 'x'
     ? Math.abs(f.momentXKnM) + Math.abs(f.shearYKn) * Dm
     : Math.abs(f.momentYKnM) + Math.abs(f.shearXKn) * Dm;
   const imposed = [ll, ...lats.flatMap(l => [1, -1].map(sg => comb([[ll, 1], [l.f, sg]]))), ...lats.flatMap(l => [1, -1].map(sg => comb([[l.f, sg]])))];
-  let worst = { ratio: -Infinity, restoring: 0, required: 0, axis: 'x' as 'x' | 'y' };
+  let worst = { ratio: -Infinity, restoring: 0, required: 0, edge: '' };
   for (const axis of ['x', 'y'] as const) {
-    const lever = axis === 'x' ? B / 2 : L / 2;
-    const r = overturningCheck({ deadVerticalKn: NDL, leverM: lever, overturningDeadKnM: otAbout(dl, axis), overturningImposedKnM: Math.max(...imposed.map(f => otAbout(f, axis))) });
-    const ratio = r.requiredKnM / Math.max(r.restoringKnM, 1e-9);
-    if (ratio > worst.ratio) worst = { ratio, restoring: r.restoringKnM, required: r.requiredKnM, axis };
+    // overturning about an x-axis edge (y = y0 or y1) uses lever arms along y, and vice versa
+    const edges = axis === 'x' ? [plan.y0, plan.y1] : [plan.x0, plan.x1];
+    const reqOt = 1.2 * otAbout(dl, axis) + 1.4 * Math.max(...imposed.map(f => otAbout(f, axis)));
+    for (const edge of edges) {
+      const restoring = 0.9 * (cols.reduce((s, c) => s + Math.max(0, c.caseForces!.DL!.axialKn) * Math.abs((axis === 'x' ? c.yM : c.xM) - edge), 0)
+        + (Wf + Ws) * (axis === 'x' ? B : L) / 2);
+      const ratio = reqOt / Math.max(restoring, 1e-9);
+      if (ratio > worst.ratio) worst = { ratio, restoring, required: reqOt, edge: `${axis === 'x' ? 'y' : 'x'} = ${round(edge, 2)} m` };
+    }
   }
   cks.push({ id: 'overturning', label: 'Overturning (0.9 M_R ≥ 1.2 M_DL + 1.4 M_imposed)', clause: 'IS 456 Cl. 20.1',
     status: worst.required > worst.restoring ? 'FAIL' : hasLateral ? 'PASS' : 'WARNING', demand: round(worst.required, 1), capacity: round(worst.restoring, 1), unit: 'kN·m',
-    note: `About the footing ${worst.axis === 'x' ? 'x' : 'y'}-axis edge; wind/earthquake treated as imposed loads.${lateralNote}` });
+    note: `About the edge ${worst.edge}; wind/earthquake treated as imposed loads.${lateralNote}` });
 
-  // uplift: least axial force with dead load and a lateral case (no live load: more adverse)
+  // uplift: least total axial force with dead load and a lateral case (no live load: more adverse)
   const Nmin = Math.min(dl.axialKn, ...lats.flatMap(l => [1, -1].map(sg => dl.axialKn + sg * l.f.axialKn)));
   const up = upliftCheck({ resistingWeightKn: Wf + Ws, upliftKn: -Nmin });
   cks.push({ id: 'uplift', label: 'Uplift (0.9 × weight ≥ 1.2 × uplift)', clause: 'IS 456 Cl. 20.1 (applied to uplift)',
     status: up.ok ? (hasLateral ? 'PASS' : 'WARNING') : 'FAIL', demand: round(up.requiredKn, 1), capacity: round(up.resistingKn, 1), unit: 'kN',
-    note: Nmin >= 0 ? `No tension in the column in any combination (least axial ${round(Nmin, 1)} kN).${lateralNote}` : `Column tension ${round(-Nmin, 1)} kN resisted by footing + soil weight ${round(Wf + Ws, 1)} kN.${lateralNote}` });
+    note: Nmin >= 0 ? `No net tension on the footing in any combination (least total axial ${round(Nmin, 1)} kN).${lateralNote}` : `Net tension ${round(-Nmin, 1)} kN resisted by footing + soil weight ${round(Wf + Ws, 1)} kN.${lateralNote}` });
   return cks;
 }
 
@@ -640,7 +653,7 @@ export function designIsolatedFooting(
       cks.push({ id: 'founding_depth', label: 'Footing + PCC fits within founding depth', status: D + p.pccThicknessMm <= p.foundationDepthM * 1000 ? 'PASS' : 'WARNING',
         demand: D + p.pccThicknessMm, capacity: p.foundationDepthM * 1000, unit: 'mm',
         note: D + p.pccThicknessMm <= p.foundationDepthM * 1000 ? undefined : 'Footing top would be above ground level: increase founding depth or use a pedestal.' });
-      cks.push(...footingStabilityChecks(col, p, L, B, D));
+      cks.push(...footingStabilityChecks([col], p, e.plan!, D));
       cks.push(...commonChecks(p, momentsUsed, { lengthM: L, widthM: B, qNetKnM2: Ps / (L * B) }));
 
       e.checks = cks;
@@ -834,6 +847,35 @@ export function designContinuousFooting(
       });
       if (bandLayers.some(x => x.spacing < 100)) continue;
 
+      // user bar override (diameter / spacing), checked on this section without re-sizing it
+      const ov = p.barOverrides?.[id];
+      const ovOn = !!ov && !!(ov.diaMm || ov.spacingMm);
+      const phiE = ovOn && ov!.diaMm ? ov!.diaMm : phi;
+      const dE = ovOn ? D - cover - 1.5 * phiE : d;
+      const areaE = barAreaMm2(phiE);
+      const limE = ovOn ? muLimitKnM(bMm, dE, p.concreteGrade, p.steelGrade) : lim;
+      const reqE = (m: number) => (m <= limE ? Math.max(flexureAstMm2(m, bMm, dE, p.concreteGrade, p.steelGrade).astMm2, minAst) : Infinity);
+      const astBotE = ovOn ? reqE(mSag) : astBot, astTopE = ovOn ? reqE(mHog) : astTop;
+      const maxSpE = Math.min(3 * dE, 300);
+      const countFor = (req: number, widthMm: number) => ov?.spacingMm
+        ? Math.floor((widthMm - 2 * cover) / ov.spacingMm) + 1
+        : Math.max(Number.isFinite(req) ? Math.ceil(req / areaE) : 2, Math.ceil((widthMm - 2 * cover) / maxSpE) + 1);
+      const nBotE = ovOn ? countFor(astBotE, bMm) : nBotF, nTopE = ovOn ? countFor(astTopE, bMm) : nTopF;
+      const provBotE = nBotE * areaE, provTopE = nTopE * areaE;
+      const spLong = (nb: number) => (bMm - 2 * cover) / Math.max(nb - 1, 1);
+      const tvShearE = ovOn ? (Math.max(0, ...profiles.flatMap(pr => uPos.flatMap((u, i) => [u - cu[i] / 2000 - dE / 1000, u + cu[i] / 2000 + dE / 1000]).filter(u => u > 0 && u < L).map(u => Math.abs(pr.V(u))))) * 1000) / (bMm * dE) : tvShear;
+      const tcShearE = ovOn ? tauCMpa((100 * Math.min(provBotE, provTopE)) / (bMm * dE), p.concreteGrade) : tcShear;
+      const punE = ovOn ? cols.map((_, i) => {
+        const cp = criticalPerimeter(cu[i], ct[i], uPos[i] * 1000, bMm / 2, dE, bounds);
+        const vp = Math.max(0, ...profiles.map(pr => pr.P[i] - ((pr.w(uPos[i]) / B) * pr.evF) * cp.areaM2));
+        return { tv: (vp * 1000) / (cp.b0Mm * dE), tc: pun[i].tc };
+      }) : pun;
+      const bandLayersE = ovOn ? bands.map(bd => {
+        const req = Math.max(flexureAstMm2(bd.Mt, bd.bw, dE, p.concreteGrade, p.steelGrade).astMm2, MIN_STEEL_FRACTION_HYSD * bd.bw * D);
+        const nb = ov?.spacingMm ? Math.max(2, Math.floor((bd.bw - 2 * cover) / ov.spacingMm) + 1) : Math.max(Math.ceil(req / areaE), 2);
+        return { ...bd, ast: req, n: nb, astProv: nb * areaE, spacing: (bd.bw - 2 * cover) / Math.max(nb - 1, 1) };
+      }) : bandLayers;
+
       // ------------------------- build result -------------------------
       const e = baseElement(id, elType, system, colsIn, p);
       const uStart = u0 + left;
@@ -842,21 +884,21 @@ export function designContinuousFooting(
         ? { x0: uStart, x1: uStart + L, y0: vCentre - B / 2, y1: vCentre + B / 2 }
         : { x0: vCentre - B / 2, x1: vCentre + B / 2, y0: uStart, y1: uStart + L };
       e.sizeXM = e.plan.x1 - e.plan.x0; e.sizeYM = e.plan.y1 - e.plan.y0;
-      e.depthMm = D; e.effectiveDepthMm = d;
+      e.depthMm = D; e.effectiveDepthMm = dE;
       e.availablePressureKnM2 = round(qAvail, 2);
       e.maxServicePressureKnM2 = round(hasCombos ? qmaxSvc : S / (L * B), 2);
       e.factoredPressureKnM2 = round(qu, 2);
 
       const dirLong: 'x' | 'y' = alongX ? 'x' : 'y';
       const dirTrans: 'x' | 'y' = alongX ? 'y' : 'x';
-      const ld = developmentLengthTensionMm(phi, p.concreteGrade, p.steelGrade);
+      const ld = developmentLengthTensionMm(phiE, p.concreteGrade, p.steelGrade);
       e.reinforcement = [
-        { id: `${id}-LB`, location: 'bottom', direction: dirLong, role: 'main', diaMm: phi, count: nBotF, spacingMm: Math.floor((bMm - 2 * cover) / Math.max(nBotF - 1, 1)),
-          astRequiredMm2: round(astBot, 0), astProvidedMm2: round(astBotProv, 0), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ld },
-        { id: `${id}-LT`, location: 'top', direction: dirLong, role: 'main', diaMm: phi, count: nTopF, spacingMm: Math.floor((bMm - 2 * cover) / Math.max(nTopF - 1, 1)),
-          astRequiredMm2: round(astTop, 0), astProvidedMm2: round(astTopProv, 0), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ld },
-        ...bandLayers.map(bd => ({
-          id: `${id}-TB${bd.i + 1}`, location: 'bottom' as const, direction: dirTrans, role: 'band' as const, diaMm: phi, count: bd.n,
+        { id: `${id}-LB`, location: 'bottom', direction: dirLong, role: 'main', diaMm: phiE, count: nBotE, spacingMm: Math.floor(spLong(nBotE)),
+          astRequiredMm2: round(astBotE, 0), astProvidedMm2: round(provBotE, 0), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ld },
+        { id: `${id}-LT`, location: 'top', direction: dirLong, role: 'main', diaMm: phiE, count: nTopE, spacingMm: Math.floor(spLong(nTopE)),
+          astRequiredMm2: round(astTopE, 0), astProvidedMm2: round(provTopE, 0), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ld },
+        ...bandLayersE.map(bd => ({
+          id: `${id}-TB${bd.i + 1}`, location: 'bottom' as const, direction: dirTrans, role: 'band' as const, diaMm: phiE, count: bd.n,
           spacingMm: Math.floor(bd.spacing), astRequiredMm2: round(bd.ast, 0), astProvidedMm2: round(bd.astProv, 0),
           straightLengthMm: bMm - 2 * cover, zoneWidthMm: bd.bw, developmentLengthMm: ld,
           note: 'Transverse band under column (width = column + d), textbook band method.',
@@ -866,7 +908,7 @@ export function designContinuousFooting(
       const colAreas = cols.map((_, i) => cu[i] * ct[i]);
       const dowelDia = p.columnBarDiaMm ?? 16;
       const ldComp = developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade);
-      const availDowel = D - cover - 2 * phi;
+      const availDowel = D - cover - 2 * phiE;
       const dowelReq = 0.005 * Math.max(...colAreas);
       e.dowels = { requiredAreaMm2: Math.round(dowelReq), diaMm: dowelDia, minBars: Math.max(4, Math.ceil(dowelReq / barAreaMm2(dowelDia))), developmentLengthMm: ldComp, availableLengthMm: availDowel };
 
@@ -881,10 +923,15 @@ export function designContinuousFooting(
       const cks: DesignCheck[] = [];
       cks.push({ id: 'bearing_pressure', label: hasCombos ? 'Max service base pressure ≤ available pressure (every service combination)' : 'Service base pressure ≤ available pressure (resultant at footing centroid)', clause: 'IS 6403', status: 'PASS', demand: round(hasCombos ? qmaxSvc : S / (L * B), 2), capacity: round(qAvail, 2), unit: 'kN/m²',
         note: hasCombos ? `Governing service combination: ${govSvc}${latF > 1 ? ` (lateral combinations: available pressure increased ×${latF}, pressure shown divided by that factor)` : ''}.` : undefined });
-      cks.push({ id: 'flexure_sag', label: 'Longitudinal flexure – sagging (bottom steel)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(mSag, 2), capacity: round(lim, 2), unit: 'kN·m' });
-      cks.push({ id: 'flexure_hog', label: 'Longitudinal flexure – hogging between columns (top steel)', clause: 'IS 456 Annex G', status: 'PASS', demand: round(mHog, 2), capacity: round(lim, 2), unit: 'kN·m' });
-      cks.push({ id: 'shear', label: 'One-way shear at d from column faces', clause: 'IS 456 Cl. 34.2.4, 40.2', status: 'PASS', demand: round(tvShear, 3), capacity: round(tcShear, 3), unit: 'N/mm²' });
-      pun.forEach((x, i) => cks.push({ id: `punching_${i + 1}`, label: `Punching shear column ${i + 1}`, clause: 'IS 456 Cl. 31.6.3', status: 'PASS', demand: round(x.tv, 3), capacity: round(x.tc, 3), unit: 'N/mm²' }));
+      cks.push({ id: 'flexure_sag', label: 'Longitudinal flexure – sagging (bottom steel)', clause: 'IS 456 Annex G', status: mSag <= limE ? 'PASS' : 'FAIL', demand: round(mSag, 2), capacity: round(limE, 2), unit: 'kN·m' });
+      cks.push({ id: 'flexure_hog', label: 'Longitudinal flexure – hogging between columns (top steel)', clause: 'IS 456 Annex G', status: mHog <= limE ? 'PASS' : 'FAIL', demand: round(mHog, 2), capacity: round(limE, 2), unit: 'kN·m' });
+      if (ovOn) {
+        cks.push({ id: 'steel_bottom', label: 'Provided bottom steel ≥ required (user bars)', clause: 'IS 456 Annex G-1.1', status: provBotE >= astBotE ? 'PASS' : 'FAIL', demand: round(astBotE, 0), capacity: round(provBotE, 0), unit: 'mm²', note: `${nBotE} × ${phiE} mm; d = ${round(dE, 0)} mm.` });
+        cks.push({ id: 'steel_top', label: 'Provided top steel ≥ required (user bars)', clause: 'IS 456 Annex G-1.1', status: provTopE >= astTopE ? 'PASS' : 'FAIL', demand: round(astTopE, 0), capacity: round(provTopE, 0), unit: 'mm²', note: `${nTopE} × ${phiE} mm.` });
+        cks.push({ id: 'bar_spacing', label: 'Bar spacing ≤ 3d and ≤ 300 mm', clause: 'IS 456 Cl. 26.3.3(b)(1)', status: Math.max(spLong(nBotE), spLong(nTopE)) <= maxSpE + 1e-9 ? 'PASS' : 'FAIL', demand: round(Math.max(spLong(nBotE), spLong(nTopE)), 0), capacity: round(maxSpE, 0), unit: 'mm' });
+      }
+      cks.push({ id: 'shear', label: 'One-way shear at d from column faces', clause: 'IS 456 Cl. 34.2.4, 40.2', status: tvShearE <= tcShearE ? 'PASS' : 'FAIL', demand: round(tvShearE, 3), capacity: round(tcShearE, 3), unit: 'N/mm²' });
+      punE.forEach((x, i) => cks.push({ id: `punching_${i + 1}`, label: `Punching shear column ${i + 1}`, clause: 'IS 456 Cl. 31.6.3', status: x.tv <= x.tc ? 'PASS' : 'FAIL', demand: round(x.tv, 3), capacity: round(x.tc, 3), unit: 'N/mm²' }));
       cks.push({ id: 'transverse', label: 'Transverse band flexure', clause: 'textbook band method', status: 'WARNING',
         note: 'Transverse reinforcement uses the textbook band method (width = column + d), not a clause-prescribed method. Verify.' });
       const bearingCap = (0.45 * fck * Math.min(...colAreas)) / 1000;
@@ -902,7 +949,7 @@ export function designContinuousFooting(
         cks.push({ id: 'factored_resultant', label: 'Factored loads assumed to share the service-load resultant', status: uniformRatio ? 'PASS' : 'WARNING',
           note: uniformRatio ? undefined : 'Factored/service load ratios differ between columns: pressure is not exactly uniform.' });
       }
-      cks.push({ id: 'stability', label: 'Sliding / overturning / uplift', clause: 'IS 456 Cl. 20', status: 'NOT_VERIFIED', note: 'Checked for isolated footings only.' });
+      cks.push(...footingStabilityChecks(cols, p, e.plan!, D));
       cks.push(...commonChecks(p, true, { lengthM: L, widthM: B, qNetKnM2: S / (L * B) }));
 
       e.checks = cks;
@@ -1095,6 +1142,7 @@ export function designStrapFooting(
         note: availAnch >= ldT ? undefined : 'Straight length not available: bend the bar ends.' },
       { id: 'punching', label: 'Punching shear at the column', status: 'NOT_VERIFIED', note: 'The column sits on the strap/footing junction at the footing edge; punching around a partial perimeter is not checked. The strap carries the column into the footing.' },
       { id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED', note: 'Strap footing designed for axial loads only.' },
+      { id: 'stability', label: 'Sliding / overturning / uplift', clause: 'IS 456 Cl. 20', status: 'NOT_VERIFIED', note: 'Not checked for the strap system (eccentric footing + strap + interior footing act together).' },
       ...commonChecks(p, true, { lengthM: L1, widthM: B1, qNetKnM2: q1 }),
     ];
     e1.checks = c1;
@@ -1428,8 +1476,40 @@ function designRaftWithProjection(
       }
       if (!punchOk) break;
 
+      // user bar override (diameter / spacing), checked on this section without re-sizing it
+      const ov = p.barOverrides?.[id];
+      const ovOn = !!ov && !!(ov.diaMm || ov.spacingMm);
+      const phiE = ovOn && ov!.diaMm ? ov!.diaMm : phi;
+      const dE = ovOn ? D - cover - 1.5 * phiE : d;
+      const limE = ovOn ? muLimitKnM(1000, dE, p.concreteGrade, p.steelGrade) : lim;
+      const astE = (m: number) => (ovOn ? (m <= limE ? Math.max(flexureAstMm2(m, 1000, dE, p.concreteGrade, p.steelGrade).astMm2, minAst) : Infinity) : ast(m));
+      const userBar = (m: number, auto: BarsPerMetre): BarsPerMetre => {
+        if (!ovOn) return auto;
+        const sp = ov!.spacingMm || selectBarsPerMetre(astE(m), dE, [phiE], 50)?.spacingMm || Math.min(3 * dE, 300);
+        return { diaMm: phiE, spacingMm: sp, astProvidedMm2PerM: (1000 * barAreaMm2(phiE)) / sp };
+      };
+      const barsE = { botX: userBar(mBotX, bars.botX), botY: userBar(mBotY, bars.botY), topX: userBar(mTopX, bars.topX), topY: userBar(mTopY, bars.topY) };
+      const vOneE = qu * Math.max(0, lGov / 2 - cMin / 2000 - dE / 1000);
+      const tvOneE = vOneE / dE;
+      const tcOneE = tauCMpa((100 * Math.min(barsE.botX.astProvidedMm2PerM, barsE.botY.astProvidedMm2PerM)) / (1000 * dE), p.concreteGrade);
+      let worstTvE = worstTv, worstTcE = worstTc, punchE = true;
+      if (ovOn) {
+        let wr = 0;
+        for (const c of columns) {
+          const cp = criticalPerimeter(c.widthMm, c.depthMm, c.xM * 1000, c.yM * 1000, dE, bnd);
+          const tv = (Math.max(0, c.factoredLoadKn - qu * cp.areaM2) * 1000) / (cp.b0Mm * dE);
+          const tc = punchingAllowableMpa(Math.min(c.widthMm, c.depthMm), Math.max(c.widthMm, c.depthMm), p.concreteGrade);
+          if (tv / tc > wr) { wr = tv / tc; worstTvE = tv; worstTcE = tc; }
+          if (tv > tc) punchE = false;
+        }
+      }
+      const mMax = Math.max(mBotX, mBotY, mTopX, mTopY);
+      const steelPairs: Array<[string, number, BarsPerMetre]> = [['BX', mBotX, barsE.botX], ['BY', mBotY, barsE.botY], ['TX', mTopX, barsE.topX], ['TY', mTopY, barsE.topY]];
+      const worstSteel = steelPairs.reduce((w, [k, m, b]) => (astE(m) / b.astProvidedMm2PerM > w.r ? { r: astE(m) / b.astProvidedMm2PerM, k, req: astE(m), prov: b.astProvidedMm2PerM } : w), { r: -Infinity, k: '', req: 0, prov: 0 });
+      const maxSpacingE = Math.max(...Object.values(barsE).map(b => b.spacingMm));
+
       const e = baseElement(id, 'raft', 'raft', columns, p);
-      e.plan = { x0, x1, y0, y1 }; e.sizeXM = L; e.sizeYM = B; e.depthMm = D; e.effectiveDepthMm = d;
+      e.plan = { x0, x1, y0, y1 }; e.sizeXM = L; e.sizeYM = B; e.depthMm = D; e.effectiveDepthMm = dE;
       e.availablePressureKnM2 = round(qAvail, 2); e.maxServicePressureKnM2 = round(qmax, 2); e.factoredPressureKnM2 = round(qu, 2);
       const lMm = L * 1000, bMm = B * 1000;
       const layer = (key: string, loc: 'bottom' | 'top', dir: 'x' | 'y', b: { diaMm: number; spacingMm: number; astProvidedMm2PerM: number }, astReq: number): RebarLayer => {
@@ -1444,9 +1524,10 @@ function designRaftWithProjection(
         };
       };
       e.reinforcement = [
-        layer('BX', 'bottom', 'x', bars.botX, ast(mBotX)), layer('BY', 'bottom', 'y', bars.botY, ast(mBotY)),
-        layer('TX', 'top', 'x', bars.topX, ast(mTopX)), layer('TY', 'top', 'y', bars.topY, ast(mTopY)),
+        layer('BX', 'bottom', 'x', barsE.botX, astE(mBotX)), layer('BY', 'bottom', 'y', barsE.botY, astE(mBotY)),
+        layer('TX', 'top', 'x', barsE.topX, astE(mTopX)), layer('TY', 'top', 'y', barsE.topY, astE(mTopY)),
       ];
+      if (ovOn) e.reinforcement.forEach(l => { l.note = 'User bar override (checked on the designed section).'; });
       const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
       e.quantities = {
         concreteM3: round(A * Dm, 3),
@@ -1460,16 +1541,23 @@ function designRaftWithProjection(
         ...(hasCombos ? [{ id: 'combinations', label: 'Load combinations (IS 456 Table 18 / IS 1893)', clause: 'IS 456 Table 18', status: 'PASS' as const,
           note: `${svcAggs.length} service and ${ultAggs.length} ultimate combinations evaluated. Governing ultimate contact pressure from ${governingUltimate.name}. Combinations use column forces from the frame analysis; column moments are summed in magnitude (conservative).` }] : []),
         { id: 'no_tension', label: 'Minimum contact pressure ≥ 0', status: 'PASS', demand: 0, capacity: round(qmin, 2), unit: 'kN/m²' },
-        { id: 'flexure', label: 'Flexure (strip method, IS 456 Table 12 envelope coefficients)', clause: 'IS 456 Annex G, Table 12', status: 'PASS',
-          demand: round(Math.max(mBotX, mBotY, mTopX, mTopY), 2), capacity: round(lim, 2), unit: 'kN·m/m' },
-        { id: 'shear', label: 'One-way shear at d from column face', clause: 'IS 456 Cl. 40.2', status: 'PASS', demand: round(tvOne, 3), capacity: round(tcOne, 3), unit: 'N/mm²' },
-        { id: 'punching', label: 'Punching shear (worst column, perimeter clipped at raft edge)', clause: 'IS 456 Cl. 31.6.3', status: 'PASS', demand: round(worstTv, 3), capacity: round(worstTc, 3), unit: 'N/mm²' },
+        { id: 'flexure', label: 'Flexure (strip method, IS 456 Table 12 envelope coefficients)', clause: 'IS 456 Annex G, Table 12', status: mMax <= limE ? 'PASS' : 'FAIL',
+          demand: round(mMax, 2), capacity: round(limE, 2), unit: 'kN·m/m' },
+        ...(ovOn ? [
+          { id: 'steel', label: 'Provided steel ≥ required in every layer (user bars)', clause: 'IS 456 Annex G-1.1', status: (worstSteel.r <= 1 ? 'PASS' : 'FAIL') as DesignStatus,
+            demand: round(worstSteel.req, 0), capacity: round(worstSteel.prov, 0), unit: 'mm²/m', note: `Governing layer ${worstSteel.k}; ${phiE} mm bars; d = ${round(dE, 0)} mm.` },
+          { id: 'bar_spacing', label: 'Bar spacing ≤ 3d and ≤ 300 mm', clause: 'IS 456 Cl. 26.3.3(b)(1)', status: (maxSpacingE <= Math.min(3 * dE, 300) + 1e-9 ? 'PASS' : 'FAIL') as DesignStatus,
+            demand: maxSpacingE, capacity: round(Math.min(3 * dE, 300), 0), unit: 'mm' },
+        ] : []),
+        { id: 'shear', label: 'One-way shear at d from column face', clause: 'IS 456 Cl. 40.2', status: tvOneE <= tcOneE ? 'PASS' : 'FAIL', demand: round(tvOneE, 3), capacity: round(tcOneE, 3), unit: 'N/mm²' },
+        { id: 'punching', label: 'Punching shear (worst column, perimeter clipped at raft edge)', clause: 'IS 456 Cl. 31.6.3', status: punchE ? 'PASS' : 'FAIL', demand: round(worstTvE, 3), capacity: round(worstTcE, 3), unit: 'N/mm²' },
         { id: 'raft_method', label: 'Raft analysis method', clause: 'IS 2950 (Part 1)', status: 'WARNING',
           note: 'Rigid-raft one-way strip method only. Flexible-raft / finite-element analysis and column-load redistribution are not implemented. Treat as preliminary.' },
         ...(sumMx + sumMy > 0
           ? [{ id: 'moments', label: 'Column base moments in the contact pressure', status: 'WARNING' as const, demand: round(sumMx + sumMy, 1), unit: 'kN·m',
               note: 'Service column base moments (summed in magnitude, conservative) are added to the load-eccentricity moment for the contact pressure. They are not applied to the raft bending or punching design.' }]
           : [{ id: 'moments', label: 'Column moments', status: 'NOT_VERIFIED' as const, note: 'No column moments supplied: raft design is for axial load only.' }]),
+        ...footingStabilityChecks(columns, p, { x0, x1, y0, y1 }, D),
         ...commonChecks(p, true, { lengthM: L, widthM: B, qNetKnM2: S / A }),
       ];
       e.checks = cks;

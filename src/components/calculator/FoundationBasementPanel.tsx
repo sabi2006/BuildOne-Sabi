@@ -310,7 +310,7 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
       {/* ------------------------- BASEMENT ------------------------- */}
       {/* ------------------------ FOOTING BAR OVERRIDE ------------------------ */}
       {(() => {
-        const footings = (design?.foundation?.elements || []).filter(e => e.elementType === 'isolated_footing' && e.depthMm);
+        const footings = (design?.foundation?.elements || []).filter(e => ['isolated_footing', 'combined_footing', 'strip_footing', 'raft'].includes(e.elementType) && e.depthMm);
         if (footings.length === 0) return null;
         const ovs = fd.barOverrides || {};
         const setOv = (id: string, patch: { diaMm?: number; spacingMm?: number }) => {
@@ -323,7 +323,7 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
         };
         const badge = (st: string) => st === 'PASS' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : st === 'FAIL' ? 'bg-red-100 text-red-800 border-red-300' : 'bg-amber-100 text-amber-800 border-amber-300';
         return (
-          <Section title="Footing Bars (override, isolated footings)" defaultOpen={Object.keys(ovs).length > 0}>
+          <Section title="Footing Bars (override)" defaultOpen={Object.keys(ovs).length > 0}>
             <div className="text-[11px] text-slate-600" data-testid="footing-bar-overrides">
               Blank = automatic. The footing size is not changed for your bars: they are checked on the designed section (steel, spacing, shear, punching) and any shortfall shows FAIL.
               Statuses below are from the last calculation: press <b>Apply &amp; Recalculate</b> to update them.

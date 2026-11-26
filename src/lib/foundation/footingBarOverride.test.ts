@@ -1,4 +1,5 @@
 import { designIsolatedFooting, FoundationColumnInput, FoundationDesignParams } from './foundationDesignService';
+import * as svc from './foundationDesignService';
 import { barAreaMm2 } from './rcDesign';
 
 const params = (over: Partial<FoundationDesignParams> = {}): FoundationDesignParams => ({
@@ -55,5 +56,41 @@ describe('Isolated footing: user bar override', () => {
   it('an override for another element id is ignored', () => {
     const e = designIsolatedFooting(col, params({ barOverrides: { 'F-C9': { diaMm: 10, spacingMm: 300 } } }));
     expect(e.reinforcement[0].diaMm).toBe(auto.reinforcement[0].diaMm);
+  });
+});
+
+describe('Bar override on combined footings and rafts', () => {
+  const a: FoundationColumnInput = { id: 'a', name: 'A', xM: 0, yM: 0, widthMm: 400, depthMm: 400, serviceLoadKn: 800, factoredLoadKn: 1200 };
+  const b: FoundationColumnInput = { ...a, id: 'b', name: 'B', xM: 2.5, serviceLoadKn: 1000, factoredLoadKn: 1500 };
+  const prm = params({ sbcKnM2: 150 });
+  const auto = svc.designCombinedFooting(a, b, prm);
+
+  it('combined: a too-light override (10 mm @ 300) keeps the size, fails the steel check and the element', () => {
+    const e = svc.designCombinedFooting(a, b, params({ sbcKnM2: 150, barOverrides: { [auto.id]: { diaMm: 10, spacingMm: 300 } } }));
+    expect(e.sizeXM).toBe(auto.sizeXM);
+    expect(e.depthMm).toBe(auto.depthMm);
+    expect(e.reinforcement[0].diaMm).toBe(10);
+    expect(e.checks.find(c => c.id === 'steel_bottom' || c.id === 'steel_top')!.status).toBe('FAIL');
+    expect(e.status).toBe('FAIL');
+  });
+
+  it('combined: a heavier override passes the steel checks', () => {
+    const e = svc.designCombinedFooting(a, b, params({ sbcKnM2: 150, barOverrides: { [auto.id]: { diaMm: 20, spacingMm: 100 } } }));
+    expect(e.checks.find(c => c.id === 'steel_bottom')!.status).toBe('PASS');
+    expect(e.checks.find(c => c.id === 'steel_top')!.status).toBe('PASS');
+    expect(e.checks.find(c => c.id === 'bar_spacing')!.status).toBe('PASS');
+  });
+
+  it('raft: override applies to all four layers and is checked', () => {
+    const grid: FoundationColumnInput[] = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) grid.push({ ...a, id: `g${i}${j}`, name: `G${i}${j}`, xM: i * 4, yM: j * 4, serviceLoadKn: 1100, factoredLoadKn: 1650 });
+    const rp = params({ requestedType: 'raft', sbcKnM2: 150 });
+    const ra = svc.designRaftFoundation(grid, rp);
+    const light = svc.designRaftFoundation(grid, { ...rp, barOverrides: { 'RAFT-1': { diaMm: 10, spacingMm: 300 } } });
+    expect(light.depthMm).toBe(ra.depthMm);
+    expect(light.reinforcement.every(l => l.diaMm === 10 && l.spacingMm === 300)).toBe(true);
+    expect(light.checks.find(c => c.id === 'steel')!.status).toBe('FAIL');
+    const heavy = svc.designRaftFoundation(grid, { ...rp, barOverrides: { 'RAFT-1': { diaMm: 20, spacingMm: 100 } } });
+    expect(heavy.checks.find(c => c.id === 'steel')!.status).toBe('PASS');
   });
 });

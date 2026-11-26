@@ -564,9 +564,9 @@
     "semantic_hash": ""
   },
   "src/components/calculator/FoundationBasementPanel.tsx": {
-    "mtime": 1795698173.7635517,
-    "seen": 1795698301.2769625,
-    "ast_hash": "00f9b428a2e110bd5eceb28e2c7312e7",
+    "mtime": 1795700211.179515,
+    "seen": 1795700275.7798455,
+    "ast_hash": "8415000f2cf743aad0c7411aa547bdfa",
     "semantic_hash": ""
   },
   "src/lib/foundation/basementDesignService.test.ts": {
@@ -600,9 +600,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795699766.7385035,
-    "seen": 1795699885.5124183,
-    "ast_hash": "053f469cf2ff88019de8cfe0b42139cc",
+    "mtime": 1795700194.7854767,
+    "seen": 1795700275.7799711,
+    "ast_hash": "efee22d6d128a7e453341fe9fef706f3",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -636,9 +636,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/types.ts": {
-    "mtime": 1795699068.7464316,
-    "seen": 1795699389.398456,
-    "ast_hash": "88b4f49a014af6b64bfabab61517aed4",
+    "mtime": 1795700211.1804485,
+    "seen": 1795700275.7800078,
+    "ast_hash": "88c74fefb404115f31d20a46d88e9c1b",
     "semantic_hash": ""
   },
   "src/lib/foundation/boq.test.ts": {
@@ -774,9 +774,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/footingBarOverride.test.ts": {
-    "mtime": 1795682671.0531898,
-    "seen": 1795682955.4245005,
-    "ast_hash": "faa213a452853092b0aca58b911c57d3",
+    "mtime": 1795700194.9383268,
+    "seen": 1795700275.7799647,
+    "ast_hash": "86b5f5c80716903e0eb60d6058700179",
     "semantic_hash": ""
   },
   "src/lib/rebarChecks.test.ts": {
@@ -822,9 +822,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/footingStability.test.ts": {
-    "mtime": 1795698219.02,
-    "seen": 1795698301.2770703,
-    "ast_hash": "00c63b12b967462389d668a29fc6fc90",
+    "mtime": 1795700080.3763244,
+    "seen": 1795700275.779967,
+    "ast_hash": "2a261442bc51e16ee4ab33e97b851304",
     "semantic_hash": ""
   },
   "src/lib/foundation/stability.test.ts": {

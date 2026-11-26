@@ -83,7 +83,7 @@ export interface FoundationDetailsConfig {
   columnLoadSource?: ColumnLoadSource;
   /** Wind / earthquake loads (default: none). Needs columnLoadSource 'frame'. */
   lateral?: LateralLoadConfig;
-  /** User bar diameter / spacing per isolated footing (element id, e.g. "F-C1"); checked, never auto-corrected */
+  /** User bar diameter / spacing per footing, combined / strip footing or raft (element id, e.g. "F-C1", "RAFT-1"); checked, never auto-corrected */
   barOverrides?: Record<string, { diaMm?: number; spacingMm?: number }>;
   /** 'gross' (default, conservative): overburden is deducted from SBC. 'net': SBC used as given. */
   sbcBasis?: SbcBasis;

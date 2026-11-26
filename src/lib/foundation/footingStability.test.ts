@@ -1,4 +1,4 @@
-import { designIsolatedFooting, designRaftFoundation, FoundationColumnInput, FoundationDesignParams } from './foundationDesignService';
+import { designIsolatedFooting, designRaftFoundation, designCombinedFooting, FoundationColumnInput, FoundationDesignParams } from './foundationDesignService';
 import type { CaseForces } from './lateral';
 import { rigidInfluenceFactor } from './stability';
 
@@ -76,6 +76,33 @@ describe('Sliding / overturning / uplift (isolated footing)', () => {
     const e = designIsolatedFooting(col({ DL: f(100), LL: f(50), EQX: f(400) }), params({ frictionAngleDeg: 30 }));
     const u = chk(e, 'uplift');
     expect(u.demand).toBeCloseTo(1.2 * 300, 6); // DL − EQX = −300
-    expect(u.note).toContain('Column tension');
+    expect(u.note).toContain('Net tension');
+  });
+});
+
+describe('Stability of combined footings and rafts', () => {
+  const two = (P: number, x: number, cases: FoundationColumnInput['caseForces']): FoundationColumnInput =>
+    ({ id: `k${x}`, name: `K${x}`, xM: x, yM: 0, widthMm: 400, depthMm: 400, serviceLoadKn: P, factoredLoadKn: 1.5 * P, caseForces: cases });
+
+  it('combined footing: sliding and overturning computed from both columns; overturning restoring uses each dead load at its lever', () => {
+    const a = two(600, 0, { DL: f(400), LL: f(200), EQX: f(20, 0, 30, 25, 0) });
+    const b = two(800, 3, { DL: f(550), LL: f(250), EQX: f(-20, 0, 30, 25, 0) });
+    const e = designCombinedFooting(a, b, params({ frictionAngleDeg: 30 }));
+    const sl = e.checks.find(c => c.id === 'sliding')!;
+    expect(sl.status).toBe('PASS');
+    const ot = e.checks.find(c => c.id === 'overturning')!;
+    const pl = e.plan!, Dm = e.depthMm! / 1000, L = pl.x1 - pl.x0, B = pl.y1 - pl.y0;
+    const W = 25 * L * B * Dm + 18 * L * B * (1.5 - Dm - 0.1);
+    // governing edge must give the smallest restoring/required margin; check the x = x0 edge value is ≥ the reported one
+    const restoringX0 = 0.9 * (400 * (0 - pl.x0) + 550 * (3 - pl.x0) + W * L / 2);
+    expect(ot.capacity!).toBeLessThanOrEqual(restoringX0 + 0.1);
+    expect(['PASS', 'FAIL']).toContain(ot.status);
+  });
+
+  it('raft: building sliding / overturning / uplift are computed (not NOT_VERIFIED) when the frame cases are given', () => {
+    const grid: FoundationColumnInput[] = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) grid.push({ ...col({ DL: f(700), LL: f(300), EQX: f(10, 0, 20, 30, 0) }), id: `g${i}${j}`, name: `G${i}${j}`, xM: i * 4, yM: j * 4, serviceLoadKn: 1000, factoredLoadKn: 1500 });
+    const r = designRaftFoundation(grid, params({ requestedType: 'raft', sbcKnM2: 150, frictionAngleDeg: 30 }));
+    for (const id of ['sliding', 'overturning', 'uplift']) expect(r.checks.find(c => c.id === id)!.status).not.toBe('NOT_VERIFIED');
   });
 });
