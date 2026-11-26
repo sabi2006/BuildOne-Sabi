@@ -588,21 +588,21 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/bbs.ts": {
-    "mtime": 1795699809.6556005,
-    "seen": 1795699885.5124059,
-    "ast_hash": "039ccbf268c75f7d1d7f3783e6b83f1d",
+    "mtime": 1795714877.2364995,
+    "seen": 1795714973.3816047,
+    "ast_hash": "a689f75c758c85c5cbf212b0395b5a69",
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.test.ts": {
-    "mtime": 1795699766.7395039,
-    "seen": 1795699885.5124173,
-    "ast_hash": "32915a0df4f77db27aaf8b03ba6c1403",
+    "mtime": 1795714887.5872784,
+    "seen": 1795714973.3816268,
+    "ast_hash": "b140ba69999f0691e905eadd8db8fbe1",
     "semantic_hash": ""
   },
   "src/lib/foundation/foundationDesignService.ts": {
-    "mtime": 1795701032.8260362,
-    "seen": 1795701191.763978,
-    "ast_hash": "b615d40676ab1c1283bc207a5204ba2a",
+    "mtime": 1795714911.4759445,
+    "seen": 1795714973.38163,
+    "ast_hash": "af50eb97152ec0fe831d7ad2103bb3cb",
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.test.ts": {
@@ -612,9 +612,9 @@
     "semantic_hash": ""
   },
   "src/lib/foundation/geometry3d.ts": {
-    "mtime": 1795700858.6724935,
-    "seen": 1795701191.763984,
-    "ast_hash": "283633022287be789f268b646ee6dbf9",
+    "mtime": 1795714946.1967237,
+    "seen": 1795714973.3816414,
+    "ast_hash": "071c797871d9ad5cb2ca3f6c43cd9a0c",
     "semantic_hash": ""
   },
   "src/lib/foundation/integration.test.ts": {

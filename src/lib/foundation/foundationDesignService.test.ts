@@ -352,14 +352,43 @@ describe('Pile foundation', () => {
     expect(r[0].pile).toBeUndefined();
   });
 
-  it('counts piles from a verified capacity and never reports PASS', () => {
+  it('designs the cap from a verified capacity: piles incl. self-weight, flexure, shear, punching all checked', () => {
     const r = designPileFoundation([col('a', 0, 0, 1600)], params({
       requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
     }));
-    expect(r[0].pile!.pilesRequired).toBe(4); // ceil(1600/500)
-    expect(r[0].pile!.spacingMm).toBeCloseTo(2.5 * 450, 6);
-    expect(r[0].status).not.toBe('PASS');
-    expect(r[0].checks.find(c => c.id === 'group')!.status).toBe('NOT_VERIFIED');
+    const e = r[0];
+    expect(e.pile!.pilesRequired).toBeGreaterThanOrEqual(4); // ceil(1600/500) = 4, more if cap weight pushes a pile over
+    expect(e.pile!.spacingMm).toBeCloseTo(2.5 * 450, 6);
+    expect(e.depthMm).toBeGreaterThanOrEqual(500);
+    for (const id of ['pile_load', 'cap_flexure', 'cap_shear', 'cap_punching']) expect(e.checks.find(c => c.id === id)!.status).toBe('PASS');
+    // per-pile load includes the cap self-weight: (P + 25·L·B·D) / n
+    const w = 25 * e.sizeXM! * e.sizeYM! * e.depthMm! / 1000;
+    expect(e.checks.find(c => c.id === 'pile_load')!.demand).toBeCloseTo((1600 + w) / e.pile!.pilesRequired!, 0);
+    expect(e.reinforcement.length).toBe(2);
+    expect(e.quantities!.concreteM3).toBeCloseTo(e.sizeXM! * e.sizeYM! * e.depthMm! / 1000, 2);
+  });
+
+  it('group efficiency / lateral / settlement stay NOT_VERIFIED so the cap is never a blanket PASS', () => {
+    const e = designPileFoundation([col('a', 0, 0, 1600)], params({
+      requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
+    }))[0];
+    for (const id of ['group', 'lateral', 'pile_settlement', 'pile_anchorage']) expect(e.checks.find(c => c.id === id)!.status).toBe('NOT_VERIFIED');
+    expect(e.status).not.toBe('PASS');
+  });
+
+  it('cap bending moment matches the hand value for a 2-pile cap', () => {
+    // 2 piles at 2.5D = 1125 mm; column 400; Pu per pile R; M at face = R·(s/2 − c/2) per side
+    const e = designPileFoundation([col('a', 0, 0, 900)], params({
+      requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
+    }))[0];
+    expect(e.pile!.pilesRequired).toBe(2);
+    const fl = e.checks.find(c => c.id === 'cap_flexure')!;
+    expect(fl.status).toBe('PASS');
+    const cx = (col('a', 0, 0, 900) as any).widthMm / 1000;
+    const wcap = 25 * e.sizeXM! * e.sizeYM! * e.depthMm! / 1000;
+    const R = (1350 + 1.5 * wcap) / 2;
+    const mx = R * (1.125 / 2 - cx / 2);
+    expect(fl.note).toContain(`Mx ${Math.round(mx * 10) / 10}`);
   });
 
   it('derives capacity from skin friction and end bearing with FS 2.5', () => {

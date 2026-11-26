@@ -184,7 +184,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     const r = sceneRect(el, dx, dz);
     const D = el.depthMm! / 1000;
     const yPccBottom = -Df, yRccBottom = -Df + pcc, yRccTop = yRccBottom + D;
-    const kind: BoxKind = el.system === 'raft' ? 'raft' : 'footing';
+    const kind: BoxKind = el.system === 'raft' ? 'raft' : el.system === 'pile' ? 'pile_cap' : 'footing';
     const group: GeometryGroup = 'foundation';
     const label = `${el.id} ${r4(r.x1 - r.x0)}×${r4(r.z1 - r.z0)}×${Math.round(D * 1000)}`;
 
@@ -212,7 +212,8 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
         }
       }
       pccRects.set(el.id, pr);
-      boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
+      // pile heads pierce the levelling bed: the bed is counted in the quantities but not drawn as a solid under pile caps
+      if (el.system !== 'pile') boxes.push(box(`${el.id}-pcc`, el.id, 'pcc', group, pr.x0, pr.x1, yPccBottom, yRccBottom, pr.z0, pr.z1, el.status, { label: 'PCC' }));
       if (el.profile && el.system === 'isolated') {
         // sloped / stepped: lower slab of the edge thickness + frustum (sloped) or upper step (stepped)
         const De = el.profile.edgeThicknessMm / 1000;
@@ -267,7 +268,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     const cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2;
     const capT = 0.05;
     const yCapBottom = -Df + pcc;
-    boxes.push(box(`${el.id}-cap`, el.id, 'pile_cap', 'foundation', r.x0, r.x1, yCapBottom, yCapBottom + capT, r.z0, r.z1, el.status,
+    if (!el.depthMm) boxes.push(box(`${el.id}-cap`, el.id, 'pile_cap', 'foundation', r.x0, r.x1, yCapBottom, yCapBottom + capT, r.z0, r.z1, el.status,
       { label: `${el.id} pile cap (structural design NOT VERIFIED)`, note: 'Cap thickness is not designed; a thin plate shows its plan only.' }));
     const { rows = 1, cols = 1, spacingMm = 0 } = el.pile;
     const d = el.pile.diameterMm / 1000, s = spacingMm / 1000;

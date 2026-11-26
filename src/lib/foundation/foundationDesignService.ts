@@ -1675,7 +1675,7 @@ function designRaftWithProjection(
   return failed(id, 'raft', 'raft', columns, p, `No raft thickness found up to ${MAX_DEPTH_MM} mm.`);
 }
 
-// ------------------------------ PILE (validation only) ------------------------------
+// ------------------------------ PILE GROUP + PILE CAP ------------------------------
 
 export function designPileFoundation(
   columns: FoundationColumnInput[], p: FoundationDesignParams, opt: Resolved = resolveOptions(p.options)
@@ -1705,26 +1705,139 @@ export function designPileFoundation(
         `Pile design needs borehole-derived capacity data (IS 2911 / IS 1892). Provide either a verified single-pile capacity plus diameter, or diameter, length, unit skin friction and unit end bearing. Missing: ${missing || 'verified capacity'}. Pile sizes are not generated from soil type alone.`));
       continue;
     }
-    const n = Math.max(1, Math.ceil(c.serviceLoadKn / safeCap));
-    const cols = n <= 2 ? n : Math.ceil(Math.sqrt(n));
-    const rows = n <= 2 ? 1 : Math.ceil(n / cols);
-    const sMm = opt.pileSpacingFactor * pile.pileDiameterMm;
-    const capX = ((cols - 1) * sMm + pile.pileDiameterMm + 2 * opt.pileCapEdgeMm) / 1000;
-    const capY = ((rows - 1) * sMm + pile.pileDiameterMm + 2 * opt.pileCapEdgeMm) / 1000;
+    const dp = pile.pileDiameterMm / 1000;
+    const sM = (opt.pileSpacingFactor * pile.pileDiameterMm) / 1000;
+    const edgeM = opt.pileCapEdgeMm / 1000;
+    const layoutFor = (n: number) => {
+      const cols = n <= 2 ? n : Math.ceil(Math.sqrt(n));
+      const rows = n <= 2 ? 1 : Math.ceil(n / cols);
+      return { n, cols, rows, capX: (cols - 1) * sM + dp + 2 * edgeM, capY: (rows - 1) * sM + dp + 2 * edgeM };
+    };
+    const pilePositions = (lay: ReturnType<typeof layoutFor>) => {
+      const pts: Array<{ x: number; y: number }> = [];
+      for (let r = 0; r < lay.rows; r++) for (let k = 0; k < lay.cols && pts.length < lay.n; k++) pts.push({ x: (k - (lay.cols - 1) / 2) * sM, y: (r - (lay.rows - 1) / 2) * sM });
+      return pts;
+    };
+    const cover = p.clearCoverMm;
+    const fck = fckOf(p.concreteGrade);
+    const cx = c.widthMm / 1000, cy = c.depthMm / 1000;
+    const EMBED = 75; // mm, pile head embedment into the cap
+    type CapResult = { D: number; d: number; phi: number; bx: BarsPerMetre; by: BarsPerMetre; astX: number; astY: number; mX: number; mY: number; limX: number; limY: number; tvX: number; tcX: number; tvY: number; tcY: number; tvp: number; tcp: number };
+    let lay = layoutFor(Math.max(1, Math.ceil(c.serviceLoadKn / safeCap)));
+    let cap: CapResult | null = null;
+    for (let iter = 0; iter < 20 && !cap; iter++) {
+      const piles = pilePositions(lay);
+      for (let D = Math.max(500, opt.minFootingDepthMm); D <= 2500 && !cap; D += 25) {
+        const Wcap = RCC_UNIT_WEIGHT * lay.capX * lay.capY * (D / 1000);
+        if ((c.serviceLoadKn + Wcap) / lay.n > safeCap) break; // more piles needed
+        const R = (c.factoredLoadKn + 1.5 * Wcap) / lay.n; // factored reaction per pile
+        for (const phi of [12, 16, 20, 25] as const) {
+          const d = D - EMBED - 25 - 1.5 * phi;
+          if (d < 200) continue;
+          // flexure at the column faces: reactions of the piles beyond the face × lever arm from the face
+          const mFace = (axis: 'x' | 'y') => {
+            const half = (axis === 'x' ? cx : cy) / 2;
+            const side = (sg: number) => piles.reduce((m, q) => { const u = sg * (axis === 'x' ? q.x : q.y) - half; return u > 0 ? m + R * u : m; }, 0);
+            return Math.max(side(1), side(-1));
+          };
+          const mX = mFace('x'), mY = mFace('y'); // total kN·m; bars along x resist mX over the cap width capY
+          const limX = muLimitKnM(lay.capY * 1000, d, p.concreteGrade, p.steelGrade), limY = muLimitKnM(lay.capX * 1000, d, p.concreteGrade, p.steelGrade);
+          if (mX > limX || mY > limY) break; // deeper cap
+          const minAst = MIN_STEEL_FRACTION_HYSD * 1000 * D;
+          const astX = Math.max(flexureAstMm2(mX, lay.capY * 1000, d, p.concreteGrade, p.steelGrade).astMm2 / lay.capY, minAst);
+          const astY = Math.max(flexureAstMm2(mY, lay.capX * 1000, d, p.concreteGrade, p.steelGrade).astMm2 / lay.capX, minAst);
+          const bx = selectBarsPerMetre(astX, d, [phi]), by = selectBarsPerMetre(astY, d, [phi]);
+          if (!bx || !by) continue;
+          // one-way shear at d from the faces: a pile counts fully when its centre is dp/2 beyond the section, none when dp/2 inside, linear between
+          const vAt = (axis: 'x' | 'y') => {
+            const sec = (axis === 'x' ? cx : cy) / 2 + d / 1000;
+            const frac = (u: number) => Math.min(1, Math.max(0, (u - sec + dp / 2) / dp));
+            return Math.max(...[1, -1].map(sg => piles.reduce((v, q) => v + R * frac(sg * (axis === 'x' ? q.x : q.y)), 0)));
+          };
+          const tvX = (vAt('x') * 1000) / (lay.capY * 1000 * d), tvY = (vAt('y') * 1000) / (lay.capX * 1000 * d);
+          const tcX = tauCMpa((100 * bx.astProvidedMm2PerM) / (1000 * d), p.concreteGrade), tcY = tauCMpa((100 * by.astProvidedMm2PerM) / (1000 * d), p.concreteGrade);
+          if (tvX > tcX || tvY > tcY) break;
+          // punching at d/2 around the column: piles whose centres lie inside the critical perimeter do not load it
+          const hx = cx / 2 + d / 2000, hy = cy / 2 + d / 2000;
+          const inside = piles.filter(q => Math.abs(q.x) < hx && Math.abs(q.y) < hy).length;
+          const vp = R * (lay.n - inside);
+          const b0 = 2 * (2 * hx + 2 * hy) * 1000;
+          const tvp = (vp * 1000) / (b0 * d);
+          const tcp = punchingAllowableMpa(Math.min(c.widthMm, c.depthMm), Math.max(c.widthMm, c.depthMm), p.concreteGrade);
+          if (tvp > tcp) break;
+          cap = { D, d, phi, bx, by, astX, astY, mX, mY, limX, limY, tvX, tcX, tvY, tcY, tvp, tcp };
+          break;
+        }
+      }
+      if (!cap) lay = layoutFor(lay.n + 1);
+    }
     const e = baseElement(id, 'pile_cap', 'pile', [c], p);
-    e.plan = { x0: c.xM - capX / 2, x1: c.xM + capX / 2, y0: c.yM - capY / 2, y1: c.yM + capY / 2 };
-    e.sizeXM = capX; e.sizeYM = capY;
-    e.pile = { singlePileSafeCapacityKn: round(safeCap, 1), pilesRequired: n, rows, cols, spacingMm: sMm, diameterMm: pile.pileDiameterMm, lengthM: pile.pileLengthM };
-    e.checks = [
-      { id: 'pile_load', label: 'Load per pile ≤ single-pile safe capacity (cap self-weight not included)', clause: 'IS 2911', status: 'WARNING',
-        demand: round(c.serviceLoadKn / n, 1), capacity: round(safeCap, 1), unit: 'kN', note: `${capNote} Pile cap self-weight and group effects are not included.` },
-      { id: 'group', label: 'Pile group capacity / efficiency', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Group efficiency is not implemented.' },
-      { id: 'cap_design', label: 'Pile cap structural design', clause: 'IS 456 Cl. 34 / IS 2911', status: 'NOT_VERIFIED', note: 'Pile cap depth, flexure and shear are not implemented.' },
-      { id: 'lateral', label: 'Lateral / moment capacity of piles', status: 'NOT_VERIFIED', note: 'Not implemented.' },
+    e.plan = { x0: c.xM - lay.capX / 2, x1: c.xM + lay.capX / 2, y0: c.yM - lay.capY / 2, y1: c.yM + lay.capY / 2 };
+    e.sizeXM = lay.capX; e.sizeYM = lay.capY;
+    e.pile = { singlePileSafeCapacityKn: round(safeCap, 1), pilesRequired: lay.n, rows: lay.rows, cols: lay.cols, spacingMm: sM * 1000, diameterMm: pile.pileDiameterMm, lengthM: pile.pileLengthM };
+    const common: DesignCheck[] = [
+      { id: 'group', label: 'Pile group capacity / efficiency', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Group efficiency and block failure need soil data per IS 2911: not implemented.' },
+      { id: 'lateral', label: 'Lateral / moment capacity of piles', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Not implemented.' },
+      { id: 'pile_settlement', label: 'Pile group settlement', status: 'NOT_VERIFIED', note: 'Not implemented.' },
       ...commonChecks(p, true),
     ];
+    if (!cap) {
+      e.checks = [{ id: 'cap_design', label: 'Pile cap structural design', clause: 'IS 456 Cl. 34', status: 'FAIL', note: 'No pile cap depth up to 2500 mm satisfies flexure, shear and punching.' }, ...common];
+    } else {
+      const Dm = cap.D / 1000;
+      const Wcap = RCC_UNIT_WEIGHT * lay.capX * lay.capY * Dm;
+      e.depthMm = cap.D; e.effectiveDepthMm = cap.d;
+      e.loads = { serviceKn: round(c.serviceLoadKn + Wcap, 1), factoredKn: round(c.factoredLoadKn + 1.5 * Wcap, 1) };
+      const lMm = lay.capX * 1000, bMm = lay.capY * 1000;
+      const ld = developmentLengthTensionMm(cap.phi, p.concreteGrade, p.steelGrade);
+      e.reinforcement = [
+        { id: `${id}-BX`, location: 'bottom', direction: 'x', role: 'main', diaMm: cap.phi, spacingMm: cap.bx.spacingMm, count: Math.floor((bMm - 2 * cover) / cap.bx.spacingMm) + 1,
+          astRequiredMm2PerM: round(cap.astX, 1), astProvidedMm2PerM: round(cap.bx.astProvidedMm2PerM, 1), straightLengthMm: lMm - 2 * cover, zoneWidthMm: bMm, developmentLengthMm: ld,
+          note: `Bottom bars 25 mm above the pile heads (piles ${EMBED} mm into the cap).` },
+        { id: `${id}-BY`, location: 'bottom', direction: 'y', role: 'main', diaMm: cap.phi, spacingMm: cap.by.spacingMm, count: Math.floor((lMm - 2 * cover) / cap.by.spacingMm) + 1,
+          astRequiredMm2PerM: round(cap.astY, 1), astProvidedMm2PerM: round(cap.by.astProvidedMm2PerM, 1), straightLengthMm: bMm - 2 * cover, zoneWidthMm: lMm, developmentLengthMm: ld },
+      ];
+      const ws = opt.workingSpaceMm / 1000, pp = opt.pccProjectionMm / 1000;
+      e.quantities = {
+        concreteM3: round(lay.capX * lay.capY * Dm, 3),
+        pccM3: round((lay.capX + 2 * pp) * (lay.capY + 2 * pp) * (p.pccThicknessMm / 1000), 3),
+        excavationM3: round((lay.capX + 2 * ws) * (lay.capY + 2 * ws) * p.foundationDepthM, 3),
+        formworkM2: round(2 * (lay.capX + lay.capY) * Dm, 3),
+      };
+      const dowelDia = p.columnBarDiaMm ?? 16;
+      const dowelReq = 0.005 * c.widthMm * c.depthMm;
+      e.dowels = {
+        requiredAreaMm2: Math.round(dowelReq), diaMm: dowelDia, minBars: Math.max(4, Math.ceil(dowelReq / barAreaMm2(dowelDia))),
+        developmentLengthMm: developmentLengthCompressionMm(dowelDia, p.concreteGrade, p.steelGrade), availableLengthMm: cap.D - cover - 2 * cap.phi,
+      };
+      const perPile = (c.serviceLoadKn + Wcap) / lay.n;
+      const bearingCap = (0.45 * fck * c.widthMm * c.depthMm) / 1000;
+      const dowelOk = e.dowels.availableLengthMm >= e.dowels.developmentLengthMm;
+      e.checks = [
+        { id: 'pile_load', label: 'Load per pile (incl. cap self-weight) ≤ single-pile safe capacity', clause: 'IS 2911', status: 'PASS',
+          demand: round(perPile, 1), capacity: round(safeCap, 1), unit: 'kN', note: `${capNote} ${lay.n} pile(s), ${lay.rows} × ${lay.cols} at ${round(sM, 3)} m.` },
+        { id: 'cap_flexure', label: 'Cap flexure at the column faces (pile reactions beyond the face)', clause: 'IS 456 Cl. 34.2.3', status: 'PASS',
+          demand: round(Math.max(cap.mX / cap.limX, cap.mY / cap.limY) * 100, 1), capacity: 100, unit: '% of Mu,lim',
+          note: `Mx ${round(cap.mX, 1)} / ${round(cap.limX, 1)} kN·m, My ${round(cap.mY, 1)} / ${round(cap.limY, 1)} kN·m (rigid cap, equal pile reactions).` },
+        { id: 'cap_shear', label: 'One-way shear at d from the column faces', clause: 'IS 456 Cl. 34.2.4.1(a), 40.2', status: 'PASS',
+          demand: round(cap.tvX / cap.tcX >= cap.tvY / cap.tcY ? cap.tvX : cap.tvY, 3), capacity: round(cap.tvX / cap.tcX >= cap.tvY / cap.tcY ? cap.tcX : cap.tcY, 3), unit: 'N/mm²',
+          note: 'A pile counts fully when its centre is half a diameter beyond the section, linearly in between; no enhancement near supports (conservative).' },
+        { id: 'cap_punching', label: 'Punching shear at d/2 around the column', clause: 'IS 456 Cl. 31.6.3, 34.2.4.1(b)', status: 'PASS', demand: round(cap.tvp, 3), capacity: round(cap.tcp, 3), unit: 'N/mm²' },
+        { id: 'column_bearing', label: 'Bearing at column–cap interface', clause: 'IS 456 Cl. 34.4', status: c.factoredLoadKn <= bearingCap ? 'PASS' : 'WARNING',
+          demand: round(c.factoredLoadKn, 1), capacity: round(bearingCap, 1), unit: 'kN', note: c.factoredLoadKn <= bearingCap ? undefined : 'Excess load must be carried by dowels/column steel (Cl. 34.4).' },
+        { id: 'dowels', label: 'Dowel development length into the cap', clause: 'IS 456 Cl. 34.4.3, 26.2.1.1', status: dowelOk ? 'PASS' : 'WARNING',
+          demand: e.dowels.developmentLengthMm, capacity: e.dowels.availableLengthMm, unit: 'mm', note: dowelOk ? undefined : 'Provide L-bends or a deeper cap for the dowel anchorage.' },
+        { id: 'pile_embedment', label: 'Pile head embedded into the cap', clause: 'IS 2911 (Part 1)', status: 'PASS', demand: EMBED, unit: 'mm',
+          note: `Pile heads ${EMBED} mm into the cap; bottom cap bars 25 mm above the pile heads.` },
+        { id: 'pile_anchorage', label: 'Pile reinforcement anchorage into the cap', status: 'NOT_VERIFIED', note: 'Pile reinforcement is not designed here: provide its development length into the cap.' },
+        ...common,
+      ];
+    }
     e.status = overallStatus(e.checks);
-    e.assumptions = [`${rows} x ${cols} grid at ${opt.pileSpacingFactor}D spacing (verify against IS 2911).`, 'Pile cap sized by geometry only; edge distance ' + opt.pileCapEdgeMm + ' mm.'];
+    e.assumptions = [
+      `${lay.rows} x ${lay.cols} grid at ${opt.pileSpacingFactor}D spacing (verify against IS 2911).`,
+      `Cap edge distance ${opt.pileCapEdgeMm} mm beyond the pile face; rigid cap, equal pile reactions under axial load (column moments not distributed to piles).`,
+    ];
     e.warnings = e.checks.filter(k => k.status !== 'PASS' && k.note).map(k => `${k.label}: ${k.note}`);
     out.push(e);
   }

@@ -400,7 +400,7 @@ export function buildBBS(args: {
     ],
     notIncluded: [
       'Column starter bars beyond the footing dowels (scheduled with the columns in the integration phase).',
-      'Pedestal and pile cap reinforcement (not designed).',
+      'Pedestal reinforcement and pile reinforcement cages (not designed).',
       'Chairs, spacers and raft edge U-bars; extra steel in raft column zones.',
       'Basement columns, beams, floor/roof slabs and wall–slab corner trimmers (not designed yet).',
       'Stirrups/ties (no beam or column members in this schedule).',
