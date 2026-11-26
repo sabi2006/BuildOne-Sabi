@@ -1759,6 +1759,14 @@ export function designPileFoundation(
     const fck = fckOf(p.concreteGrade);
     const cx = c.widthMm / 1000, cy = c.depthMm / 1000;
     const EMBED = 75; // mm, pile head embedment into the cap
+    const userEta = pile.groupEfficiency && pile.groupEfficiency > 0 ? Math.min(1, pile.groupEfficiency) : undefined;
+    /** Converse-Labarre: η = 1 − θ [(m − 1) n + (n − 1) m] / (90 m n), θ = atan(D / s) in degrees (textbook formula, friction piles) */
+    const etaOf = (l: { rows: number; cols: number; n: number }): number => {
+      if (userEta !== undefined) return userEta;
+      if (l.n <= 1) return 1;
+      const theta = (Math.atan(dp / sM) * 180) / Math.PI;
+      return Math.max(0.3, 1 - (theta * ((l.rows - 1) * l.cols + (l.cols - 1) * l.rows)) / (90 * l.rows * l.cols));
+    };
     type CapResult = { D: number; d: number; phi: number; bx: BarsPerMetre; by: BarsPerMetre; astX: number; astY: number; mX: number; mY: number; limX: number; limY: number; tvX: number; tcX: number; tvY: number; tcY: number; tvp: number; tcp: number };
     let lay = layoutFor(Math.max(1, Math.ceil(c.serviceLoadKn / safeCap)));
     let cap: CapResult | null = null;
@@ -1767,6 +1775,7 @@ export function designPileFoundation(
       for (let D = Math.max(500, opt.minFootingDepthMm); D <= 2500 && !cap; D += 25) {
         const Wcap = RCC_UNIT_WEIGHT * lay.capX * lay.capY * (D / 1000);
         if ((c.serviceLoadKn + Wcap) / lay.n > safeCap) break; // more piles needed
+        if (c.serviceLoadKn + Wcap > etaOf(lay) * lay.n * safeCap) break; // group capacity: more piles needed
         const R = (c.factoredLoadKn + 1.5 * Wcap) / lay.n; // factored reaction per pile
         for (const phi of [12, 16, 20, 25] as const) {
           const d = D - EMBED - 25 - 1.5 * phi;
@@ -1812,8 +1821,15 @@ export function designPileFoundation(
     e.plan = { x0: c.xM - lay.capX / 2, x1: c.xM + lay.capX / 2, y0: c.yM - lay.capY / 2, y1: c.yM + lay.capY / 2 };
     e.sizeXM = lay.capX; e.sizeYM = lay.capY;
     e.pile = { singlePileSafeCapacityKn: round(safeCap, 1), pilesRequired: lay.n, rows: lay.rows, cols: lay.cols, spacingMm: sM * 1000, diameterMm: pile.pileDiameterMm, lengthM: pile.pileLengthM };
+    const eta = etaOf(lay);
+    const groupLoad = cap ? c.serviceLoadKn + RCC_UNIT_WEIGHT * lay.capX * lay.capY * (cap.D / 1000) : c.serviceLoadKn;
+    const groupCheck: DesignCheck = cap
+      ? { id: 'group', label: 'Pile group capacity = efficiency × n × single-pile capacity', clause: userEta !== undefined ? 'user-entered group efficiency' : 'Converse-Labarre (textbook formula, not an IS 2911 clause)', status: groupLoad <= eta * lay.n * safeCap + 1e-9 ? 'PASS' : 'FAIL', demand: round(groupLoad, 1), capacity: round(eta * lay.n * safeCap, 1), unit: 'kN',
+          note: `η = ${round(eta, 3)} (${userEta !== undefined ? 'entered by the user' : `friction-pile assumption, spacing ${round(sM / dp, 2)} D`}). For end-bearing piles in a firm stratum enter η = 1.` }
+      : { id: 'group', label: 'Pile group capacity', status: 'NOT_VERIFIED', note: 'No cap design found.' };
     const common: DesignCheck[] = [
-      { id: 'group', label: 'Pile group capacity / efficiency', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Group efficiency and block failure need soil data per IS 2911: not implemented.' },
+      groupCheck,
+      { id: 'block_failure', label: 'Block failure of the pile group', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Needs the soil strength around and below the group: not computed.' },
       { id: 'lateral', label: 'Lateral / moment capacity of piles', clause: 'IS 2911', status: 'NOT_VERIFIED', note: 'Not implemented.' },
       { id: 'pile_settlement', label: 'Pile group settlement', status: 'NOT_VERIFIED', note: 'Not implemented.' },
       ...commonChecks(p, true),

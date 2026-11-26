@@ -5,6 +5,8 @@ import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '.
 import { isSpecialColumn } from '../../lib/columnGeometry';
 import { isSegmented, segmentHeightM } from '../../lib/columnSegments';
 import { columnAppearance } from '../../lib/columnAppearance';
+import { beamVolumeM3, type EditedBeam } from '../../lib/beamEdits';
+import { BeamGeometry } from './BeamSolid';
 import { getColumnTexture } from './columnTextures';
 import { ColumnGeometry } from './ColumnSolid';
 import { Canvas, useThree } from '@react-three/fiber';
@@ -26,8 +28,8 @@ import {
   worldPositionTo2D,
   validatePillarPlacement,
   detectClosedStructuralBays,
-  detectPillarToPillarBeams,
   detectStructuralPillars,
+  getFloorBeams,
   convertUnit,
   DEFAULT_RCC_REINFORCEMENT,
   RCCReinforcementConfig,
@@ -2181,6 +2183,8 @@ interface SelectedBeamInfo {
   steelGrade?: string;
   /** Level of the beam centre above the ground-floor floor level (3D datum), m */
   centreLevelM?: number;
+  /** Id of the frame beam in the floor's beam list (for the per-beam edits of the plan editor) */
+  frameBeamId?: string;
 }
 
 interface SelectedSlabInfo {
@@ -3562,7 +3566,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   }];
 
                   // Structural pillar-to-pillar beams along all frame lines
-                  const detectedBeams = isAnyBeamActiveIn3D ? detectPillarToPillarBeams(floorPillars, model.buildingUnit, floorAllWalls) : [];
+                  const detectedBeams = isAnyBeamActiveIn3D ? getFloorBeams(floor, floorPillars, floorAllWalls, model.buildingUnit, { frameOnly: true }) : [];
 
                   return (
                     <group key={floor.id}>
@@ -3671,7 +3675,11 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const pStartY = toM(effStartPos.y);
                               const pEndX = toM(effEndPos.x);
                               const pEndY = toM(effEndPos.y);
+                              // edited beams (extended, trimmed, shifted) and cantilevers are not clamped to the pillars / the floor outline
+                              const beamEdit = (beam as EditedBeam).edit;
+                              const skipClamp = !!(beamEdit && (beamEdit.startExtendMm || beamEdit.endExtendMm || beamEdit.lateralOffsetMm)) || !!(beam as EditedBeam).isCantilever;
 
+                              if (!skipClamp) {
                               // Clamp start endpoint so it never extends past the far face of start pillar
                               if (ux > 0.001) extSX = Math.max(extSX, pStartX - startPW / 2);
                               else if (ux < -0.001) extSX = Math.min(extSX, pStartX + startPW / 2);
@@ -3689,6 +3697,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               extEX = Math.max(floorBounds.minX, Math.min(floorBounds.maxX, extEX));
                               extSY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, extSY));
                               extEY = Math.max(floorBounds.minY, Math.min(floorBounds.maxY, extEY));
+                              }
 
                               const fullBeamLenM = Math.hypot(extEX - extSX, extEY - extSY);
                               const extMidX = (extSX + extEX) / 2;
@@ -3696,6 +3705,15 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               const effExtStartM = Math.hypot(sX - extSX, sY - extSY);
                               const effExtEndM = Math.hypot(extEX - eX, extEY - eY);
                               const localPlasterX = (effExtStartM - effExtEndM) / 2;
+
+                              // per-beam edits: size, elevation, section, material look
+                              const beamWM = beamEdit?.widthMm ? beamEdit.widthMm / 1000 : beamThickM;
+                              const beamHM = beamEdit?.depthMm ? beamEdit.depthMm / 1000 : junction.fullRingBeamHeight;
+                              const beamCenterY = junction.fullRingBeamCenterY + (junction.fullRingBeamHeight - beamHM) / 2 + (beamEdit?.elevationOffsetMm ?? 0) / 1000;
+                              const sect = beamEdit?.section;
+                              const specialBeam = !!sect && (sect.kind !== 'rect' || !!sect.taperEndDepthMm || !!sect.curveSagittaMm || !!sect.riseMm);
+                              const beamLook = columnAppearance({ width: 0, depth: 0, columnType: beamEdit?.material, finish: beamEdit?.finish, colour: beamEdit?.colour, texture: beamEdit?.texture, roughness: beamEdit?.roughness, metalness: beamEdit?.metalness });
+                              const beamMap = getColumnTexture(beamLook.texture);
 
                               return (
                                 <React.Fragment key={`frame-beam-${floor.id}-${beam.id}`}>
@@ -3775,7 +3793,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                     const isRingSelected = selectedBeam?.id === ringId;
                                     if (hiddenInView.has(ringId)) return null;
                                     return (
-                                      <group position={[extMidX, junction.fullRingBeamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
+                                      <group position={[extMidX, beamCenterY, -extMidY]} rotation={[0, -ang, 0]}>
                                         {showFullRingBeam && (
                                           <mesh 
                                             name="rccFullRingBeamMesh" 
@@ -3789,7 +3807,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               } else {
                                                 setSelectedBeam({
                                                   id: ringId,
-                                                  centreLevelM: junction.fullRingBeamCenterY,
+                                                  frameBeamId: beam.id,
+                                                  centreLevelM: beamCenterY,
                                                   floorId: floor.id,
                                                   floorName: floor.name || `Floor ${i}`,
                                                   isPlinth: false,
@@ -3797,12 +3816,12 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                                   endPillarId: beam.endPillarId,
                                                   lengthM: fullBeamLenM,
                                                   lengthFt: fullBeamLenM * 3.28084,
-                                                  widthIn: Math.round(beamThickM * 39.3701),
-                                                  depthIn: Math.round(junction.fullRingBeamHeight * 39.3701),
-                                                  widthM: beamThickM,
-                                                  depthM: junction.fullRingBeamHeight,
-                                                  concreteVolumeM3: fullBeamLenM * beamThickM * junction.fullRingBeamHeight,
-                                                  concreteVolumeCft: (fullBeamLenM * beamThickM * junction.fullRingBeamHeight) * 35.3147,
+                                                  widthIn: Math.round(beamWM * 39.3701),
+                                                  depthIn: Math.round(beamHM * 39.3701),
+                                                  widthM: beamWM,
+                                                  depthM: beamHM,
+                                                  concreteVolumeM3: beamEdit ? beamVolumeM3({ widthMm: beamWM * 1000, depthMm: beamHM * 1000, section: sect }, fullBeamLenM) : fullBeamLenM * beamThickM * junction.fullRingBeamHeight,
+                                                  concreteVolumeCft: (beamEdit ? beamVolumeM3({ widthMm: beamWM * 1000, depthMm: beamHM * 1000, section: sect }, fullBeamLenM) : fullBeamLenM * beamThickM * junction.fullRingBeamHeight) * 35.3147,
                                                   reinf: floorBeamReinf,
                                                   beamSizingRule: isTopFloor ? 'Span / 15 Rule (Roof Ring Beam)' : 'Span / 12 Rule (Floor Ring Beam)',
                                                   concreteGrade: (model as any).concreteGrade || 'M20',
@@ -3814,11 +3833,15 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               }
                                             }}
                                           >
-                                            <boxGeometry args={[fullBeamLenM, junction.fullRingBeamHeight, beamThickM]} />
+                                            {specialBeam
+                                              ? <BeamGeometry spec={{ lengthM: fullBeamLenM, widthMm: beamWM * 1000, depthMm: beamHM * 1000, section: sect }} />
+                                              : <boxGeometry args={[fullBeamLenM, beamHM, beamWM]} />}
                                             <meshStandardMaterial 
-                                              color={isRingSelected ? "#0284c7" : "#64748b"} 
-                                              roughness={isBeamXRay ? 0.3 : 0.85} 
-                                              metalness={isBeamXRay ? 0.1 : 0.05} 
+                                              key={beamMap ? beamLook.texture : 'none'}
+                                              map={isRingSelected || isBeamXRay ? null : beamMap}
+                                              color={isRingSelected ? "#0284c7" : (beamEdit ? beamLook.color : "#64748b")} 
+                                              roughness={isBeamXRay ? 0.3 : (beamEdit ? beamLook.roughness : 0.85)} 
+                                              metalness={isBeamXRay ? 0.1 : (beamEdit ? beamLook.metalness : 0.05)} 
                                               transparent={isConcreteTransparent} 
                                               opacity={concreteOpacity} 
                                               depthWrite={isConcreteDepthWrite} 
@@ -3829,26 +3852,26 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                         )}
 
                                         {/* Exposed Rebar Cage for Ring Beam */}
-                                        {isRebarActive && showRingBeamRebar && (
+                                        {isRebarActive && showRingBeamRebar && !specialBeam && (
                                           <RingBeamRebarCage 
                                             lenM={fullBeamLenM} 
-                                            heightM={junction.fullRingBeamHeight} 
-                                            widthM={beamThickM} 
+                                            heightM={beamHM} 
+                                            widthM={beamWM} 
                                             reinf={floorBeamReinf} 
                                           />
                                         )}
 
                                         {/* 3D RCC Side Beam Plaster: Real Physical Layer strictly on Exposed Side Face A (+Z) and Side Face B (-Z) */}
-                                        {showFullRingBeam && isSideBeamPlasterVisible && (
+                                        {showFullRingBeam && isSideBeamPlasterVisible && !specialBeam && (
                                           <group name="rccSideBeamPlasterGroup">
                                             <mesh 
                                               name="rccBeamPlasterMesh"
-                                              position={[localPlasterX, 0, beamThickM / 2 + 0.0005 + beamPlasterThickM / 2]} 
+                                              position={[localPlasterX, 0, beamWM / 2 + 0.0005 + beamPlasterThickM / 2]} 
                                               castShadow={!plasterXRay} 
                                               receiveShadow={!plasterXRay}
                                               renderOrder={plasterXRay ? 10 : 0}
                                             >
-                                              <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
+                                              <boxGeometry args={[clearSpanM, beamHM, beamPlasterThickM]} />
                                               <meshStandardMaterial 
                                                 color="#bfc7d2" 
                                                 roughness={0.90} 
@@ -3860,12 +3883,12 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                             </mesh>
                                             <mesh 
                                               name="rccBeamPlasterMesh"
-                                              position={[localPlasterX, 0, -beamThickM / 2 - 0.0005 - beamPlasterThickM / 2]} 
+                                              position={[localPlasterX, 0, -beamWM / 2 - 0.0005 - beamPlasterThickM / 2]} 
                                               castShadow={!plasterXRay} 
                                               receiveShadow={!plasterXRay}
                                               renderOrder={plasterXRay ? 10 : 0}
                                             >
-                                              <boxGeometry args={[clearSpanM, junction.fullRingBeamHeight, beamPlasterThickM]} />
+                                              <boxGeometry args={[clearSpanM, beamHM, beamPlasterThickM]} />
                                               <meshStandardMaterial 
                                                 color="#bfc7d2" 
                                                 roughness={0.90} 

@@ -372,14 +372,15 @@ describe('Pile foundation', () => {
     const e = designPileFoundation([col('a', 0, 0, 1600)], params({
       requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
     }))[0];
-    for (const id of ['group', 'lateral', 'pile_settlement', 'pile_anchorage']) expect(e.checks.find(c => c.id === id)!.status).toBe('NOT_VERIFIED');
+    for (const id of ['block_failure', 'lateral', 'pile_settlement', 'pile_anchorage']) expect(e.checks.find(c => c.id === id)!.status).toBe('NOT_VERIFIED');
+    expect(e.checks.find(c => c.id === 'group')!.status).toBe('PASS');
     expect(e.status).not.toBe('PASS');
   });
 
   it('cap bending moment matches the hand value for a 2-pile cap', () => {
     // 2 piles at 2.5D = 1125 mm; column 400; Pu per pile R; M at face = R·(s/2 − c/2) per side
     const e = designPileFoundation([col('a', 0, 0, 900)], params({
-      requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 },
+      requestedType: 'pile', pile: { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12, groupEfficiency: 1 },
     }))[0];
     expect(e.pile!.pilesRequired).toBe(2);
     const fl = e.checks.find(c => c.id === 'cap_flexure')!;
@@ -393,11 +394,28 @@ describe('Pile foundation', () => {
 
   it('derives capacity from skin friction and end bearing with FS 2.5', () => {
     const r = designPileFoundation([col('a', 0, 0, 1000)], params({
-      requestedType: 'pile', pile: { pileDiameterMm: 500, pileLengthM: 10, unitSkinFrictionKnM2: 30, unitEndBearingKnM2: 1500 },
+      requestedType: 'pile', pile: { pileDiameterMm: 500, pileLengthM: 10, unitSkinFrictionKnM2: 30, unitEndBearingKnM2: 1500, groupEfficiency: 1 },
     }));
     // Qu = 30*π*0.5*10 + 1500*π*0.25/4... = 471.2 + 294.5 = 765.7 ; safe = /2.5 = 306.3
     expect(r[0].pile!.singlePileSafeCapacityKn).toBeCloseTo(306.3, 0);
     expect(r[0].pile!.pilesRequired).toBe(4); // ceil(1000/306.3)
+  });
+
+  it('group efficiency (Converse-Labarre, friction piles): 2 x 2 at 2.5 D gives η = 1 − θ[(m−1)n + (n−1)m]/(90 m n), and the group capacity drives the pile count', () => {
+    const pile = { verifiedPileCapacityKn: 500, pileDiameterMm: 450, pileLengthM: 12 };
+    const withEta = designPileFoundation([col('a', 0, 0, 1600)], params({ requestedType: 'pile', pile }))[0];
+    const ignore = designPileFoundation([col('a', 0, 0, 1600)], params({ requestedType: 'pile', pile: { ...pile, groupEfficiency: 1 } }))[0];
+    expect(withEta.pile!.pilesRequired!).toBeGreaterThan(ignore.pile!.pilesRequired!);
+    const g = withEta.checks.find(c => c.id === 'group')!;
+    const { rows, cols } = withEta.pile!;
+    const theta = (Math.atan(1 / 2.5) * 180) / Math.PI;
+    const eta = 1 - (theta * ((rows! - 1) * cols! + (cols! - 1) * rows!)) / (90 * rows! * cols!);
+    expect(g.capacity).toBeCloseTo(eta * withEta.pile!.pilesRequired! * 500, 0);
+    expect(g.status).toBe('PASS');
+    expect(g.clause).toContain('Converse-Labarre');
+    const user = ignore.checks.find(c => c.id === 'group')!;
+    expect(user.capacity).toBeCloseTo(ignore.pile!.pilesRequired! * 500, 0);
+    expect(user.clause).toContain('user-entered');
   });
 });
 

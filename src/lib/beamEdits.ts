@@ -59,12 +59,15 @@ export interface BeamEdit {
   metalness?: number;
   extraBars?: BeamExtraBars;
   endCondition?: BeamEndCondition;
+  /** Set on the parts of a split beam: the id of the beam they were split from (used to merge them back) */
+  splitOf?: string;
 }
 
 export type BeamEnd =
   | { kind: 'pillar'; pillarId: string }
   | { kind: 'beam'; beamId: string; t: number }
-  | { kind: 'free'; x: number; y: number };
+  /** A free point. `joint` marks a split point shared with another beam (not a cantilever tip). */
+  | { kind: 'free'; x: number; y: number; joint?: boolean };
 
 export interface CustomBeam { id: string; start: BeamEnd; end: BeamEnd }
 
@@ -171,8 +174,8 @@ export interface EditedBeam extends StructuralBeam {
   elevationOffsetM?: number;
   deleted?: boolean;
   /** How each end is attached: for the connection / clash report */
-  startAttach?: 'pillar' | 'beam' | 'free';
-  endAttach?: 'pillar' | 'beam' | 'free';
+  startAttach?: 'pillar' | 'beam' | 'free' | 'point';
+  endAttach?: 'pillar' | 'beam' | 'free' | 'point';
 }
 
 const planLengthUnit = (a: Coordinate, b: Coordinate) => Math.hypot(b.x - a.x, b.y - a.y);
@@ -203,9 +206,9 @@ export function applyBeamEdits(
   for (let guard = 0; pending.length > 0 && guard < 20; guard++) {
     for (let i = pending.length - 1; i >= 0; i--) {
       const cb = pending[i];
-      const resolve = (end: BeamEnd): { p?: Coordinate; attach: 'pillar' | 'beam' | 'free'; pillarId?: string } => {
+      const resolve = (end: BeamEnd): { p?: Coordinate; attach: 'pillar' | 'beam' | 'free' | 'point'; pillarId?: string } => {
         if (end.kind === 'pillar') { const p = pillarPos(end.pillarId); return { p, attach: 'pillar', pillarId: end.pillarId }; }
-        if (end.kind === 'free') return { p: { x: end.x, y: end.y }, attach: 'free' };
+        if (end.kind === 'free') return { p: { x: end.x, y: end.y }, attach: end.joint ? 'point' : 'free' };
         const host = byId.get(end.beamId);
         if (!host) return { attach: 'beam' };
         const t = Math.min(1, Math.max(0, end.t));

@@ -2017,6 +2017,25 @@ Please contact me.`;
                       </tbody>
                     </table>
                   </div>
+                  {s.editedBeamCalculations && s.editedBeamCalculations.length > 0 && (
+                    <div className="px-4 py-3 border-t border-slate-200 bg-purple-50/40" data-testid="edited-beam-designs">
+                      <div className="text-[11px] font-bold text-purple-900 mb-1.5">Edited and drawn beams (each designed on its own span, IS 456)</div>
+                      <div className="space-y-1">
+                        {s.editedBeamCalculations.map(({ beamId, label, calc }) => (
+                          <div key={beamId} className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-slate-700 border border-purple-100 bg-white rounded px-2 py-1">
+                            <span className="font-bold">{label}</span>
+                            <span className="font-mono">{calc.beamWidthMm} × {calc.beamDepthMm} mm, span {calc.effectiveSpanM} m</span>
+                            <span className="font-mono">Mu {calc.designBendingMomentMuKnM} kNm · Vu {calc.designShearForceVuKn} kN</span>
+                            <span className="font-mono text-indigo-700">Bot {calc.bottomMainBarCount}-⌀{calc.bottomMainBarDiaMm} · Top {calc.topAnchorBarCount}-⌀{calc.topAnchorBarDiaMm}</span>
+                            <span className={`font-bold ${calc.rebarChecks.some(c => c.status === 'FAIL') ? 'text-red-700' : calc.rebarChecks.some(c => c.status === 'WARNING') ? 'text-amber-700' : 'text-emerald-700'}`}>
+                              {calc.rebarChecks.some(c => c.status === 'FAIL') ? 'FAIL' : calc.rebarChecks.some(c => c.status === 'WARNING') ? 'WARNING' : 'PASS'}
+                            </span>
+                            {calc.notes.filter(n => /Cantilever|Fixed-end/.test(n)).map((n, i) => <span key={i} className="basis-full text-[10px] text-slate-500">{n}</span>)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

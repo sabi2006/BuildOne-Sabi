@@ -31,7 +31,7 @@ import {
   trimWallByPillars, 
   splitWallByPillars,
   getEffectivePillarPosition,
-  getEffectiveFloorBeams,
+  getFloorBeams,
   getPillarWorldPosition,
   worldPositionTo2D,
   validatePillarPlacement,
@@ -71,6 +71,9 @@ import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfig
 
 import { isSpecialColumn, columnTaperRatio, rotatedSectionPolygon } from '@/lib/columnGeometry';
 import { columnAppearance } from '@/lib/columnAppearance';
+import { BeamEditorPanel } from './BeamEditorPanel';
+import { detectBeamJunctions, type BeamEdit, type BeamEnd, type BeamJunction, type EditedBeam } from '@/lib/beamEdits';
+import { patchBeams, deleteBeams, restoreBeams, addCustomBeam, duplicateBeam, copyBeamProperties, pasteBeamProperties, retargetCustomBeam, snapBeamEnd, splitBeam, mergeBeams } from '@/lib/beamEditOps';
 import { splitColumn, mergeColumnSegments, columnSegments, isUpperSegment, segmentHeightM } from '@/lib/columnSegments';
 /** Unique id suffix for new elements (module scope: called from event handlers only) */
 /** Plan outline of a shaped column (rotation applied) in building units as an SVG points string; `top` gives the top face (taper + incline) */
@@ -92,7 +95,7 @@ interface BuildingEditorProps {
   onGenerate: () => void;
 }
 
-type Tool = 'wall' | 'door' | 'window' | 'delete' | 'none' | 'pillar' | 'beam' | 'fullRingBeam' | 'foundation' | 'slab' | 'roof' | 'clear';
+type Tool = 'wall' | 'door' | 'window' | 'delete' | 'none' | 'pillar' | 'beam' | 'frameBeam' | 'fullRingBeam' | 'foundation' | 'slab' | 'roof' | 'clear';
 
 export function BuildingEditor({ initialDetails, onGenerate }: BuildingEditorProps) {
   const { setBuildingModel, buildingModel, updateBuildingConfig, updateSettings, brickType, settings, result, projectName, toastMessage, triggerToast } = useCalculator();
@@ -3794,11 +3797,69 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
 
   };
 
+  // ---------------- Frame beams: selection, per-beam edits, drawing, dragging ----------------
+  const [selectedBeamIds, setSelectedBeamIds] = useState<string[]>([]);
+  const [beamDrawMode, setBeamDrawMode] = useState(false);
+  const [beamDrawStart, setBeamDrawStart] = useState<BeamEnd | null>(null);
+  const [beamDrawCursor, setBeamDrawCursor] = useState<Coordinate | null>(null);
+  const [beamClipboard, setBeamClipboard] = useState<BeamEdit | null>(null);
+  const [beamNotice, setBeamNotice] = useState<string>('');
+  const [beamDrag, setBeamDrag] = useState<{ id: string; startMouse: Coordinate; startLateralMm: number; px: number; py: number } | null>(null);
+
+  const frameBeamFloorId = activeFloorId;
+  const frameBeamPillars = (model.pillars || []).filter(pp => pp.position && pp.floorId === activeFloorId && !isUpperSegment(pp));
+  const frameBeamWalls = [...(activeFloor?.externalWalls || []), ...(activeFloor?.internalWalls || [])];
+  /** All frame beams of the active floor, deleted ones included (flagged) */
+  const frameBeamsAll: EditedBeam[] = activeFloor ? getFloorBeams(activeFloor, frameBeamPillars, frameBeamWalls, model.buildingUnit, { includeDeleted: true, frameOnly: true }) : [];
+  const frameBeamsLive = frameBeamsAll.filter(b => !b.deleted);
+  const frameBeamDefaults = { widthMm: Math.round((activeFloor?.ringBeam?.width ?? 9) * 25.4), depthMm: Math.round((activeFloor?.ringBeam?.depth ?? 9) * 25.4) };
+  const frameBeamJunctions: BeamJunction[] = activeTool === 'frameBeam'
+    ? detectBeamJunctions(frameBeamsLive, b => b.elevationOffsetM ?? 0, b => (b.edit?.depthMm ?? frameBeamDefaults.depthMm) / 1000)
+    : [];
+  const updateFloorBeams = (fn: (f: { beamEdits?: Record<string, BeamEdit>; customBeams?: import('@/lib/beamEdits').CustomBeam[] }) => { floor: { beamEdits: Record<string, BeamEdit>; customBeams: import('@/lib/beamEdits').CustomBeam[] }; changed?: string[]; skippedLocked?: string[] }, what: string) => {
+    if (!activeFloor) return;
+    const r = fn({ beamEdits: activeFloor.beamEdits, customBeams: activeFloor.customBeams });
+    setModel(prev => ({ ...prev, floors: prev.floors.map(f => (f.id === frameBeamFloorId ? { ...f, beamEdits: r.floor.beamEdits, customBeams: r.floor.customBeams } : f)) }));
+    const skipped = r.skippedLocked?.length ?? 0;
+    setBeamNotice(`${what}${r.changed ? `: ${r.changed.length} changed` : ''}${skipped ? `, ${skipped} locked skipped` : ''}.`);
+  };
+  const beamPillarPos = (id: string): Coordinate | undefined => {
+    const pp = frameBeamPillars.find(x => x.id === id);
+    return pp ? getEffectivePillarPosition(pp, frameBeamWalls, model.buildingUnit) : undefined;
+  };
+  const beamSnapPillars = () => frameBeamPillars.map(pp => ({ id: pp.id, ...(beamPillarPos(pp.id) as Coordinate) }));
+  const selectBeam = (id: string, additive: boolean) => {
+    setSelectedBeamIds(prev => (additive ? (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]) : [id]));
+  };
+  const handleBeamDrawClick = (e: React.MouseEvent) => {
+    const c = getMouseCoords(e);
+    if (!c) return;
+    const end = snapBeamEnd(c, beamSnapPillars(), frameBeamsLive, 0.8, 1);
+    if (!beamDrawStart) { setBeamDrawStart(end); setBeamNotice('Click the second point.'); return; }
+    if (beamDrawStart.kind === 'free' && end.kind === 'free') { setBeamNotice('At least one end must be on a pillar or a beam.'); return; }
+    const same = beamDrawStart.kind === end.kind && ((end.kind === 'pillar' && (beamDrawStart as { pillarId?: string }).pillarId === end.pillarId) || (end.kind === 'free' && (beamDrawStart as { x?: number; y?: number }).x === end.x && (beamDrawStart as { y?: number }).y === end.y));
+    if (same) { setBeamNotice('The two points are the same.'); return; }
+    let newId = '';
+    updateFloorBeams(f => { const r = addCustomBeam(f, beamDrawStart, end); newId = r.id; return { floor: r.floor }; }, 'Beam drawn');
+    setBeamDrawStart(null); setBeamDrawCursor(null);
+    if (newId) setSelectedBeamIds([newId]);
+  };
+
   /** Touch support: a touch release places like a click, and the synthesised mouse events that follow it are ignored */
   const lastTouchRef = useRef(0);
   const touchGuard = () => nowMs() - lastTouchRef.current < 800;
-  const svgTouchPlacing = activeMode === 'foundation' ? isPlacingFooting : (activeTool === 'pillar' || activeTool === 'wall');
+  const svgTouchPlacing = activeMode === 'foundation' ? isPlacingFooting : (activeTool === 'pillar' || activeTool === 'wall' || (activeTool === 'frameBeam' && beamDrawMode));
   const svgPointerMove = (e: React.MouseEvent) => {
+    if (activeTool === 'frameBeam') {
+      const drag = beamDrag;
+      const c = getMouseCoords(e);
+      if (drag && c) {
+        const perpDist = (c.x - drag.startMouse.x) * drag.px + (c.y - drag.startMouse.y) * drag.py; // building unit, + = left of the beam
+        const mmPer: Record<string, number> = { ft: 304.8, m: 1000, in: 25.4, mm: 1, cm: 10 };
+        const lat = Math.round((drag.startLateralMm + perpDist * (mmPer[model.buildingUnit] ?? 304.8)) / 25) * 25;
+        updateFloorBeams(f => patchBeams(f, [drag.id], { lateralOffsetMm: lat || undefined }), 'Beam moved');
+      } else if (beamDrawMode && beamDrawStart && c) setBeamDrawCursor(c);
+    }
     if (footDrawStartRef.current) {
       const c = getFoundationCoords(e, foundationSnapMode);
       if (c) setFootDrawRect({ a: footDrawStartRef.current, b: c });
@@ -3806,6 +3867,18 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
     handleSvgMouseMove(e);
   };
   const svgPointerDown = (e: React.MouseEvent) => {
+    if (activeTool === 'frameBeam' && !beamDrawMode) {
+      // press on a selected, unlocked beam starts moving it sideways (the move follows the mouse in svgPointerMove)
+      const hit = (e.target as Element | null)?.closest?.('[data-beam-hit]');
+      const id = hit?.getAttribute('data-beam-hit');
+      const b = id ? frameBeamsAll.find(x => x.id === id) : undefined;
+      if (b && !b.deleted && !b.edit?.locked && selectedBeamIds.length === 1 && selectedBeamIds[0] === b.id && !isMultiKey(e)) {
+        const c = getMouseCoords(e);
+        const len = Math.hypot(b.end.x - b.start.x, b.end.y - b.start.y);
+        if (c && len > 0) setBeamDrag({ id: b.id, startMouse: c, startLateralMm: b.edit?.lateralOffsetMm ?? 0, px: -(b.end.y - b.start.y) / len, py: (b.end.x - b.start.x) / len });
+      }
+      return;
+    }
     if (activeMode === 'foundation' && isPlacingFooting) {
       const c = getFoundationCoords(e, foundationSnapMode);
       if (c) { footDrawStartRef.current = c; setFootDrawRect({ a: c, b: c }); }
@@ -3813,6 +3886,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
   };
   /** Finishes a footing drag; returns true when a footing was drawn (the click that follows must not add a second one) */
   const svgPointerUp = (e: React.MouseEvent): boolean => {
+    if (beamDrag) { setBeamDrag(null); return true; }
     const a = footDrawStartRef.current;
     footDrawStartRef.current = null;
     setFootDrawRect(null);
@@ -3844,6 +3918,11 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
     }
     if (activeMode === 'plaster') {
       setSelectedWallForPlasterId(null);
+      return;
+    }
+    if (activeTool === 'frameBeam') {
+      if (beamDrawMode) handleBeamDrawClick(e);
+      else if (!isMultiKey(e)) setSelectedBeamIds([]);
       return;
     }
     const coords = getMouseCoords(e);
@@ -7946,6 +8025,39 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
               </div>
             )}
 
+            <button
+              onClick={() => { setActiveTool('frameBeam'); setDrawingStart(null); setBeamDrawStart(null); }}
+              data-testid="tool-frame-beam"
+              className={cn("flex items-center space-x-2 px-3 py-2 rounded text-sm transition-colors", activeTool === 'frameBeam' ? 'bg-purple-700 text-white' : 'hover:bg-gray-200 text-gray-700')}
+            >
+              <Box className="w-4 h-4" /> <span>Frame Beams (edit / draw)</span>
+            </button>
+            {activeTool === 'frameBeam' && (
+              <BeamEditorPanel
+                beams={frameBeamsAll}
+                selectedIds={selectedBeamIds}
+                unit={model.buildingUnit}
+                defaults={frameBeamDefaults}
+                pillars={frameBeamPillars.map(pp => ({ id: pp.id, name: pp.name || pp.id }))}
+                junctions={frameBeamJunctions}
+                drawMode={beamDrawMode}
+                hasClipboard={!!beamClipboard}
+                notice={beamNotice}
+                onDrawMode={(on) => { setBeamDrawMode(on); setBeamDrawStart(null); setBeamDrawCursor(null); setBeamNotice(on ? 'Click the first point.' : ''); }}
+                onEdit={(ids, patch) => updateFloorBeams(f => patchBeams(f, ids, patch), 'Beam updated')}
+                onDelete={(ids) => { const r = deleteBeams({ beamEdits: activeFloor?.beamEdits, customBeams: activeFloor?.customBeams }, ids); updateFloorBeams(() => r, 'Deleted'); setSelectedBeamIds(prev => prev.filter(x => !r.changed.includes(x))); }}
+                onRestore={(ids) => updateFloorBeams(f => restoreBeams(f, ids), 'Restored')}
+                onDuplicate={(id) => { const b = frameBeamsAll.find(x => x.id === id); if (!b) return; let nid = ''; updateFloorBeams(f => { const r = duplicateBeam(f, b, b.edit?.widthMm ?? frameBeamDefaults.widthMm); nid = r.id; return { floor: r.floor }; }, 'Beam duplicated'); if (nid) setSelectedBeamIds([nid]); }}
+                onCopy={(id) => { setBeamClipboard(copyBeamProperties({ beamEdits: activeFloor?.beamEdits }, id)); setBeamNotice('Properties copied.'); }}
+                onPaste={(ids) => { if (beamClipboard) updateFloorBeams(f => pasteBeamProperties(f, ids, beamClipboard), 'Pasted properties'); }}
+                onRetarget={(id, which, pillarId) => updateFloorBeams(f => retargetCustomBeam(f, id, which, { kind: 'pillar', pillarId }), 'Beam re-attached')}
+                onSelect={setSelectedBeamIds}
+                onSplit={(id, t) => { const b = frameBeamsAll.find(x => x.id === id); if (!b) return; let ids: string[] = []; updateFloorBeams(f => { const r = splitBeam(f, b, t); if (!r) return { floor: { beamEdits: f.beamEdits ?? {}, customBeams: f.customBeams ?? [] }, changed: [], skippedLocked: b.edit?.locked ? [id] : [] }; ids = r.ids; return { floor: r.floor, changed: r.ids }; }, 'Beam split'); if (ids.length) setSelectedBeamIds(ids); }}
+                onMerge={(a, b) => { let nid = ''; updateFloorBeams(f => { const r = mergeBeams(f, a, b); nid = r.id ?? ''; return r; }, 'Beams merged'); if (nid) setSelectedBeamIds([nid]); }}
+                onResolveClash={(beamId, rise) => updateFloorBeams(f => patchBeams(f, [beamId], { elevationOffsetMm: rise }), 'Beam raised')}
+              />
+            )}
+
             {/* 1. Floor RCC Slab Tool */}
             <button 
               onClick={() => { setActiveTool('slab'); setDrawingStart(null); }}
@@ -9396,12 +9508,13 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
               {activeMode === 'floor' && (() => {
                 const floorPillars = (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId);
                 const floorWalls = [...(activeFloor?.externalWalls || []), ...(activeFloor?.internalWalls || [])];
-                const beams = getEffectiveFloorBeams(floorPillars, floorWalls, model.buildingUnit);
-                if (beams.length === 0) return null;
+                const beams = activeTool === 'frameBeam' ? frameBeamsAll : getFloorBeams(activeFloor, floorPillars, floorWalls, model.buildingUnit);
+                if (beams.length === 0 && activeTool !== 'frameBeam') return null;
 
                 const ringCfg = activeFloor?.ringBeam;
                 const fullRingCfg = activeFloor?.fullRingBeam;
                 const isBeamTool = activeTool === 'beam' || activeTool === 'fullRingBeam';
+                const isFrameTool = activeTool === 'frameBeam';
                 const isRingOn = ringCfg?.enabled !== false && !fullRingCfg?.enabled;
                 const isFullOn = fullRingCfg?.enabled === true;
 
@@ -9409,7 +9522,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                 const beamWidthFt = convertUnit(beamWidthIn, 'in', model.buildingUnit);
 
                 return (
-                  <g className="pointer-events-none" opacity={isBeamTool ? 0.95 : (isRingOn || isFullOn ? 0.75 : 0.4)}>
+                  <g className={isFrameTool ? '' : 'pointer-events-none'} opacity={isBeamTool || isFrameTool ? 0.95 : (isRingOn || isFullOn ? 0.75 : 0.4)}>
                     {beams.map(b => {
                       const dx = b.end.x - b.start.x;
                       const dy = b.end.y - b.start.y;
@@ -9419,27 +9532,51 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                       const midX = (b.start.x + b.end.x) / 2;
                       const midY = (b.start.y + b.end.y) / 2;
 
-                      const strokeColor = isFullOn ? "#6366f1" : (isBeamTool ? "#2563eb" : "#3b82f6");
+                      const edB = b as EditedBeam;
+                      const isSel = isFrameTool && selectedBeamIds.includes(b.id);
+                      const strokeColor = edB.deleted ? "#9ca3af" : isSel ? "#f97316" : (edB.edit?.locked ? "#b45309" : (isFullOn ? "#6366f1" : (isBeamTool || isFrameTool ? "#2563eb" : "#3b82f6")));
+                      const bandFt = convertUnit(edB.edit?.widthMm ?? beamWidthIn * 25.4, 'mm', model.buildingUnit);
 
                       return (
-                        <g key={`2d-beam-${b.id}`}>
+                        <g key={`2d-beam-${b.id}`} data-beam-id={b.id} data-beam-selected={isSel ? 'true' : undefined} data-beam-deleted={edB.deleted ? 'true' : undefined}>
+                          {isFrameTool && (
+                            <line
+                              x1={b.start.x} y1={b.start.y} x2={b.end.x} y2={b.end.y}
+                              stroke="transparent" strokeWidth={Math.max(1.2, bandFt)} strokeLinecap="round"
+                              style={{ cursor: edB.edit?.locked ? 'not-allowed' : (isSel ? 'grab' : 'pointer') }}
+                              data-beam-hit={b.id}
+                              onClick={(ev) => {
+                                if (beamDrawMode) return; // the canvas click places the point
+                                ev.stopPropagation();
+                                if (edB.deleted) { updateFloorBeams(f => restoreBeams(f, [b.id]), 'Restored'); return; }
+                                selectBeam(b.id, isMultiKey(ev));
+                              }}
+                            />
+                          )}
                           {/* Beam Width Band */}
                           <line
                             x1={b.start.x} y1={b.start.y}
                             x2={b.end.x} y2={b.end.y}
                             stroke={strokeColor}
-                            strokeWidth={beamWidthFt}
+                            strokeWidth={isFrameTool ? bandFt : beamWidthFt}
                             strokeLinecap="square"
-                            opacity={isBeamTool ? "0.35" : "0.2"}
+                            opacity={edB.deleted ? "0.12" : (isBeamTool || isFrameTool ? "0.35" : "0.2")}
+                            className="pointer-events-none"
                           />
                           {/* Centerline */}
                           <line
                             x1={b.start.x} y1={b.start.y}
                             x2={b.end.x} y2={b.end.y}
                             stroke={strokeColor}
-                            strokeWidth="0.12"
-                            strokeDasharray={isBeamTool ? undefined : "0.6,0.3"}
+                            strokeWidth={isSel ? "0.22" : "0.12"}
+                            strokeDasharray={edB.deleted ? "0.2,0.4" : (isBeamTool ? undefined : "0.6,0.3")}
+                            className="pointer-events-none"
                           />
+                          {isFrameTool && !edB.deleted && len > 2 && (
+                            <text x={midX} y={midY} transform={`scale(1, -1) translate(0, ${-midY * 2})`} textAnchor="middle" alignmentBaseline="middle" fontSize="0.36" fill="#1e3a8a" fontWeight="600" className="select-none pointer-events-none">
+                              {`${edB.edit?.section && edB.edit.section.kind !== 'rect' ? edB.edit.section.kind + ' ' : ''}${edB.edit?.widthMm ?? frameBeamDefaults.widthMm}×${edB.edit?.depthMm ?? frameBeamDefaults.depthMm}${edB.isCantilever ? ' cant.' : ''}${edB.edit?.locked ? ' 🔒' : ''}`}
+                            </text>
+                          )}
                           {/* Beam dimension label when Beam Tool is active */}
                           {isBeamTool && len > 3 && (
                             <text
@@ -9458,6 +9595,18 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                         </g>
                       );
                     })}
+                    {isFrameTool && frameBeamJunctions.filter(j => j.kind !== 'pillar').map((j, i) => (
+                      <circle key={`jn-${j.beamA}-${j.beamB}-${i}`} cx={j.point.x} cy={j.point.y} r={0.45}
+                        fill={j.kind === 'tee' ? '#16a34a' : (j.separatedVertically ? '#a3a3a3' : '#dc2626')} opacity="0.85" className="pointer-events-none"
+                        data-beam-junction={j.kind} />
+                    ))}
+                    {isFrameTool && beamDrawMode && beamDrawStart && beamDrawCursor && (() => {
+                      const sp = beamDrawStart.kind === 'pillar' ? beamPillarPos(beamDrawStart.pillarId)
+                        : beamDrawStart.kind === 'free' ? { x: beamDrawStart.x, y: beamDrawStart.y }
+                        : (() => { const hb = frameBeamsLive.find(x => x.id === (beamDrawStart as { beamId: string }).beamId); const t = (beamDrawStart as { t: number }).t; return hb ? { x: hb.start.x + (hb.end.x - hb.start.x) * t, y: hb.start.y + (hb.end.y - hb.start.y) * t } : undefined; })();
+                      if (!sp) return null;
+                      return <line x1={sp.x} y1={sp.y} x2={beamDrawCursor.x} y2={beamDrawCursor.y} stroke="#7c3aed" strokeWidth="0.15" strokeDasharray="0.4,0.3" className="pointer-events-none" data-testid="beam-draw-preview" />;
+                    })()}
                   </g>
                 );
               })()}
@@ -9514,6 +9663,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                       key={p.id} 
                       onMouseDown={(e) => {
                         if (isDeleteMode) return;
+                        if (activeTool === 'frameBeam' && beamDrawMode) return; // drawing a beam: the press is not a column drag
                         e.stopPropagation();
                         if (isMultiKey(e)) return; // multi-select click: no drag, no single selection
                         const mouse = getMouseCoords(e);
@@ -9545,6 +9695,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (activeTool === 'frameBeam' && beamDrawMode) { handleBeamDrawClick(e); return; } // a pillar is a valid beam end
                         if (isDeleteMode) {
                           promptRemovePillar(p);
                         } else if (isMultiKey(e)) {

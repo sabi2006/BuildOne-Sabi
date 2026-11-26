@@ -410,6 +410,9 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
               <NumField label="Verified Pile Capacity" unit="kN" step={10} value={fd.investigation.pile?.verifiedPileCapacityKn}
                 hint="e.g. from a pile load test"
                 onChange={(v) => setInv({ pile: { ...fd.investigation.pile, verifiedPileCapacityKn: v } })} />
+              <NumField label="Group Efficiency" unit="0 - 1" step={0.05} min={0.3} value={fd.investigation.pile?.groupEfficiency}
+                hint="Blank = Converse-Labarre (friction piles); 1 for end-bearing piles"
+                onChange={(v) => setInv({ pile: { ...fd.investigation.pile, groupEfficiency: v === undefined ? undefined : Math.min(1, Math.max(0.3, v)) } })} />
               <NumField label="Unit Skin Friction" unit="kN/m²" value={fd.investigation.pile?.unitSkinFrictionKnM2}
                 onChange={(v) => setInv({ pile: { ...fd.investigation.pile, unitSkinFrictionKnM2: v } })} />
               <NumField label="Unit End Bearing" unit="kN/m²" value={fd.investigation.pile?.unitEndBearingKnM2}

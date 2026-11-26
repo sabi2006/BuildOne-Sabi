@@ -59,6 +59,8 @@ export interface PileInvestigationData {
   unitEndBearingKnM2?: number;
   /** User-supplied verified single-pile capacity, kN (e.g. from a pile load test) */
   verifiedPileCapacityKn?: number;
+  /** Group efficiency (0 - 1) of the pile group, e.g. 1 for end-bearing piles in a firm stratum. Blank: the Converse-Labarre formula for friction piles is used. */
+  groupEfficiency?: number;
 }
 
 export interface SoilInvestigationData {
