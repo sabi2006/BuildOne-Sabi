@@ -1619,10 +1619,12 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
         onMouseLeave={() => setShowHint(false)}
         style={{ pointerEvents: 'auto' }}
       >
-        {/* Debug Label */}
-        <div className="absolute bottom-3 left-3 z-30 bg-black/80 text-green-400 font-mono text-xs px-2 py-1 rounded shadow-lg pointer-events-none">
-          {debugText}
-        </div>
+        {/* Debug Label (developer view only) */}
+        {(debugMode || structuralView) && (
+          <div className="absolute bottom-3 left-3 z-30 bg-black/80 text-green-400 font-mono text-xs px-2 py-1 rounded shadow-lg pointer-events-none">
+            {debugText}
+          </div>
+        )}
 
         {/* Structural Junction Validation Overlay (Rule 37) */}
         {(debugMode || structuralView) && (
@@ -1817,7 +1819,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
         {showSceneElements && (
           <div 
             aria-hidden={!showSceneElements}
-            className="absolute top-14 right-3 z-20 w-64 max-w-[calc(100%-24px)] max-h-[calc(100%-72px)] flex flex-col bg-white/95 text-slate-800 p-3 rounded-xl backdrop-blur-md shadow-2xl border border-slate-200/90 text-xs box-border animate-in fade-in slide-in-from-top-2 duration-200"
+            className="absolute top-14 right-3 z-20 w-64 max-w-[calc(100%-24px)] max-h-[calc(100%-7rem)] flex flex-col bg-white/95 text-slate-800 p-3 rounded-xl backdrop-blur-md shadow-2xl border border-slate-200/90 text-xs box-border animate-in fade-in slide-in-from-top-2 duration-200"
           >
             <div className="flex items-center justify-between font-bold text-slate-900 mb-2 border-b border-slate-200 pb-1.5 flex-shrink-0">
               <span className="flex items-center gap-1.5">
@@ -2003,7 +2005,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
         {/* Live Rebar Reinforcement Diagnostics Overlay (Top-Left under Labels button) */}
         {(showPillarRebar || showRoofSlabRebar || showFootingRebar || showRingBeamRebar) && (
-          <div className="absolute top-14 left-3 z-20 bg-slate-900/95 text-white p-3 rounded-lg border border-cyan-500 shadow-2xl max-w-xs text-xs space-y-1.5 backdrop-blur-md">
+          <div className="absolute top-14 left-3 z-20 bg-slate-900/95 text-white p-3 rounded-lg border border-cyan-500 shadow-2xl max-w-xs text-xs space-y-1.5 backdrop-blur-md max-h-[calc(100%-7rem)] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between font-bold text-cyan-400 border-b border-slate-700 pb-1">
               <div className="flex items-center space-x-1.5">
                 <Hammer className="w-4 h-4 text-cyan-400" />
@@ -2113,7 +2115,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
           const fData = selectedPillar.calculatedFooting;
 
           return (
-            <div className="absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto">
+            <div className="absolute top-14 left-3 z-30 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl w-80 max-w-[calc(100%-24px)] text-xs space-y-2 backdrop-blur-md max-h-[calc(100%-7rem)] overflow-y-auto overscroll-contain">
               <div className="flex justify-between items-center border-b border-slate-700 pb-1.5">
                 <div>
                   <span className="font-bold text-orange-400 text-sm">{selectedPillar.name || selectedPillar.id} RCC Column</span>
@@ -2290,7 +2292,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
           const totalBeamSteelKg = topWeight + botWeight + stirrupWeight;
 
           return (
-            <div className="absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto">
+            <div className="absolute top-14 left-3 z-30 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl w-80 max-w-[calc(100%-24px)] text-xs space-y-2 backdrop-blur-md max-h-[calc(100%-7rem)] overflow-y-auto overscroll-contain">
               <div className="flex justify-between items-center border-b border-slate-700 pb-1.5">
                 <div>
                   <span className="font-bold text-amber-400 text-sm">{selectedBeam.isPlinth ? 'RCC Plinth Tie Beam' : 'RCC Ring Beam'}</span>
@@ -2394,7 +2396,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
           const totalSlabSteelKg = mainSteelKg + distSteelKg;
 
           return (
-            <div className="absolute top-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md max-h-[85vh] overflow-y-auto">
+            <div className="absolute top-14 left-3 z-30 bg-slate-900/95 text-white p-3.5 rounded-lg border border-slate-700 shadow-2xl w-80 max-w-[calc(100%-24px)] text-xs space-y-2 backdrop-blur-md max-h-[calc(100%-7rem)] overflow-y-auto overscroll-contain">
               <div className="flex justify-between items-center border-b border-slate-700 pb-1.5">
                 <div>
                   <span className="font-bold text-cyan-400 text-sm">{selectedSlab.isRoof ? 'RCC Roof Slab & Terrace' : 'RCC Floor Slab'}</span>

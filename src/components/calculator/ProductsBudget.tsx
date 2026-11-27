@@ -43,8 +43,8 @@ export function ProductsBudget({ budget, onRate, extra }: {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-        <table className="w-full text-sm text-slate-900">
+      <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto">
+        <table className="w-full min-w-[560px] text-sm text-slate-900">
           <thead className="bg-slate-50 text-slate-600 text-xs">
             <tr>
               <th className="text-left px-3 py-2 font-semibold">Product</th>

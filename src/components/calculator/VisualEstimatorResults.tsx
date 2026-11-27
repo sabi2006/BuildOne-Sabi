@@ -222,12 +222,17 @@ export function VisualEstimatorResults({ onBack, view = '3d', onOpenBudget, onOp
             className="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-md text-xs font-bold text-slate-700 bg-white hover:bg-slate-50">
             <SlidersHorizontal className="h-4 w-4 mr-1.5 text-orange-600" /> Structural Config
           </button>
-          <button onClick={() => setIsSaveModalOpen(true)} className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-bold text-gray-700 bg-white hover:bg-gray-50">
-            <Save className="h-4 w-4 mr-1.5 text-orange-600" /> Save
-          </button>
-          <button onClick={() => setIsHistoryModalOpen(true)} className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-bold text-gray-700 bg-white hover:bg-gray-50">
-            <FolderClock className="h-4 w-4 mr-1.5 text-orange-600" /> History
-          </button>
+          {/* on the 3D page the viewer has its own Save Plan / History buttons */}
+          {view === 'budget' && (
+            <>
+              <button onClick={() => setIsSaveModalOpen(true)} className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-bold text-gray-700 bg-white hover:bg-gray-50">
+                <Save className="h-4 w-4 mr-1.5 text-orange-600" /> Save
+              </button>
+              <button onClick={() => setIsHistoryModalOpen(true)} className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-bold text-gray-700 bg-white hover:bg-gray-50">
+                <FolderClock className="h-4 w-4 mr-1.5 text-orange-600" /> History
+              </button>
+            </>
+          )}
           {view === 'budget' && (
             <button onClick={() => window.print()} className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-bold text-gray-700 bg-white hover:bg-gray-50">
               <Download className="h-4 w-4 mr-1.5 text-gray-500" /> Print / PDF

@@ -20,7 +20,7 @@ function CalculatorContent() {
       {/* Page Header - Compact when in visual mode for maximum workspace */}
       <div className={cn(
         "bg-slate-900 text-white transition-all",
-        activeTab === 'visual' ? "py-4 md:py-6" : "py-14 md:py-18"
+        activeTab === 'visual' ? "pt-24 pb-4 md:pt-24 md:pb-5" : "pt-28 pb-14 md:pt-32 md:pb-18"
       )}>
         <div className={cn(
           "mx-auto px-4 sm:px-6 lg:px-8 text-center",

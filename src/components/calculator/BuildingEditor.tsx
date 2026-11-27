@@ -9916,7 +9916,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
 
       <div className="flex items-center justify-between pt-2 border-t border-slate-200">
         <div className="text-xs text-slate-500">
-          Step 1 of 2: Configure walls, columns, footings, and slabs. Click Generate to produce full 3D building.
+          Step 1 of 3: draw the plan (walls, doors, windows, columns). Next: see it in 3D, then the products & budget.
         </div>
         <button
           onClick={handleGenerate}
