@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- test builds loose project/model shapes */
 import { DEFAULT_BUILDING_CONFIG, BuildingConfig, CONCRETE_MIX_DATABASE } from './structuralCalculationService';
 import { rccMix, pccMix } from './concreteMix';
-import { calculateProject, DEFAULT_RCC_SLAB, DEFAULT_RCC_RING_BEAM } from './brickCalculator';
+import { calculateProject, calculateBuildingBOQ, DEFAULT_RCC_SLAB, DEFAULT_RCC_RING_BEAM } from './brickCalculator';
 import { buildMaterialBudget } from './materialBudget';
 
 /**
@@ -155,5 +155,56 @@ describe('mixing method (hand derivations)', () => {
     const fill = b.mixPlaces.find(m => m.kind === 'filling');
     expect(fill).toBeDefined();
     expect(b.products.find(x => x.id === 'sand')!.uses.some(u => u.place === 'Sand filling of the plinth')).toBe(true);
+  });
+});
+
+describe('adjustable constants and visible assumptions', () => {
+  const cr = (o: Record<string, number>) => ({ customRates: { ...(DEFAULT_BUILDING_CONFIG.customRates || {}), ...o } }) as Partial<BuildingConfig>;
+  const base = calculateProject(project(cr({ steelCuttingWastagePercent: 0 })));
+  const steel = (x: typeof base) => x.buildingBOQ!.products.find(q => q.id === 'steel' as never || q.id === 'tmt_steel')!;
+  const sb = (x: typeof base) => x.buildingBOQ!.products.find(q => q.id === 'tmt_steel')!.sourceBreakdown!;
+
+  it('steel cutting loss: 0% = the bar schedule weights; 3% adds exactly 3% to columns, beams and slabs, not to footings', () => {
+    void steel;
+    const w3 = calculateProject(project(cr({ steelCuttingWastagePercent: 3 })));
+    for (const k of ['columns', 'beams', 'slabs'] as const) expect(sb(w3)[k]!).toBeCloseTo(sb(base)[k]! * 1.03, 0);
+    expect(sb(w3).footings).toBe(sb(base).footings);
+  });
+
+  it('the default cutting loss is 3% (practice value) and is listed in the assumptions', () => {
+    const d = calculateProject(project());
+    expect(sb(d).columns!).toBeCloseTo(sb(base).columns! * 1.03, 0);
+    expect(d.buildingBOQ!.assumptions.join(' ')).toContain('3% cutting');
+  });
+
+  it('binding wire follows the kg-per-tonne input (default 11)', () => {
+    const wire = (x: typeof base) => x.buildingBOQ!.products.find(q => q.id === 'binding_wire')!.quantity;
+    const steelKg = (x: typeof base) => x.buildingBOQ!.products.find(q => q.id === 'tmt_steel')!.quantity;
+    expect(wire(base)).toBeCloseTo(steelKg(base) * 0.011, 0);
+    const w22 = calculateProject(project(cr({ steelCuttingWastagePercent: 0, bindingWireKgPerTonne: 22 })));
+    expect(wire(w22)).toBeCloseTo(steelKg(w22) * 0.022, 0);
+  });
+
+  it('overheads follow the input, not a fixed 5%', () => {
+    const o = (x: typeof base) => x.buildingBOQ!;
+    const hi = calculateProject(project(cr({ steelCuttingWastagePercent: 0, overheadPercent: 10 })));
+    expect(o(base).overheads).toBe(Math.round(o(base).directCostTotal * 0.05));
+    expect(o(hi).overheads).toBe(Math.round(o(hi).directCostTotal * 0.10));
+  });
+
+  it('the assumptions list names the adjustable constants and the practice-value cover blocks', () => {
+    const a = base.buildingBOQ!.assumptions.join(' ');
+    for (const t of ['Binding wire', 'Overheads', 'contingency', 'GST', 'Cover blocks']) expect(a).toContain(t);
+    expect(a).not.toContain('THUMB RULE'); // member designs exist in this building
+  });
+
+  it('when the structural summary flags thumb-rule beam / slab steel, the BOQ says so in bold (never silent)', () => {
+    const r2 = calculateProject(project());
+    expect(r2.structuralSummary!.steelFromThumbRule).toEqual({ beams: false, slabs: false });
+    const flagged = { ...r2.structuralSummary!, steelFromThumbRule: { beams: true, slabs: true } };
+    const boq = calculateBuildingBOQ({ buildingModel: r2.buildingModel as any, settings: {} as any, structuralSummary: flagged, customRates: {} });
+    const a = boq.assumptions.join(' ');
+    expect(a).toContain('Beam steel is a THUMB RULE (120 kg per m³');
+    expect(a).toContain('Slab steel is a THUMB RULE (65 kg per m³');
   });
 });

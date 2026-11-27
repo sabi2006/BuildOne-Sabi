@@ -60,6 +60,8 @@ export interface MaterialBudget {
   products: BudgetProduct[];
   /** The mix of each place, with its quantities */
   mixPlaces: MixPlace[];
+  /** Every constant and thumb rule behind the numbers */
+  assumptions: string[];
   /** How the mixing is done (bag, dry volume, water): the batching rules behind the quantities */
   methodNotes: string[];
   /** Sum of the priced products */
@@ -223,7 +225,7 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
   notes.push('Quantities include the wastage the estimate applies to bricks; concrete materials are net (add site wastage as per your practice).');
 
   return {
-    products, mixPlaces, methodNotes,
+    products, mixPlaces, methodNotes, assumptions: boq.assumptions,
     materialsTotal: products.reduce((a, p) => a + (p.cost ?? 0), 0),
     unpriced,
     projectTotal: boq.grandTotal,

@@ -1952,6 +1952,7 @@ export function StructuralConfigModal({
                     </div>
                     {([
                       ['backfillRatePerM3', 'Backfill / Compaction', '/m³', 120],
+                      ['beamPlacingRatePerM3', 'Beam Concreting Labour', '/m³', 1500],
                       ['waterproofingRatePerM2', 'Basement Waterproofing', '/m²', undefined],
                       ['drainagePerimeterRatePerM', 'Perimeter Drain', '/m', undefined],
                       ['sumpRatePerNo', 'Sump & Pump', '/no', undefined],
@@ -1976,6 +1977,28 @@ export function StructuralConfigModal({
                       </div>
                     ))}
                   </div>
+
+                  {([
+                    ['overheadPercent', 'Overheads', '%', 5, 0, 30],
+                    ['steelCuttingWastagePercent', 'Steel Cutting / Rolling Loss', '%', 3, 0, 15],
+                    ['bindingWireKgPerTonne', 'Binding Wire', 'kg / tonne steel', 11, 0, 30],
+                  ] as Array<[string, string, string, number, number, number]>).map(([key, label, unit, dflt, min, max]) => (
+                    <div key={key} data-testid={`rate-${key}`}>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-1">{label}</label>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number" min={min} max={max} step="any" placeholder={String(dflt)}
+                          value={(rates as Record<string, number | undefined>)[key] ?? ''}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value);
+                            setLocalConfig(prev => ({ ...prev, customRates: { ...(prev.customRates || {}), [key]: Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : undefined } }));
+                          }}
+                          className="w-full text-xs font-bold text-slate-900 px-3 py-2 rounded-lg border border-slate-300 bg-white"
+                        />
+                        <span className="text-[10px] text-slate-500 shrink-0">{unit}</span>
+                      </div>
+                    </div>
+                  ))}
 
                   <div>
                     <label className="block text-[11px] font-bold text-slate-600 mb-1">Formwork Shuttering</label>

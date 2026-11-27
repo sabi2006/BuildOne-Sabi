@@ -155,6 +155,14 @@ export interface StructuralRatesConfig {
   steelRatePerKg?: number;
   bindingWireRatePerKg?: number;
   brickPrice?: number;
+  /** Labour of placing beam concrete, per m³ (default 1500) */
+  beamPlacingRatePerM3?: number;
+  /** Overheads on the direct cost, % (default 5) */
+  overheadPercent?: number;
+  /** Cutting and rolling-margin loss on column, beam and slab steel, % (practice value, default 3; footings and basement are scheduled with their own stock-length loss) */
+  steelCuttingWastagePercent?: number;
+  /** Binding wire, kg per tonne of steel (practice value, default 11) */
+  bindingWireKgPerTonne?: number;
   /** Mixing water, per 1000 litres. No default: listed but unpriced if unset. */
   waterRatePerKl?: number;
   /** Cover blocks (concrete spacers), per number. No default: listed but unpriced if unset. */
@@ -666,6 +674,8 @@ export interface BuildingStructuralSummary {
   totalPccM3: number;
   totalColumnRccM3: number;
   totalBeamRccM3: number;
+  /** True when the beam / slab steel is a thumb rule (120 / 65 kg per m³) because no member design was available */
+  steelFromThumbRule?: { beams: boolean; slabs: boolean };
   totalSlabRccM3: number;
   totalRccVolumeM3: number;
   totalRccVolumeCft: number;
@@ -1987,6 +1997,8 @@ export function calculateBuildingStructuralSummary(
     taxPercent: number;
     transportCost: number;
     equipmentCost: number;
+    backfillRatePerM3?: number;
+    beamPlacingRatePerM3?: number;
   },
   floorsData?: Array<{ height: number; unit?: any; slab?: any }> | number[],
   roofSlabData?: { thickness?: number; thicknessUnit?: any; length?: number; width?: number; overhang?: number; enabled?: boolean }
@@ -2605,10 +2617,12 @@ export function calculateBuildingStructuralSummary(
 
   // Beams: ~1.5% steel = 120 kg/m³ or detailed calculation sum
   const detailedBeamSteelKg = floorBeamCalculations.reduce((sum, b) => sum + b.totalSteelWeightKg, 0);
+  const beamSteelFromThumbRule = !(detailedBeamSteelKg > 0) && totalBeamRccM3 > 0;
   const beamSteelKg = detailedBeamSteelKg > 0 ? detailedBeamSteelKg : (totalBeamRccM3 * 120);
 
   // Slabs: ~0.8% steel = 65 kg/m³ or detailed calculation sum
   const detailedSlabSteelKg = floorSlabCalculations.reduce((sum, s) => sum + s.totalSteelWeightKg, 0) + (roofSlabCalculation?.totalSteelWeightKg || 0);
+  const slabSteelFromThumbRule = !(detailedSlabSteelKg > 0) && totalSlabRccM3 > 0;
   const slabSteelKg = detailedSlabSteelKg > 0 ? detailedSlabSteelKg : (totalSlabRccM3 * 65);
 
   const totalSteelWeightKg = footingSteelKg + columnSteelKg + beamSteelKg + slabSteelKg;
@@ -2641,7 +2655,7 @@ export function calculateBuildingStructuralSummary(
   const costPcc = totalPccM3 * (rates.pccRatePerM3 || (rates as any).pccLabourRatePerM3 || 3200);
   const costFootingRcc = totalFootingRccM3 * (rates.footingLabourRatePerM3 || 3500);
   const costFootingSteel = footingSteelKg * steelRatePerKg;
-  const costBackfill = totalBackfillM3 * 120; // compaction labour
+  const costBackfill = totalBackfillM3 * (rates.backfillRatePerM3 ?? 120); // compaction labour
   const foundationTotal = costExcavation + costSandFill + costPcc + costFootingRcc + costFootingSteel + costBackfill;
 
   // 2. Column Costs
@@ -2662,7 +2676,7 @@ export function calculateBuildingStructuralSummary(
   const beamConcreteCost = totalBeamRccM3 * (rates.beamLabourRatePerM3 || rates.columnLabourRatePerM3 || 3500);
   const beamSteelCost = beamSteelKg * steelRatePerKg;
   const beamFormworkCost = beamFormworkM2 * (rates.formworkRatePerM2 || 350);
-  const beamLabourCost = totalBeamRccM3 * 1500;
+  const beamLabourCost = totalBeamRccM3 * (rates.beamPlacingRatePerM3 ?? 1500);
   const beamsTotal = beamConcreteCost + beamSteelCost + beamFormworkCost + beamLabourCost;
 
   // 4. Slab Costs
@@ -2782,6 +2796,7 @@ export function calculateBuildingStructuralSummary(
     totalPccM3,
     totalColumnRccM3,
     totalBeamRccM3,
+    steelFromThumbRule: { beams: beamSteelFromThumbRule, slabs: slabSteelFromThumbRule },
     totalSlabRccM3,
     totalRccVolumeM3,
     totalRccVolumeCft,

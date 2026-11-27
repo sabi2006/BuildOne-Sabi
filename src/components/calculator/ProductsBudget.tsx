@@ -106,6 +106,15 @@ export function ProductsBudget({ budget, onRate, extra }: {
       </div>
       {budget.notes.map((n, i) => <p key={i} className="text-[11px] text-slate-500">{n}</p>)}
 
+      {budget.assumptions.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 text-slate-900" data-testid="assumptions">
+          <div className="text-sm font-bold text-amber-900">Assumptions and thumb rules used</div>
+          <ul className="mt-1 space-y-1 text-[11px] text-slate-700 list-disc pl-5">
+            {budget.assumptions.map((a, i) => <li key={i} className={/THUMB RULE/.test(a) ? 'font-bold text-red-800' : undefined}>{a}</li>)}
+          </ul>
+        </div>
+      )}
+
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden text-slate-900" data-testid="mix-places">
         <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200">
           <div className="text-sm font-bold text-slate-900">How it is mixed and where it goes</div>

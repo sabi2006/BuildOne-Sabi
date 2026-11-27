@@ -2414,6 +2414,8 @@ export interface CategoryCostItem {
 export interface BuildingBOQSummary {
   /** How the concrete was mixed for these quantities (per m³): structural concrete and P.C.C. */
   mixes: { rcc: MixPerM3; pcc: MixPerM3 };
+  /** Every constant or thumb rule used in these numbers (shown to the user) */
+  assumptions: string[];
   products: BOQProductItem[];
   floorSchedules: FloorBOQSchedule[];
   categoryBreakdown: CategoryCostItem[];
@@ -4694,17 +4696,20 @@ export function calculateBuildingBOQ(params: {
   // 6. Steel & Binding Wire
   const footingSteelKg = useFbFoundation ? fbq!.foundationSteelKg : (s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.footingSteelKg || 0), 0) : (params.foundationEstimate?.totalSteelKg || 0));
   const basementSteelKg = useFbBasement ? fbq!.basementSteelKg : 0;
-  const columnSteelKg = s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.totalSteelWeightKg || 0), 0) : 0;
+  // column / beam / slab steel carries the cutting and rolling-margin loss (footings and basement are scheduled with their own stock-length loss)
+  const steelCut = 1 + Math.max(0, rates.steelCuttingWastagePercent ?? 3) / 100;
+  const bindingWireFactor = Math.max(0, rates.bindingWireKgPerTonne ?? 11) / 1000;
+  const columnSteelKg = s ? s.pillarsCalculations.reduce((sum, c) => sum + (c.totalSteelWeightKg || 0), 0) * steelCut : 0;
   const beamSteelKg = s
-    ? (s.floorBeamCalculations || []).reduce((sum, b) => sum + (b.totalSteelWeightKg || 0), 0) + (s.roofBeamCalculation?.totalSteelWeightKg || 0)
+    ? ((s.floorBeamCalculations || []).reduce((sum, b) => sum + (b.totalSteelWeightKg || 0), 0) + (s.roofBeamCalculation?.totalSteelWeightKg || 0)) * steelCut
     : 0;
   const slabSteelKg = s
-    ? (s.floorSlabCalculations || []).reduce((sum, sl) => sum + (sl.totalSteelWeightKg || 0), 0) + (s.roofSlabCalculation?.totalSteelWeightKg || 0)
+    ? ((s.floorSlabCalculations || []).reduce((sum, sl) => sum + (sl.totalSteelWeightKg || 0), 0) + (s.roofSlabCalculation?.totalSteelWeightKg || 0)) * steelCut
     : 0;
 
   const totalSteelKg = Math.round((footingSteelKg + basementSteelKg + columnSteelKg + beamSteelKg + slabSteelKg) * 10) / 10;
   const totalSteelTonnes = Math.round((totalSteelKg / 1000) * 1000) / 1000;
-  const bindingWireKg = Math.round(totalSteelKg * 0.011 * 10) / 10;
+  const bindingWireKg = Math.round(totalSteelKg * bindingWireFactor * 10) / 10;
 
   // 7. Aggregate 8 Construction Products
   const totalCementBags = concreteCementBags + masonryCementBags + plasterCementBags;
@@ -4901,7 +4906,7 @@ export function calculateBuildingBOQ(params: {
 
     const fSteelKg = Math.round(footingSteelKg * 10) / 10;
     const fSteelCost = Math.round(fSteelKg * steelRate);
-    const fWireKg = Math.round(fSteelKg * 0.011 * 10) / 10;
+    const fWireKg = Math.round(fSteelKg * bindingWireFactor * 10) / 10;
     const fWireCost = Math.round(fWireKg * bindingWireRate);
 
     const fConcreteM3 = Math.round((pccM3 + footingRccM3) * 100) / 100;
@@ -4938,7 +4943,7 @@ export function calculateBuildingBOQ(params: {
     const bAggCost = Math.round(bAggCft * aggregateRate);
     const bSteelKg = Math.round(basementSteelKg * 10) / 10;
     const bSteelCost = Math.round(bSteelKg * steelRate);
-    const bWireKg = Math.round(bSteelKg * 0.011 * 10) / 10;
+    const bWireKg = Math.round(bSteelKg * bindingWireFactor * 10) / 10;
     const bWireCost = Math.round(bWireKg * bindingWireRate);
     const bConcM3 = Math.round(basementRccM3 * 100) / 100;
     floorSchedules.push({
@@ -4980,17 +4985,17 @@ export function calculateBuildingBOQ(params: {
         const pCalc = s?.pillarsCalculations?.find(c => c.pillarId === p.id);
         if (pCalc) {
           flColConcreteM3 += (pCalc.concreteVolumeM3 || 0);
-          flColSteelKg += (pCalc.totalSteelWeightKg || 0);
+          flColSteelKg += (pCalc.totalSteelWeightKg || 0) * steelCut;
         } else {
           flColConcreteM3 += calculatePillarMetrics(p).volume;
         }
       });
 
       const flBeamConcreteM3 = flBeam ? flBeam.concreteVolumeM3 : 0;
-      const flBeamSteelKg = flBeam ? flBeam.totalSteelWeightKg : 0;
+      const flBeamSteelKg = flBeam ? flBeam.totalSteelWeightKg * steelCut : 0;
 
       const flSlabConcreteM3 = flSlab ? flSlab.concreteVolumeM3 : 0;
-      const flSlabSteelKg = flSlab ? flSlab.totalSteelWeightKg : 0;
+      const flSlabSteelKg = flSlab ? flSlab.totalSteelWeightKg * steelCut : 0;
 
       const flRccM3 = flColConcreteM3 + flBeamConcreteM3 + flSlabConcreteM3;
       const flConcreteM3 = Math.round(flRccM3 * 100) / 100;
@@ -5024,7 +5029,7 @@ export function calculateBuildingBOQ(params: {
 
       const flTotalSteelKg = Math.round((flColSteelKg + flBeamSteelKg + flSlabSteelKg) * 10) / 10;
       const flSteelCost = Math.round(flTotalSteelKg * steelRate);
-      const flWireKg = Math.round(flTotalSteelKg * 0.011 * 10) / 10;
+      const flWireKg = Math.round(flTotalSteelKg * bindingWireFactor * 10) / 10;
       const flWireCost = Math.round(flWireKg * bindingWireRate);
 
       const flTotalMortarM3 = Math.round((flMasonryWetMortarM3 + flPlasterWetMortarM3) * 100) / 100;
@@ -5077,8 +5082,8 @@ export function calculateBuildingBOQ(params: {
     const rCementBags = Math.ceil((rConcM3 * mix.cementKgPerM3) / 50);
     const rSandCft = Math.round((((rConcM3 * mix.fineAggKgPerM3) / 1600) * 35.3147) * 10) / 10;
     const rAggCft = Math.round((((rConcM3 * mix.coarseAggKgPerM3) / 1500) * 35.3147) * 10) / 10;
-    const rSteelKg = Math.round(((rSlab.totalSteelWeightKg || 0) + (rBeam?.totalSteelWeightKg || 0)) * 10) / 10;
-    const rWireKg = Math.round(rSteelKg * 0.011 * 10) / 10;
+    const rSteelKg = Math.round(((rSlab.totalSteelWeightKg || 0) + (rBeam?.totalSteelWeightKg || 0)) * steelCut * 10) / 10;
+    const rWireKg = Math.round(rSteelKg * bindingWireFactor * 10) / 10;
 
     const rCementCost = rCementBags * cementRate;
     const rSandCost = Math.round(rSandCft * sandRate);
@@ -5186,7 +5191,7 @@ export function calculateBuildingBOQ(params: {
   const directCostTotal = materialSubtotal + labourAndFormworkSubtotal + (params.settings?.transportCost || 0);
 
   const wastagePercent = rates.wastagePercent ?? (params.settings?.wastagePercentage || 5);
-  const overheadPercent = 5;
+  const overheadPercent = rates.overheadPercent ?? 5;
   const contingencyPercent = rates.contingencyPercent ?? 5;
   const taxPercent = rates.taxPercent ?? 18;
 
@@ -5201,8 +5206,20 @@ export function calculateBuildingBOQ(params: {
   const builtUpAreaSqFt = s ? s.totalBuiltUpAreaSqFt : (bModel ? toSqMeters(bModel.buildingLength * bModel.buildingWidth, bModel.buildingUnit) * 10.7639 * (floorsList.length || 1) : 0);
   const costPerSqFt = builtUpAreaSqFt > 0 ? Math.round(grandTotal / builtUpAreaSqFt) : 0;
 
+  // Constants and thumb rules behind the numbers (never hidden)
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  const assumptions: string[] = [
+    `Steel of columns, beams and slabs includes ${r1(steelCut * 100 - 100)}% cutting / rolling-margin loss (Structural Config rates; bar-schedule weights already include laps and bends: columns 50 d lap + anchorage, beams and slabs a flat 10%). Footing and basement steel come from the bar bending schedule with its own stock-length loss.`,
+    `Binding wire ${r1(bindingWireFactor * 1000)} kg per tonne of steel (practice value, adjustable).`,
+    `Overheads ${overheadPercent}%, contingency ${contingencyPercent}%, GST ${taxPercent}%, material wastage allowance ${wastagePercent}% (all adjustable in the Structural Config rates).`,
+    'Cover blocks are counted by site-practice spacing (IS 456 fixes only the cover thickness); curing water is not counted.',
+  ];
+  if (s?.steelFromThumbRule?.beams) assumptions.push('Beam steel is a THUMB RULE (120 kg per m³ of beam concrete): no beam design was available. Treat it as an assumption, not an IS 456 result.');
+  if (s?.steelFromThumbRule?.slabs) assumptions.push('Slab steel is a THUMB RULE (65 kg per m³ of slab concrete): no slab design was available. Treat it as an assumption, not an IS 456 result.');
+
   return {
     mixes: { rcc: rccMixSpec, pcc: pccMixSpec },
+    assumptions,
     products,
     floorSchedules,
     categoryBreakdown,
@@ -5688,7 +5705,9 @@ export const calculateProject = (
       helperWagePerDay: cr.helperWagePerDay || 600,
       formworkRatePerM2: cr.formworkRatePerM2 || 350,
       wastagePercent: cr.wastagePercent ?? (settings.wastagePercentage || 5),
-      overheadPercent: 5,
+      overheadPercent: cr.overheadPercent ?? 5,
+      backfillRatePerM3: cr.backfillRatePerM3,
+      beamPlacingRatePerM3: cr.beamPlacingRatePerM3,
       contingencyPercent: cr.contingencyPercent ?? 5,
       taxPercent: cr.taxPercent ?? 18,
       transportCost: settings.transportCost || 0,
