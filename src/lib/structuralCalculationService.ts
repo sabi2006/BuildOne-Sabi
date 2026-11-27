@@ -195,6 +195,12 @@ export interface BuildingConfig {
     liveLoadKnM2: number;
   };
   concreteGrade: ConcreteGrade;
+  /** How structural concrete is batched: by volume (nominal, site boxes / bags) or by weight (design mix). Blank = M15 / M20 by volume, M25+ by weight (see concreteMix.ts) */
+  concreteBatching?: 'by_volume' | 'by_weight';
+  /** Lean concrete (P.C.C.) grade under footings; default M7.5 = 1:4:8 */
+  pccGrade?: 'M5' | 'M7.5' | 'M10' | 'M15';
+  /** Brickwork mortar, cement:sand by volume (default 1:5) */
+  masonryMortarRatio?: string;
   steelGrade: SteelGrade;
   fineAggregateType: FineAggregateType;
   foundationType: FoundationType;

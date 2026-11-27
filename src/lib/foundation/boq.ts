@@ -224,6 +224,7 @@ export interface FoundationBasementCosts {
   backfill: number;
   foundationFormwork: number;
   basementFormwork: number;
+  /** Value of the plinth sand filling at the sand price: information only, it is part of the BOQ sand product */
   plinthFill: number;
   basementRccLabour: number;
   waterproofing: number;
@@ -263,7 +264,8 @@ export function priceFoundationBasement(
   const sump = priced(q.sumpCount, rates.sumpRatePerNo, 'Sump and pump (nos)');
 
   const plinthFill = q.plinthFillM3 * (rates.sandPricePerCft ?? 55) * 35.3147;
-  const foundationLabour = excavation + backfill + foundationFormwork + plinthFill;
+  // the sand filling of the plinth is a MATERIAL: it is carried in the sand product of the BOQ (priced there), not here, so it is not counted twice
+  const foundationLabour = excavation + backfill + foundationFormwork;
   const basementLabour = basementFormwork + basementRccLabour + waterproofing + drainage + sump;
   const foundationDisplayMaterial =
     q.pccM3 * (rates.pccLabourRatePerM3 || 3200) + q.foundationRccM3 * (rates.footingLabourRatePerM3 || 3500) + q.foundationSteelKg * steelRatePerKg;

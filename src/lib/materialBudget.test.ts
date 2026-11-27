@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- test builds loose project/model shapes */
 import { DEFAULT_BUILDING_CONFIG, BuildingConfig, CONCRETE_MIX_DATABASE } from './structuralCalculationService';
+import { rccMix, pccMix } from './concreteMix';
 import { calculateProject, DEFAULT_RCC_SLAB, DEFAULT_RCC_RING_BEAM } from './brickCalculator';
 import { buildMaterialBudget } from './materialBudget';
 
@@ -27,7 +28,7 @@ const project = (cfg: Partial<BuildingConfig> = {}, floorsN = 2) => {
 describe('buildMaterialBudget', () => {
   const r = calculateProject(project());
   const boq = r.buildingBOQ!;
-  const b = buildMaterialBudget({ boq, structural: r.structuralSummary, concreteGrade: 'M25' });
+  const b = buildMaterialBudget({ boq, structural: r.structuralSummary });
   const p = (id: string) => b.products.find(x => x.id === id)!;
   const bp = (id: string) => boq.products.find(x => x.id === id)!;
   const sum = (id: string) => p(id).uses.reduce((a, u) => a + u.quantity, 0);
@@ -60,9 +61,9 @@ describe('buildMaterialBudget', () => {
   it('water = mix water of the grade for RCC (hand derivation) and w/c 0.60 for P.C.C.', () => {
     const conc = bp('concrete').sourceBreakdown!;
     const col = p('water').uses.find(u => u.place === 'Columns')!;
-    expect(col.quantity).toBe(Math.round(conc.columns! * CONCRETE_MIX_DATABASE.M25.waterLitresPerM3));
+    expect(col.quantity).toBe(Math.round(conc.columns! * CONCRETE_MIX_DATABASE.M25.waterLitresPerM3)); // M25 is a design mix by weight
     const pcc = p('water').uses.find(u => u.place === 'Foundation P.C.C.');
-    if ((conc.pcc ?? 0) > 0) expect(pcc!.quantity).toBe(Math.round(conc.pcc! * 160 * 0.6));
+    if ((conc.pcc ?? 0) > 0) expect(pcc!.quantity).toBe(Math.round(conc.pcc! * pccMix('M7.5').waterL));
     expect(p('water').basis).toContain('Curing water not included');
   });
 
@@ -83,7 +84,7 @@ describe('buildMaterialBudget', () => {
   });
 
   it('with rates, water (per 1000 L) and cover blocks are priced and added to the total', () => {
-    const priced = buildMaterialBudget({ boq, structural: r.structuralSummary, concreteGrade: 'M25', waterRatePerKl: 100, coverBlockRatePerNo: 3 });
+    const priced = buildMaterialBudget({ boq, structural: r.structuralSummary, waterRatePerKl: 100, coverBlockRatePerNo: 3 });
     const w = priced.products.find(x => x.id === 'water')!, c = priced.products.find(x => x.id === 'cover_blocks')!;
     expect(w.cost).toBe(Math.round((w.quantity / 1000) * 100));
     expect(c.cost).toBe(c.quantity * 3);
@@ -103,7 +104,56 @@ describe('buildMaterialBudget', () => {
 
   it('a changed input (more floors) changes the products', () => {
     const r3 = calculateProject(project({}, 3));
-    const b3 = buildMaterialBudget({ boq: r3.buildingBOQ!, structural: r3.structuralSummary, concreteGrade: 'M25' });
+    const b3 = buildMaterialBudget({ boq: r3.buildingBOQ!, structural: r3.structuralSummary });
     expect(b3.products.find(x => x.id === 'steel')!.quantity).not.toBe(p('steel').quantity);
+  });
+});
+
+describe('mixing method (hand derivations)', () => {
+  it('M20 by volume 1:1.5:3: cement = 1.54 × 1/5.5 × 1440 = 403.2 kg (8.06 bags), sand 14.8 cft, jalli 29.7 cft, water 30 L per bag', () => {
+    const m = rccMix('M20', 'by_volume');
+    expect(m.cementKg).toBeCloseTo((1.54 / 5.5) * 1440, 1);
+    expect(m.sandM3 * 35.3147).toBeCloseTo(14.8, 0);
+    expect(m.jalliM3 * 35.3147).toBeCloseTo(29.7, 0);
+    expect(m.waterL).toBeCloseTo((m.cementKg / 50) * 30, 0);
+    expect(m.method).toBe('by_volume');
+  });
+  it('P.C.C. 1:4:8 by volume: cement = 1.54 × 1/13 × 1440 = 170.6 kg per m³', () => {
+    const m = pccMix('M7.5');
+    expect(m.cementKg).toBeCloseTo((1.54 / 13) * 1440, 1);
+    expect(m.sandM3).toBeCloseTo((1.54 * 4) / 13, 2);
+    expect(m.jalliM3).toBeCloseTo((1.54 * 8) / 13, 2);
+  });
+  it('automatic: M20 by volume, M25+ by weight; forcing by weight uses the project mix design', () => {
+    expect(rccMix('M20').method).toBe('by_volume');
+    expect(rccMix('M30').method).toBe('by_weight');
+    expect(rccMix('M25').method).toBe('by_weight');
+    const w = rccMix('M20', 'by_weight');
+    expect(w.cementKg).toBe(CONCRETE_MIX_DATABASE.M20.cementKgPerM3);
+    expect(rccMix('M30', 'by_volume').method).toBe('by_weight'); // no site proportions for M30
+  });
+  it('the BOQ follows the chosen method: by volume needs more cement and sand than the weight design for M20', () => {
+    const vol = calculateProject(project({ concreteGrade: 'M20' }));
+    const wt = calculateProject(project({ concreteGrade: 'M20', concreteBatching: 'by_weight' }));
+    expect(vol.buildingBOQ!.mixes.rcc.method).toBe('by_volume');
+    expect(wt.buildingBOQ!.mixes.rcc.method).toBe('by_weight');
+    const cem = (x: typeof vol) => x.buildingBOQ!.products.find(q => q.id === 'cement')!.quantity;
+    expect(cem(vol)).toBeGreaterThan(cem(wt));
+  });
+  it('P.C.C. grade changes the lean-concrete cement (1:3:6 needs more than 1:4:8)', () => {
+    const a = calculateProject(project({ pccGrade: 'M7.5' })), b = calculateProject(project({ pccGrade: 'M10' }));
+    const cem = (x: typeof a) => x.buildingBOQ!.products.find(q => q.id === 'cement')!.quantity;
+    expect(cem(b)).toBeGreaterThan(cem(a));
+  });
+  it('the mix places table adds up to the concrete products and carries the plinth filling', () => {
+    const r2 = calculateProject(project());
+    const b = buildMaterialBudget({ boq: r2.buildingBOQ!, structural: r2.structuralSummary });
+    const conc = b.mixPlaces.filter(m => m.kind === 'concrete');
+    expect(conc.length).toBeGreaterThan(2);
+    expect(b.mixPlaces.reduce((a, m) => a + m.steelKg, 0)).toBeCloseTo(b.products.find(x => x.id === 'steel')!.quantity, 0);
+    expect(Math.abs(b.mixPlaces.reduce((a, m) => a + m.cementBags, 0) - b.products.find(x => x.id === 'cement')!.quantity)).toBeLessThanOrEqual(2);
+    const fill = b.mixPlaces.find(m => m.kind === 'filling');
+    expect(fill).toBeDefined();
+    expect(b.products.find(x => x.id === 'sand')!.uses.some(u => u.place === 'Sand filling of the plinth')).toBe(true);
   });
 });

@@ -102,7 +102,9 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
     // the sand filling of the plinth is priced at the project's sand price (per cft)
     expect(q.plinthFillM3).toBeCloseTo(L * W * ((design.summary.plinthHeightM ?? 0) - 0.1), 2);
     expect(fb.costs.plinthFill).toBeGreaterThan(0);
-    const expected = q.excavationM3 * DEF.excavationRatePerM3! + q.backfillM3 * LEGACY_BACKFILL_RATE_PER_M3 + q.foundationFormworkM2 * DEF.formworkRatePerM2! + fb.costs.plinthFill;
+    // the sand filling is carried in the BOQ sand product, not in this labour (no double count)
+    const expected = q.excavationM3 * DEF.excavationRatePerM3! + q.backfillM3 * LEGACY_BACKFILL_RATE_PER_M3 + q.foundationFormworkM2 * DEF.formworkRatePerM2!;
+    expect(d.buildingBOQ!.products.find(p => p.id === 'sand')!.sourceBreakdown!.plinthFill).toBeCloseTo(q.plinthFillM3 * 1.15 * 35.3147, 0);
     expect(fb.costs.foundationLabour).toBeCloseTo(expected, 1);
     expect(cat(d, 'foundation')!.labourCost).toBe(Math.round(expected));
   });

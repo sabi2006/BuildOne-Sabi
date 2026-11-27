@@ -47,7 +47,7 @@ export function VisualEstimatorResults({ onBack, view = '3d', onOpenBudget, onOp
 
   // Local Editable States for Calculation
   const [wastagePercent, setWastagePercent] = useState<number>(settings.wastagePercentage || 5);
-  const [mortarRatio] = useState<string>('1:5'); // Cement:Sand
+  const mortarRatio = bConfig.masonryMortarRatio ?? '1:5'; // Cement:Sand
   const [brickPrice, setBrickPrice] = useState<number>(settings.brickPrice || 8.5);
   const [cementPrice, setCementPrice] = useState<number>(settings.cementPrice || 400);
   const [sandPrice, setSandPrice] = useState<number>(
@@ -260,10 +260,10 @@ export function VisualEstimatorResults({ onBack, view = '3d', onOpenBudget, onOp
         const budget = buildMaterialBudget({
           boq: computedResult.buildingBOQ!,
           structural: s,
-          concreteGrade: bConfig.concreteGrade,
           footings: computedResult.buildingBOQ!.foundationBasement?.replacedLegacyFoundation && fEls.length
             ? { areasM2: fEls.map(e => e.sizeXM! * e.sizeYM!), coverMm: fbd!.summary.clearCoverMm }
             : undefined,
+          masonryRatio: bConfig.masonryMortarRatio ?? '1:5',
           waterRatePerKl: bConfig.customRates?.waterRatePerKl,
           coverBlockRatePerNo: bConfig.customRates?.coverBlockRatePerNo,
         });

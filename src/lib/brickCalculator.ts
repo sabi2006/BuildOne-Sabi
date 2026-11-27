@@ -16,6 +16,7 @@ import {
   CONCRETE_MIX_DATABASE,
   StructuralRatesConfig
 } from './structuralCalculationService';
+import { rccMix, pccMix, type MixPerM3 } from './concreteMix';
 import { computeFoundationBasementDesign, isDetailedDesignRequested, type FoundationBasementIntegration } from './foundation/integration';
 import { resolveFoundationDetails } from './foundation/types';
 import { buildFoundationBasementQuantities, priceFoundationBasement, type FoundationBasementQuantities, type FoundationBasementCosts } from './foundation/boq';
@@ -2369,6 +2370,7 @@ export interface BOQProductItem {
     masonry?: number;
     plaster?: number;
     bedding?: number;
+    plinthFill?: number;
     concrete?: number;
     total?: number;
     rcc?: number;
@@ -2410,6 +2412,8 @@ export interface CategoryCostItem {
 }
 
 export interface BuildingBOQSummary {
+  /** How the concrete was mixed for these quantities (per m³): structural concrete and P.C.C. */
+  mixes: { rcc: MixPerM3; pcc: MixPerM3 };
   products: BOQProductItem[];
   floorSchedules: FloorBOQSchedule[];
   categoryBreakdown: CategoryCostItem[];
@@ -4612,7 +4616,10 @@ export function calculateBuildingBOQ(params: {
   const mortarRate = rates.mortarRatePerM3 || 3800;
 
   const grade = bConfig.concreteGrade || 'M20';
-  const mix = CONCRETE_MIX_DATABASE[grade] || CONCRETE_MIX_DATABASE.M20;
+  // how the concrete is mixed: structural concrete by volume (M15 / M20 nominal) or by weight (design mix), lean concrete 1:4:8 by default
+  const rccMixSpec = rccMix(CONCRETE_MIX_DATABASE[grade] ? grade : 'M20', bConfig.concreteBatching);
+  const pccMixSpec = pccMix(bConfig.pccGrade);
+  const mix = { cementKgPerM3: rccMixSpec.cementKg, fineAggKgPerM3: rccMixSpec.sandKg, coarseAggKgPerM3: rccMixSpec.jalliKg, waterLitresPerM3: rccMixSpec.waterL };
 
   // 1. Concrete Volumes
   const s = params.structuralSummary;
@@ -4633,16 +4640,16 @@ export function calculateBuildingBOQ(params: {
 
   // 2. Concrete Constituents
   const rccCementKg = totalRccM3 * mix.cementKgPerM3;
-  const pccCementKg = pccM3 * 160;
+  const pccCementKg = pccM3 * pccMixSpec.cementKg;
   const concreteCementBags = Math.ceil((rccCementKg + pccCementKg) / 50);
 
   const rccFineAggM3 = (totalRccM3 * mix.fineAggKgPerM3) / 1600;
-  const pccFineAggM3 = (pccM3 * 640) / 1600;
+  const pccFineAggM3 = (pccM3 * pccMixSpec.sandKg) / 1600;
   const concreteFineAggM3 = rccFineAggM3 + pccFineAggM3;
   const concreteFineAggCft = concreteFineAggM3 * 35.3147;
 
   const rccCoarseAggM3 = (totalRccM3 * mix.coarseAggKgPerM3) / 1500;
-  const pccCoarseAggM3 = (pccM3 * 1280) / 1500;
+  const pccCoarseAggM3 = (pccM3 * pccMixSpec.jalliKg) / 1500;
   const concreteCoarseAggM3 = rccCoarseAggM3 + pccCoarseAggM3;
   const concreteCoarseAggCft = concreteCoarseAggM3 * 35.3147;
 
@@ -4656,6 +4663,8 @@ export function calculateBuildingBOQ(params: {
     footingBedSandM3 = params.foundationEstimate.totalSandFillVolumeM3 || (params.foundationEstimate.totalSandFillCft / 35.3147) || 0;
   }
   const footingBedSandCft = footingBedSandM3 * 35.3147;
+  // Sand filling inside the plinth (G.L. to the underside of the flooring), loose volume = compacted × 1.15 (the app's sand compaction factor)
+  const plinthSandCft = useFbFoundation ? (fbq!.plinthFillM3 || 0) * 1.15 * 35.3147 : 0;
 
   // 4. Masonry Constituents
   const flMasonry = params.floorMasonryEstimates;
@@ -4701,7 +4710,7 @@ export function calculateBuildingBOQ(params: {
   const totalCementBags = concreteCementBags + masonryCementBags + plasterCementBags;
   const cementAmount = Math.round(totalCementBags * cementRate);
 
-  const totalSandCft = Math.round((footingBedSandCft + concreteFineAggCft + masonrySandCft + plasterSandCft) * 10) / 10;
+  const totalSandCft = Math.round((footingBedSandCft + plinthSandCft + concreteFineAggCft + masonrySandCft + plasterSandCft) * 10) / 10;
   const totalSandM3 = Math.round((totalSandCft / 35.3147) * 100) / 100;
   const sandAmount = Math.round(totalSandCft * sandRate);
 
@@ -4756,6 +4765,7 @@ export function calculateBuildingBOQ(params: {
       description: 'Clean washed sand for Concrete, Bedding, Masonry & Plaster',
       sourceBreakdown: {
         bedding: Math.round(footingBedSandCft * 10) / 10,
+        plinthFill: Math.round(plinthSandCft * 10) / 10,
         concrete: Math.round(concreteFineAggCft * 10) / 10,
         masonry: Math.round(masonrySandCft * 10) / 10,
         plaster: Math.round(plasterSandCft * 10) / 10
@@ -4876,16 +4886,16 @@ export function calculateBuildingBOQ(params: {
 
   // A. Substructure & Foundation (if active)
   if (pccM3 > 0 || footingRccM3 > 0 || footingSteelKg > 0) {
-    const fPccCement = Math.ceil((pccM3 * 160) / 50);
+    const fPccCement = Math.ceil((pccM3 * pccMixSpec.cementKg) / 50);
     const fRccCement = Math.ceil((footingRccM3 * mix.cementKgPerM3) / 50);
     const fCementBags = fPccCement + fRccCement;
     const fCementCost = fCementBags * cementRate;
 
-    const fSandCft = Math.round((footingBedSandCft + (((pccM3 * 640) / 1600) + ((footingRccM3 * mix.fineAggKgPerM3) / 1600)) * 35.3147) * 10) / 10;
+    const fSandCft = Math.round((footingBedSandCft + (((pccM3 * pccMixSpec.sandKg) / 1600) + ((footingRccM3 * mix.fineAggKgPerM3) / 1600)) * 35.3147) * 10) / 10;
     const fSandM3 = Math.round((fSandCft / 35.3147) * 100) / 100;
     const fSandCost = Math.round(fSandCft * sandRate);
 
-    const fAggCft = Math.round(((((pccM3 * 1280) / 1500) + ((footingRccM3 * mix.coarseAggKgPerM3) / 1500)) * 35.3147) * 10) / 10;
+    const fAggCft = Math.round(((((pccM3 * pccMixSpec.jalliKg) / 1500) + ((footingRccM3 * mix.coarseAggKgPerM3) / 1500)) * 35.3147) * 10) / 10;
     const fAggM3 = Math.round((fAggCft / 35.3147) * 100) / 100;
     const fAggCost = Math.round(fAggCft * aggregateRate);
 
@@ -5192,6 +5202,7 @@ export function calculateBuildingBOQ(params: {
   const costPerSqFt = builtUpAreaSqFt > 0 ? Math.round(grandTotal / builtUpAreaSqFt) : 0;
 
   return {
+    mixes: { rcc: rccMixSpec, pcc: pccMixSpec },
     products,
     floorSchedules,
     categoryBreakdown,

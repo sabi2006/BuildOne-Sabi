@@ -1222,6 +1222,42 @@ export function StructuralConfigModal({
                 </p>
               </div>
 
+              {/* How the concrete and mortar are mixed (drives cement, sand, jalli and water of the BOQ) */}
+              <div data-testid="mixing-inputs" className="rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 space-y-3">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">How the concrete and mortar are mixed</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <label className="text-xs font-semibold text-slate-700">Batching of structural concrete
+                    <select data-testid="concrete-batching" className="mt-1 w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-900"
+                      value={localConfig.concreteBatching ?? ''}
+                      onChange={e => setLocalConfig(prev => ({ ...prev, concreteBatching: (e.target.value || undefined) as 'by_volume' | 'by_weight' | undefined }))}>
+                      <option value="">Automatic (M15 / M20 by volume, M25+ by weight)</option>
+                      <option value="by_volume">By volume (bags, boxes, cft: site method)</option>
+                      <option value="by_weight">By weight (design mix, kg per m³)</option>
+                    </select>
+                  </label>
+                  <label className="text-xs font-semibold text-slate-700">Lean concrete (P.C.C.) under footings
+                    <select data-testid="pcc-grade" className="mt-1 w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-900"
+                      value={localConfig.pccGrade ?? 'M7.5'}
+                      onChange={e => setLocalConfig(prev => ({ ...prev, pccGrade: e.target.value as 'M5' | 'M7.5' | 'M10' | 'M15' }))}>
+                      <option value="M5">M5 · 1:5:10</option>
+                      <option value="M7.5">M7.5 · 1:4:8</option>
+                      <option value="M10">M10 · 1:3:6</option>
+                      <option value="M15">M15 · 1:2:4</option>
+                    </select>
+                  </label>
+                  <label className="text-xs font-semibold text-slate-700">Brickwork mortar (cement : sand)
+                    <select data-testid="masonry-mortar" className="mt-1 w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-900"
+                      value={localConfig.masonryMortarRatio ?? '1:5'}
+                      onChange={e => setLocalConfig(prev => ({ ...prev, masonryMortarRatio: e.target.value }))}>
+                      {['1:3', '1:4', '1:5', '1:6', '1:8'].map(r => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Nominal mixes M5 to M20 follow IS 456 Table 9 (proportions and water per bag); above M20 IS 456 asks for a design mix by weight. The products page shows the cement, sand, jalli and water of each place.
+                </p>
+              </div>
+
               {/* Steel Reinforcement Grade */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">

@@ -105,6 +105,46 @@ export function ProductsBudget({ budget, onRate, extra }: {
         </table>
       </div>
       {budget.notes.map((n, i) => <p key={i} className="text-[11px] text-slate-500">{n}</p>)}
+
+      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden text-slate-900" data-testid="mix-places">
+        <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200">
+          <div className="text-sm font-bold text-slate-900">How it is mixed and where it goes</div>
+          <div className="text-[11px] text-slate-600">Each place of concrete or mortar: the mix, how much of it, and the cement, sand, jalli, water and steel it takes.</div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-slate-900">
+            <thead className="text-slate-600">
+              <tr className="border-b border-slate-100">
+                <th className="text-left px-3 py-2 font-semibold">Place</th>
+                <th className="text-left px-3 py-2 font-semibold">Mix</th>
+                <th className="text-right px-3 py-2 font-semibold">Volume m³</th>
+                <th className="text-right px-3 py-2 font-semibold">Cement bags</th>
+                <th className="text-right px-3 py-2 font-semibold">Sand cft</th>
+                <th className="text-right px-3 py-2 font-semibold">Jalli cft</th>
+                <th className="text-right px-3 py-2 font-semibold">Water L</th>
+                <th className="text-right px-3 py-2 font-semibold">Steel kg</th>
+              </tr>
+            </thead>
+            <tbody>
+              {budget.mixPlaces.map(m => (
+                <tr key={m.place} className="border-b border-slate-50" data-testid={`mix-row-${m.place}`}>
+                  <td className="px-3 py-2 font-bold">{m.place}</td>
+                  <td className="px-3 py-2 text-slate-700">{m.mix}</td>
+                  <td className="px-3 py-2 text-right font-mono">{num(m.volumeM3, 2)}</td>
+                  <td className="px-3 py-2 text-right font-mono">{m.cementBags ? num(m.cementBags, 1) : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono">{m.sandCft ? num(m.sandCft, 1) : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono">{m.jalliCft ? num(m.jalliCft, 1) : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono">{m.waterL ? num(m.waterL) : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono">{m.steelKg ? num(m.steelKg, 1) : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <ul className="px-4 py-3 space-y-1 text-[11px] text-slate-600 list-disc pl-8 border-t border-slate-100" data-testid="method-notes">
+          {budget.methodNotes.map((n, i) => <li key={i}>{n}</li>)}
+        </ul>
+      </div>
       {extra && (
         <details className="rounded-xl border border-slate-200 bg-white">
           <summary className="px-4 py-3 text-sm font-bold text-slate-700 cursor-pointer">Engineering details (design report)</summary>
