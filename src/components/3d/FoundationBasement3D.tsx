@@ -26,6 +26,8 @@ const KIND_COLOR: Record<BoxSpec['kind'], string> = {
 const BAR_COLOR: Record<BarSpec['kind'], string> = {
   mesh: '#00f0ff',
   dowel: '#f59e0b',
+  pedestal_bar: '#fbbf24',
+  tie: '#e2e8f0',
   wall_vertical: '#22d3ee',
   wall_horizontal: '#67e8f9',
   slab: '#00f0ff',

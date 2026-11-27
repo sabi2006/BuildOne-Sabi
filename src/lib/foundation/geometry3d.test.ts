@@ -107,15 +107,19 @@ describe('Isolated footings (no basement)', () => {
     }
   });
 
-  it('dowels: minimum bars per column, standing inside the column outline', () => {
+  it('dowels: minimum bars per column standing inside the column outline, up to the lap above the footing, each with a foot on the mesh', () => {
     const el = d.foundation!.elements[0];
     const c = d.loadPath.columns.find(x => x.id === el.columnIds[0])!;
     const dw = g.bars.filter(b => b.elementId === el.id && b.kind === 'dowel');
-    expect(dw.length).toBe(Math.max(4, el.dowels!.minBars));
-    for (const b of dw) {
+    const vertical = dw.filter(b => Math.abs(b.to[1] - b.from[1]) > 1e-6);
+    expect(vertical.length).toBe(Math.max(4, el.dowels!.minBars));
+    expect(dw.length).toBe(2 * vertical.length); // + the horizontal foot of each dowel
+    const lap = d.bbs!.rows.find(x => x.mark === `${el.id}-DW`)!.lapLengthMm! / 1000;
+    const footTop = -Df + pcc + el.depthMm! / 1000;
+    for (const b of vertical) {
       expect(Math.abs(b.from[0] - c.xM)).toBeLessThanOrEqual(c.widthMm / 2000 + 1e-6);
       expect(Math.abs(b.from[2] + c.yM)).toBeLessThanOrEqual(c.depthMm / 2000 + 1e-6);
-      expect(b.to[1]).toBeCloseTo(-0.1, 3);
+      expect(b.to[1]).toBeCloseTo(Math.min(-0.1, footTop + lap), 3);
     }
   });
 

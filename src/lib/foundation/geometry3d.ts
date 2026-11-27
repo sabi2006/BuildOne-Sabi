@@ -48,7 +48,7 @@ export interface BoxSpec {
 export interface BarSpec {
   elementId: string;
   group: GeometryGroup;
-  kind: 'mesh' | 'dowel' | 'wall_vertical' | 'wall_horizontal' | 'slab';
+  kind: 'mesh' | 'dowel' | 'pedestal_bar' | 'tie' | 'wall_vertical' | 'wall_horizontal' | 'slab';
   from: [number, number, number];
   to: [number, number, number];
   radiusM: number;
@@ -84,6 +84,25 @@ export interface Geometry3DArgs {
 /** A footing (not a raft or pile cap) lies BELOW the basement base slab: the foundation is under the basement, not inside it */
 export const footingBelowBasement = (system: string | undefined, basementOn: boolean, slabDesigned: boolean): boolean =>
   basementOn && slabDesigned && system !== 'raft' && system !== 'pile';
+
+/**
+ * Levels of a pedestal (the column below the plinth), m relative to the plinth level (the frame of the 3D view, the BOQ and the BBS):
+ * it starts on the footing top (or on the basement base slab when the footing is below it / thinner than it) and stops under the flooring.
+ */
+export function pedestalLevels(a: {
+  foundationDepthM: number; plinthHeightM: number; pccM: number; footingDepthM: number; system: string | undefined;
+  basementOn: boolean; slabThicknessM?: number; plinthThicknessM?: number;
+}): { bottomY: number; topY: number; heightM: number } {
+  const plinthH = a.basementOn ? 0 : Math.max(0, a.plinthHeightM);
+  const Df = a.foundationDepthM + plinthH;
+  const slabDesigned = a.slabThicknessM !== undefined;
+  const below = footingBelowBasement(a.system, a.basementOn, slabDesigned);
+  const footTop = below ? -Df : -Df + a.pccM + a.footingDepthM;
+  const slabTop = slabDesigned ? -Df + a.pccM + a.slabThicknessM! : -Df + a.pccM;
+  const bottomY = a.basementOn && slabDesigned ? (below ? slabTop : Math.max(footTop, slabTop)) : footTop;
+  const topY = -(a.plinthThicknessM ?? 0.1);
+  return { bottomY, topY, heightM: Math.max(0, topY - bottomY) };
+}
 
 const MAX_BARS_DEFAULT = 6000;
 const r4 = (v: number) => Math.round(v * 1e4) / 1e4;
@@ -464,27 +483,67 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       }
     }
 
-    // dowels around each column
+    // dowels around each column: from the footing mesh up to the lap with the pedestal bars (the projection of the bar schedule), with
+    // the horizontal foot resting on the mesh; then the pedestal (the column below the plinth): the column's own bars and ties
+    const footTopY = footingBelowBasement(el.system, basementOn, slabT !== undefined) ? -Df : -Df + pcc + D;
+    const perimeterPoints = (hx: number, hz: number, n: number) => {
+      const out: Array<[number, number]> = [];
+      const perim = 4 * (hx + hz);
+      for (let i = 0; i < n; i++) {
+        let t = (i / n) * perim; // walk the perimeter from the (+x,+z) corner
+        let px: number, pz: number;
+        if (t <= 2 * hx) { px = hx - t; pz = hz; }
+        else if ((t -= 2 * hx) <= 2 * hz) { px = -hx; pz = hz - t; }
+        else if ((t -= 2 * hz) <= 2 * hx) { px = -hx + t; pz = -hz; }
+        else { t -= 2 * hx; px = hx; pz = -hz + t; }
+        out.push([px, pz]);
+      }
+      return out;
+    };
+    const grp: GeometryGroup = droppedElements.has(el.id) ? 'basement' : 'foundation';
+    const dowelRow = (design.bbs?.rows ?? []).find(rw => rw.mark === `${el.id}-DW`);
     if (el.dowels) {
       const yStart = yb + cover + (el.reinforcement[0]?.diaMm ?? 12) / 1000 * 2;
-      const yEnd = -plinth;
+      const projection = (dowelRow?.lapLengthMm ?? 0) / 1000;
+      const yEnd = Math.min(-plinth, footTopY + projection);
+      const footM = dowelRow?.segmentsMm?.[1] ? dowelRow.segmentsMm[1] / 1000 : 0.15;
       if (yEnd > yStart) {
         for (const cid of el.columnIds) {
           const c = colInfo.get(cid);
           if (!c) continue;
           const pos = args.columnPositions?.[cid] ?? { x: c.xM + dx, z: -c.yM + dz };
           const hx = c.widthMm / 2000 - 0.05, hz = c.depthMm / 2000 - 0.05;
-          const n = Math.max(4, el.dowels.minBars);
-          const perim = 4 * (hx + hz);
-          for (let i = 0; i < n; i++) {
-            let t = ((i + 0.0) / n) * perim; // walk the perimeter from the (+x,+z) corner
-            let px: number, pz: number;
-            if (t <= 2 * hx) { px = hx - t; pz = hz; }
-            else if ((t -= 2 * hx) <= 2 * hz) { px = -hx; pz = hz - t; }
-            else if ((t -= 2 * hz) <= 2 * hx) { px = -hx + t; pz = -hz; }
-            else { t -= 2 * hx; px = hx; pz = -hz + t; }
-            push({ elementId: el.id, group: droppedElements.has(el.id) ? 'basement' : 'foundation', kind: 'dowel', from: [pos.x + px, yStart, pos.z + pz], to: [pos.x + px, yEnd, pos.z + pz], radiusM: Math.max(el.dowels.diaMm / 2000, 0.005) });
+          const rad = Math.max(el.dowels.diaMm / 2000, 0.005);
+          for (const [px, pz] of perimeterPoints(hx, hz, Math.max(4, el.dowels.minBars))) {
+            push({ elementId: el.id, group: grp, kind: 'dowel', from: [pos.x + px, yStart, pos.z + pz], to: [pos.x + px, yEnd, pos.z + pz], radiusM: rad });
+            // foot pointing outwards from the column centre, on top of the mesh
+            const len = Math.hypot(px, pz) || 1;
+            push({ elementId: el.id, group: grp, kind: 'dowel', from: [pos.x + px, yStart, pos.z + pz], to: [pos.x + px + (px / len) * footM, yStart, pos.z + pz + (pz / len) * footM], radiusM: rad });
           }
+        }
+      }
+    }
+    for (const cid of el.columnIds) {
+      const c = colInfo.get(cid);
+      const ped = boxes.find(bx => bx.id === `${el.id}-ped-${cid}`);
+      if (!c?.rebar || !ped) continue;
+      const pos = args.columnPositions?.[cid] ?? { x: c.xM + dx, z: -c.yM + dz };
+      const y0 = ped.center[1] - ped.size[1] / 2, y1 = ped.center[1] + ped.size[1] / 2;
+      const cv = c.rebar.coverMm / 1000;
+      const hx = c.widthMm / 2000 - cv - c.rebar.tieDiaMm / 1000 - c.rebar.mainDiaMm / 2000;
+      const hz = c.depthMm / 2000 - cv - c.rebar.tieDiaMm / 1000 - c.rebar.mainDiaMm / 2000;
+      if (hx <= 0 || hz <= 0) continue;
+      for (const [px, pz] of perimeterPoints(hx, hz, c.rebar.mainBars)) {
+        push({ elementId: el.id, group: grp, kind: 'pedestal_bar', from: [pos.x + px, y0, pos.z + pz], to: [pos.x + px, y1, pos.z + pz], radiusM: Math.max(c.rebar.mainDiaMm / 2000, 0.005) });
+      }
+      const tx = hx + c.rebar.mainDiaMm / 2000, tz = hz + c.rebar.mainDiaMm / 2000;
+      const step = Math.max(0.05, c.rebar.tieSpacingMm / 1000);
+      const tr = Math.max(c.rebar.tieDiaMm / 2000, 0.003);
+      for (let y = y0 + 0.05; y <= y1 - 0.02 + 1e-9; y += step) {
+        const corners: Array<[number, number]> = [[tx, tz], [-tx, tz], [-tx, -tz], [tx, -tz]];
+        for (let k = 0; k < 4; k++) {
+          const [ax, az] = corners[k], [bx2, bz] = corners[(k + 1) % 4];
+          push({ elementId: el.id, group: grp, kind: 'tie', from: [pos.x + ax, y, pos.z + az], to: [pos.x + bx2, y, pos.z + bz], radiusM: tr });
         }
       }
     }

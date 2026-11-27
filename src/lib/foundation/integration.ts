@@ -25,6 +25,7 @@ import {
 } from './foundationDesignService';
 import { designBasement, type BasementDesignResult } from './basementDesignService';
 import { buildBBS, type BBSResult } from './bbs';
+import { pedestalLevels } from './geometry3d';
 import { RCC_UNIT_WEIGHT } from './rcDesign';
 import { analyseBuildingFrame, type BuildingFrameInput, type BuildingFrameResult, type BuildingFrameLateralResult } from './buildingFrame';
 import type { ColumnCombo, CaseForces, CaseId } from './lateral';
@@ -54,6 +55,8 @@ export interface LoadPathColumn {
   factoredKn: number;
   /** The user entered the service load of this column (it replaces the computed load) */
   userSpecified?: boolean;
+  /** Bars of the ground-storey column design (they continue down through the pedestal to the footing) */
+  rebar?: { mainBars: number; mainDiaMm: number; tieDiaMm: number; tieSpacingMm: number; tieCutMm: number; coverMm: number };
   /** 'tributary_area_accumulation' (host estimate) or 'frame_analysis' (3D gravity frame) */
   source: 'tributary_area_accumulation' | 'frame_analysis';
   /** The host's tributary-area service load for this column (kept for comparison when the frame is used) */
@@ -256,6 +259,9 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       tributaryAreaM2: round(c.tributaryAreaM2), levels, structureServiceKn: round(structureService),
       basementAddedServiceKn: round(basementAdd), serviceKn: round(service), factoredKn: round(factored), source: 'tributary_area_accumulation',
       userSpecified: c.loadSpecifiedByUser || undefined,
+      rebar: c.providedBarCount > 0 && c.providedBarDiaMm > 0
+        ? { mainBars: c.providedBarCount, mainDiaMm: c.providedBarDiaMm, tieDiaMm: c.stirrupDiaMm, tieSpacingMm: c.stirrupSpacingMm, tieCutMm: Math.round(c.stirrupCutLengthM * 1000), coverMm: c.coverMm }
+        : undefined,
     };
   });
 
@@ -540,8 +546,22 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
   // ---------- BBS ----------
   let bbs: BBSResult | undefined;
   if (foundation || basement) {
+    // pedestals: the column below the plinth, from the footing (or base slab) to the underside of the flooring, with the column's bars and ties
+    const baseSlab = basement?.elements.find(e => e.elementType === 'basement_base_slab');
+    const colById = new Map(columns.map(c => [c.id, c]));
+    const pedestals: Record<string, Array<{ columnId: string; heightMm: number; widthMm: number; depthMm: number; rebar?: LoadPathColumn['rebar'] }>> = {};
+    for (const el of foundation?.elements ?? []) {
+      if (!el.depthMm || el.system === 'pile' || el.system === 'raft') continue;
+      const lv = pedestalLevels({
+        foundationDepthM, plinthHeightM: details.plinthHeightM ?? 0, pccM: details.pccThicknessMm / 1000, footingDepthM: el.depthMm / 1000,
+        system: el.system, basementOn: basementOn && !!basement, slabThicknessM: baseSlab?.thicknessMm ? baseSlab.thicknessMm / 1000 : undefined,
+      });
+      if (lv.heightM < 0.05) continue;
+      pedestals[el.id] = el.columnIds.map(id => colById.get(id)).filter((c): c is LoadPathColumn => !!c)
+        .map(c => ({ columnId: c.id, heightMm: Math.round(lv.heightM * 1000), widthMm: c.widthMm, depthMm: c.depthMm, rebar: c.rebar }));
+    }
     bbs = buildBBS({
-      foundation, basement,
+      foundation, basement, pedestals,
       basementPlan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM },
       clearCoverMm: details.clearCoverMm,
       foundationConcrete: params.concreteGrade, foundationSteel: params.steelGrade,

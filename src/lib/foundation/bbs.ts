@@ -14,8 +14,8 @@
 //    result's `assumptions` and must be confirmed against IS 2502 / SP 34 and the project's
 //    detailing standard before use.
 //
-// Not included (no design data exists for them): column starter bars beyond the dowels,
-// pedestals, pile cap bars, chairs/spacers, raft edge U-bars and column-zone extra steel,
+// Pedestals are scheduled with the bars and ties of the column above them (vertical bars from the footing top to the
+// plinth, ties at the column spacing). Not included (no design data exists for them): pile cap bars, chairs/spacers, raft edge U-bars and column-zone extra steel,
 // wall-to-slab corner trimmers, stirrups, and wastage (apply wastage in the BOQ).
 // -------------------------------------------------------------
 
@@ -134,8 +134,17 @@ function makeRow(r: Omit<BBSRow, 'cuttingLengthMm' | 'totalLengthM' | 'unitWeigh
 
 // ------------------------------ foundation ------------------------------
 
+/** The column below the plinth of one footing: clear height and the bars of the column design that continue through it */
+export interface PedestalInput {
+  columnId: string;
+  heightMm: number;
+  widthMm: number;
+  depthMm: number;
+  rebar?: { mainBars: number; mainDiaMm: number; tieDiaMm: number; tieSpacingMm: number; tieCutMm: number; coverMm: number };
+}
+
 export function buildFoundationBBS(
-  el: FoundationElementResult, coverMm: number, concrete: ConcreteGrade, steel: SteelGrade, options?: BBSOptions
+  el: FoundationElementResult, coverMm: number, concrete: ConcreteGrade, steel: SteelGrade, options?: BBSOptions, pedestals?: PedestalInput[]
 ): { rows: BBSRow[]; warnings: string[] } {
   const o = resolveBBS(options);
   const rows: BBSRow[] = [];
@@ -235,6 +244,40 @@ export function buildFoundationBBS(
       diaMm: phi, shape: 'dowel_L', noOfBars: dw.minBars * el.columnIds.length, segmentsMm: [Math.round(embed + projection), Math.round(foot)],
       bendDeductionMm: o.bend90 * phi, lapAddedMm: 0, developmentLengthMm: dw.developmentLengthMm, lapLengthMm: round(projection, 0),
       cuttingLengthMm: cutting, designStatus: el.status, notes,
+    }, o.wDiv));
+  }
+
+  // pedestal: the column below the plinth, reinforced as the column above it (same bars and ties), from the footing top to the plinth.
+  // The bars start on the footing top and lap there with the dowel projection; the ground-storey column bars lap into the pedestal top
+  // (that lap is part of the column schedule), so a pedestal bar is the clear pedestal height.
+  const peds = (pedestals ?? []).filter(pd => pd.heightMm >= 50);
+  const withBars = peds.filter(pd => pd.rebar);
+  if (peds.length && withBars.length < peds.length) warnings.push(`${el.id}: ${peds.length - withBars.length} pedestal(s) without column bar data: their steel is not scheduled.`);
+  const byMain = new Map<string, PedestalInput[]>();
+  for (const pd of withBars) { const k = `${pd.rebar!.mainDiaMm}|${pd.heightMm}`; byMain.set(k, [...(byMain.get(k) ?? []), pd]); }
+  let pi = 0;
+  for (const [, group] of byMain) {
+    const r0 = group[0].rebar!;
+    pi++;
+    rows.push(makeRow({
+      mark: `${el.id}-PL${pi}`, member: el.id, description: `pedestal vertical bars (column bars continued to the footing, ${group.length} column${group.length > 1 ? 's' : ''})`,
+      diaMm: r0.mainDiaMm, shape: 'straight', noOfBars: group.reduce((a, pd) => a + pd.rebar!.mainBars, 0), segmentsMm: [group[0].heightMm],
+      bendDeductionMm: 0, lapAddedMm: 0, cuttingLengthMm: group[0].heightMm, designStatus: el.status,
+      notes: [`Pedestal clear height ${group[0].heightMm} mm (footing top to the underside of the flooring). Laps: with the dowels at the bottom (dowel projection), with the ground-storey column bars at the top (in the column schedule).`],
+    }, o.wDiv));
+  }
+  const byTie = new Map<string, PedestalInput[]>();
+  for (const pd of withBars) { const r = pd.rebar!; const k = `${r.tieDiaMm}|${r.tieCutMm}|${r.tieSpacingMm}|${pd.heightMm}`; byTie.set(k, [...(byTie.get(k) ?? []), pd]); }
+  let ti = 0;
+  for (const [, group] of byTie) {
+    const r0 = group[0].rebar!;
+    ti++;
+    const perPedestal = Math.floor(group[0].heightMm / Math.max(50, r0.tieSpacingMm)) + 1;
+    rows.push(makeRow({
+      mark: `${el.id}-PT${ti}`, member: el.id, description: `pedestal lateral ties (${group.length} column${group.length > 1 ? 's' : ''})`,
+      diaMm: r0.tieDiaMm, shape: 'stirrup', noOfBars: perPedestal * group.length, segmentsMm: [r0.tieCutMm],
+      bendDeductionMm: 0, lapAddedMm: 0, cuttingLengthMm: r0.tieCutMm, designStatus: el.status,
+      notes: [`${perPedestal} ties per pedestal at ${r0.tieSpacingMm} mm (the column's tie spacing), cut length ${r0.tieCutMm} mm as in the column schedule (135° hooks).`],
     }, o.wDiv));
   }
   return { rows, warnings };
@@ -370,12 +413,14 @@ export function buildBBS(args: {
   foundationConcrete: ConcreteGrade; foundationSteel: SteelGrade;
   basementConcrete?: ConcreteGrade; basementSteel?: SteelGrade;
   options?: BBSOptions;
+  /** Pedestals per foundation element (column below the plinth) */
+  pedestals?: Record<string, PedestalInput[]>;
 }): BBSResult {
   const o = resolveBBS(args.options);
   const rows: BBSRow[] = [];
   const warnings: string[] = [];
   for (const el of args.foundation?.elements ?? []) {
-    const r = buildFoundationBBS(el, args.clearCoverMm, args.foundationConcrete, args.foundationSteel, args.options);
+    const r = buildFoundationBBS(el, args.clearCoverMm, args.foundationConcrete, args.foundationSteel, args.options, args.pedestals?.[el.id]);
     rows.push(...r.rows); warnings.push(...r.warnings);
   }
   if (args.basement?.enabled) {
@@ -400,7 +445,7 @@ export function buildBBS(args: {
     ],
     notIncluded: [
       'Column starter bars beyond the footing dowels (scheduled with the columns in the integration phase).',
-      'Pedestal reinforcement and pile reinforcement cages (not designed).',
+      'Pile reinforcement cages (not scheduled). Pedestals are scheduled with the bars and ties of the column above them.',
       'Chairs, spacers and raft edge U-bars; extra steel in raft column zones.',
       'Basement columns, beams, floor/roof slabs and wall–slab corner trimmers (not designed yet).',
       'Stirrups/ties (no beam or column members in this schedule).',
