@@ -497,3 +497,13 @@ describe('Plinth zone: G.L., plinth level, sand filling and DPC (the section of 
     expect(gb.warnings.join(' ')).toContain('Plinth height is not applied with a basement');
   });
 });
+
+describe('Basement without a designed base slab', () => {
+  it('draws no bare PCC plate (the PCC belongs to the slab) and says the slab is not drawn', () => {
+    const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: { ...basementCfg, frictionAngleDeg: undefined } as any }, 3, INNER);
+    const g = geo(d, sceneCols(d));
+    expect(g.boxes.some(b => b.id === 'basement-pcc')).toBe(false);
+    expect(g.boxes.some(b => b.kind === 'base_slab')).toBe(false);
+    expect(g.warnings.join(' ')).toContain('base slab has no designed thickness');
+  });
+});

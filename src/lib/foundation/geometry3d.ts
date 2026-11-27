@@ -189,7 +189,8 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   };
 
   if (basementOn) {
-    boxes.push(box('basement-pcc', 'basement', 'pcc', 'basement', 0, L, -Df, slabBottom, -W, 0, 'WARNING', { label: 'PCC' }));
+    // the PCC belongs to the base slab: without a designed slab it would be a bare grey plate, so it is not drawn
+    if (slabT !== undefined && baseEl) boxes.push(box('basement-pcc', 'basement', 'pcc', 'basement', 0, L, -Df, slabBottom, -W, 0, 'WARNING', { label: 'PCC' }));
     if (slabT !== undefined && baseEl) {
       boxes.push(box(baseEl.id, baseEl.id, 'base_slab', 'basement', 0, L, slabBottom, slabTop, -W, 0, baseEl.status, { label: `${baseEl.id} ${Math.round(slabT * 1000)} mm` }));
     } else {
