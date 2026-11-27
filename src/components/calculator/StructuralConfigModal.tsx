@@ -1982,6 +1982,7 @@ export function StructuralConfigModal({
                     ['overheadPercent', 'Overheads', '%', 5, 0, 30],
                     ['steelCuttingWastagePercent', 'Steel Cutting / Rolling Loss', '%', 3, 0, 15],
                     ['bindingWireKgPerTonne', 'Binding Wire', 'kg / tonne steel', 11, 0, 30],
+                    ['sandBulkingPercent', 'Sand Bulking (damp, loose)', '%', 0, 0, 40],
                   ] as Array<[string, string, string, number, number, number]>).map(([key, label, unit, dflt, min, max]) => (
                     <div key={key} data-testid={`rate-${key}`}>
                       <label className="block text-[11px] font-bold text-slate-600 mb-1">{label}</label>

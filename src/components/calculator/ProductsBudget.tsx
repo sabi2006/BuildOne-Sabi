@@ -106,6 +106,32 @@ export function ProductsBudget({ budget, onRate, extra }: {
       </div>
       {budget.notes.map((n, i) => <p key={i} className="text-[11px] text-slate-500">{n}</p>)}
 
+      {budget.shuttering && (
+        <div className="rounded-xl border border-slate-200 bg-white overflow-hidden text-slate-900" data-testid="shuttering">
+          <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-baseline justify-between gap-2">
+            <div className="text-sm font-bold text-slate-900">Shuttering (formwork)</div>
+            <div className="text-xs text-slate-600">One set for a floor: <b className="text-slate-900">{num(budget.shuttering.plywoodSheets)} plywood sheets (8 × 4 ft)</b> and <b className="text-slate-900">{num(budget.shuttering.props)} steel props</b></div>
+          </div>
+          <table className="w-full text-xs text-slate-900">
+            <tbody>
+              {budget.shuttering.rows.map(rw => (
+                <tr key={rw.place} className="border-b border-slate-50">
+                  <td className="px-3 py-1.5 font-bold">{rw.place}</td>
+                  <td className="px-3 py-1.5 text-right font-mono">{num(rw.areaM2, 1)} m²</td>
+                </tr>
+              ))}
+              <tr className="bg-slate-50">
+                <td className="px-3 py-1.5 font-bold">Total area · cost at {inr(budget.shuttering.ratePerM2)}/m²</td>
+                <td className="px-3 py-1.5 text-right font-mono font-bold">{num(budget.shuttering.totalM2, 1)} m² · {inr(budget.shuttering.cost)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <ul className="px-4 py-2 space-y-1 text-[11px] text-slate-600 list-disc pl-8 border-t border-slate-100">
+            {budget.shuttering.notes.map((n, i) => <li key={i}>{n}</li>)}
+          </ul>
+        </div>
+      )}
+
       {budget.assumptions.length > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3 text-slate-900" data-testid="assumptions">
           <div className="text-sm font-bold text-amber-900">Assumptions and thumb rules used</div>

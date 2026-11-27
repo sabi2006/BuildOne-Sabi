@@ -56,7 +56,22 @@ export interface MixPlace {
   steelKg: number;
 }
 
+/** Shuttering (formwork): contact area by place, and what one set of plywood and props takes (reused floor to floor) */
+export interface Shuttering {
+  rows: Array<{ place: string; areaM2: number }>;
+  totalM2: number;
+  ratePerM2: number;
+  /** Area × formwork rate: already part of the project estimate (labour & formwork), NOT added to the materials total */
+  cost: number;
+  /** One set for one floor (columns + beams + slab soffit of a typical floor) */
+  setAreaM2: number;
+  plywoodSheets: number;
+  props: number;
+  notes: string[];
+}
+
 export interface MaterialBudget {
+  shuttering?: Shuttering;
   products: BudgetProduct[];
   /** The mix of each place, with its quantities */
   mixPlaces: MixPlace[];
@@ -81,6 +96,8 @@ export interface MaterialBudgetInput {
   footings?: { areasM2: number[]; coverMm: number };
   /** Brickwork mortar cement:sand, for the label (e.g. '1:5') */
   masonryRatio?: string;
+  /** Formwork rate per m² (default 350, as the BOQ) */
+  formworkRatePerM2?: number;
   /** Optional rates for the products that have no BOQ rate */
   waterRatePerKl?: number;
   coverBlockRatePerNo?: number;
@@ -198,6 +215,35 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
     'Brickwork and plaster mortar are measured from the wall and plaster areas with the ratios chosen in the Structural Config and plaster settings.',
   ];
 
+  // shuttering: areas from the member designs (columns, beams, slab soffits) and the designed footings
+  const fw = s?.formworkAreasM2;
+  const footFw = boq.foundationBasement?.replacedLegacyFoundation ? (boq.foundationBasement.quantities.foundationFormworkM2 ?? 0) : 0;
+  let shuttering: Shuttering | undefined;
+  if (fw && fw.columns + fw.beams + fw.slabs + footFw > 0) {
+    const rows = [
+      { place: 'Footings & pedestals', areaM2: r(footFw, 1) },
+      { place: PLACE.columns, areaM2: r(fw.columns, 1) },
+      { place: PLACE.beams, areaM2: r(fw.beams, 1) },
+      { place: `${PLACE.slabs} (soffit)`, areaM2: r(fw.slabs, 1) },
+    ].filter(x => x.areaM2 > 0);
+    const totalM2 = rows.reduce((a, x) => a + x.areaM2, 0);
+    const n = Math.max(1, fw.floorCount);
+    const setAreaM2 = (fw.columns + fw.beams + fw.slabs) / n;
+    const SHEET_M2 = 2.4384 * 1.2192; // 8 ft × 4 ft plywood
+    const rate = input.formworkRatePerM2 ?? 350;
+    shuttering = {
+      rows, totalM2: r(totalM2, 1), ratePerM2: rate, cost: Math.round(totalM2 * rate),
+      setAreaM2: r(setAreaM2, 1),
+      plywoodSheets: Math.ceil((setAreaM2 / SHEET_M2) * 1.1),
+      props: Math.ceil(fw.slabs / n),
+      notes: [
+        `Contact area of the concrete faces: columns 2 (b + d) × height, beams (b + 2 D) × length, slabs the soffit of each floor slab, footings and pedestals their sides.`,
+        `One set of shuttering is reused floor after floor: plywood 8 × 4 ft (2.97 m²) for one floor plus 10% cutting = ${Math.ceil((setAreaM2 / SHEET_M2) * 1.1)} sheets; steel props at about 1 per m² of slab soffit (practice spacing about 1 m each way).`,
+        `Cost = area × formwork rate ₹${rate}/m² (hire / labour of shuttering, as in the project estimate). It is already inside the full project estimate, so it is not added to the materials total.`,
+      ],
+    };
+  }
+
   const priced = (q: number, rate: number | null | undefined) => (rate === null || rate === undefined ? null : Math.round(q * rate));
   const fromBoq = (p: BOQProductItem | undefined) => ({ rate: p ? p.unitRate : null, cost: p ? p.totalAmount : null });
 
@@ -225,7 +271,7 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
   notes.push('Quantities include the wastage the estimate applies to bricks; concrete materials are net (add site wastage as per your practice).');
 
   return {
-    products, mixPlaces, methodNotes, assumptions: boq.assumptions,
+    products, mixPlaces, methodNotes, assumptions: boq.assumptions, shuttering,
     materialsTotal: products.reduce((a, p) => a + (p.cost ?? 0), 0),
     unpriced,
     projectTotal: boq.grandTotal,

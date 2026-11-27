@@ -4621,6 +4621,12 @@ export function calculateBuildingBOQ(params: {
   // how the concrete is mixed: structural concrete by volume (M15 / M20 nominal) or by weight (design mix), lean concrete 1:4:8 by default
   const rccMixSpec = rccMix(CONCRETE_MIX_DATABASE[grade] ? grade : 'M20', bConfig.concreteBatching);
   const pccMixSpec = pccMix(bConfig.pccGrade);
+  // damp sand measured loose by volume takes more room (bulking): applied to the sand of volume-batched mixes and of mortar
+  const sandBulk = 1 + Math.max(0, rates.sandBulkingPercent ?? 0) / 100;
+  if (sandBulk > 1) {
+    if (rccMixSpec.method === 'by_volume') { rccMixSpec.sandKg *= sandBulk; rccMixSpec.sandM3 *= sandBulk; }
+    pccMixSpec.sandKg *= sandBulk; pccMixSpec.sandM3 *= sandBulk;
+  }
   const mix = { cementKgPerM3: rccMixSpec.cementKg, fineAggKgPerM3: rccMixSpec.sandKg, coarseAggKgPerM3: rccMixSpec.jalliKg, waterLitresPerM3: rccMixSpec.waterL };
 
   // 1. Concrete Volumes
@@ -4679,8 +4685,8 @@ export function calculateBuildingBOQ(params: {
     : (params.cementBags || 0);
 
   const masonrySandCft = (flMasonry && flMasonry.length > 0)
-    ? flMasonry.reduce((sum, f) => sum + f.sandCft, 0)
-    : ((params.sandVolume || 0) * 35.3147);
+    ? flMasonry.reduce((sum, f) => sum + f.sandCft, 0) * sandBulk
+    : ((params.sandVolume || 0) * 35.3147) * sandBulk;
 
   const masonryWetMortarM3 = (flMasonry && flMasonry.length > 0)
     ? flMasonry.reduce((sum, f) => sum + f.wetMortarVolume, 0)
@@ -4690,7 +4696,7 @@ export function calculateBuildingBOQ(params: {
   const plaster = params.plasterEstimate;
   const plasterEnabled = plaster && plaster.enabled !== false;
   const plasterCementBags = plasterEnabled ? (plaster.totalCementBags || 0) : 0;
-  const plasterSandCft = plasterEnabled ? (plaster.totalSandCft || 0) : 0;
+  const plasterSandCft = plasterEnabled ? (plaster.totalSandCft || 0) * sandBulk : 0;
   const plasterWetMortarM3 = plasterEnabled ? (plaster.totalWetVolumeM3 || 0) : 0;
 
   // 6. Steel & Binding Wire
@@ -5011,11 +5017,11 @@ export function calculateBuildingBOQ(params: {
       const flBrickCost = Math.round(flBricks * brickRate);
 
       const flMasonryCementBags = flMasonry ? flMasonry.cementBags : 0;
-      const flMasonrySandCft = flMasonry ? flMasonry.sandCft : 0;
+      const flMasonrySandCft = flMasonry ? flMasonry.sandCft * sandBulk : 0;
       const flMasonryWetMortarM3 = flMasonry ? flMasonry.wetMortarVolume : 0;
 
       const flPlasterCementBags = flPlaster ? flPlaster.totalCementBags : 0;
-      const flPlasterSandCft = flPlaster ? flPlaster.totalSandCft : 0;
+      const flPlasterSandCft = flPlaster ? flPlaster.totalSandCft * sandBulk : 0;
       const flPlasterWetMortarM3 = flPlaster ? flPlaster.totalWetVolumeM3 : 0;
 
       const flTotalCementBags = flConcreteCementBags + flMasonryCementBags + flPlasterCementBags;
@@ -5213,6 +5219,9 @@ export function calculateBuildingBOQ(params: {
     `Binding wire ${r1(bindingWireFactor * 1000)} kg per tonne of steel (practice value, adjustable).`,
     `Overheads ${overheadPercent}%, contingency ${contingencyPercent}%, GST ${taxPercent}%, material wastage allowance ${wastagePercent}% (all adjustable in the Structural Config rates).`,
     'Cover blocks are counted by site-practice spacing (IS 456 fixes only the cover thickness); curing water is not counted.',
+    sandBulk > 1
+      ? `Sand bulking ${r1(sandBulk * 100 - 100)}% added to the sand of volume-batched concrete and of mortar (damp sand measured loose).`
+      : 'No sand bulking added (dry-volume factors 1.54 / 1.33 already allow for voids); set a bulking % in the rates if damp sand is measured loose.',
   ];
   if (s?.steelFromThumbRule?.beams) assumptions.push('Beam steel is a THUMB RULE (120 kg per m³ of beam concrete): no beam design was available. Treat it as an assumption, not an IS 456 result.');
   if (s?.steelFromThumbRule?.slabs) assumptions.push('Slab steel is a THUMB RULE (65 kg per m³ of slab concrete): no slab design was available. Treat it as an assumption, not an IS 456 result.');

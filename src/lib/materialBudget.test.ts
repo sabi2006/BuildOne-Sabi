@@ -208,3 +208,40 @@ describe('adjustable constants and visible assumptions', () => {
     expect(a).toContain('Slab steel is a THUMB RULE (65 kg per m³');
   });
 });
+
+describe('shuttering and sand bulking', () => {
+  const r = calculateProject(project());
+  const b = buildMaterialBudget({ boq: r.buildingBOQ!, structural: r.structuralSummary, formworkRatePerM2: 350 });
+
+  it('shuttering areas are the formwork areas of the member designs (columns, beams, slab soffits) plus the designed footings', () => {
+    const fw = r.structuralSummary!.formworkAreasM2!;
+    const sh = b.shuttering!;
+    expect(sh.rows.find(x => x.place === 'Columns')!.areaM2).toBeCloseTo(fw.columns, 0);
+    expect(sh.rows.find(x => x.place === 'Beams')!.areaM2).toBeCloseTo(fw.beams, 0);
+    expect(sh.rows.find(x => x.place.startsWith('Slabs'))!.areaM2).toBeCloseTo(fw.slabs, 0);
+    expect(sh.totalM2).toBeCloseTo(sh.rows.reduce((a, x) => a + x.areaM2, 0), 0);
+    expect(sh.cost).toBe(Math.round(sh.totalM2 * 350));
+  });
+
+  it('one set for a floor: sheets = floor area / 2.97 m² × 1.1, props = 1 per m² of slab soffit (hand derivation)', () => {
+    const fw = r.structuralSummary!.formworkAreasM2!;
+    const per = (fw.columns + fw.beams + fw.slabs) / fw.floorCount;
+    expect(b.shuttering!.plywoodSheets).toBe(Math.ceil((per / (2.4384 * 1.2192)) * 1.1));
+    expect(b.shuttering!.props).toBe(Math.ceil(fw.slabs / fw.floorCount));
+  });
+
+  it('shuttering cost is not added to the materials total (it is inside the project estimate)', () => {
+    expect(b.materialsTotal).toBe(b.products.reduce((a, p) => a + (p.cost ?? 0), 0));
+  });
+
+  it('sand bulking: 0% by default; 20% adds 20% to the sand of P.C.C. and mortar, not to the filling', () => {
+    const cr = (o: Record<string, number>) => ({ customRates: { ...(DEFAULT_BUILDING_CONFIG.customRates || {}), ...o } }) as Partial<BuildingConfig>;
+    const a = calculateProject(project(cr({ sandBulkingPercent: 0 }))), c = calculateProject(project(cr({ sandBulkingPercent: 20 })));
+    const sb = (x: typeof a) => x.buildingBOQ!.products.find(q => q.id === 'sand')!.sourceBreakdown!;
+    expect(sb(c).masonry!).toBeCloseTo(sb(a).masonry! * 1.2, 0);
+    expect(sb(c).plinthFill ?? 0).toBeCloseTo(sb(a).plinthFill ?? 0, 5);
+    expect(c.buildingBOQ!.mixes.pcc.sandM3).toBeCloseTo(a.buildingBOQ!.mixes.pcc.sandM3 * 1.2, 2);
+    expect(c.buildingBOQ!.assumptions.join(' ')).toContain('Sand bulking 20%');
+    expect(a.buildingBOQ!.assumptions.join(' ')).toContain('No sand bulking added');
+  });
+});

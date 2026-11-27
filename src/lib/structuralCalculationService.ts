@@ -163,6 +163,8 @@ export interface StructuralRatesConfig {
   steelCuttingWastagePercent?: number;
   /** Binding wire, kg per tonne of steel (practice value, default 11) */
   bindingWireKgPerTonne?: number;
+  /** Bulking of damp sand measured loose by volume, % (default 0: the 1.54 / 1.33 dry-volume factors already allow for voids) */
+  sandBulkingPercent?: number;
   /** Mixing water, per 1000 litres. No default: listed but unpriced if unset. */
   waterRatePerKl?: number;
   /** Cover blocks (concrete spacers), per number. No default: listed but unpriced if unset. */
@@ -692,6 +694,8 @@ export interface BuildingStructuralSummary {
   totalExcavationM3: number;
   totalBackfillM3: number;
   totalFormworkAreaM2: number;
+  /** Shuttering (formwork) contact area by member, m² (slabs = soffit of every floor slab) */
+  formworkAreasM2?: { columns: number; beams: number; slabs: number; floorCount: number };
 
   // Cost Breakdown (Handbook Section 17)
   costs: {
@@ -2812,6 +2816,7 @@ export function calculateBuildingStructuralSummary(
     totalExcavationM3,
     totalBackfillM3,
     totalFormworkAreaM2,
+    formworkAreasM2: { columns: columnFormworkM2, beams: beamFormworkM2, slabs: slabFormworkM2, floorCount: numFloors },
 
     costs: {
       foundation: {
