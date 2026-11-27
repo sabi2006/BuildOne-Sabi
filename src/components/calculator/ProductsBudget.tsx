@@ -24,7 +24,7 @@ export function ProductsBudget({ budget, onRate, extra }: {
 }) {
   const [open, setOpen] = useState<BudgetProductId | null>(null);
   return (
-    <div className="space-y-4" data-testid="products-budget">
+    <div className="space-y-4 text-slate-900" data-testid="products-budget">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="rounded-xl bg-orange-600 text-white p-4">
           <div className="text-xs font-semibold opacity-90">Materials budget</div>
@@ -44,7 +44,7 @@ export function ProductsBudget({ budget, onRate, extra }: {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm text-slate-900">
           <thead className="bg-slate-50 text-slate-600 text-xs">
             <tr>
               <th className="text-left px-3 py-2 font-semibold">Product</th>
@@ -74,7 +74,7 @@ export function ProductsBudget({ budget, onRate, extra }: {
                       ) : (p.rate !== null ? inr(p.rate) : '—')}
                       <span className="ml-1 text-[10px] text-slate-400">{p.rateUnit}</span>
                     </td>
-                    <td className="px-3 py-2.5 text-right font-bold whitespace-nowrap">{p.cost !== null ? inr(p.cost) : <span className="text-[11px] text-amber-700 font-semibold">no rate</span>}</td>
+                    <td className="px-3 py-2.5 text-right font-bold text-slate-900 whitespace-nowrap">{p.cost !== null ? inr(p.cost) : <span className="text-[11px] text-amber-700 font-semibold">no rate</span>}</td>
                   </tr>
                   {isOpen && (
                     <tr className="bg-orange-50/50" data-testid={`budget-uses-${p.id}`}>
@@ -82,13 +82,13 @@ export function ProductsBudget({ budget, onRate, extra }: {
                         <div className="flex flex-wrap gap-2">
                           {p.uses.length === 0 && <span className="text-xs text-slate-500">Not used in this building.</span>}
                           {p.uses.map(u => (
-                            <span key={u.place} className="text-xs bg-white border border-orange-200 rounded-lg px-2 py-1">
-                              <b className="text-slate-800">{u.place}:</b> <span className="font-mono">{num(u.quantity, p.unit === 'kg' || p.unit === 'cft' || p.unit === 'bags' ? 1 : 0)} {p.unit}</span>
+                            <span key={u.place} className="text-xs text-slate-900 bg-white border border-orange-200 rounded-lg px-2 py-1">
+                              <b className="text-slate-800">{u.place}:</b> <span className="font-mono text-slate-900">{num(u.quantity, p.unit === 'kg' || p.unit === 'cft' || p.unit === 'bags' ? 1 : 0)} {p.unit}</span>
                               {u.note && <span className="text-slate-500"> ({u.note})</span>}
                             </span>
                           ))}
                         </div>
-                        <div className="mt-1.5 text-[10px] text-slate-500">{p.basis}</div>
+                        <div className="mt-1.5 text-[10px] text-slate-600">{p.basis}</div>
                       </td>
                     </tr>
                   )}
@@ -97,7 +97,7 @@ export function ProductsBudget({ budget, onRate, extra }: {
             })}
           </tbody>
           <tfoot>
-            <tr className="border-t-2 border-slate-200 bg-slate-50">
+            <tr className="border-t-2 border-slate-200 bg-slate-50 text-slate-900">
               <td className="px-3 py-2.5 font-bold" colSpan={3}>Materials total</td>
               <td className="px-3 py-2.5 text-right font-extrabold text-orange-700">{inr(budget.materialsTotal)}</td>
             </tr>
