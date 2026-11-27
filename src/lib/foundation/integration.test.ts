@@ -47,10 +47,12 @@ const makeProject = (cfg: Partial<BuildingConfig> = {}, floorsN = 3, extra: Reco
 };
 
 describe('Detailed design is opt-in and isolated', () => {
-  it('is not requested for a plain configuration and the result has no foundation design', () => {
+  it('a plain configuration (no foundation inputs) still gets the designed foundation with defaults, and no basement', () => {
     const r = calculateProject(makeProject());
     expect(isDetailedDesignRequested(makeProject().buildingModel.buildingConfig)).toBe(false);
-    expect(r.foundationBasementDesign).toBeUndefined();
+    expect(r.foundationBasementDesign).toBeDefined();
+    expect(r.foundationBasementDesign!.foundation).toBeDefined();
+    expect(r.foundationBasementDesign!.basement?.enabled).toBeFalsy();
     expect(r.structuralSummary).toBeDefined();
   });
 

@@ -113,6 +113,8 @@ export interface FoundationDetailsConfig {
   tieBeams?: { widthMm: number; depthMm: number; wallLoadKnM?: number; tieForcePct?: number };
   /** Appearance of the concrete footings, rafts, pile caps and pedestals in 3D (no effect on quantities or cost) */
   finish?: { kind: 'raw' | 'smooth' | 'painted'; colour?: string };
+  /** Plinth height: the plinth level (top of the plinth beam / flooring) above the ground level G.L., m. Practice value 0.45 m, not a code clause; the founding depth is measured from G.L. */
+  plinthHeightM?: number;
   /** Foundation–soil contact (base friction δ, adhesion) used by the sliding check */
   soilInterface?: { contact: 'cast_on_soil' | 'on_pcc' | 'membrane'; baseFrictionAngleDeg?: number; adhesionKnM2?: number };
   /** Plan shape for the 'custom' foundation type */
@@ -179,6 +181,7 @@ export const DEFAULT_FOUNDATION_DETAILS: FoundationDetailsConfig = {
   investigation: { sbcSource: 'assumed_preliminary' },
   clearCoverMm: 50,
   pccThicknessMm: 100,
+  plinthHeightM: 0.45,
   designPreference: 'balanced'
 };
 

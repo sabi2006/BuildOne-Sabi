@@ -6,6 +6,7 @@ import type { DesignCheck, FoundationElementResult } from '@/lib/foundation/foun
 import type { BasementElementResult } from '@/lib/foundation/basementDesignService';
 import type { DesignStatus } from '@/lib/foundation/types';
 import { footingLevels, memberWeight } from '../../lib/elementMeasurements';
+import { FoundationSection } from './FoundationSection';
 
 /**
  * Detailed design report for the foundation and basement elements.
@@ -249,6 +250,12 @@ export function FoundationReport({ design }: { design: FoundationBasementIntegra
           <b>PASS</b> only if every implemented check passed and none was skipped. <b>WARNING</b>: a check needs attention or inputs are assumed.
           {' '}<b>FAIL</b>: a design check failed. <b>NOT VERIFIED</b>: the analysis is not implemented or data is missing. The overall status never shows PASS while the limits below exist.
         </div>
+
+        {/* How it is built: section from the foundation bed to the plinth level, with the real numbers of this design */}
+        <section>
+          <h4 className="text-sm font-bold text-slate-900 mb-2">Foundation to plinth: how it is built</h4>
+          <FoundationSection design={design} />
+        </section>
 
         {/* Method limits & load path */}
         <section>

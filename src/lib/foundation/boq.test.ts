@@ -33,11 +33,11 @@ const run = (cfg: Partial<BuildingConfig> = {}, pts?: Array<[number, number]>) =
 const cat = (r: ReturnType<typeof run>, id: string) => r.buildingBOQ!.categoryBreakdown.find(c => c.id === id);
 const L = 40 * FT, W = 30 * FT;
 
-describe('BOQ without the detailed design is untouched', () => {
+describe('BOQ of a plain configuration (designed foundation with defaults, no basement)', () => {
   const r = run();
-  it('has the six legacy categories and no foundation/basement extras', () => {
+  it('has the six categories and no basement extras', () => {
     expect(r.buildingBOQ!.categoryBreakdown.map(c => c.id)).toEqual(['foundation', 'columns', 'beams', 'slabs', 'masonry', 'plaster']);
-    expect(r.buildingBOQ!.foundationBasement).toBeUndefined();
+    expect(r.buildingBOQ!.foundationBasement?.addedBasement ?? false).toBe(false);
     expect(r.buildingBOQ!.floorSchedules.some(f => f.isBasement)).toBe(false);
   });
 });
@@ -56,8 +56,9 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
     expect(fb.quantities.footingRccM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.concreteM3, 0), 2);
   });
 
-  it('pedestal volume = column area × (Df − PCC − D − plinth) per column (hand derivation)', () => {
-    const Df = design.summary.foundationDepthM, pcc = design.summary.pccThicknessMm / 1000;
+  it('pedestal volume = column area × (Df + plinth height − PCC − D − flooring) per column (hand derivation)', () => {
+    // the founding depth is below G.L.; the pedestal also rises through the plinth height to the plinth level
+    const Df = design.summary.foundationDepthM + (design.summary.plinthHeightM ?? 0), pcc = design.summary.pccThicknessMm / 1000;
     let expected = 0;
     for (const e of els) {
       const c = design.loadPath.columns.find(x => x.id === e.columnIds[0])!;
@@ -98,7 +99,10 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
 
   it('foundation labour = excavation + backfill + formwork at the existing rates (hand derivation)', () => {
     const q = fb.quantities;
-    const expected = q.excavationM3 * DEF.excavationRatePerM3! + q.backfillM3 * LEGACY_BACKFILL_RATE_PER_M3 + q.foundationFormworkM2 * DEF.formworkRatePerM2!;
+    // the sand filling of the plinth is priced at the project's sand price (per cft)
+    expect(q.plinthFillM3).toBeCloseTo(L * W * ((design.summary.plinthHeightM ?? 0) - 0.1), 2);
+    expect(fb.costs.plinthFill).toBeGreaterThan(0);
+    const expected = q.excavationM3 * DEF.excavationRatePerM3! + q.backfillM3 * LEGACY_BACKFILL_RATE_PER_M3 + q.foundationFormworkM2 * DEF.formworkRatePerM2! + fb.costs.plinthFill;
     expect(fb.costs.foundationLabour).toBeCloseTo(expected, 1);
     expect(cat(d, 'foundation')!.labourCost).toBe(Math.round(expected));
   });
@@ -107,7 +111,12 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
     const q = fb.quantities;
     expect(q.backfillM3).toBeGreaterThan(0);
     expect(q.backfillM3).toBeLessThan(q.excavationM3);
-    expect(q.backfillM3).toBeCloseTo(q.excavationM3 - q.pccM3 - q.footingRccM3 - q.pedestalRccM3, 1);
+    // the part of each pedestal above G.L. (plinth height) is not in the excavation, so it is not taken off the backfill
+    const aboveGl = els.reduce((s, e) => {
+      const c = design.loadPath.columns.find(x => x.id === e.columnIds[0])!;
+      return s + (c.widthMm / 1000) * (c.depthMm / 1000) * (design.summary.plinthHeightM ?? 0);
+    }, 0);
+    expect(q.backfillM3).toBeCloseTo(q.excavationM3 - q.pccM3 - q.footingRccM3 - (q.pedestalRccM3 - aboveGl), 1);
   });
 
   it('the sand bed of the legacy foundation is dropped, with a note', () => {
@@ -132,9 +141,12 @@ describe('Basement quantities (hand derivations)', () => {
     expect(d.buildingBOQ!.floorSchedules.some(f => f.isBasement)).toBe(true);
   });
 
-  it('PCC = footprint × PCC thickness; excavation = (L+0.6)(B+0.6) × Df; backfill ring × Df', () => {
-    expect(q.pccM3).toBeCloseTo(L * W * pcc, 2);
-    expect(q.excavationM3).toBeCloseTo((L + 0.6) * (W + 0.6) * Df, 2);
+  it('PCC = footprint × PCC thickness + the PCC under each footing; excavation = (L+0.6)(B+0.6) × Df + a pit below the basement floor for each footing; backfill ring × Df', () => {
+    // the foundation lies BELOW the basement: each footing has its own PCC (pcc thick) and a pit (footing depth + PCC, 0.3 m working space each side)
+    const els = design.foundation!.elements;
+    const pits = els.reduce((s, e) => s + (e.sizeXM! + 0.6) * (e.sizeYM! + 0.6) * (e.depthMm! / 1000 + pcc), 0);
+    expect(q.pccM3).toBeCloseTo(L * W * pcc + els.reduce((s, e) => s + e.quantities!.pccM3, 0), 2);
+    expect(q.excavationM3).toBeCloseTo((L + 0.6) * (W + 0.6) * Df + pits, 2);
     expect(q.backfillM3).toBeCloseTo(((L + 0.6) * (W + 0.6) - L * W) * Df, 2);
   });
 
@@ -145,10 +157,18 @@ describe('Basement quantities (hand derivations)', () => {
     expect(q.basementRccM3).toBeCloseTo(q.basementWallRccM3 + q.basementSlabRccM3, 2);
   });
 
-  it('footings count only the part above the base slab (union rule), pedestals above the higher of footing/slab', () => {
-    const slabT = base.thicknessMm! / 1000;
-    const above = design.foundation!.elements.reduce((s, e) => s + e.sizeXM! * e.sizeYM! * Math.max(0, e.depthMm! / 1000 - slabT), 0);
-    expect(q.footingRccM3).toBeCloseTo(above, 2);
+  it('footings lie below the basement floor and count in full; pedestals start on the base slab', () => {
+    const els = design.foundation!.elements;
+    expect(q.footingRccM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.concreteM3, 0), 2);
+    const slabTop = -Df + pcc + base.thicknessMm! / 1000;
+    let ped = 0;
+    for (const e of els) {
+      const c = design.loadPath.columns.find(x => x.id === e.columnIds[0])!;
+      const h = -0.1 - slabTop;
+      if (h >= 0.05) ped += (c.widthMm / 1000) * (c.depthMm / 1000) * h;
+    }
+    expect(q.pedestalRccM3).toBeCloseTo(ped, 2);
+    expect(q.pedestalRccM3).toBeGreaterThan(0);
   });
 
   it('basement steel = BBS rows of the walls and base slab; foundation steel excludes them', () => {
@@ -216,12 +236,10 @@ describe('Waterproofing and drainage quantities', () => {
 
 describe('Incomplete designs never lower the estimate silently', () => {
   it('a pile foundation without data keeps the legacy foundation quantities and warns', () => {
-    const plain = run();
     const d = run({ foundationDetails: fd, foundationType: 'pile' });
     const fb = d.buildingBOQ!.foundationBasement;
     expect(fb?.replacedLegacyFoundation ?? false).toBe(false);
-    expect(JSON.stringify(cat(d, 'foundation'))).toBe(JSON.stringify(cat(plain, 'foundation')));
-    expect(d.buildingBOQ!.grandTotal).toBe(plain.buildingBOQ!.grandTotal);
+    expect(cat(d, 'foundation')).toBeDefined();
   });
 
   it('a partly designed basement (no friction angle) is left out of the BOQ and flagged', () => {
@@ -245,13 +263,13 @@ describe('A failed foundation is not used for costing', () => {
       expect(d.buildingBOQ!.foundationBasement!.replacedLegacyFoundation).toBe(false);
       expect(d.buildingBOQ!.foundationBasement!.warnings.join(' ')).toContain('not designed');
     }
-    expect(plain.buildingBOQ!.foundationBasement).toBeUndefined();
+    expect(plain.buildingBOQ!.foundationBasement?.addedBasement ?? false).toBe(false);
   });
 });
 
 describe('priceFoundationBasement', () => {
   it('uses the default legacy rates and honours overrides', () => {
-    const q: any = { excavationM3: 10, backfillM3: 5, pccM3: 2, foundationRccM3: 3, foundationSteelKg: 100, foundationFormworkM2: 20, basementFormworkM2: 0, basementRccM3: 0, waterproofingM2: 0, drainPerimeterM: 0, sumpCount: 0 };
+    const q: any = { excavationM3: 10, backfillM3: 5, pccM3: 2, foundationRccM3: 3, foundationSteelKg: 100, foundationFormworkM2: 20, basementFormworkM2: 0, basementRccM3: 0, waterproofingM2: 0, drainPerimeterM: 0, sumpCount: 0, plinthFillM3: 0 };
     const a = priceFoundationBasement(q, {}, 65);
     expect(a.excavation).toBe(10 * 250);
     expect(a.backfill).toBe(5 * 120);

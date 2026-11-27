@@ -286,6 +286,9 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
             onChange={(v) => setFd({ clearCoverMm: v ?? 50 })} />
           <NumField label="PCC Thickness" unit="mm" value={fd.pccThicknessMm} step={10} min={50}
             onChange={(v) => setFd({ pccThicknessMm: v ?? 100 })} />
+          <NumField label="Plinth Height (G.L. to plinth level)" unit="m" value={fd.plinthHeightM ?? 0.45} step={0.05} min={0}
+            hint="Height of the plinth level above the ground level G.L. (practice value 0.45 m, not a code clause). The founding depth is measured from G.L.; the pedestal and the sand filling use this height. Not applied with a basement."
+            onChange={(v) => setFd({ plinthHeightM: v ?? 0.45 })} />
           <SelectField
             label="Concrete Finish (3D look)"
             value={fd.finish?.kind ?? 'raw'}

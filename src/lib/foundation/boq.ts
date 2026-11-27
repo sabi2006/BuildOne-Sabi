@@ -19,7 +19,7 @@
 
 import type { StructuralRatesConfig } from '../structuralCalculationService';
 import type { FoundationBasementIntegration } from './integration';
-import { buildFoundation3DModel } from './geometry3d';
+import { buildFoundation3DModel, footingBelowBasement } from './geometry3d';
 
 export interface FoundationBasementQuantities {
   /** Design produced usable quantities */
@@ -33,6 +33,8 @@ export interface FoundationBasementQuantities {
   excavationM3: number;
   backfillM3: number;
   pccM3: number;
+  /** Sand filling of the plinth: footprint × (plinth height − flooring thickness), m³ (0 with a basement) */
+  plinthFillM3: number;
   /** Footings/rafts (above the base slab when a basement exists) + pedestals */
   foundationRccM3: number;
   footingRccM3: number;
@@ -64,7 +66,7 @@ export function buildFoundationBasementQuantities(
   const plinth = options?.plinthThicknessM ?? 0.1;
   const ws = options?.workingSpaceM ?? 0.3;
   const sum = design.summary;
-  const Df = sum.foundationDepthM;
+  const Dg = sum.foundationDepthM;
   const pcc = sum.pccThicknessMm / 1000;
   const L = sum.plan?.lengthM ?? 0, B = sum.plan?.widthM ?? 0;
   const warnings: string[] = [];
@@ -92,6 +94,9 @@ export function buildFoundationBasementQuantities(
   }
   const slabT = slabDesigned ? baseEl!.thicknessMm! / 1000 : undefined;
   const wallT = Math.max(0, ...wallEls.map(w => (w.thicknessMm ?? 0) / 1000));
+  // levels are measured from the plinth level (the same frame as the 3D view): G.L. lies plinthH below it (0 with a basement)
+  const plinthH = basementOn ? 0 : Math.max(0, sum.plinthHeightM ?? 0);
+  const Df = Dg + plinthH;
   const slabTop = slabT !== undefined ? -Df + pcc + slabT : -Df + pcc;
 
   const integral = new Set<string>();
@@ -101,6 +106,7 @@ export function buildFoundationBasementQuantities(
   const colInfo = new Map(design.loadPath.columns.map(c => [c.id, c]));
 
   let pccM3 = 0, excavationM3 = 0, backfillM3 = 0;
+  let pitPccM3 = 0, pitExcavationM3 = 0; // footings under a basement: their own PCC and pits below the basement floor
   let footingRccM3 = 0, pedestalRccM3 = 0;
   let foundationFormworkM2 = 0;
 
@@ -108,10 +114,18 @@ export function buildFoundationBasementQuantities(
     const D = e.depthMm! / 1000;
     const sx = e.sizeXM ?? 0, sy = e.sizeYM ?? 0;
     const footTop = -Df + pcc + D;
+    const pedBelowGl = (hh: number) => Math.max(0, hh - plinthH); // the part of a pedestal above G.L. is not in the excavation
     // footing / raft concrete
     let elRcc: number;
     let elForm: number;
-    if (basementOn && slabT !== undefined) {
+    const below = footingBelowBasement(e.system, basementOn, slabT !== undefined);
+    if (below) {
+      // the foundation lies under the basement: the whole footing is concrete of its own (not part of the base slab), with its own PCC and pit
+      elRcc = e.quantities!.concreteM3;
+      elForm = e.quantities!.formworkM2;
+      pitPccM3 += e.quantities!.pccM3;
+      pitExcavationM3 += (sx + 2 * ws) * (sy + 2 * ws) * (D + pcc);
+    } else if (basementOn && slabT !== undefined) {
       const above = Math.max(0, D - slabT);
       // pad above the slab, clipped to the inside faces of the walls (the rest is monolithic with wall and slab)
       const p = e.plan;
@@ -129,7 +143,7 @@ export function buildFoundationBasementQuantities(
     // pedestals / column stubs up to the underside of the plinth
     let elPed = 0;
     if (!(basementOn && integral.has(e.id))) {
-      const supportTop = basementOn && slabT !== undefined ? Math.max(footTop, slabTop) : footTop;
+      const supportTop = basementOn && slabT !== undefined ? (below ? slabTop : Math.max(footTop, slabTop)) : footTop;
       const h = -plinth - supportTop;
       if (h >= 0.05) {
         for (const cid of e.columnIds) {
@@ -146,16 +160,17 @@ export function buildFoundationBasementQuantities(
     if (!basementOn) {
       pccM3 += e.quantities!.pccM3;
       excavationM3 += e.quantities!.excavationM3;
-      backfillM3 += Math.max(0, e.quantities!.excavationM3 - e.quantities!.pccM3 - e.quantities!.concreteM3 - elPed);
+      const pedFrac = elPed > 0 ? pedBelowGl(-plinth - footTop) / Math.max(1e-9, -plinth - footTop) : 0;
+      backfillM3 += Math.max(0, e.quantities!.excavationM3 - e.quantities!.pccM3 - e.quantities!.concreteM3 - elPed * pedFrac);
     }
   }
 
   let basementWallRccM3 = 0, basementSlabRccM3 = 0, basementFormworkM2 = 0;
   let waterproofingM2 = 0, drainPerimeterM = 0, sumpCount = 0;
   if (basementOn && L > 0 && B > 0) {
-    pccM3 = L * B * pcc;
-    excavationM3 = (L + 2 * ws) * (B + 2 * ws) * Df;
-    backfillM3 = ((L + 2 * ws) * (B + 2 * ws) - L * B) * Df;
+    pccM3 = L * B * pcc + pitPccM3;
+    excavationM3 = (L + 2 * ws) * (B + 2 * ws) * Dg + pitExcavationM3;
+    backfillM3 = ((L + 2 * ws) * (B + 2 * ws) - L * B) * Dg;
     for (const w of wallsDesigned) {
       basementWallRccM3 += w.quantities!.concreteM3;
       basementFormworkM2 += w.quantities!.formworkM2;
@@ -191,7 +206,7 @@ export function buildFoundationBasementQuantities(
 
   return {
     hasQuantities, foundationComplete, basementComplete, basementEnabled: basementOn,
-    excavationM3: r3(excavationM3), backfillM3: r3(backfillM3), pccM3: r3(pccM3),
+    excavationM3: r3(excavationM3), backfillM3: r3(backfillM3), pccM3: r3(pccM3), plinthFillM3: r3(!basementOn && L > 0 && B > 0 ? L * B * Math.max(0, plinthH - plinth) : 0),
     foundationRccM3: r3(rcc), footingRccM3: r3(footingRccM3), pedestalRccM3: r3(pedestalRccM3),
     basementWallRccM3: r3(basementWallRccM3), basementSlabRccM3: r3(basementSlabRccM3),
     basementRccM3: r3(basementWallRccM3 + basementSlabRccM3),
@@ -209,6 +224,7 @@ export interface FoundationBasementCosts {
   backfill: number;
   foundationFormwork: number;
   basementFormwork: number;
+  plinthFill: number;
   basementRccLabour: number;
   waterproofing: number;
   drainage: number;
@@ -246,13 +262,14 @@ export function priceFoundationBasement(
   const drainage = priced(q.drainPerimeterM, rates.drainagePerimeterRatePerM, 'Perimeter drain (m)');
   const sump = priced(q.sumpCount, rates.sumpRatePerNo, 'Sump and pump (nos)');
 
-  const foundationLabour = excavation + backfill + foundationFormwork;
+  const plinthFill = q.plinthFillM3 * (rates.sandPricePerCft ?? 55) * 35.3147;
+  const foundationLabour = excavation + backfill + foundationFormwork + plinthFill;
   const basementLabour = basementFormwork + basementRccLabour + waterproofing + drainage + sump;
   const foundationDisplayMaterial =
     q.pccM3 * (rates.pccLabourRatePerM3 || 3200) + q.foundationRccM3 * (rates.footingLabourRatePerM3 || 3500) + q.foundationSteelKg * steelRatePerKg;
 
   return {
-    excavation, backfill, foundationFormwork, basementFormwork, basementRccLabour, waterproofing, drainage, sump,
+    excavation, backfill, foundationFormwork, basementFormwork, plinthFill, basementRccLabour, waterproofing, drainage, sump,
     foundationLabour, basementLabour, foundationDisplayMaterial, unpriced,
   };
 }

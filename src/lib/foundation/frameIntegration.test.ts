@@ -132,8 +132,10 @@ describe('Frame analysis is the default load source', () => {
     expect(f.loadPath.totalServiceKn).not.toBeCloseTo(t.loadPath.totalServiceKn, 0);
   });
 
-  it('the detailed design is still opt-in: no foundationDetails and no basement means no design', () => {
-    expect(run({}).foundationBasementDesign).toBeUndefined();
+  it('the designed foundation is always computed (defaults apply when no foundationDetails are set); a basement only when enabled', () => {
+    const d = run({}).foundationBasementDesign;
+    expect(d).toBeDefined();
+    expect(d!.basement?.enabled).toBeFalsy();
   });
 
   it('when a frame cannot be formed the default falls back to the tributary loads with a warning (never fails)', () => {

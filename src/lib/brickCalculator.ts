@@ -5713,7 +5713,7 @@ export const calculateProject = (
     bModel.structuralSummary = structuralSummary;
 
     // Detailed foundation & basement design (opt-in; isolated from the existing calculations so a failure never breaks them)
-    if (isDetailedDesignRequested(bConfig)) {
+    if (isDetailedDesignRequested(bConfig) || effectivePillars.length > 0) {
       try {
         foundationBasementDesign = computeFoundationBasementDesign({
           summary: structuralSummary,

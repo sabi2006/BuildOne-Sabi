@@ -39,7 +39,8 @@ const INNER: Array<[number, number]> = [[10, 8], [30, 8], [30, 22], [10, 22]];
 describe('Isolated footings (no basement)', () => {
   const d = designOf({ foundationDetails: fd });
   const g = geo(d, sceneCols(d));
-  const Df = d.summary.foundationDepthM, pcc = d.summary.pccThicknessMm / 1000;
+  // Y = 0 is the plinth level: the founding depth below G.L. plus the plinth height above it
+  const Df = d.summary.foundationDepthM + (d.summary.plinthHeightM ?? 0), pcc = d.summary.pccThicknessMm / 1000;
 
   it('draws PCC, footing and pedestal for every ground column', () => {
     for (const c of d.loadPath.columns) {
@@ -176,7 +177,7 @@ describe('Pile foundation', () => {
   it('pile design without data draws nothing and says why', () => {
     const none = designOf({ foundationDetails: fd, foundationType: 'pile' });
     const gn = geo(none, sceneCols(none));
-    expect(gn.boxes.length).toBe(0);
+    expect(gn.boxes.filter(b => b.kind !== 'fill' && b.kind !== 'dpc').length).toBe(0);
     expect(gn.warnings.join(' ')).toContain('not drawn');
   });
 });
@@ -189,9 +190,10 @@ describe('Basement', () => {
   const walls = g.boxes.filter(b => b.kind === 'wall');
   const slab = g.boxes.find(b => b.kind === 'base_slab')!;
 
-  it('founds at the basement base and has one PCC layer, a base slab and four wall boxes per level', () => {
+  it('the basement has one PCC layer, a base slab and four wall boxes per level; every footing has its own PCC below it', () => {
     expect(Df).toBeGreaterThanOrEqual(3);
-    expect(g.boxes.filter(b => b.kind === 'pcc').length).toBe(1);
+    expect(g.boxes.filter(b => b.kind === 'pcc' && b.id === 'basement-pcc').length).toBe(1);
+    expect(g.boxes.filter(b => b.kind === 'pcc').length).toBe(1 + d.foundation!.elements.length);
     expect(slab).toBeDefined();
     expect(walls.length).toBe(4);
   });
@@ -258,6 +260,47 @@ describe('Basement', () => {
   });
 });
 
+describe('Basement: the foundation lies BELOW the basement floor', () => {
+  const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any }, 3, INNER);
+  const g = geo(d, sceneCols(d));
+  const Df = d.summary.foundationDepthM;
+  const slab = g.boxes.find(b => b.kind === 'base_slab')!;
+  const bpcc = g.boxes.find(b => b.id === 'basement-pcc')!;
+  const slabTop = slab.center[1] + slab.size[1] / 2;
+
+  it('each footing hangs under the basement PCC: its top is the underside of that PCC, its own PCC below, nothing above the base slab', () => {
+    for (const el of d.foundation!.elements) {
+      const f = g.boxes.find(b => b.kind === 'footing' && b.elementId === el.id)!;
+      const p = g.boxes.find(b => b.kind === 'pcc' && b.elementId === el.id)!;
+      expect(f.center[1] + f.size[1] / 2).toBeCloseTo(-Df, 3);
+      expect(f.size[1]).toBeCloseTo(el.depthMm! / 1000, 3);
+      expect(f.center[1] + f.size[1] / 2).toBeCloseTo(bpcc.center[1] - bpcc.size[1] / 2, 3);
+      expect(p.center[1] + p.size[1] / 2).toBeCloseTo(f.center[1] - f.size[1] / 2, 3);
+      expect(f.center[1] + f.size[1] / 2).toBeLessThan(slab.center[1] - slab.size[1] / 2);
+    }
+  });
+
+  it('the pedestal / column starts on the base slab and rises to the plinth', () => {
+    const ped = g.boxes.filter(b => b.kind === 'pedestal');
+    expect(ped.length).toBeGreaterThan(0);
+    for (const p of ped) {
+      expect(p.center[1] - p.size[1] / 2).toBeCloseTo(slabTop, 3);
+      expect(p.center[1] + p.size[1] / 2).toBeCloseTo(-0.1, 3);
+    }
+  });
+
+  it('the lowest solid is the footing PCC, below the basement', () => {
+    expect(g.minY).toBeLessThan(-Df);
+    expect(findBoxOverlaps(g.boxes)).toEqual([]);
+  });
+
+  it('the footing bars are drawn below the base slab', () => {
+    const mesh = g.bars.filter(b => b.kind === 'mesh');
+    expect(mesh.length).toBeGreaterThan(0);
+    for (const b of mesh) { expect(b.from[1]).toBeLessThan(-Df); expect(b.to[1]).toBeLessThan(-Df); }
+  });
+});
+
 describe('Basement with columns on the wall line', () => {
   const d = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any });
   const g = geo(d, sceneCols(d));
@@ -268,16 +311,7 @@ describe('Basement with columns on the wall line', () => {
     expect(g.boxes.filter(b => b.kind === 'wall').length).toBe(4);
   });
 
-  it('clips mesh bars to the inside of the walls, hides dowels with their wall, and nothing sticks out of the footprint', () => {
-    const wallT = Math.max(...d.basement!.elements.filter(e => e.elementType === 'basement_wall').map(e => e.thicknessMm! / 1000));
-    for (const b of g.bars.filter(x => x.kind === 'mesh')) {
-      for (const p of [b.from, b.to]) {
-        expect(p[0]).toBeGreaterThanOrEqual(wallT - 1e-6);
-        expect(p[0]).toBeLessThanOrEqual(L - wallT + 1e-6);
-        expect(p[2]).toBeLessThanOrEqual(-wallT + 1e-6);
-        expect(p[2]).toBeGreaterThanOrEqual(-W + wallT - 1e-6);
-      }
-    }
+  it('hides dowels with their wall, and nothing of the basement itself sticks out of the footprint (footings below it may)', () => {
     const integral = new Set(g.integralElementIds);
     expect(integral.size).toBeGreaterThan(0);
     const orphanDowels = g.bars.filter(b => b.kind === 'dowel' && integral.has(b.elementId));
@@ -285,7 +319,7 @@ describe('Basement with columns on the wall line', () => {
     expect(orphanDowels.every(b => b.group === 'basement')).toBe(true); // embedded in the wall: hidden with it
     for (const b of g.bars) {
       for (const p of [b.from, b.to]) {
-        if (b.kind === 'dowel') continue;
+        if (b.kind === 'dowel' || b.kind === 'mesh') continue;
         expect(p[0]).toBeGreaterThanOrEqual(-1e-6);
         expect(p[0]).toBeLessThanOrEqual(L + 1e-6);
         expect(p[2]).toBeLessThanOrEqual(1e-6);
@@ -400,5 +434,66 @@ describe('Custom-shaped footing', () => {
 
   it('rebar is not drawn for custom shapes and the model says so', () => {
     expect(g.warnings.join(' ')).toContain('not drawn in 3D for a custom-shaped footing');
+  });
+});
+
+describe('Plinth zone: G.L., plinth level, sand filling and DPC (the section of a framed building)', () => {
+  const d = designOf({ foundationDetails: fd });
+  const h = d.summary.plinthHeightM!;
+  const walls = [
+    { x0: 0, z0: 0, x1: L, z1: 0, thicknessM: 0.23 },        // along x
+    { x0: 0, z0: -W, x1: 0, z1: 0, thicknessM: 0.23 },       // along z
+    { x0: 0, z0: -1, x1: 3, z1: -2, thicknessM: 0.23 },      // slanted: no DPC strip
+  ];
+  const g = buildFoundation3DModel({ design: d, buildingLengthM: L, buildingWidthM: W, columnPositions: sceneCols(d), plinthWalls: walls });
+
+  it('the plinth height is 0.45 m above G.L. by default and is carried by the design', () => {
+    expect(h).toBe(0.45);
+    expect(g.levels).toEqual({ plinthY: 0, glY: -0.45, floorUnderY: -0.1, bedY: -(d.summary.foundationDepthM + 0.45), plinthHeightM: 0.45 });
+  });
+
+  it('the founding depth is measured from G.L.: the PCC bottom lies Df below G.L., i.e. Df + plinth height below the plinth level', () => {
+    const p = g.boxes.find(b => b.kind === 'pcc')!;
+    expect(p.center[1] - p.size[1] / 2).toBeCloseTo(-(d.summary.foundationDepthM + h), 3);
+  });
+
+  it('sand filling lies between G.L. and the underside of the flooring over the whole plan', () => {
+    const f = g.boxes.find(b => b.kind === 'fill')!;
+    expect(f.center[1] + f.size[1] / 2).toBeCloseTo(-0.1, 4);
+    expect(f.center[1] - f.size[1] / 2).toBeCloseTo(-h, 4);
+    expect(f.size[0]).toBeCloseTo(L, 3);
+    expect(f.size[2]).toBeCloseTo(W, 3);
+    expect(f.status).toBe('NOT_VERIFIED'); // not a designed element: never shown as PASS
+  });
+
+  it('pedestals rise from the footing to the underside of the flooring (through G.L.)', () => {
+    const ped = g.boxes.find(b => b.kind === 'pedestal')!;
+    expect(ped.center[1] + ped.size[1] / 2).toBeCloseTo(-0.1, 3);
+    expect(ped.center[1] - ped.size[1] / 2).toBeLessThan(-h);
+  });
+
+  it('a DPC strip lies on the plinth level along each axis-aligned wall and not along a slanted one', () => {
+    const dpc = g.boxes.filter(b => b.kind === 'dpc');
+    expect(dpc.length).toBe(2);
+    for (const b of dpc) { expect(b.center[1] - b.size[1] / 2).toBeCloseTo(0, 4); expect(b.size[1]).toBeCloseTo(0.04, 4); }
+  });
+
+  it('the filling and DPC touch the concrete by design and do not count as overlaps', () => {
+    expect(findBoxOverlaps(g.boxes)).toEqual([]);
+  });
+
+  it('with no plinth height there is no filling, DPC or G.L. offset (legacy frame)', () => {
+    const z = designOf({ foundationDetails: { ...fd, plinthHeightM: 0 } });
+    const gz = buildFoundation3DModel({ design: z, buildingLengthM: L, buildingWidthM: W, columnPositions: sceneCols(z), plinthWalls: walls });
+    expect(gz.boxes.some(b => b.kind === 'fill' || b.kind === 'dpc')).toBe(false);
+    expect(gz.levels.bedY).toBeCloseTo(-z.summary.foundationDepthM, 4);
+  });
+
+  it('with a basement the plinth height is not applied (walls rise from the base slab) and the model says so', () => {
+    const b = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any }, 3, INNER);
+    const gb = buildFoundation3DModel({ design: b, buildingLengthM: L, buildingWidthM: W, columnPositions: sceneCols(b), plinthWalls: walls });
+    expect(gb.levels.plinthHeightM).toBe(0);
+    expect(gb.boxes.some(x => x.kind === 'fill' || x.kind === 'dpc')).toBe(false);
+    expect(gb.warnings.join(' ')).toContain('Plinth height is not applied with a basement');
   });
 });

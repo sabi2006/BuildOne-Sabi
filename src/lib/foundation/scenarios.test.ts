@@ -341,14 +341,15 @@ describe('Scenario 17: save and reload', () => {
     expect(JSON.stringify(second.foundationBasementDesign)).toBe(JSON.stringify(first.foundationBasementDesign));
     expect(second.buildingBOQ!.grandTotal).toBe(first.buildingBOQ!.grandTotal);
   });
-  it('a project saved before these features existed still loads and has no detailed design', () => {
+  it('a project saved before these features existed still loads, gets the default foundation design and no basement', () => {
     const proj = project({}, 3, INNER4);
     const legacy = JSON.parse(JSON.stringify(proj.buildingModel));
     delete legacy.buildingConfig.foundationDetails;
     delete legacy.buildingConfig.basement;
     const r = calculateProject({ walls: proj.walls, pillars: proj.pillars, buildingModel: legacy });
-    expect(r.foundationBasementDesign).toBeUndefined();
-    expect(r.buildingBOQ!.foundationBasement).toBeUndefined();
+    expect(r.foundationBasementDesign).toBeDefined();
+    expect(r.foundationBasementDesign!.basement?.enabled).toBeFalsy();
+    expect(r.buildingBOQ!.foundationBasement?.addedBasement ?? false).toBe(false);
     expect(r.buildingBOQ!.categoryBreakdown.length).toBe(6);
   });
 });

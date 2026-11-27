@@ -103,6 +103,8 @@ export interface FoundationBasementIntegration {
     excavationM3: number;
     /** Founding level used by the design (underside of PCC below ground), m */
     foundationDepthM: number;
+    /** Plinth level above ground level (G.L.), m (not applied when a basement is drawn) */
+    plinthHeightM?: number;
     pccThicknessMm: number;
     clearCoverMm: number;
     /** Basement geometry used by the design (undefined when no basement) */
@@ -202,7 +204,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
     return {
       generatedFrom: 'structural_summary',
       loadPath: { columns: [], totalServiceKn: 0, totalFactoredKn: 0, groundColumnCount: 0, checks: [], capabilityGaps },
-      summary: { foundationConcreteM3: 0, basementConcreteM3: 0, steelKg: 0, excavationM3: 0, foundationDepthM: config.foundationDepthM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm, plan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM } },
+      summary: { foundationConcreteM3: 0, basementConcreteM3: 0, steelKg: 0, excavationM3: 0, foundationDepthM: config.foundationDepthM, plinthHeightM: details.plinthHeightM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm, plan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM } },
       status: 'NOT_VERIFIED',
       warnings: ['No ground-level columns were found in the structural summary: foundation cannot be designed.'],
     };
@@ -570,7 +572,7 @@ export function computeFoundationBasementDesign(args: IntegrationArgs): Foundati
       basementConcreteM3: basement?.totals.concreteM3 ?? 0,
       steelKg: bbs?.totals.steelKg ?? 0,
       excavationM3: Math.max(foundation?.totals.excavationM3 ?? 0, basement?.totals.excavationM3 ?? 0),
-      foundationDepthM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm,
+      foundationDepthM, plinthHeightM: details.plinthHeightM, pccThicknessMm: details.pccThicknessMm, clearCoverMm: details.clearCoverMm,
       basement: basementOn ? { depthM: basementCfg.depthM, levels: levelsBelow, waterproofing: basementCfg.waterproofing, drainage: basementCfg.drainage } : undefined,
       plan: { lengthM: args.buildingLengthM, widthM: args.buildingWidthM },
     },

@@ -8,9 +8,10 @@
 // Rules applied (so nothing overlaps and nothing above ground is touched):
 //  - Founding level = -foundationDepth (underside of PCC). RCC starts at PCC top.
 //  - Footings/rafts are aligned to the 3D position of their columns (translation only).
-//  - With a basement: one PCC layer under the whole footprint, the base slab on it, walls on the
-//    slab; footings/rafts that are deeper than the slab are drawn only above the slab (union of
-//    volumes, no double solids); pedestals start at the highest of footing/slab top.
+//  - With a basement: one PCC layer under the whole footprint, the base slab on it, walls on the slab. The FOUNDATION is
+//    BELOW the basement: isolated / combined / strip / strap / custom footings hang under the basement PCC (footing top =
+//    underside of the basement PCC, its own PCC below), and the pedestal / column starts on the base slab. A raft is the base
+//    slab itself (union of volumes, drawn only above the slab); pile caps keep the old rule.
 //  - Pedestals/basement-column stubs rise to the underside of the plinth slab (-plinth).
 //  - Elements the engine could not design (no plan/thickness) produce no solid geometry.
 //  - Basement columns, beams, floor/roof slabs are not designed, so they are NOT drawn.
@@ -21,7 +22,10 @@ import type { FoundationBasementIntegration } from './integration';
 import type { FoundationElementResult } from './foundationDesignService';
 import type { BasementElementResult } from './basementDesignService';
 
-export type BoxKind = 'pcc' | 'footing' | 'raft' | 'pedestal' | 'pile_cap' | 'pile' | 'wall' | 'base_slab';
+export type BoxKind = 'pcc' | 'footing' | 'raft' | 'pedestal' | 'pile_cap' | 'pile' | 'wall' | 'base_slab' | 'fill' | 'dpc';
+
+/** Kinds that are layers around the structure (sand filling, damp-proof course): they surround or touch the concrete, so they are left out of the no-overlap rule */
+export const LAYER_KINDS: BoxKind[] = ['fill', 'dpc'];
 export type GeometryGroup = 'foundation' | 'basement';
 
 export interface BoxSpec {
@@ -58,6 +62,8 @@ export interface Foundation3DModel {
   integralElementIds: string[];
   /** lowest Y of any solid, m (negative) */
   minY: number;
+  /** Levels in the scene frame (Y = 0 is the plinth level): ground level, underside of the flooring, foundation bed */
+  levels: { plinthY: number; glY: number; floorUnderY: number; bedY: number; plinthHeightM: number };
 }
 
 export interface Geometry3DArgs {
@@ -68,8 +74,16 @@ export interface Geometry3DArgs {
   buildingWidthM: number;
   /** Thickness of the plinth/ground slab drawn at Y 0 downward (default 0.1) */
   plinthThicknessM?: number;
+  /** Ground-floor wall lines in the scene frame (axis-aligned ones get a damp-proof course on the plinth level) */
+  plinthWalls?: Array<{ x0: number; z0: number; x1: number; z1: number; thicknessM: number }>;
+  /** DPC thickness, m (default 0.04) */
+  dpcThicknessM?: number;
   maxBars?: number;
 }
+
+/** A footing (not a raft or pile cap) lies BELOW the basement base slab: the foundation is under the basement, not inside it */
+export const footingBelowBasement = (system: string | undefined, basementOn: boolean, slabDesigned: boolean): boolean =>
+  basementOn && slabDesigned && system !== 'raft' && system !== 'pile';
 
 const MAX_BARS_DEFAULT = 6000;
 const r4 = (v: number) => Math.round(v * 1e4) / 1e4;
@@ -91,6 +105,7 @@ export function findBoxOverlaps(boxes: BoxSpec[], eps = 5e-4): Array<[string, st
   for (let i = 0; i < boxes.length; i++) {
     for (let j = i + 1; j < boxes.length; j++) {
       const a = boxes[i], b = boxes[j];
+      if (LAYER_KINDS.includes(a.kind) || LAYER_KINDS.includes(b.kind)) continue;
       let overlap = true;
       for (let k = 0; k < 3 && overlap; k++) {
         const [a0, a1] = ext(a, k), [b0, b1] = ext(b, k);
@@ -120,12 +135,16 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   const bars: BarSpec[] = [];
   const maxBars = args.maxBars ?? MAX_BARS_DEFAULT;
   const plinth = args.plinthThicknessM ?? 0.1;
-  const Df = design.summary.foundationDepthM;
+  const Dg = design.summary.foundationDepthM;
   const pcc = design.summary.pccThicknessMm / 1000;
   const cover = design.summary.clearCoverMm / 1000;
   const L = args.buildingLengthM, W = args.buildingWidthM;
   const colInfo = new Map(design.loadPath.columns.map(c => [c.id, c]));
   const basementOn = !!design.basement?.enabled && !!design.summary.basement;
+  // Y = 0 is the PLINTH level (top of the flooring). Ground level G.L. lies plinthH below it and the founding depth is measured from G.L.
+  // With a basement the walls rise from the base slab to the plinth, so the plinth height is not applied there.
+  const plinthH = basementOn ? 0 : Math.max(0, design.summary.plinthHeightM ?? 0);
+  const Df = Dg + plinthH;
 
   const wallEls = (design.basement?.elements ?? []).filter(e => e.elementType === 'basement_wall') as BasementElementResult[];
   const baseEl = (design.basement?.elements ?? []).find(e => e.elementType === 'basement_base_slab') as BasementElementResult | undefined;
@@ -243,6 +262,13 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
         if (el.polygon) { rc.shape = 'prism'; rc.outline = outlineOf(el, dx, dz, r); }
         boxes.push(rc);
       }
+    } else if (footingBelowBasement(el.system, basementOn, slabT !== undefined)) {
+      // the foundation lies under the basement: footing top = underside of the basement PCC, its own PCC below, no clipping to the walls
+      const fTop = -Df, fBot = -Df - D;
+      const pc = box(`${el.id}-pcc`, el.id, 'pcc', group, r.x0, r.x1, fBot - pcc, fBot, r.z0, r.z1, el.status, { label: 'PCC under the footing' });
+      const rc = box(`${el.id}-rcc`, el.id, kind, group, r.x0, r.x1, fBot, fTop, r.z0, r.z1, el.status, { label: `${label} (below the basement floor)` });
+      if (el.polygon) { pc.shape = 'prism'; pc.outline = outlineOf(el, dx, dz, r); rc.shape = 'prism'; rc.outline = outlineOf(el, dx, dz, r); }
+      boxes.push(pc, rc);
     } else {
       // union with the base slab: only the part of the footing that rises above the slab is drawn
       if (slabT !== undefined) {
@@ -257,7 +283,8 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     }
 
     // pedestals / column stubs (basement columns are not designed: labelled accordingly)
-    const supportTop = basementOn && slabT !== undefined ? Math.max(yRccTop, slabTop) : yRccTop;
+    const below = footingBelowBasement(el.system, basementOn, slabT !== undefined);
+    const supportTop = basementOn && slabT !== undefined ? (below ? slabTop : Math.max(yRccTop, slabTop)) : yRccTop;
     const stubTop = -plinth;
     for (const cid of el.columnIds) {
       const c = colInfo.get(cid);
@@ -270,6 +297,25 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       boxes.push(box(`${el.id}-ped-${cid}`, el.id, 'pedestal', group,
         pos.x - c.widthMm / 2000, pos.x + c.widthMm / 2000, supportTop, stubTop, pos.z - c.depthMm / 2000, pos.z + c.depthMm / 2000, el.status,
         { label: `${c.name} ${basementOn ? 'basement column / pedestal (not designed)' : 'pedestal'}` }));
+    }
+  }
+
+  // plinth filling and damp-proof course (sectional layers of a framed building: footing, pedestal, sand filling, flooring, DPC)
+  if (!basementOn && plinthH > plinth + 0.05 && L > 0 && W > 0) {
+    boxes.push(box('plinth-fill', 'plinth', 'fill', 'foundation', 0, L, -plinthH, -plinth, -W, 0, 'NOT_VERIFIED',
+      { label: `Sand filling ${Math.round((plinthH - plinth) * 1000)} mm (G.L. to underside of flooring)`, note: 'Compacted sand between the plinth beams, under the flooring. Not a designed element.' }));
+  }
+  if (!basementOn && plinthH > 0) {
+    const t = args.dpcThicknessM ?? 0.04;
+    let k = 0;
+    for (const w of args.plinthWalls ?? []) {
+      const dx = Math.abs(w.x1 - w.x0), dz = Math.abs(w.z1 - w.z0);
+      const half = Math.max(w.thicknessM, 0.05) / 2 + 0.005;
+      if (dx >= dz && dx > 0.05 && dz < 0.01) {
+        boxes.push(box(`dpc-${k++}`, 'plinth', 'dpc', 'foundation', Math.min(w.x0, w.x1), Math.max(w.x0, w.x1), 0, t, w.z0 - half, w.z0 + half, 'NOT_VERIFIED', { label: 'DPC' }));
+      } else if (dz > dx && dz > 0.05 && dx < 0.01) {
+        boxes.push(box(`dpc-${k++}`, 'plinth', 'dpc', 'foundation', w.x0 - half, w.x0 + half, 0, t, Math.min(w.z0, w.z1), Math.max(w.z0, w.z1), 'NOT_VERIFIED', { label: 'DPC' }));
+      }
     }
   }
 
@@ -363,7 +409,8 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
     const { dx, dz } = offsets.get(el.id)!;
     const r = sceneRect(el, dx, dz);
     const D = el.depthMm! / 1000;
-    const yb = -Df + pcc;
+    const yb = footingBelowBasement(el.system, basementOn, slabT !== undefined) ? -Df - D : -Df + pcc;
+    const pushM = footingBelowBasement(el.system, basementOn, slabT !== undefined) ? push : pushMesh;
     const bottomMain = el.reinforcement.filter(l => l.location === 'bottom' && l.role === 'main');
     const topMain = el.reinforcement.filter(l => l.location === 'top' && l.role === 'main');
     const bandLayers = el.reinforcement.filter(l => l.role === 'band');
@@ -397,10 +444,10 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
           const off = -zone / 2 + (n > 1 ? (i * zone) / (n - 1) : zone / 2);
           if (l.direction === 'y') {
             const x = pos.x + off;
-            pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
+            pushM({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
           } else {
             const z = pos.z + off;
-            pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
+            pushM({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
           }
         }
         continue;
@@ -408,11 +455,11 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
       const spacing = (l.spacingMm ?? 150) / 1000;
       if (l.direction === 'x') {
         for (const z of barPositions(r.z0 + cover, r.z1 - cover, spacing, l.count)) {
-          pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
+          pushM({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [r.x0 + cover, y, z], to: [r.x1 - cover, y, z], radiusM: rad });
         }
       } else {
         for (const x of barPositions(r.x0 + cover, r.x1 - cover, spacing, l.count)) {
-          pushMesh({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
+          pushM({ elementId: el.id, group: 'foundation', kind: 'mesh', from: [x, y, r.z0 + cover], to: [x, y, r.z1 - cover], radiusM: rad });
         }
       }
     }
@@ -495,6 +542,7 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   }
   if (thinned) warnings.push(`Reinforcement is drawn at reduced density (more than ${maxBars} bars): the schedule (BBS) still counts every bar.`);
 
+  if (basementOn && (design.summary.plinthHeightM ?? 0) > 0) warnings.push('Plinth height is not applied with a basement: the basement walls rise from the base slab to the plinth level.');
   const minY = boxes.length ? Math.min(...boxes.map(b => b.center[1] - b.size[1] / 2)) : 0;
-  return { boxes, bars, warnings, integralElementIds: [...droppedElements], minY: r4(minY) };
+  return { boxes, bars, warnings, integralElementIds: [...droppedElements], minY: r4(minY), levels: { plinthY: 0, glY: r4(-plinthH), floorUnderY: r4(-plinth), bedY: r4(-Df), plinthHeightM: r4(plinthH) } };
 }

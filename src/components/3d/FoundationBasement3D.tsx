@@ -7,8 +7,8 @@ import type { BarSpec, BoxSpec, Foundation3DModel } from '@/lib/foundation/geome
 
 /**
  * Renders the detailed foundation & basement design (see lib/foundation/geometry3d.ts for the placement
- * rules). Everything is at or below ground level (Y <= 0) and lives in its own group, so adding or
- * removing it never moves any upper-floor element.
+ * rules). Y = 0 is the plinth level; everything is at or below it (the DPC is a thin strip on it) and lives in
+ * its own group, so adding or removing it never moves any upper-floor element.
  */
 
 const KIND_COLOR: Record<BoxSpec['kind'], string> = {
@@ -20,6 +20,8 @@ const KIND_COLOR: Record<BoxSpec['kind'], string> = {
   pile: '#a78bfa',
   wall: '#0ea5e9',
   base_slab: '#0369a1',
+  fill: '#d9b36c',
+  dpc: '#0f172a',
 };
 const BAR_COLOR: Record<BarSpec['kind'], string> = {
   mesh: '#00f0ff',
@@ -129,6 +131,12 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
   if (!showFoundation && !showBasement && !showSoilBed) return null;
 
   // soil pit: a thin stratum just below the lowest designed solid, 2 m beyond the building plan on every side
+  // levels as in the section of a framed building: plinth level, ground level (G.L.), foundation bed level
+  const lv = geometry.levels;
+  const footprint = (() => {
+    const f = geometry.boxes.find(b => b.id === 'plinth-fill') ?? geometry.boxes.find(b => b.kind === 'pcc');
+    return f ? { cx: f.center[0], cz: f.center[2], w: f.size[0], d: f.size[2] } : null;
+  })();
   const pit = (() => {
     const solids = geometry.boxes;
     if (!showSoilBed || solids.length === 0) return null;
@@ -149,8 +157,27 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
           <meshStandardMaterial color={soilColor} roughness={0.95} metalness={0} />
         </mesh>
       )}
+      {showFoundation && footprint && lv.plinthHeightM > 0 && (
+        <group name="ground-level">
+          {/* G.L.: a thin, see-through ground surface 1.5 m beyond the plan, so the buried footing stays visible below it */}
+          <mesh position={[footprint.cx, lv.glY, footprint.cz]}>
+            <boxGeometry args={[footprint.w + 3, 0.02, footprint.d + 3]} />
+            <meshStandardMaterial color={soilColor} transparent opacity={0.22} depthWrite={false} roughness={1} />
+          </mesh>
+          {showLabels && ([
+            { y: lv.plinthY, text: 'Plinth level', c: 'text-sky-300 border-sky-500/60' },
+            { y: lv.glY, text: 'G.L. (ground level)', c: 'text-emerald-300 border-emerald-500/60' },
+            { y: lv.bedY, text: 'Foundation bed level', c: 'text-amber-300 border-amber-500/60' },
+          ]).map(l => (
+            <Html key={l.text} position={[footprint.cx - footprint.w / 2 - 0.2, l.y, footprint.cz + footprint.d / 2]} center zIndexRange={[30, 0]}>
+              <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono whitespace-nowrap border bg-slate-900/90 ${l.c}`}>{l.text} · {l.y === 0 ? '±0.00' : l.y.toFixed(2)} m</div>
+            </Html>
+          ))}
+        </group>
+      )}
       {visibleBoxes.map(b => {
         const failed = b.status === 'FAIL';
+        const layer = b.kind === 'fill' || b.kind === 'dpc';
         const concreteKind = b.kind === 'footing' || b.kind === 'raft' || b.kind === 'pile_cap' || b.kind === 'pedestal';
         const color = failed ? '#ef4444' : (concreteKind && finish ? (finish.colour || (finish.kind === 'painted' ? '#cbd5e1' : KIND_COLOR[b.kind])) : KIND_COLOR[b.kind]);
         const roughness = concreteKind && finish ? (finish.kind === 'raw' ? 0.85 : finish.kind === 'smooth' ? 0.35 : 0.6) : 0.6;
@@ -163,7 +190,9 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
               : b.shape === 'frustum' && b.topSize
                 ? <FrustumGeometry base={[b.size[0], b.size[2]]} top={b.topSize} height={b.size[1]} />
                 : <boxGeometry args={b.size} />}
-            <meshStandardMaterial color={color} roughness={roughness} metalness={0.05} transparent={transparent} opacity={opacity} depthWrite={isConcreteSolid} />
+            {layer
+              ? <meshStandardMaterial color={color} roughness={0.95} metalness={0} transparent opacity={b.kind === 'fill' ? 0.3 : 1} depthWrite={b.kind === 'dpc'} />
+              : <meshStandardMaterial color={color} roughness={roughness} metalness={0.05} transparent={transparent} opacity={opacity} depthWrite={isConcreteSolid} />}
           </mesh>
         );
       })}
@@ -172,7 +201,7 @@ export function FoundationBasement3D({ geometry, showFoundation, showBasement, s
         <InstancedBars key={kind} bars={list} color={BAR_COLOR[kind]} />
       ))}
 
-      {showLabels && visibleBoxes.filter(b => b.label && (b.kind === 'footing' || b.kind === 'raft' || b.kind === 'base_slab' || b.kind === 'pile_cap' || (b.kind === 'wall' && b.id.endsWith('-N')))).map(b => (
+      {showLabels && visibleBoxes.filter(b => b.label && (b.kind === 'footing' || b.kind === 'raft' || b.kind === 'base_slab' || b.kind === 'pile_cap' || b.kind === 'fill' || (b.kind === 'wall' && b.id.endsWith('-N')))).map(b => (
         <Html key={`lbl-${b.id}`} position={[b.center[0], b.center[1] + b.size[1] / 2 + 0.1, b.center[2]]} center zIndexRange={[30, 0]}>
           <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono whitespace-nowrap border ${b.status === 'FAIL' ? 'bg-red-900/90 text-red-100 border-red-400' : b.status === 'PASS' ? 'bg-emerald-900/90 text-emerald-100 border-emerald-500' : 'bg-slate-900/90 text-amber-300 border-amber-500/60'}`}>
             {b.label} · {b.status.replace('_', ' ')}

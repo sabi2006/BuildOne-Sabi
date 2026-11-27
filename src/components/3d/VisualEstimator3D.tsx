@@ -34,12 +34,9 @@ import {
   convertUnit,
   DEFAULT_RCC_REINFORCEMENT,
   RCCReinforcementConfig,
-  FoundationFooting,
   ColumnStubRebarConfig,
   FoundationConfig,
   DEFAULT_FOUNDATION_CONFIG,
-  getEffectiveFootingSize,
-  generateFootingsForPillars,
   DEFAULT_PLASTER_CONFIG,
   PlasterConfig,
   toMetersPlaster,
@@ -1054,317 +1051,6 @@ function RingBeamRebarCage({
 
 
 
-// 2-Way RCC Footing Reinforcement Mesh & Column Starter Anchor Bars
-function FootingRebarMesh({
-  footingLengthM,
-  footingWidthM,
-  footingDepthM,
-  stubH_M = 0.6,
-  stubW_M = 0.2286,
-  stubD_M = 0.2286,
-  hasStub = true,
-  rebar,
-  columnStubRebar,
-  starterCount = 4,
-  starterDiaMm = 16
-}: {
-  footingLengthM: number;
-  footingWidthM: number;
-  footingDepthM: number;
-  stubH_M?: number;
-  stubW_M?: number;
-  stubD_M?: number;
-  hasStub?: boolean;
-  rebar?: { mainBarDiaMm: number; mainBarCount: number; distBarDiaMm: number; distBarCount: number; coverMm: number; hookLengthMm?: number };
-  columnStubRebar?: ColumnStubRebarConfig;
-  starterCount?: number;
-  starterDiaMm?: number;
-}) {
-  const coverM = Math.max(0.03, (rebar?.coverMm || 50) * 0.001);
-  const hookM = Math.max(0.08, (rebar?.hookLengthMm || 150) * 0.001);
-  
-  const mainDiaM = Math.max(0.008, (rebar?.mainBarDiaMm || 12) * 0.001);
-  const distDiaM = Math.max(0.008, (rebar?.distBarDiaMm || 12) * 0.001);
-  const mainRadius = Math.max(0.010, mainDiaM / 2);
-  const distRadius = Math.max(0.010, distDiaM / 2);
-
-  const usableLenM = Math.max(0.2, footingLengthM - 2 * coverM);
-  const usableWidM = Math.max(0.2, footingWidthM - 2 * coverM);
-
-  const mainCount = Math.max(2, rebar?.mainBarCount || 6);
-  const distCount = Math.max(2, rebar?.distBarCount || 6);
-
-  // Position mesh near bottom of footing
-  const bottomY = -footingDepthM / 2 + coverM;
-  const mainY = bottomY + mainRadius;
-  const distY = mainY + mainRadius + distRadius;
-
-  return (
-    <group renderOrder={1}>
-      {/* Main Bars spanning Length (along X) with 90-degree end hooks turning UP */}
-      {Array.from({ length: mainCount }).map((_, idx) => {
-        const z = -usableWidM / 2 + (idx * (usableWidM / Math.max(1, mainCount - 1)));
-        return (
-          <group key={`footing-main-${idx}`} position={[0, mainY, z]}>
-            <mesh rotation={[0, 0, Math.PI / 2]} material={SHARED_FOOTING_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[mainRadius, mainRadius, usableLenM, 8]} />
-            </mesh>
-            <mesh position={[-usableLenM / 2, hookM / 2, 0]} material={SHARED_FOOTING_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[mainRadius, mainRadius, hookM, 8]} />
-            </mesh>
-            <mesh position={[usableLenM / 2, hookM / 2, 0]} material={SHARED_FOOTING_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[mainRadius, mainRadius, hookM, 8]} />
-            </mesh>
-          </group>
-        );
-      })}
-
-      {/* Distribution Bars spanning Width (along Z) with 90-degree end hooks turning UP */}
-      {Array.from({ length: distCount }).map((_, idx) => {
-        const x = -usableLenM / 2 + (idx * (usableLenM / Math.max(1, distCount - 1)));
-        return (
-          <group key={`footing-dist-${idx}`} position={[x, distY, 0]}>
-            <mesh rotation={[Math.PI / 2, 0, 0]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[distRadius, distRadius, usableWidM, 8]} />
-            </mesh>
-            <mesh position={[0, hookM / 2, -usableWidM / 2]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[distRadius, distRadius, hookM, 8]} />
-            </mesh>
-            <mesh position={[0, hookM / 2, usableWidM / 2]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-              <cylinderGeometry args={[distRadius, distRadius, hookM, 8]} />
-            </mesh>
-          </group>
-        );
-      })}
-
-      {/* Column Starter & Stub Reinforcement Anchoring into Footing with 90-degree L-bends, rising through entire stub height */}
-      {hasStub && stubH_M > 0.05 && (() => {
-        const effStarterDiaMm = columnStubRebar?.mainBarDiaMm || starterDiaMm || 16;
-        const starterRadius = Math.max(0.012, effStarterDiaMm * 0.0005);
-        const cCoverM = (columnStubRebar?.coverMm || 40) * 0.001;
-        const innerW = Math.max(0.08, stubW_M - 2 * cCoverM);
-        const innerD = Math.max(0.08, stubD_M - 2 * cCoverM);
-        const starterBendM = 0.25;
-        const starterVerticalH = footingDepthM - coverM + stubH_M;
-        const startY = -footingDepthM / 2 + coverM;
-
-        const colPositions = [
-          [-innerW / 2, -innerD / 2, -1, 0],
-          [innerW / 2, -innerD / 2, 1, 0],
-          [innerW / 2, innerD / 2, 1, 0],
-          [-innerW / 2, innerD / 2, -1, 0]
-        ];
-
-        // Column Stub Stirrups (Ties)
-        const stirrupDiaM = (columnStubRebar?.stirrupDiaMm || 8) * 0.001;
-        const stirrupRadius = Math.max(0.006, stirrupDiaM / 2);
-        const stirrupSpacingM = (columnStubRebar?.stirrupSpacingMm || 150) * 0.001;
-        const numTies = Math.max(2, Math.floor(stubH_M / Math.max(0.08, stirrupSpacingM)));
-        const tieW = Math.max(0.08, innerW + starterRadius * 2);
-        const tieD = Math.max(0.08, innerD + starterRadius * 2);
-
-        return (
-          <>
-            {/* 4 Vertical Main Rebar Bars + L-bend into footing */}
-            {colPositions.map(([cx, cz, bdx, bdz], sIdx) => (
-              <group key={`col-starter-${sIdx}`} position={[cx, 0, cz]}>
-                <mesh position={[0, startY + starterVerticalH / 2, 0]} material={SHARED_MAIN_REBAR_MAT} castShadow renderOrder={1}>
-                  <cylinderGeometry args={[starterRadius, starterRadius, starterVerticalH, 8]} />
-                </mesh>
-                <mesh position={[bdx * starterBendM / 2, startY + 0.015, 0]} rotation={[0, 0, Math.PI / 2]} material={SHARED_MAIN_REBAR_MAT} castShadow renderOrder={1}>
-                  <cylinderGeometry args={[starterRadius, starterRadius, starterBendM, 8]} />
-                </mesh>
-              </group>
-            ))}
-
-            {/* Lateral Column Tie Stirrups along the Column Stub Height */}
-            {Array.from({ length: numTies }).map((_, tIdx) => {
-              const tieY = footingDepthM / 2 + 0.05 + (tIdx * (stubH_M - 0.1) / Math.max(1, numTies - 1));
-              return (
-                <group key={`stub-tie-${tIdx}`} position={[0, tieY, 0]}>
-                  <mesh position={[0, 0, -tieD / 2]} rotation={[0, 0, Math.PI / 2]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-                    <cylinderGeometry args={[stirrupRadius, stirrupRadius, tieW, 6]} />
-                  </mesh>
-                  <mesh position={[0, 0, tieD / 2]} rotation={[0, 0, Math.PI / 2]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-                    <cylinderGeometry args={[stirrupRadius, stirrupRadius, tieW, 6]} />
-                  </mesh>
-                  <mesh position={[-tieW / 2, 0, 0]} rotation={[Math.PI / 2, 0, 0]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-                    <cylinderGeometry args={[stirrupRadius, stirrupRadius, tieD, 6]} />
-                  </mesh>
-                  <mesh position={[tieW / 2, 0, 0]} rotation={[Math.PI / 2, 0, 0]} material={SHARED_TIE_REBAR_MAT} castShadow renderOrder={1}>
-                    <cylinderGeometry args={[stirrupRadius, stirrupRadius, tieD, 6]} />
-                  </mesh>
-                </group>
-              );
-            })}
-          </>
-        );
-      })()}
-    </group>
-  );
-}
-
-// 3D Foundation Footing Group with layer-by-layer representation below Ground Floor (Y < 0)
-function Footing3DGroup({
-  footing,
-  foundationConfig,
-  buildingUnit,
-  showFoundation,
-  showFootingRebar,
-  showLabels,
-  isSelected,
-  onSelect,
-  reinf
-}: {
-  footing: FoundationFooting;
-  foundationConfig?: FoundationConfig;
-  buildingUnit: Unit;
-  showFoundation: boolean;
-  showFootingRebar: boolean;
-  showLabels: boolean;
-  isSelected: boolean;
-  onSelect: () => void;
-  reinf?: Partial<RCCReinforcementConfig>;
-}) {
-  const effSize = getEffectiveFootingSize(footing, foundationConfig);
-  const fL_M = toMeters(effSize.length, effSize.unit);
-  const fW_M = toMeters(effSize.width, effSize.unit);
-  const fD_M = toMeters(effSize.depth, effSize.unit);
-
-  const stubHeightFt = footing.columnStubHeight !== undefined ? footing.columnStubHeight : 2.0;
-  const stubH_M = toMeters(stubHeightFt, footing.columnStubUnit || effSize.unit);
-  const stubW_M = toMeters(footing.columnStubWidth || 9, 'in');
-  const stubD_M = toMeters(footing.columnStubDepth || 9, 'in');
-
-  const pccL_M = toMeters(footing.pccLength || (effSize.length + 1), footing.pccUnit || effSize.unit);
-  const pccW_M = toMeters(footing.pccWidth || (effSize.width + 1), footing.pccUnit || effSize.unit);
-  const pccT_M = toMeters(footing.pccThickness || 0.33, footing.pccUnit || effSize.unit);
-
-  const sandL_M = toMeters(footing.sandFillLength || footing.pccLength || (effSize.length + 1), footing.sandFillUnit || effSize.unit);
-  const sandW_M = toMeters(footing.sandFillWidth || footing.pccWidth || (effSize.width + 1), footing.sandFillUnit || effSize.unit);
-  const sandD_M = toMeters(footing.sandFillDepth || 0.5, footing.sandFillUnit || effSize.unit);
-
-  const posX = toMeters(footing.position?.x || 0, buildingUnit);
-  const posZ = toMeters(footing.position?.y || 0, buildingUnit);
-
-  // Check if foundation pillar / column stub exists
-  const hasStub = footing.hasFoundationPillar !== false && stubHeightFt > 0;
-  const actualStubH_M = hasStub ? stubH_M : 0;
-
-  // Exact vertical flush stack below Ground Level (Y = 0)
-  // 1. Column Stub: 0 down to -actualStubH_M (Center at -actualStubH_M / 2)
-  // 2. RCC Footing: -actualStubH_M down to -actualStubH_M - fD_M (Center at -actualStubH_M - fD_M / 2)
-  // 3. PCC Base: -actualStubH_M - fD_M down to -actualStubH_M - fD_M - pccT_M (Center at -actualStubH_M - fD_M - pccT_M / 2)
-  // 4. Sand Fill: -actualStubH_M - fD_M - pccT_M down to -actualStubH_M - fD_M - pccT_M - sandD_M (Center at -actualStubH_M - fD_M - pccT_M - sandD_M / 2)
-  const stubCenterY = -actualStubH_M / 2;
-  const footingCenterY = -actualStubH_M - fD_M / 2;
-  const pccCenterY = -actualStubH_M - fD_M - pccT_M / 2;
-  const sandCenterY = -actualStubH_M - fD_M - pccT_M - sandD_M / 2;
-
-  const isXRay = showFootingRebar;
-
-  return (
-    <group position={[posX, 0, -posZ]} onClick={(e) => { e.stopPropagation(); onSelect(); }}>
-      {/* 1. Sub-grade RCC Column Stub extending from Ground Level to top of Footing */}
-      {showFoundation && hasStub && (
-        <mesh position={[0, stubCenterY, 0]} castShadow={!isXRay} receiveShadow={!isXRay} renderOrder={isXRay ? 2 : 1}>
-          <boxGeometry args={[stubW_M, actualStubH_M, stubD_M]} />
-          <meshStandardMaterial 
-            color={isSelected ? "#0284c7" : "#94a3b8"} 
-            roughness={0.5} 
-            metalness={0.1} 
-            transparent={isXRay} 
-            opacity={isXRay ? 0.35 : 1.0}
-            depthWrite={!isXRay}
-          />
-        </mesh>
-      )}
-
-      {/* 2. Isolated RCC Footing Box Geometry */}
-      {showFoundation && (
-        <mesh position={[0, footingCenterY, 0]} castShadow={!isXRay} receiveShadow={!isXRay} renderOrder={isXRay ? 2 : 1}>
-          <boxGeometry args={[fL_M, fD_M, fW_M]} />
-          <meshStandardMaterial 
-            color={isSelected ? "#ea580c" : "#60a5fa"} 
-            roughness={0.4} 
-            metalness={0.1} 
-            transparent={isXRay} 
-            opacity={isXRay ? 0.3 : 1.0}
-            depthWrite={!isXRay}
-          />
-        </mesh>
-      )}
-
-      {/* 3. Plain Cement Concrete (PCC) 1:4:8 Lean Bedding Base Layer */}
-      {showFoundation && (
-        <mesh position={[0, pccCenterY, 0]} receiveShadow={!isXRay} renderOrder={isXRay ? 1 : 0}>
-          <boxGeometry args={[pccL_M, pccT_M, pccW_M]} />
-          <meshStandardMaterial 
-            color="#94a3b8" 
-            roughness={0.9} 
-            metalness={0.0} 
-            transparent={isXRay} 
-            opacity={isXRay ? 0.25 : 1.0}
-            depthWrite={!isXRay}
-          />
-        </mesh>
-      )}
-
-      {/* 4. Well-compacted Sand Bed Filling Layer under PCC */}
-      {showFoundation && (
-        <mesh position={[0, sandCenterY, 0]} receiveShadow={!isXRay} renderOrder={isXRay ? 1 : 0}>
-          <boxGeometry args={[sandL_M, sandD_M, sandW_M]} />
-          <meshStandardMaterial 
-            color="#d97706" 
-            roughness={0.95} 
-            metalness={0.0} 
-            transparent={isXRay} 
-            opacity={isXRay ? 0.45 : 1.0}
-            depthWrite={!isXRay} 
-          />
-        </mesh>
-      )}
-
-      {/* 5. 3D Footing Reinforcement Mesh, Column Starter Bars, and Stub Stirrup Ties */}
-      {showFootingRebar && (
-        <group position={[0, footingCenterY, 0]}>
-          <FootingRebarMesh 
-            footingLengthM={fL_M} 
-            footingWidthM={fW_M} 
-            footingDepthM={fD_M} 
-            stubH_M={actualStubH_M}
-            stubW_M={stubW_M}
-            stubD_M={stubD_M}
-            hasStub={hasStub}
-            rebar={footing.rebar} 
-            columnStubRebar={footing.columnStubRebar}
-            starterCount={reinf?.pillarMainBarCount || 4} 
-            starterDiaMm={reinf?.pillarMainBarDiaMm || 16} 
-          />
-        </group>
-      )}
-
-      {/* Footing Label in 3D */}
-      {showLabels && (
-        <Html position={[0, -actualStubH_M - fD_M - 0.25, 0]} center zIndexRange={[50, 0]}>
-          <div 
-            onClick={onSelect}
-            className={cn(
-              "px-2.5 py-1 rounded text-[9px] font-bold shadow-lg cursor-pointer whitespace-nowrap select-none transition-all",
-              isSelected ? "bg-amber-600 text-white ring-2 ring-white scale-110" : "bg-slate-900/90 text-amber-300 hover:bg-slate-800"
-            )}
-          >
-            <div>{footing.pillarName || footing.id} Footing</div>
-            <div className="text-[8px] text-slate-300 font-mono">
-              {effSize.length}'×{effSize.width}' • {hasStub ? `Stub: ${stubHeightFt} ft` : 'No Stub'}
-            </div>
-          </div>
-        </Html>
-      )}
-    </group>
-  );
-}
-
 // 3D RCC Dog-Legged Staircase connecting storeys in multi-storey buildings
 function Staircase3D({
   baseY,
@@ -1531,567 +1217,6 @@ function Staircase3D({
   );
 }
 
-// 3D Comprehensive Foundation System supporting all 6 foundation types:
-// 1. Isolated Footing (individual pads under every column)
-// 2. Combined Footing (common footing slab for adjacent column pairs)
-// 3. Strip Footing (continuous trench footing under walls & column lines)
-// 4. Strap Footing (isolated footings linked by continuous RCC strap beams)
-// 5. Raft / Mat Foundation (monolithic continuous thick slab under entire building footprint)
-// 6. Pile Foundation (heavy pile caps with vertical cylindrical concrete piles driven deep into stratum)
-function Foundation3DSystem({
-  model,
-  groundPillars,
-  floorAllWalls,
-  showFoundation,
-  showFootingRebar,
-  showSoilBed,
-  showLabels,
-  isConcreteSolid = false,
-  isGhosted = false,
-  selectedFooting,
-  onSelectFooting,
-  hiddenIds,
-  reinf
-}: {
-  model: BuildingModel;
-  groundPillars: Pillar[];
-  floorAllWalls: Wall[];
-  showFoundation: boolean;
-  showFootingRebar: boolean;
-  showSoilBed: boolean;
-  showLabels: boolean;
-  isConcreteSolid?: boolean;
-  isGhosted?: boolean;
-  selectedFooting: any;
-  onSelectFooting: (f: any) => void;
-  /** Footing ids hidden in the view only */
-  hiddenIds?: Set<string>;
-  reinf?: Partial<RCCReinforcementConfig>;
-}) {
-  const bUnit = model.buildingUnit || 'ft';
-  const toM = (v: number) => toMeters(v, bUnit);
-  const bLenM = toM(model.buildingLength || 40);
-  const bWidM = toM(model.buildingWidth || 30);
-
-  const bConfig = model.buildingConfig;
-  const foundationType = bConfig?.foundationType || (model.foundation as any)?.foundationType || 'isolated';
-  const soilType = bConfig?.soilClassification || 'dense_sand_gravel';
-  const groundwater = bConfig?.groundwaterCondition || 'normal';
-  const foundDepthM = Math.max(1.0, bConfig?.foundationDepthM || 1.5);
-
-  const stubH_M = Math.max(0.4, foundDepthM - 0.45);
-  const pccT_M = 0.10;
-  const sandT_M = 0.10;
-
-  // Soil colors based on geological classification
-  const soilColorMap: Record<string, string> = {
-    dense_sand_gravel: '#b45309', // Dense golden gravelly sand
-    loose_sand: '#eab308',        // Pale loose sand
-    stiff_clay: '#9a3412',        // Reddish-brown stiff clay
-    soft_clay: '#78716c',         // Greyish-brown soft clay
-    black_cotton: '#1c1917',      // Expansive black cotton soil (charcoal)
-    filled_soil: '#57534e',       // Made-up mottled fill
-    rock: '#334155'               // Solid bedrock
-  };
-  const soilColor = soilColorMap[soilType] || '#b45309';
-
-  const concreteMatOpacity = isGhosted ? 0.05 : (isConcreteSolid ? 1.0 : 0.35);
-  const isTransparent = !isConcreteSolid;
-  const depthWrite = isConcreteSolid;
-
-  // Prepare list of footings (from model.foundation or auto-derived from groundPillars)
-  const effectiveFootings: FoundationFooting[] = useMemo(() => {
-    if (model.foundation?.footings && model.foundation.footings.length > 0) {
-      return model.foundation.footings.map(f => {
-        const matchingPillar = groundPillars.find(p => p.id === f.pillarId || p.name === f.pillarName);
-        if (matchingPillar) {
-          const eff = getEffectivePillarPosition(matchingPillar, floorAllWalls, bUnit);
-          return { ...f, position: { x: eff.x, y: eff.y } };
-        }
-        return f;
-      });
-    }
-    return generateFootingsForPillars(groundPillars, model.foundation, bUnit, model.buildingConfig, model.floors?.length, floorAllWalls);
-  }, [model.foundation, groundPillars, floorAllWalls, bUnit, model.buildingConfig, model.floors?.length]);
-
-  // Pillar coordinate helper in meters
-  const pillarCoords = useMemo(() => {
-    return groundPillars.map(p => {
-      const effPos = getEffectivePillarPosition(p, floorAllWalls, bUnit);
-      const pW_M = toMeters(p.width || 9, p.unit || 'in');
-      const pD_M = toMeters(p.depth || 9, p.unit || 'in');
-      const fData = p.calculatedFooting;
-      const fL_M = fData ? fData.lengthM : Math.max(1.2, pW_M * 4.5);
-      const fW_M = fData ? fData.widthM : Math.max(1.2, pD_M * 4.5);
-      const fD_M = fData ? fData.depthM : 0.40;
-
-      return {
-        pillar: p,
-        posX: toM(effPos.x),
-        posZ: toM(effPos.y),
-        pW_M,
-        pD_M,
-        fL_M,
-        fW_M,
-        fD_M
-      };
-    });
-  }, [groundPillars, floorAllWalls, bUnit]);
-
-  if (!showFoundation && !showFootingRebar) return null;
-
-  return (
-    <group key={`foundation-system-${foundationType}`}>
-      {/* 1. Soil Excavation Stratum Bed & Geotechnical Stratum */}
-      {showSoilBed && (
-        <group position={[bLenM / 2, -(foundDepthM + pccT_M + sandT_M), -bWidM / 2]}>
-          {/* Excavation Base Pit */}
-          <mesh receiveShadow>
-            <boxGeometry args={[bLenM + 4, 0.08, bWidM + 4]} />
-            <meshStandardMaterial color={soilColor} roughness={0.95} metalness={0.0} />
-          </mesh>
-
-          {/* Geological Stratum Label */}
-          {showLabels && (
-            <Html position={[0, -0.2, (bWidM + 4) / 2 + 0.3]} center zIndexRange={[30, 0]}>
-              <div className="bg-slate-900/90 text-amber-400 border border-amber-500/50 px-2 py-0.5 rounded text-[9px] font-bold font-mono whitespace-nowrap shadow-lg">
-                🌍 Soil Stratum: {soilType.replace(/_/g, ' ').toUpperCase()} • SBC: {bConfig?.allowableSoilBearingPressureKnM2 || 200} kN/m²
-              </div>
-            </Html>
-          )}
-
-          {/* High Groundwater Table Plane */}
-          {((groundwater as string) === 'high' || (groundwater as string) === 'high_water_table') && (
-            <mesh position={[0, foundDepthM * 0.45, 0]}>
-              <boxGeometry args={[bLenM + 3.8, 0.02, bWidM + 3.8]} />
-              <meshStandardMaterial color="#0284c7" transparent opacity={0.35} roughness={0.1} />
-            </mesh>
-          )}
-        </group>
-      )}
-
-      {/* 2. FOUNDATION TYPE GEOMETRY RENDERING */}
-
-      {/* TYPE A: ISOLATED SPREAD FOOTINGS */}
-      {foundationType === 'isolated' && (
-        effectiveFootings.filter(f => !hiddenIds?.has(f.id)).map(footing => (
-          <Footing3DGroup
-            key={`3d-footing-${footing.id}`}
-            footing={footing}
-            foundationConfig={model.foundation}
-            buildingUnit={bUnit}
-            showFoundation={showFoundation}
-            showFootingRebar={showFootingRebar}
-            showLabels={showLabels}
-            isSelected={selectedFooting?.id === footing.id}
-            onSelect={() => onSelectFooting(selectedFooting?.id === footing.id ? null : footing)}
-            reinf={reinf}
-          />
-        ))
-      )}
-
-      {/* TYPE B: COMBINED FOOTINGS (Common slab for adjacent column pairs) */}
-      {foundationType === 'combined' && (() => {
-        const pairedPillars: Array<[typeof pillarCoords[0], typeof pillarCoords[0]]> = [];
-        const visited = new Set<string>();
-
-        for (let i = 0; i < pillarCoords.length; i++) {
-          if (visited.has(pillarCoords[i].pillar.id)) continue;
-          let bestNeighbor: typeof pillarCoords[0] | null = null;
-          let minD = 999;
-          for (let j = i + 1; j < pillarCoords.length; j++) {
-            if (visited.has(pillarCoords[j].pillar.id)) continue;
-            const dist = Math.hypot(pillarCoords[j].posX - pillarCoords[i].posX, pillarCoords[j].posZ - pillarCoords[i].posZ);
-            if (dist <= 5.0 && dist < minD) {
-              minD = dist;
-              bestNeighbor = pillarCoords[j];
-            }
-          }
-          if (bestNeighbor) {
-            pairedPillars.push([pillarCoords[i], bestNeighbor]);
-            visited.add(pillarCoords[i].pillar.id);
-            visited.add(bestNeighbor.pillar.id);
-          }
-        }
-
-        const remainingPillars = pillarCoords.filter(p => !visited.has(p.pillar.id));
-
-        return (
-          <group name="combinedFootingsGroup">
-            {pairedPillars.map(([p1, p2], pairIdx) => {
-              const mx = (p1.posX + p2.posX) / 2;
-              const mz = (p1.posZ + p2.posZ) / 2;
-              const spanDist = Math.hypot(p2.posX - p1.posX, p2.posZ - p1.posZ);
-              const angle = Math.atan2(-(p2.posZ - p1.posZ), p2.posX - p1.posX);
-
-              const padLenM = spanDist + Math.max(p1.fL_M, p2.fL_M) + 0.4;
-              const padWidM = Math.max(p1.fW_M, p2.fW_M) + 0.3;
-              const padDepM = 0.50;
-
-              const padCenterY = -stubH_M - padDepM / 2;
-              const pccCenterY = -stubH_M - padDepM - pccT_M / 2;
-              const sandCenterY = -stubH_M - padDepM - pccT_M - sandT_M / 2;
-
-              return (
-                <group key={`comb-pad-${pairIdx}`} position={[mx, 0, -mz]} rotation={[0, -angle, 0]}>
-                  {/* Unified Combined RCC Footing Pad */}
-                  {showFoundation && (
-                    <mesh position={[0, padCenterY, 0]} castShadow receiveShadow>
-                      <boxGeometry args={[padLenM, padDepM, padWidM]} />
-                      <meshStandardMaterial color="#3b82f6" roughness={0.4} metalness={0.1} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                    </mesh>
-                  )}
-
-                  {/* Combined PCC Lean Base */}
-                  {showFoundation && (
-                    <mesh position={[0, pccCenterY, 0]} receiveShadow>
-                      <boxGeometry args={[padLenM + 0.3, pccT_M, padWidM + 0.3]} />
-                      <meshStandardMaterial color="#94a3b8" roughness={0.9} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                    </mesh>
-                  )}
-
-                  {/* Combined Sand Filling Bed */}
-                  {showFoundation && (
-                    <mesh position={[0, sandCenterY, 0]} receiveShadow>
-                      <boxGeometry args={[padLenM + 0.3, sandT_M, padWidM + 0.3]} />
-                      <meshStandardMaterial color="#d97706" roughness={0.95} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                    </mesh>
-                  )}
-
-                  {/* Pedestals rising under both columns */}
-                  {showFoundation && (
-                    <>
-                      <mesh position={[-spanDist / 2, -stubH_M / 2, 0]} castShadow receiveShadow>
-                        <boxGeometry args={[p1.pW_M + 0.05, stubH_M, p1.pD_M + 0.05]} />
-                        <meshStandardMaterial color="#64748b" roughness={0.5} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                      </mesh>
-                      <mesh position={[spanDist / 2, -stubH_M / 2, 0]} castShadow receiveShadow>
-                        <boxGeometry args={[p2.pW_M + 0.05, stubH_M, p2.pD_M + 0.05]} />
-                        <meshStandardMaterial color="#64748b" roughness={0.5} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                      </mesh>
-                    </>
-                  )}
-
-                  {/* Rebar: Longitudinal Top and Bottom Steel Reinforcement Mesh */}
-                  {showFootingRebar && (
-                    <group renderOrder={10}>
-                      {[-padWidM * 0.35, 0, padWidM * 0.35].map((rz, rIdx) => (
-                        <React.Fragment key={`comb-rebar-${rIdx}`}>
-                          <mesh position={[0, -stubH_M - padDepM + 0.05, rz]}>
-                            <cylinderGeometry args={[0.008, 0.008, padLenM - 0.1, 12]} />
-                            <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                          </mesh>
-                          <mesh position={[0, -stubH_M - 0.05, rz]}>
-                            <cylinderGeometry args={[0.008, 0.008, padLenM - 0.1, 12]} />
-                            <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                          </mesh>
-                        </React.Fragment>
-                      ))}
-                    </group>
-                  )}
-                </group>
-              );
-            })}
-
-            {/* Isolated fallback for any remaining columns */}
-            {remainingPillars.map(p => (
-              <Footing3DGroup
-                key={`comb-rem-${p.pillar.id}`}
-                footing={{
-                  id: `footing-${p.pillar.id}`,
-                  floorId: 'ground',
-                  pillarId: p.pillar.id,
-                  pillarName: p.pillar.name,
-                  position: { x: p.pillar.position?.x || 0, y: p.pillar.position?.y || 0 },
-                  footingLength: p.fL_M * 3.28084,
-                  footingWidth: p.fW_M * 3.28084,
-                  footingDepth: p.fD_M * 3.28084,
-                  footingUnit: 'ft',
-                  excavationLength: (p.fL_M + 0.6) * 3.28084,
-                  excavationWidth: (p.fW_M + 0.6) * 3.28084,
-                  excavationDepth: 4,
-                  excavationUnit: 'ft',
-                  sandFillLength: (p.fL_M + 0.3) * 3.28084,
-                  sandFillWidth: (p.fW_M + 0.3) * 3.28084,
-                  sandFillDepth: 0.5,
-                  sandFillUnit: 'ft',
-                  pccLength: (p.fL_M + 0.3) * 3.28084,
-                  pccWidth: (p.fW_M + 0.3) * 3.28084,
-                  pccThickness: 0.33,
-                  pccUnit: 'ft',
-                  columnStubHeight: 2
-                }}
-                foundationConfig={model.foundation}
-                buildingUnit={bUnit}
-                showFoundation={showFoundation}
-                showFootingRebar={showFootingRebar}
-                showLabels={showLabels}
-                isSelected={false}
-                onSelect={() => {}}
-                reinf={reinf}
-              />
-            ))}
-          </group>
-        );
-      })()}
-
-      {/* TYPE C: CONTINUOUS STRIP FOOTINGS (Under all wall lines) */}
-      {foundationType === 'strip' && (
-        <group name="stripFootingGroup">
-          {floorAllWalls.map((wall, wIdx) => {
-            if (!wall.start || !wall.end) return null;
-            const sx = toM(wall.start.x);
-            const sz = toM(wall.start.y);
-            const ex = toM(wall.end.x);
-            const ez = toM(wall.end.y);
-            const len = Math.hypot(ex - sx, ez - sz);
-            if (len <= 0.1) return null;
-            const angle = Math.atan2(-(ez - sz), ex - sx);
-            const mx = (sx + ex) / 2;
-            const mz = (sz + ez) / 2;
-
-            const stripWidM = toMeters(wall.dimensions.thickness, wall.dimensions.thicknessUnit || 'in') + 0.6;
-            const stripDepM = 0.38;
-
-            const stripCenterY = -stubH_M - stripDepM / 2;
-            const pccCenterY = -stubH_M - stripDepM - pccT_M / 2;
-            const sandCenterY = -stubH_M - stripDepM - pccT_M - sandT_M / 2;
-
-            return (
-              <group key={`strip-wall-${wIdx}`} position={[mx, 0, -mz]} rotation={[0, -angle, 0]}>
-                {showFoundation && (
-                  <mesh position={[0, stripCenterY, 0]} castShadow receiveShadow>
-                    <boxGeometry args={[len + stripWidM, stripDepM, stripWidM]} />
-                    <meshStandardMaterial color="#2563eb" roughness={0.4} metalness={0.1} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                )}
-                {showFoundation && (
-                  <mesh position={[0, pccCenterY, 0]} receiveShadow>
-                    <boxGeometry args={[len + stripWidM + 0.3, pccT_M, stripWidM + 0.3]} />
-                    <meshStandardMaterial color="#94a3b8" roughness={0.9} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                )}
-                {showFoundation && (
-                  <mesh position={[0, sandCenterY, 0]} receiveShadow>
-                    <boxGeometry args={[len + stripWidM + 0.3, sandT_M, stripWidM + 0.3]} />
-                    <meshStandardMaterial color="#d97706" roughness={0.95} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                )}
-              </group>
-            );
-          })}
-          {showFoundation && pillarCoords.map((p, pIdx) => (
-            <mesh key={`strip-ped-${pIdx}`} position={[p.posX, -stubH_M / 2, -p.posZ]} castShadow receiveShadow>
-              <boxGeometry args={[p.pW_M + 0.05, stubH_M, p.pD_M + 0.05]} />
-              <meshStandardMaterial color="#64748b" roughness={0.5} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-            </mesh>
-          ))}
-        </group>
-      )}
-
-      {/* TYPE D: STRAP FOOTINGS (Isolated pads linked by heavy RCC strap beams) */}
-      {foundationType === 'strap' && (
-        <group name="strapFootingsGroup">
-          {effectiveFootings.filter(f => !hiddenIds?.has(f.id)).map(footing => (
-            <Footing3DGroup
-              key={`strap-f-${footing.id}`}
-              footing={footing}
-              foundationConfig={model.foundation}
-              buildingUnit={bUnit}
-              showFoundation={showFoundation}
-              showFootingRebar={showFootingRebar}
-              showLabels={showLabels}
-              isSelected={selectedFooting?.id === footing.id}
-              onSelect={() => onSelectFooting(selectedFooting?.id === footing.id ? null : footing)}
-              reinf={reinf}
-            />
-          ))}
-
-          {showFoundation && (() => {
-            const strapBeams: React.ReactNode[] = [];
-            for (let i = 0; i < pillarCoords.length; i++) {
-              for (let j = i + 1; j < pillarCoords.length; j++) {
-                const p1 = pillarCoords[i];
-                const p2 = pillarCoords[j];
-                const dist = Math.hypot(p2.posX - p1.posX, p2.posZ - p1.posZ);
-                if (dist >= 1.0 && dist <= 5.0) {
-                  const mx = (p1.posX + p2.posX) / 2;
-                  const mz = (p1.posZ + p2.posZ) / 2;
-                  const angle = Math.atan2(-(p2.posZ - p1.posZ), p2.posX - p1.posX);
-                  const beamH = 0.45;
-                  const beamW = 0.35;
-                  const beamCenterY = -stubH_M - beamH / 2;
-
-                  strapBeams.push(
-                    <group key={`strap-beam-${i}-${j}`} position={[mx, beamCenterY, -mz]} rotation={[0, -angle, 0]}>
-                      <mesh castShadow receiveShadow>
-                        <boxGeometry args={[dist, beamH, beamW]} />
-                        <meshStandardMaterial color="#475569" roughness={0.6} metalness={0.1} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                      </mesh>
-                      {showFootingRebar && (
-                        <mesh position={[0, beamH / 2 - 0.04, 0]}>
-                          <cylinderGeometry args={[0.009, 0.009, dist - 0.1, 12]} />
-                          <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                        </mesh>
-                      )}
-                    </group>
-                  );
-                }
-              }
-            }
-            return strapBeams;
-          })()}
-        </group>
-      )}
-
-      {/* TYPE E: RAFT / MAT FOUNDATION */}
-      {foundationType === 'raft' && (() => {
-        const raftWidthM = bLenM + 0.8;
-        const raftDepthM = bWidM + 0.8;
-        const raftThickM = 0.50;
-
-        const raftCenterY = -stubH_M - raftThickM / 2;
-        const pccCenterY = -stubH_M - raftThickM - pccT_M / 2;
-        const sandCenterY = -stubH_M - raftThickM - pccT_M - sandT_M / 2;
-
-        return (
-          <group name="raftFoundationGroup" position={[bLenM / 2, 0, -bWidM / 2]}>
-            {showFoundation && (
-              <mesh position={[0, raftCenterY, 0]} castShadow receiveShadow>
-                <boxGeometry args={[raftWidthM, raftThickM, raftDepthM]} />
-                <meshStandardMaterial color="#1d4ed8" roughness={0.35} metalness={0.15} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-              </mesh>
-            )}
-
-            {showFoundation && (
-              <mesh position={[0, pccCenterY, 0]} receiveShadow>
-                <boxGeometry args={[raftWidthM + 0.4, pccT_M, raftDepthM + 0.4]} />
-                <meshStandardMaterial color="#94a3b8" roughness={0.9} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-              </mesh>
-            )}
-
-            {showFoundation && (
-              <mesh position={[0, sandCenterY, 0]} receiveShadow>
-                <boxGeometry args={[raftWidthM + 0.4, sandT_M, raftDepthM + 0.4]} />
-                <meshStandardMaterial color="#d97706" roughness={0.95} metalness={0.0} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-              </mesh>
-            )}
-
-            {showFoundation && pillarCoords.map((p, pIdx) => (
-              <mesh key={`raft-ped-${pIdx}`} position={[p.posX - bLenM / 2, -stubH_M / 2, -(p.posZ - bWidM / 2)]} castShadow receiveShadow>
-                <boxGeometry args={[p.pW_M + 0.05, stubH_M, p.pD_M + 0.05]} />
-                <meshStandardMaterial color="#64748b" roughness={0.5} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-              </mesh>
-            ))}
-
-            {showFootingRebar && (
-              <group renderOrder={10}>
-                {Array.from({ length: 9 }).map((_, rIdx) => {
-                  const z = -raftDepthM / 2 + 0.2 + (rIdx * (raftDepthM - 0.4) / 8);
-                  return (
-                    <mesh key={`raft-mesh-x-${rIdx}`} position={[0, -stubH_M - raftThickM + 0.06, z]} rotation={[0, 0, Math.PI / 2]}>
-                      <cylinderGeometry args={[0.008, 0.008, raftWidthM - 0.2, 12]} />
-                      <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                    </mesh>
-                  );
-                })}
-                {Array.from({ length: 9 }).map((_, rIdx) => {
-                  const x = -raftWidthM / 2 + 0.2 + (rIdx * (raftWidthM - 0.4) / 8);
-                  return (
-                    <mesh key={`raft-mesh-z-${rIdx}`} position={[x, -stubH_M - 0.06, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                      <cylinderGeometry args={[0.008, 0.008, raftDepthM - 0.2, 12]} />
-                      <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                    </mesh>
-                  );
-                })}
-              </group>
-            )}
-          </group>
-        );
-      })()}
-
-      {/* TYPE F: PILE FOUNDATION */}
-      {foundationType === 'pile' && (
-        <group name="pileFoundationGroup">
-          {pillarCoords.map((p, pIdx) => {
-            const capW = 1.3;
-            const capD = 1.3;
-            const capH = 0.65;
-            const pileRadius = 0.18;
-            const pileLenM = 5.0;
-
-            const capCenterY = -stubH_M - capH / 2;
-            const pileCenterY = -stubH_M - capH - pileLenM / 2;
-
-            const pileOffsets = [
-              [-0.35, -0.35],
-              [0.35, -0.35],
-              [-0.35, 0.35],
-              [0.35, 0.35]
-            ];
-
-            return (
-              <group key={`pile-group-${pIdx}`} position={[p.posX, 0, -p.posZ]}>
-                {showFoundation && (
-                  <mesh position={[0, capCenterY, 0]} castShadow receiveShadow>
-                    <boxGeometry args={[capW, capH, capD]} />
-                    <meshStandardMaterial color="#1e3a8a" roughness={0.4} metalness={0.2} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                )}
-
-                {showFoundation && (
-                  <mesh position={[0, -stubH_M / 2, 0]} castShadow receiveShadow>
-                    <boxGeometry args={[p.pW_M + 0.05, stubH_M, p.pD_M + 0.05]} />
-                    <meshStandardMaterial color="#64748b" roughness={0.5} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                )}
-
-                {showFoundation && pileOffsets.map(([px, pz], pileIdx) => (
-                  <mesh key={`cyl-pile-${pileIdx}`} position={[px, pileCenterY, pz]} castShadow receiveShadow>
-                    <cylinderGeometry args={[pileRadius, pileRadius, pileLenM, 24]} />
-                    <meshStandardMaterial color="#334155" roughness={0.7} metalness={0.1} transparent={isTransparent} opacity={concreteMatOpacity} depthWrite={depthWrite} />
-                  </mesh>
-                ))}
-
-                {showFootingRebar && (
-                  <group renderOrder={10}>
-                    {pileOffsets.map(([px, pz], pileIdx) => (
-                      <group key={`pile-rebar-${pileIdx}`} position={[px, pileCenterY, pz]}>
-                        {[-0.10, 0.10].map(vx =>
-                          [-0.10, 0.10].map(vz => (
-                            <mesh key={`pbar-${vx}-${vz}`} position={[vx, 0, vz]}>
-                              <cylinderGeometry args={[0.007, 0.007, pileLenM + 0.4, 12]} />
-                              <meshStandardMaterial color="#00f0ff" emissive="#0284c7" emissiveIntensity={0.6} metalness={0.9} roughness={0.2} />
-                            </mesh>
-                          ))
-                        )}
-                        {Array.from({ length: 6 }).map((_, loopIdx) => (
-                          <mesh key={`loop-${loopIdx}`} position={[0, -pileLenM / 2 + 0.5 + loopIdx * (pileLenM - 1) / 5, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                            <torusGeometry args={[0.13, 0.006, 8, 24]} />
-                            <meshStandardMaterial color="#f59e0b" emissive="#d97706" emissiveIntensity={0.4} metalness={0.8} roughness={0.3} />
-                          </mesh>
-                        ))}
-                      </group>
-                    ))}
-                  </group>
-                )}
-
-                {showLabels && (
-                  <Html position={[0, -stubH_M - capH - 0.2, 0]} center zIndexRange={[50, 0]}>
-                    <div className="bg-slate-900/90 text-cyan-300 border border-cyan-500/50 px-2 py-0.5 rounded text-[8px] font-bold font-mono whitespace-nowrap shadow-md">
-                      {p.pillar.name} Pile Cap (4×Ø350mm Piles • 5m)
-                    </div>
-                  </Html>
-                )}
-              </group>
-            );
-          })}
-        </group>
-      )}
-    </group>
-  );
-}
-
 function CameraController({ 
   viewMode, 
   viewPreset,
@@ -2241,12 +1366,10 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const [showFloorSlab, setShowFloorSlab] = useState(true);
   const [showFullRingBeam, setShowFullRingBeam] = useState(true);
   const [showFullRoof, setShowFullRoof] = useState(model.fullRoof?.enabled ?? true);
-  const [showFoundation, setShowFoundation] = useState(true);
   const [showSoilBed, setShowSoilBed] = useState(true);
   const [showDetailedFoundation, setShowDetailedFoundation] = useState(true);
   const [showBasement, setShowBasement] = useState(true);
   const [selectedPillar, setSelectedPillar] = useState<Pillar | null>(null);
-  const [selectedFooting, setSelectedFooting] = useState<FoundationFooting | null>(null);
   const [selectedBeam, setSelectedBeam] = useState<SelectedBeamInfo | null>(null);
   // View-only visibility: elements hidden here are still in the model and the estimate
   const [hiddenInView, setHiddenInView] = useState<Set<string>>(() => new Set());
@@ -2341,6 +1464,12 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
         columnPositions: positions,
         buildingLengthM: toMeters(model.buildingLength, unit),
         buildingWidthM: toMeters(model.buildingWidth, unit),
+        // ground-floor wall lines: the damp-proof course runs along them at the plinth level
+        plinthWalls: groundFloorWalls.filter(w => w.start && w.end).map(w => {
+          const u = w.dimensions.unit || unit;
+          const tUnit = w.dimensions.thicknessUnit || (w.dimensions.unit === 'ft' ? 'in' : 'mm');
+          return { x0: toMeters(w.start!.x, u), z0: -toMeters(w.start!.y, u), x1: toMeters(w.end!.x, u), z1: -toMeters(w.end!.y, u), thicknessM: Math.min(2, toMeters(w.dimensions.thickness, tUnit)) };
+        }),
       });
     } catch (err) {
       console.warn('Detailed foundation geometry failed:', err);
@@ -2352,7 +1481,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   // sized from the plain founding depth. They ignore overlaps, raft/combined systems and the basement, so showing them
   // next to (or instead of) the designed foundation would contradict it. Turning the designed foundation off hides it
   // rather than falling back to the legacy pads.
-  const hideLegacyFoundation = !!detailedGeometry;
 
   const debugInfo = useMemo(() => {
     let ew = 0, iw = 0;
@@ -2712,7 +1840,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                     setShowFullRoof(true);
                     setShowFloorSlab(true);
                     setShowInternal(true);
-                    setShowFoundation(true);
                     setShowSoilBed(true);
                     setShowStairs(true);
                     setShowBrickInfill(true);
@@ -2776,13 +1903,9 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 <span>Show Full Roof</span>
               </label>
 
-              <label className="flex items-center space-x-2 cursor-pointer text-amber-900 font-semibold bg-amber-50/90 px-1.5 py-0.5 rounded border border-amber-300/70">
-                <input type="checkbox" checked={showFoundation && !hideLegacyFoundation} disabled={hideLegacyFoundation} onChange={(e) => setShowFoundation(e.target.checked)} className="rounded text-amber-600 focus:ring-amber-500" />
-                <span>Show Foundation (Footing/PCC){hideLegacyFoundation ? ' – replaced by the designed foundation' : ''}</span>
-              </label>
               <label className="flex items-center space-x-2 cursor-pointer text-amber-800 font-bold bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-400/80">
                 <input type="checkbox" checked={showFootingRebar} onChange={(e) => setShowFootingRebar(e.target.checked)} className="rounded text-amber-600 focus:ring-amber-500" />
-                <span>Show Footing Rebar (2-Way)</span>
+                <span>Show Foundation Rebar</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer text-yellow-900 font-medium py-0.5">
                 <input type="checkbox" checked={showSoilBed} onChange={(e) => setShowSoilBed(e.target.checked)} className="rounded text-yellow-700 focus:ring-yellow-600" />
@@ -2792,7 +1915,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 <>
                   <label className="flex items-center space-x-2 cursor-pointer text-sky-900 font-semibold bg-sky-50/90 px-1.5 py-0.5 rounded border border-sky-300/70">
                     <input type="checkbox" checked={showDetailedFoundation} onChange={(e) => setShowDetailedFoundation(e.target.checked)} className="rounded text-sky-600 focus:ring-sky-500" />
-                    <span>Show Designed Foundation (engine)</span>
+                    <span>Show Foundation (footing, pedestal, plinth filling)</span>
                   </label>
                   {detailedGeometry.boxes.some(b => b.group === 'basement') && (
                     <label className="flex items-center space-x-2 cursor-pointer text-sky-900 font-semibold bg-sky-50/90 px-1.5 py-0.5 rounded border border-sky-300/70">
@@ -2892,17 +2015,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   </div>
                 ))}
                 <div className="text-[10px] text-slate-400">Full bar bending schedule: see the Foundation &amp; Basement Design Report.</div>
-              </div>
-            )}
-            {showFootingRebar && !detailedGeometry && (
-              <div className="space-y-0.5">
-                <div className="text-[11px] font-semibold text-amber-300">Foundation Footing Rebar:</div>
-                <div className="text-[10px] text-slate-300">
-                  • Main Mesh: <span className="text-cyan-300 font-mono font-bold">{model.foundation?.footings?.[0]?.rebar?.mainBarCount || 6}×{model.foundation?.footings?.[0]?.rebar?.mainBarDiaMm || 12}mm</span> (2-Way Mesh + 90° Upward End Hooks)
-                </div>
-                <div className="text-[10px] text-slate-300">
-                  • Starter Bars: <span className="text-sky-300 font-mono font-bold">4×16mm</span> Anchored into Footing
-                </div>
               </div>
             )}
             {showPillarRebar && (
@@ -3349,7 +2461,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
             gl={{ powerPreference: 'default', failIfMajorPerformanceCaveat: false, preserveDrawingBuffer: true, antialias: true }}
             onPointerMissed={() => {
               setSelectedPillar(null);
-              setSelectedFooting(null);
               setSelectedBeam(null);
               setSelectedSlab(null);
             }}
@@ -3377,30 +2488,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   />
                 </mesh>
               )}
-
-              {/* Comprehensive Foundation System supporting all 6 foundation types and soil stratum */}
-              <Foundation3DSystem
-                model={model}
-                groundPillars={groundPillars}
-                floorAllWalls={groundFloorWalls}
-                showFoundation={showFoundation && !hideLegacyFoundation}
-                showFootingRebar={showFootingRebar && !hideLegacyFoundation}
-                showSoilBed={showSoilBed}
-                showLabels={showPillarLabels}
-                isConcreteSolid={isConcreteSolid}
-                isGhosted={isGhosted}
-                selectedFooting={selectedFooting}
-                hiddenIds={hiddenInView}
-                onSelectFooting={(f) => {
-                  setSelectedFooting(f);
-                  if (f) {
-                    setSelectedPillar(null);
-                    setSelectedBeam(null);
-                    setSelectedSlab(null);
-                  }
-                }}
-                reinf={settings.rccReinforcement}
-              />
 
               {/* Detailed foundation & basement from the design engines (below ground only; never moves floors) */}
               {detailedGeometry && (
@@ -3760,7 +2847,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                                   steelGrade: (model as any).steelGrade || 'Fe500'
                                                 });
                                                 setSelectedPillar(null);
-                                                setSelectedFooting(null);
                                                 setSelectedSlab(null);
                                               }
                                             }}
@@ -3831,7 +2917,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                                   steelGrade: (model as any).steelGrade || 'Fe500'
                                                 });
                                                 setSelectedPillar(null);
-                                                setSelectedFooting(null);
                                                 setSelectedSlab(null);
                                               }
                                             }}
@@ -4046,7 +3131,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                                   steelGrade: (model as any).steelGrade || 'Fe500'
                                                 });
                                                 setSelectedPillar(null);
-                                                setSelectedFooting(null);
                                                 setSelectedSlab(null);
                                               }
                                             }}
@@ -4115,7 +3199,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                                   steelGrade: (model as any).steelGrade || 'Fe500'
                                                 });
                                                 setSelectedPillar(null);
-                                                setSelectedFooting(null);
                                                 setSelectedSlab(null);
                                               }
                                             }}
@@ -4258,7 +3341,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                               steelGrade: (model as any).steelGrade || 'Fe500'
                                             });
                                             setSelectedPillar(null);
-                                            setSelectedFooting(null);
                                             setSelectedBeam(null);
                                           }
                                         }}
@@ -4355,7 +3437,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                               setSelectedPillar(isPillarSelected ? null : p);
                               setSelectedBeam(null);
                               setSelectedSlab(null);
-                              setSelectedFooting(null);
                             }}
                           >
                             {/* 1. Monolithic Solid Pillar Column (Continuous structural column from floor base to top structural line, zero joint gaps) */}
@@ -4535,103 +3616,6 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
             <gridHelper args={[100, 100, '#1e293b', '#0f172a']} position={[0, -0.01, 0]} />
           </Canvas>
           </WebGLErrorBoundary>
-
-          {/* Selected Footing 3D Floating Inspector */}
-          {selectedFooting && (() => {
-            const effSize = getEffectiveFootingSize(selectedFooting, model.foundation);
-            const isCommon = model.foundation?.useCommonFootingSize;
-
-            return (
-              <div className="absolute bottom-4 left-4 z-20 bg-slate-900/95 text-white p-3.5 rounded-lg border border-amber-500 shadow-2xl max-w-sm text-xs space-y-2 backdrop-blur-md">
-                <div className="flex items-center justify-between font-bold text-amber-400 border-b border-slate-700 pb-1">
-                  <div className="flex items-center space-x-1.5">
-                    <LandPlot className="w-4 h-4 text-amber-400" />
-                    <span>{selectedFooting.pillarName ? `${selectedFooting.pillarName} Footing` : selectedFooting.id}</span>
-                  </div>
-                  <button onClick={() => setSelectedFooting(null)} className="p-0.5 hover:bg-slate-800 rounded text-slate-400 hover:text-white">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="bg-slate-800/80 p-1.5 rounded">
-                    <div className="flex justify-between items-center text-slate-400 text-[10px]">
-                      <span>RCC Footing:</span>
-                      {isCommon && <span className="text-[8px] bg-amber-500/20 text-amber-300 px-1 rounded font-bold">Common</span>}
-                    </div>
-                    <div className="font-bold text-amber-300 font-mono">
-                      {effSize.length}' × {effSize.width}' × {effSize.depth}'
-                    </div>
-                    <div className="text-[9px] text-slate-400">Grade: {selectedFooting.concreteGrade || 'M20'}</div>
-                  </div>
-                  <div className="bg-slate-800/80 p-1.5 rounded">
-                    <span className="text-slate-400 text-[10px]">PCC Base Lean:</span>
-                    <div className="font-bold text-slate-200 font-mono">
-                      {selectedFooting.pccLength || (effSize.length + 1)}' × {selectedFooting.pccWidth || (effSize.width + 1)}' × {selectedFooting.pccThickness || 0.33}'
-                    </div>
-                    <div className="text-[9px] text-slate-400">Mix: {selectedFooting.pccMixRatio || '1:4:8'}</div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="bg-slate-800/80 p-1.5 rounded">
-                    <span className="text-slate-400 text-[10px]">Sand Filling:</span>
-                    <div className="font-bold text-yellow-400 font-mono">
-                      {selectedFooting.sandFillDepth || 0.5}' Depth
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-1.5 rounded">
-                    <span className="text-slate-400 text-[10px]">Total Excavation:</span>
-                    <div className="font-bold text-amber-200 font-mono">
-                      {selectedFooting.excavationDepth || 4}' Depth
-                    </div>
-                  </div>
-                </div>
-
-              <div className="bg-slate-800/80 p-1.5 rounded text-[10px] space-y-0.5">
-                <span className="text-slate-400">Reinforcement Mesh (2-Way Bottom):</span>
-                <div className="text-cyan-300 font-mono font-bold">
-                  • Main & Dist: {selectedFooting.rebar?.mainBarCount || 6}×{selectedFooting.rebar?.mainBarDiaMm || 12}mm TMT
-                </div>
-                <div className="text-sky-300 font-mono">
-                  • Starter Ties: 4×16mm Column Anchor Dowels
-                </div>
-              </div>
-
-              {(() => {
-                const u = selectedFooting.footingUnit || model.buildingUnit || 'ft';
-                const L = toMeters(effSize.length, u), W = toMeters(effSize.width, u), D = toMeters(effSize.depth, u);
-                const exc = toMeters(selectedFooting.excavationDepth || 4, selectedFooting.excavationUnit || u);
-                const sand = toMeters(selectedFooting.sandFillDepth || 0.5, selectedFooting.sandFillUnit || u);
-                const pcc = toMeters(selectedFooting.pccThickness || 0.33, selectedFooting.pccUnit || u);
-                const lv = footingLevels(exc - sand, pcc, D);
-                const wt = memberWeight(L * W * D);
-                return (
-                  <div className="bg-slate-800/80 p-1.5 rounded text-[10px] space-y-0.5" data-testid="footing-measurements">
-                    <span className="text-slate-400">Levels & Weight:</span>
-                    <div className="font-mono text-slate-200">Footing bottom / top: {lv.bottomM.toFixed(2)} m / {lv.topM.toFixed(2)} m</div>
-                    <div className="font-mono text-slate-200">Bearing area: {(L * W).toFixed(2)} m² · Concrete: {(L * W * D).toFixed(3)} m³</div>
-                    <div className="font-mono text-emerald-300">Footing self-weight: {Math.round(wt.concreteKg)} kg ({(wt.concreteKg * 9.81 / 1000).toFixed(1)} kN)</div>
-                    <div className="text-[9px] text-slate-500">Levels from ground-floor level (±0.00); PCC sits on the sand bed at the excavation base.</div>
-                  </div>
-                );
-              })()}
-
-              <button
-                type="button"
-                onClick={() => { hideInView(selectedFooting.id); setSelectedFooting(null); }}
-                className="w-full text-[10.5px] font-semibold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200"
-              >
-                Hide this footing in the 3D view
-              </button>
-
-              <div className="text-[9px] text-amber-300/80 italic flex items-center gap-1 border-t border-slate-800 pt-1">
-                <ShieldAlert className="w-3 h-3 flex-shrink-0" />
-                Must be verified by a structural engineer with actual soil data.
-              </div>
-            </div>
-            );
-          })()}
 
           {/* Floating Toast Notification */}
           {activeToast && (
