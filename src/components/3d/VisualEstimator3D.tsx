@@ -1594,26 +1594,21 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const centerZ = toM(model.buildingWidth) / 2;
 
   return (
-    <div className="w-full flex flex-col space-y-4">
-      {/* Validation Summary */}
-      <div className="bg-white p-4 rounded border shadow-sm text-sm">
-        <h4 className="font-semibold mb-2 flex items-center">
-          <Info className="w-4 h-4 mr-2 text-blue-500" />
-          Structural Geometry Validation
-        </h4>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-          <div><span className="text-gray-500 block text-xs">External Walls</span><span className="font-medium">{validation.extCount}</span></div>
-          <div><span className="text-gray-500 block text-xs">Internal Walls</span><span className="font-medium text-green-600">{validation.intCount}</span></div>
-          <div><span className="text-gray-500 block text-xs">RCC Columns</span><span className="font-medium text-orange-600">{model.pillars?.length || 0}</span></div>
-          <div><span className="text-gray-500 block text-xs">Doors</span><span className="font-medium text-blue-600">{validation.doorsCount}</span></div>
-          <div><span className="text-gray-500 block text-xs">Windows</span><span className="font-medium text-cyan-600">{validation.winCount}</span></div>
-          <div><span className="text-gray-500 block text-xs">Junction Status</span><span className="font-medium text-emerald-600">Flush Trimmed</span></div>
-        </div>
+    <div className="w-full flex flex-col space-y-2">
+      {/* Validation summary: one compact line so the 3D view keeps the screen */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-1.5 rounded border bg-white text-xs text-slate-600" data-testid="geometry-validation">
+        <span className="font-semibold text-slate-800 flex items-center"><Info className="w-3.5 h-3.5 mr-1 text-blue-500" />Geometry</span>
+        <span>External walls <b className="text-slate-900">{validation.extCount}</b></span>
+        <span>Internal walls <b className="text-green-700">{validation.intCount}</b></span>
+        <span>Columns <b className="text-orange-600">{model.pillars?.length || 0}</b></span>
+        <span>Doors <b className="text-blue-600">{validation.doorsCount}</b></span>
+        <span>Windows <b className="text-cyan-700">{validation.winCount}</b></span>
+        <span>Junctions <b className="text-emerald-700">flush trimmed</b></span>
       </div>
 
       <div 
         ref={viewerRef}
-        className="w-full h-[640px] relative rounded-xl overflow-hidden border border-slate-800 touch-none bg-slate-950 select-none" 
+        className="w-full h-[calc(100vh-240px)] min-h-[460px] relative rounded-xl overflow-hidden border border-slate-800 touch-none bg-slate-950 select-none" 
         onMouseEnter={() => setShowHint(true)} 
         onMouseLeave={() => setShowHint(false)}
         style={{ pointerEvents: 'auto' }}

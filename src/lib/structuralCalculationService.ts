@@ -145,6 +145,9 @@ export const SOIL_CATALOG: Record<SoilClassification, SoilMetadata> = {
   }
 };
 
+/** Ring-beam settings of a floor as stored in the model (sizes in their own units) */
+type RingBeamLike = { enabled?: boolean; width?: number; widthUnit?: Unit; depth?: number; depthUnit?: Unit; height?: number; heightUnit?: Unit };
+
 export interface StructuralRatesConfig {
   cementBagPrice?: number;
   sandPricePerCft?: number;
@@ -152,6 +155,10 @@ export interface StructuralRatesConfig {
   steelRatePerKg?: number;
   bindingWireRatePerKg?: number;
   brickPrice?: number;
+  /** Mixing water, per 1000 litres. No default: listed but unpriced if unset. */
+  waterRatePerKl?: number;
+  /** Cover blocks (concrete spacers), per number. No default: listed but unpriced if unset. */
+  coverBlockRatePerNo?: number;
   concreteRatePerM3?: number;
   mortarRatePerM3?: number;
   sandFillRatePerCft?: number;
@@ -2238,11 +2245,23 @@ export function calculateBuildingStructuralSummary(
   // Beams: perimeter and internal structural frame spans
   let totalBeamRccM3 = 0;
   let totalBeamFormworkM2 = 0;
+  // floors whose ring-beam drawing option is off: their frame beams are still designed (and drawn), so their concrete is added from the design below
+  const beamsFromDesignFloors = new Set<string>();
 
   if (Array.isArray(floorsData) && floorsData.length > 0) {
     floorsData.forEach(fl => {
-      const ringBeam = (fl as any).ringBeam;
-      if (ringBeam && ringBeam.enabled === false) return;
+      const f = fl as { id?: string; ringBeam?: RingBeamLike };
+      const ringBeam = f.ringBeam;
+      if (ringBeam && ringBeam.enabled === false) { beamsFromDesignFloors.add(f.id ?? ''); return; }
+      const before = totalBeamRccM3;
+      measureFloorBeams(fl, ringBeam);
+      // no beam lines or walls found on this floor: its beams are taken from the beam design instead (never zero concrete with designed steel)
+      if (totalBeamRccM3 - before <= 1e-9) beamsFromDesignFloors.add(f.id ?? '');
+    });
+  } else {
+    measureFallbackBeams();
+  }
+  function measureFloorBeams(fl: unknown, ringBeam: RingBeamLike | undefined) {
 
       const beamWidthM = ringBeam?.width !== undefined 
         ? toMeters(ringBeam.width, ringBeam.widthUnit || 'in') 
@@ -2291,8 +2310,8 @@ export function calculateBuildingStructuralSummary(
         totalBeamRccM3 += floorWallLenM * beamWidthM * beamDepthM;
         totalBeamFormworkM2 += floorWallLenM * (beamWidthM + 2 * beamDepthM);
       }
-    });
-  } else {
+  }
+  function measureFallbackBeams() {
     // Single-floor or standalone test fallback
     const beamWidthM = 0.23;
     const beamDepthM = 0.30;
@@ -2340,29 +2359,6 @@ export function calculateBuildingStructuralSummary(
     const slabThicknessM = 0.125;
     totalSlabRccM3 = numFloors * (singleFloorAreaM2 * slabThicknessM);
   }
-
-  const totalRccVolumeM3 = totalFootingRccM3 + totalColumnRccM3 + totalBeamRccM3 + totalSlabRccM3;
-  const totalRccVolumeCft = totalRccVolumeM3 * 35.3147;
-  const totalDryIngredientVolumeM3 = (totalRccVolumeM3 + totalPccM3) * 1.54;
-
-  // Material Breakdown from Mix Design Database
-  const mix = CONCRETE_MIX_DATABASE[config.concreteGrade];
-  const rccCementKg = totalRccVolumeM3 * mix.cementKgPerM3;
-  // PCC 1:4:8 lean concrete (approx 160 kg cement/m³)
-  const pccCementKg = totalPccM3 * 160;
-  const totalCementBags50Kg = Math.ceil((rccCementKg + pccCementKg) / 50);
-
-  // Fine Aggregate (Sand / M-Sand)
-  const rccFineAggM3 = (totalRccVolumeM3 * mix.fineAggKgPerM3) / 1600; // density ~1600 kg/m³
-  const pccFineAggM3 = (totalPccM3 * 640) / 1600;
-  const totalFineAggregateM3 = rccFineAggM3 + pccFineAggM3;
-  const totalFineAggregateCft = totalFineAggregateM3 * 35.3147;
-
-  // Coarse Aggregate (20mm & 40mm)
-  const rccCoarseAggM3 = (totalRccVolumeM3 * mix.coarseAggKgPerM3) / 1500;
-  const pccCoarseAggM3 = (totalPccM3 * 1280) / 1500;
-  const totalCoarseAggregateM3 = rccCoarseAggM3 + pccCoarseAggM3;
-  const totalCoarseAggregateCft = totalCoarseAggregateM3 * 35.3147;
 
   // Total Reinforcement Steel
   const footingSteelKg = pillarsCalculations.reduce((sum, c) => sum + c.footingSteelKg, 0);
@@ -2569,6 +2565,37 @@ export function calculateBuildingStructuralSummary(
         design: (config.floorOverrides?.['roof'] || config.floorOverrides?.[`floor-${numFloors}`])?.beamDesign }
     );
   }
+
+  // Frame beams of floors whose ring-beam option is off: concrete and formwork of the designed beam (its size and length)
+  floorBeamCalculations.forEach(bc => {
+    if (!beamsFromDesignFloors.has(bc.floorId) || !(bc.concreteVolumeM3 > 0)) return;
+    const bM = bc.beamWidthMm / 1000, dM = bc.beamDepthMm / 1000;
+    totalBeamRccM3 += bc.concreteVolumeM3;
+    if (bM > 0 && dM > 0) totalBeamFormworkM2 += (bc.concreteVolumeM3 / (bM * dM)) * (bM + 2 * dM);
+  });
+
+  const totalRccVolumeM3 = totalFootingRccM3 + totalColumnRccM3 + totalBeamRccM3 + totalSlabRccM3;
+  const totalRccVolumeCft = totalRccVolumeM3 * 35.3147;
+  const totalDryIngredientVolumeM3 = (totalRccVolumeM3 + totalPccM3) * 1.54;
+
+  // Material Breakdown from Mix Design Database
+  const mix = CONCRETE_MIX_DATABASE[config.concreteGrade];
+  const rccCementKg = totalRccVolumeM3 * mix.cementKgPerM3;
+  // PCC 1:4:8 lean concrete (approx 160 kg cement/m³)
+  const pccCementKg = totalPccM3 * 160;
+  const totalCementBags50Kg = Math.ceil((rccCementKg + pccCementKg) / 50);
+
+  // Fine Aggregate (Sand / M-Sand)
+  const rccFineAggM3 = (totalRccVolumeM3 * mix.fineAggKgPerM3) / 1600; // density ~1600 kg/m³
+  const pccFineAggM3 = (totalPccM3 * 640) / 1600;
+  const totalFineAggregateM3 = rccFineAggM3 + pccFineAggM3;
+  const totalFineAggregateCft = totalFineAggregateM3 * 35.3147;
+
+  // Coarse Aggregate (20mm & 40mm)
+  const rccCoarseAggM3 = (totalRccVolumeM3 * mix.coarseAggKgPerM3) / 1500;
+  const pccCoarseAggM3 = (totalPccM3 * 1280) / 1500;
+  const totalCoarseAggregateM3 = rccCoarseAggM3 + pccCoarseAggM3;
+  const totalCoarseAggregateCft = totalCoarseAggregateM3 * 35.3147;
 
   // Beams: ~1.5% steel = 120 kg/m³ or detailed calculation sum
   const detailedBeamSteelKg = floorBeamCalculations.reduce((sum, b) => sum + b.totalSteelWeightKg, 0);
