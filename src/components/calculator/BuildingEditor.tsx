@@ -71,6 +71,7 @@ import { StructuralConfigModal, BuildingDetailsConfig } from './StructuralConfig
 
 import { isSpecialColumn, columnTaperRatio, rotatedSectionPolygon } from '@/lib/columnGeometry';
 import { columnAppearance } from '@/lib/columnAppearance';
+import { withColumnDefaults } from '@/lib/memberDefaults';
 import { BeamEditorPanel } from './BeamEditorPanel';
 import { detectBeamJunctions, type BeamEdit, type BeamEnd, type BeamJunction, type EditedBeam } from '@/lib/beamEdits';
 import { patchBeams, deleteBeams, restoreBeams, addCustomBeam, duplicateBeam, copyBeamProperties, pasteBeamProperties, retargetCustomBeam, snapBeamEnd, splitBeam, mergeBeams } from '@/lib/beamEditOps';
@@ -3810,7 +3811,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
   const frameBeamPillars = (model.pillars || []).filter(pp => pp.position && pp.floorId === activeFloorId && !isUpperSegment(pp));
   const frameBeamWalls = [...(activeFloor?.externalWalls || []), ...(activeFloor?.internalWalls || [])];
   /** All frame beams of the active floor, deleted ones included (flagged) */
-  const frameBeamsAll: EditedBeam[] = activeFloor ? getFloorBeams(activeFloor, frameBeamPillars, frameBeamWalls, model.buildingUnit, { includeDeleted: true, frameOnly: true }) : [];
+  const frameBeamsAll: EditedBeam[] = activeFloor ? getFloorBeams(activeFloor, frameBeamPillars, frameBeamWalls, model.buildingUnit, { includeDeleted: true, frameOnly: true, defaults: model.buildingConfig?.beamDefaults }) : [];
   const frameBeamsLive = frameBeamsAll.filter(b => !b.deleted);
   const frameBeamDefaults = { widthMm: Math.round((activeFloor?.ringBeam?.width ?? 9) * 25.4), depthMm: Math.round((activeFloor?.ringBeam?.depth ?? 9) * 25.4) };
   const frameBeamJunctions: BeamJunction[] = activeTool === 'frameBeam'
@@ -9508,7 +9509,7 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
               {activeMode === 'floor' && (() => {
                 const floorPillars = (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId);
                 const floorWalls = [...(activeFloor?.externalWalls || []), ...(activeFloor?.internalWalls || [])];
-                const beams = activeTool === 'frameBeam' ? frameBeamsAll : getFloorBeams(activeFloor, floorPillars, floorWalls, model.buildingUnit);
+                const beams = activeTool === 'frameBeam' ? frameBeamsAll : getFloorBeams(activeFloor, floorPillars, floorWalls, model.buildingUnit, { defaults: model.buildingConfig?.beamDefaults });
                 if (beams.length === 0 && activeTool !== 'frameBeam') return null;
 
                 const ringCfg = activeFloor?.ringBeam;
@@ -9617,7 +9618,8 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                 (() => {
                   const gfId = model.floors[0]?.id || 'floor-0';
                   const gfPillars = (model.pillars || []).filter(p => p.position && (!p.floorId || p.floorId === gfId || p.floorId === 'floor-0' || p.floorId === 'ground'));
-                  return gfPillars.map(p => {
+                  return gfPillars.map(pRaw => {
+                    const p = withColumnDefaults(pRaw, model.buildingConfig?.columnDefaults);
                     const effPos = p.position!;
                     const drawW = convertUnit(p.width, p.unit, model.buildingUnit);
                     const drawD = convertUnit(p.depth, p.unit, model.buildingUnit);
@@ -9648,7 +9650,8 @@ isCustomSize: isSizeChange ? true : (changes.isCustomSize !== undefined ? change
                 })()
               ) : (
                 /* Active Floor Concrete Pillars (Floor-Scoped, Interactive) */
-                (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId && !isUpperSegment(p)).map(p => {
+                (model.pillars || []).filter(p => p.position && p.floorId === activeFloorId && !isUpperSegment(p)).map(pRaw => {
+                  const p = withColumnDefaults(pRaw, model.buildingConfig?.columnDefaults); // building-wide defaults under the column's own values
                   const effPos = getEffectivePillarPosition(p, allWalls, model.buildingUnit);
                   const drawW = convertUnit(p.width, p.unit, model.buildingUnit);
                   const drawD = convertUnit(p.depth, p.unit, model.buildingUnit);

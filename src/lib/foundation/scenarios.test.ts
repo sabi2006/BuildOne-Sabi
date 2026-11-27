@@ -450,3 +450,41 @@ describe('User-specified column load', () => {
     expect(col.userSpecified).toBe(true);
   });
 });
+
+describe('Building-wide column and beam defaults (Structural Config) reach the automatic build', () => {
+  const base = () => project({ foundationDetails: fd({ selectionMode: 'manual', columnLoadSource: 'tributary' }) }, 2, INNER4);
+  const withDefaults = (d: Record<string, unknown>) => { const p = base(); Object.assign(p.buildingModel.buildingConfig, d); p.buildingModel.floors[0].pillars = p.pillars; return p; };
+
+  it('column defaults: a taper default reduces every column volume; a column with its own value keeps it', () => {
+    const plain = calculateProject(base()).structuralSummary!.pillarsCalculations;
+    const tapered = calculateProject(withDefaults({ columnDefaults: { taperTopRatio: 0.5 } })).structuralSummary!.pillarsCalculations;
+    expect(tapered.length).toBe(plain.length);
+    tapered.forEach((c, i) => expect(c.concreteVolumeM3).toBeLessThan(plain[i].concreteVolumeM3));
+    const own = withDefaults({ columnDefaults: { taperTopRatio: 0.5 } });
+    own.pillars[0].taperTopRatio = 1;
+    const r = calculateProject(own).structuralSummary!.pillarsCalculations;
+    expect(r[0].concreteVolumeM3).toBeCloseTo(plain[0].concreteVolumeM3, 6);
+    expect(r[1].concreteVolumeM3).toBeLessThan(plain[1].concreteVolumeM3);
+  });
+
+  it('column defaults: steel type removes the RCC quantities of every column and flags it NOT VERIFIED', () => {
+    const r = calculateProject(withDefaults({ columnDefaults: { columnType: 'steel', materialRate: 90 } }));
+    r.structuralSummary!.pillarsCalculations.forEach(c => { expect(c.concreteVolumeM3).toBe(0); expect(c.rebarChecks[0].label).toContain('NOT VERIFIED'); });
+  });
+
+  it('beam defaults: extra bars and an end condition design every beam on its own span', () => {
+    const plain = calculateProject(withDefaults({})).structuralSummary!;
+    expect(plain.editedBeamCalculations).toBeUndefined();
+    const r = calculateProject(withDefaults({ beamDefaults: { endCondition: 'fixed', extraBars: { topCount: 2 } } })).structuralSummary!;
+    expect(r.editedBeamCalculations!.length).toBeGreaterThan(0);
+    expect(r.editedBeamCalculations![0].calc.notes.join(' ')).toContain('Fixed-end beam');
+  });
+
+  it('beam defaults: a steel material default moves the beams out of the RCC totals (estimate)', () => {
+    const plain = calculateProject(withDefaults({}));
+    const steel = calculateProject(withDefaults({ beamDefaults: { material: 'steel', widthMm: 8, depthMm: 250, materialRate: 80 } }));
+    const beamsOf = (r: ReturnType<typeof calculateProject>) => r.rccProjectEstimate!.floors.reduce((s, f) => s + f.elements.ringBeams.concreteVolumeM3, 0);
+    expect(beamsOf(steel)).toBeLessThan(beamsOf(plain));
+    expect(steel.rccProjectEstimate!.floors.some(f => (f.elements.ringBeams.beamExtras?.steelBeamKg ?? 0) > 0)).toBe(true);
+  });
+});

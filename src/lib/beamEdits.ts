@@ -10,6 +10,7 @@
  * apply the edits. Lengths in the edit records are millimetres; coordinates of a beam are in the building unit.
  */
 import type { Coordinate, StructuralBeam, Unit } from './brickCalculator';
+import { withBeamDefaults, type BeamDefaults } from './memberDefaults';
 
 export type BeamMaterial = 'rcc' | 'steel' | 'timber';
 export type BeamSectionKind = 'rect' | 'circular' | 'T' | 'L' | 'I' | 'channel';
@@ -151,7 +152,7 @@ export function beamVolumeM3(d: BeamDims, planLengthM: number): number {
 // ---------------------------------------------------------------------------------------------
 
 export const beamHasSizeEdit = (e?: BeamEdit): boolean =>
-  !!e && (e.widthMm !== undefined || e.depthMm !== undefined || !!e.section || (e.material !== undefined && e.material !== 'rcc')
+  !!e && ((!!e.finish && ['painted', 'steel', 'wood', 'marble', 'stone'].includes(e.finish)) || e.widthMm !== undefined || e.depthMm !== undefined || !!e.section || (e.material !== undefined && e.material !== 'rcc')
     || !!e.startExtendMm || !!e.endExtendMm || !!e.extraBars);
 
 const mmToUnit = (mm: number, unit: Unit): number => {
@@ -195,7 +196,7 @@ export function applyBeamEdits(
   customBeams: CustomBeam[] | undefined,
   pillarPos: (id: string) => Coordinate | undefined,
   unit: Unit,
-  options?: { includeDeleted?: boolean }
+  options?: { includeDeleted?: boolean; defaults?: BeamDefaults }
 ): EditedBeam[] {
   const out: EditedBeam[] = [];
   const byId = new Map<string, EditedBeam>();
@@ -229,7 +230,7 @@ export function applyBeamEdits(
 
   const result: EditedBeam[] = [];
   for (const b of out) {
-    const e = edits?.[b.id];
+    const e = withBeamDefaults(edits?.[b.id], options?.defaults);
     if (e?.deleted) { if (options?.includeDeleted) result.push({ ...b, edit: e, deleted: true }); continue; }
     if (!e) { result.push(b); continue; }
     const len = planLengthUnit(b.start, b.end);

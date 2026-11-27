@@ -1,5 +1,6 @@
 "use client";
 
+import { MemberDefaultsSection } from './MemberDefaultsSection';
 import React, { useState, useEffect, useContext } from 'react';
 import { 
   X, 
@@ -1333,6 +1334,13 @@ export function StructuralConfigModal({
                 </div>
                 <span className="text-[10px] text-slate-500">IS 456 Clause 39.3 Tied Column Method</span>
               </div>
+
+              <MemberDefaultsSection
+                columnDefaults={localConfig.columnDefaults}
+                beamDefaults={localConfig.beamDefaults}
+                onColumn={(d) => setLocalConfig(prev => ({ ...prev, columnDefaults: d }))}
+                onBeam={(d) => setLocalConfig(prev => ({ ...prev, beamDefaults: d }))}
+              />
             </div>
           )}
 

@@ -298,7 +298,7 @@ export function CalculatorProvider({ children }: { children: ReactNode }) {
       const updatedFloorsWithBeams = updatedFloors.map(fl => {
         const flPillars = allPillars.filter(p => p.floorId === fl.id || (!p.floorId && fl.level === 0));
         const flWalls = [...fl.externalWalls, ...fl.internalWalls];
-        const flBeams = getFloorBeams(fl, flPillars, flWalls, prevModel.buildingUnit || 'ft');
+        const flBeams = getFloorBeams(fl, flPillars, flWalls, prevModel.buildingUnit || 'ft', { defaults: prevModel.buildingConfig?.beamDefaults });
         return {
           ...fl,
           detectedBeams: flBeams

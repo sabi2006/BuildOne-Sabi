@@ -22,6 +22,7 @@ import { buildFoundationBasementQuantities, priceFoundationBasement, type Founda
 import type { ColumnRebarOverride, RebarCheck } from './rebarChecks';
 import { columnVolumeM3 } from './columnGeometry';
 import { isUpperSegment, isSegmented, segmentHeightM } from './columnSegments';
+import { withColumnDefaults, hasBeamDefaults, type ColumnDefaults, type BeamDefaults } from './memberDefaults';
 import { applyBeamEdits, beamHasSizeEdit, editedBeamQuantities, type BeamEdit, type CustomBeam, type EditedBeam, type BeamQuantities } from './beamEdits';
 import { columnSurfaceAreaM2, steelColumnMassKg, timberColumnCft, hasAppliedFinish, type ColumnType, type ColumnFinish, type ColumnTexture } from './columnAppearance';
 import { foundationLayerTotals, type FoundationLayerSettings, type LayerTotals } from './foundationLayers';
@@ -1122,17 +1123,17 @@ export const getFloorBeams = (
   pillars: Pillar[] = [],
   walls: Wall[] = [],
   buildingUnit: Unit = 'ft',
-  options?: { includeDeleted?: boolean; frameOnly?: boolean }
+  options?: { includeDeleted?: boolean; frameOnly?: boolean; defaults?: BeamDefaults }
 ): EditedBeam[] => {
   const base: StructuralBeam[] = options?.frameOnly
     ? detectPillarToPillarBeams(pillars, buildingUnit, walls)
     : getEffectiveFloorBeams(pillars, walls, buildingUnit);
-  if (!floor || (!floor.customBeams?.length && !(floor.beamEdits && Object.keys(floor.beamEdits).length))) return base;
+  if (!hasBeamDefaults(options?.defaults) && (!floor || (!floor.customBeams?.length && !(floor.beamEdits && Object.keys(floor.beamEdits).length)))) return base;
   const pos = (id: string): Coordinate | undefined => {
     const p = pillars.find(x => x.id === id);
     return p ? getEffectivePillarPosition(p, walls, buildingUnit) : undefined;
   };
-  return applyBeamEdits(base, floor.beamEdits, floor.customBeams, pos, buildingUnit, { includeDeleted: options?.includeDeleted });
+  return applyBeamEdits(base, floor?.beamEdits, floor?.customBeams, pos, buildingUnit, { includeDeleted: options?.includeDeleted, defaults: options?.defaults });
 };
 
 /**
@@ -2924,7 +2925,7 @@ export const calculateFloorRccEstimate = (
   modelPillars: Pillar[] = [],
   buildingUnit: Unit = 'ft',
   settings: CalculatorSettings,
-  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit }
+  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit; columnDefaults?: ColumnDefaults; beamDefaults?: BeamDefaults }
 ): RCCFloorEstimate => {
   const reinf: RCCReinforcementConfig = {
     ...DEFAULT_RCC_REINFORCEMENT,
@@ -2945,7 +2946,7 @@ export const calculateFloorRccEstimate = (
   const isAnyBeamOn = isFullBeamOn || isRingBeamOn;
 
   // A. Pillars
-  const pillarRes = calculatePillarsRcc(floorPillars, floor.height, buildingUnit, reinf);
+  const pillarRes = calculatePillarsRcc(floorPillars.map(pp => withColumnDefaults(pp, buildingDimensions?.columnDefaults)), floor.height, buildingUnit, reinf);
   const pillarMats = calculateRccMaterialsFromVolume(pillarRes.concreteVolumeM3, pillarRes.steelKg, pillarRes.coverBlocks, settings, reinf);
 
   // B. Structural Frame Beams (Linear Frame Spans)
@@ -2959,7 +2960,7 @@ export const calculateFloorRccEstimate = (
     depthUnit: 'in'
   };
 
-  const floorBeams = getFloorBeams(floor, floorPillars, allWalls, buildingUnit);
+  const floorBeams = getFloorBeams(floor, floorPillars, allWalls, buildingUnit, { defaults: buildingDimensions?.beamDefaults });
 
   const ringBeamRes = isAnyBeamOn
     ? calculateRingBeamsRcc(allWalls, effectiveBeamConfig, buildingUnit, reinf, floorBeams)
@@ -3105,7 +3106,7 @@ export const calculateProjectRccEstimate = (
   buildingUnit: Unit = 'ft',
   settings: CalculatorSettings,
   roofSlab?: RCCSlabConfig,
-  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit }
+  buildingDimensions?: { buildingLength: number; buildingWidth: number; buildingUnit?: Unit; columnDefaults?: ColumnDefaults; beamDefaults?: BeamDefaults }
 ): RCCProjectEstimate => {
   // Independent Roof Slab calculation
   const isRoofSlabOn = Boolean(roofSlab && roofSlab.enabled !== false);
@@ -5691,7 +5692,7 @@ export const calculateProject = (
     const floorsWithBeams = (bModel.floors || []).map(fl => {
       const flPillars = fl.pillars || [];
       const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
-      const flBeams = getFloorBeams(fl, flPillars, flWalls, bModel.buildingUnit || 'ft');
+      const flBeams = getFloorBeams(fl, flPillars, flWalls, bModel.buildingUnit || 'ft', { defaults: bModel.buildingConfig?.beamDefaults });
       return {
         ...fl,
         detectedBeams: flBeams
@@ -5954,7 +5955,9 @@ export const calculateProject = (
       { 
         buildingLength: project.buildingModel.buildingLength, 
         buildingWidth: project.buildingModel.buildingWidth, 
-        buildingUnit: bUnit 
+        buildingUnit: bUnit,
+        columnDefaults: project.buildingModel.buildingConfig?.columnDefaults,
+        beamDefaults: project.buildingModel.buildingConfig?.beamDefaults
       }
     );
   } else if (effectivePillars.length > 0 || project.walls.length > 0) {
@@ -6889,7 +6892,7 @@ export function recalculateBuildingPillarSizing(
   const floorsWithBeams = (model.floors || []).map(fl => {
     const flPillars = fl.pillars || [];
     const flWalls = [...(fl.externalWalls || []), ...(fl.internalWalls || [])];
-    const flBeams = getFloorBeams(fl, flPillars, flWalls, model.buildingUnit || 'ft');
+    const flBeams = getFloorBeams(fl, flPillars, flWalls, model.buildingUnit || 'ft', { defaults: model.buildingConfig?.beamDefaults });
     return {
       ...fl,
       detectedBeams: flBeams

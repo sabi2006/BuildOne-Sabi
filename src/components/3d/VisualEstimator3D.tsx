@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { columnMeasurements, memberWeight, memberLevels, footingLevels } from '../../lib/elementMeasurements';
 import { isSpecialColumn } from '../../lib/columnGeometry';
+import { withColumnDefaults } from '../../lib/memberDefaults';
 import { isSegmented, segmentHeightM } from '../../lib/columnSegments';
 import { columnAppearance } from '../../lib/columnAppearance';
 import { beamVolumeM3, type EditedBeam } from '../../lib/beamEdits';
@@ -3493,7 +3494,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                     });
                   };
 
-                  const floorPillars: Pillar[] = rawFloorPillars.map(p => {
+                  const floorPillarsBase: Pillar[] = rawFloorPillars.map(p => {
                     if (p.isStoreyOverride) return p;
                     const matchGf = findMatchingGfPillar(p);
                     if (matchGf) {
@@ -3508,6 +3509,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                     }
                     return p;
                   });
+                  // building-wide column defaults (Structural Config) under each column's own values
+                  const floorPillars: Pillar[] = floorPillarsBase.map(pp => withColumnDefaults(pp, model.buildingConfig?.columnDefaults));
 
                   const floorAllWalls = [...floor.externalWalls, ...floor.internalWalls];
                   const gfAllWalls = groundFloorWalls;
@@ -3566,7 +3569,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                   }];
 
                   // Structural pillar-to-pillar beams along all frame lines
-                  const detectedBeams = isAnyBeamActiveIn3D ? getFloorBeams(floor, floorPillars, floorAllWalls, model.buildingUnit, { frameOnly: true }) : [];
+                  const detectedBeams = isAnyBeamActiveIn3D ? getFloorBeams(floor, floorPillars, floorAllWalls, model.buildingUnit, { frameOnly: true, defaults: model.buildingConfig?.beamDefaults }) : [];
 
                   return (
                     <group key={floor.id}>

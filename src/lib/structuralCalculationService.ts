@@ -17,6 +17,7 @@ import type { FoundationDetailsConfig, BasementConfig } from './foundation/types
 import { columnSectionAreaM2, columnSectionPolygon, columnVolumeM3, columnAxisLengthM, columnTaperRatio } from './columnGeometry';
 import { polygonPerimeter, polygonBounds } from './foundation/polygon';
 import { isSegmented, segmentHeightM } from './columnSegments';
+import { withColumnDefaults, type ColumnDefaults, type BeamDefaults } from './memberDefaults';
 import { beamHasSizeEdit, beamVolumeM3, beamMemberLengthM, beamSectionPerimeterMm, type BeamEdit } from './beamEdits';
 import { columnRebarChecks, hasColumnRebarOverride, beamRebarChecks, hasBeamRebarOverride, type ColumnRebarOverride, type BeamRebarOverride, type RebarCheck } from './rebarChecks';
 
@@ -211,6 +212,9 @@ export interface BuildingConfig {
     beamDesign?: BeamDesignInputs;
   }>;
   customRates?: StructuralRatesConfig;
+  /** Building-wide defaults for every column / beam that has no value of its own (see memberDefaults.ts) */
+  columnDefaults?: ColumnDefaults;
+  beamDefaults?: BeamDefaults;
   /** Extended geotechnical/foundation inputs (optional; defaults via resolveFoundationDetails) */
   foundationDetails?: FoundationDetailsConfig;
   /** Basement configuration (optional; absent or enabled=false means no basement) */
@@ -1974,6 +1978,7 @@ export function calculateBuildingStructuralSummary(
   floorsData?: Array<{ height: number; unit?: any; slab?: any }> | number[],
   roofSlabData?: { thickness?: number; thicknessUnit?: any; length?: number; width?: number; overhang?: number; enabled?: boolean }
 ): BuildingStructuralSummary {
+  pillars = pillars.map(p => withColumnDefaults(p, config.columnDefaults));
   const numFloors = Math.max(1, config.floorCount);
   const floorHeightsM = Array.isArray(floorsData) && floorsData.length > 0
     ? floorsData.map(f => typeof f === 'number' ? f : toMeters(f.height, f.unit || 'ft'))
