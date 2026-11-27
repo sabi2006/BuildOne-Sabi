@@ -1,5 +1,6 @@
 "use client";
 
+import { resolveFoundationDetails } from '@/lib/foundation/types';
 import { MemberDefaultsSection } from './MemberDefaultsSection';
 import React, { useState, useEffect, useContext } from 'react';
 import { 
@@ -1486,6 +1487,18 @@ export function StructuralConfigModal({
                   Foundation Construction Type
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  <button
+                    type="button"
+                    data-testid="foundation-type-auto"
+                    onClick={() => setLocalConfig(prev => ({ ...prev, foundationDetails: { ...resolveFoundationDetails(prev.foundationDetails), selectionMode: 'auto' } }))}
+                    className={`p-2.5 rounded-lg border text-xs font-bold transition-all text-left col-span-full ${
+                      resolveFoundationDetails(localConfig.foundationDetails).selectionMode === 'auto'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    Automatic (Recommended): the type is chosen from your floors, heights, length, breadth and soil
+                  </button>
                   {[
                     { id: 'isolated' as FoundationType, label: 'Isolated Spread Footing' },
                     { id: 'combined' as FoundationType, label: 'Combined Footing' },
@@ -1498,9 +1511,9 @@ export function StructuralConfigModal({
                     <button
                       key={ft.id}
                       type="button"
-                      onClick={() => setLocalConfig(prev => ({ ...prev, foundationType: ft.id }))}
+                      onClick={() => setLocalConfig(prev => ({ ...prev, foundationType: ft.id, foundationDetails: { ...resolveFoundationDetails(prev.foundationDetails), selectionMode: 'manual' } }))}
                       className={`p-2.5 rounded-lg border text-xs font-bold transition-all text-left ${
-                        localConfig.foundationType === ft.id
+                        resolveFoundationDetails(localConfig.foundationDetails).selectionMode === 'manual' && localConfig.foundationType === ft.id
                           ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       }`}

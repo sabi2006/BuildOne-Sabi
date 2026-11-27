@@ -173,7 +173,8 @@ export interface BasementConfig {
 // ----------------------------- DEFAULTS ---------------------------
 
 export const DEFAULT_FOUNDATION_DETAILS: FoundationDetailsConfig = {
-  selectionMode: 'manual',
+  // automatic by default: from the floors, heights, plan size and soil the engine picks isolated / combined / raft
+  selectionMode: 'auto',
   soilUnitWeightKnM3: 18,
   // the gravity frame analysis is the default load source (it falls back to the tributary estimate, with a warning,
   // if a frame cannot be formed from the model)
