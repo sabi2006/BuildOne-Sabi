@@ -87,6 +87,10 @@ export function SharedBrickWall({
     const actCourses = Math.ceil(h / actEffH);
     const actBricksPerCourse = Math.ceil(l / actEffL);
     const actDepthLayers = Math.ceil(t / actEffW);
+    // the layers across the wall must fit inside its thickness: a brick wider than its share is drawn to the share (a 150 mm brick in a
+    // 230 mm wall would otherwise stick out of both faces and hide the plaster)
+    const layerW = t / actDepthLayers;
+    const brickDepth = Math.max(0.01, Math.min(actBW, layerW - (actDepthLayers > 1 ? mV * scaleFactor : 0)));
 
     // Calculate virtual opening positions
     const flatOpenings: any[] = [];
@@ -166,7 +170,7 @@ export function SharedBrickWall({
       const y = c * actEffH + (actBH / 2);
       
       for (let d = 0; d < actDepthLayers; d++) {
-        const z = startZ + d * actEffW + (actBW / 2);
+        const z = startZ + d * layerW + (layerW / 2);
         
         // Stagger alternate courses
         const stagger = (c % 2 === 0) ? 0 : (actEffL / 2);
@@ -252,7 +256,7 @@ export function SharedBrickWall({
       matrices: tempMatrices,
       colors: finalColors,
       brickCount: tempMatrices.length,
-      geometryArgs: [actBL, actBH, actBW] as [number, number, number],
+      geometryArgs: [actBL, actBH, brickDepth] as [number, number, number],
       totalLength: l,
       totalHeight: h,
       totalThickness: t,

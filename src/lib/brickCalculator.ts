@@ -2195,7 +2195,7 @@ export const DEFAULT_PLASTER_CONFIG: PlasterConfig = {
 };
 
 export interface PlasterSurfaceEstimate {
-  surfaceType: 'inner' | 'outer' | 'rcc_column' | 'rcc_beam' | 'reveal';
+  surfaceType: 'inner' | 'outer' | 'rcc_column' | 'rcc_beam' | 'reveal' | 'ceiling';
   name: string;
   grossAreaSqM: number;
   grossAreaSqFt: number;
@@ -2239,6 +2239,7 @@ export interface FloorPlasterEstimate {
   outer: PlasterSurfaceEstimate;
   rcc: PlasterSurfaceEstimate;
   rccSideBeam: PlasterSurfaceEstimate;
+  ceiling: PlasterSurfaceEstimate;
   totalAreaSqM: number;
   totalAreaSqFt: number;
   totalWetVolumeM3: number;
@@ -2252,6 +2253,7 @@ export interface FloorPlasterEstimate {
     outer: number;
     rcc: number;
     rccSideBeam: number;
+    ceiling: number;
     cement: number;
     sand: number;
     labour: number;
@@ -2265,6 +2267,7 @@ export interface PlasterEstimate {
   outer: PlasterSurfaceEstimate;
   rcc: PlasterSurfaceEstimate;
   rccSideBeam: PlasterSurfaceEstimate;
+  ceiling: PlasterSurfaceEstimate;
   floors: FloorPlasterEstimate[];
   totalGrossAreaSqM: number;
   totalOpeningDeductionSqM: number;
@@ -2287,6 +2290,7 @@ export interface PlasterEstimate {
     outerPlaster: number;
     rccPlaster: number;
     rccSideBeamPlaster: number;
+    ceilingPlaster: number;
     cement: number;
     sand: number;
     labour: number;
@@ -3993,7 +3997,7 @@ export const parsePlasterMix = (mixRatio: string): { cementPart: number; sandPar
 
 // Calculate quantities for an individual plaster surface
 export const calculatePlasterSurfaceMaterials = (
-  surfaceType: 'inner' | 'outer' | 'rcc_column' | 'rcc_beam' | 'reveal',
+  surfaceType: 'inner' | 'outer' | 'rcc_column' | 'rcc_beam' | 'reveal' | 'ceiling',
   name: string,
   grossAreaSqM: number,
   openingDeductionSqM: number,
@@ -4122,19 +4126,51 @@ export const calculatePlasterSurfaceMaterials = (
 };
 
 // 10. Calculate Complete Inner + Outer + RCC Cement Plaster Estimate
+/** Standard plaster of the whole building (Structural Config): thickness in mm and cement:sand mix */
+export const STANDARD_PLASTER = {
+  inner: { thicknessMm: 12, ratio: '1:6' },
+  outer: { thicknessMm: 15, ratio: '1:4' },
+  rcc: { thicknessMm: 6, ratio: '1:4' },
+  ceiling: { thicknessMm: 6, ratio: '1:3' },
+};
+
+/**
+ * The plaster settings that apply to a floor: the Structural Config's standard plaster (default), the 2D editor's settings, or none.
+ * Used by the estimate and by the 3D view so both show the same plaster.
+ */
+export function resolvePlasterConfig(model: BuildingModel | undefined, floor?: Floor, base?: Partial<PlasterConfig>): PlasterConfig & { mode: 'standard' | 'editor' | 'none'; ceilingCfg: PlasterSurfaceConfig } {
+  const spec = model?.buildingConfig?.plasterSpec;
+  // a model built in the app always has a building config: standard plaster by default. A bare model (no config) keeps the editor's own plaster.
+  const mode = spec?.mode ?? (model?.buildingConfig ? 'standard' : 'editor');
+  const g: PlasterConfig = { ...DEFAULT_PLASTER_CONFIG, ...(base || {}), ...(model?.plaster || {}) };
+  const surf = (b: PlasterSurfaceConfig | undefined, sp: { thicknessMm?: number; ratio?: string } | undefined, d: { thicknessMm: number; ratio: string }, enabled: boolean): PlasterSurfaceConfig =>
+    ({ ...(b || DEFAULT_PLASTER_CONFIG.rcc), enabled, thickness: sp?.thicknessMm ?? d.thicknessMm, unit: 'mm', mixRatio: sp?.ratio ?? d.ratio });
+  // the 2D editor has no ceiling setting: in editor mode the ceiling is plastered only when the Structural Config says so
+  const ceilingOn = mode === 'standard' ? spec?.ceiling?.enabled !== false : mode === 'editor' && spec?.ceiling?.enabled === true;
+  const ceilingCfg = surf(DEFAULT_PLASTER_CONFIG.rcc, spec?.ceiling, STANDARD_PLASTER.ceiling, ceilingOn);
+  if (mode === 'none') return { ...g, enabled: false, mode, ceilingCfg };
+  if (mode === 'editor') return { ...g, ...(floor?.plaster || {}), mode, ceilingCfg };
+  return {
+    ...g, enabled: true, scope: 'both', rccColumnsEnabled: true, rccBeamsEnabled: true,
+    inner: surf(g.inner, spec?.inner, STANDARD_PLASTER.inner, true),
+    outer: surf(g.outer, spec?.outer, STANDARD_PLASTER.outer, true),
+    rcc: surf(g.rcc, spec?.rcc, STANDARD_PLASTER.rcc, true),
+    rccSideBeam: surf(g.rccSideBeam, spec?.rcc, STANDARD_PLASTER.rcc, true),
+    mode, ceilingCfg,
+  };
+}
+
 export const calculatePlasterEstimate = (
   project: { walls: Wall[]; pillars?: Pillar[]; buildingModel?: BuildingModel },
   settings: CalculatorSettings,
   buildingUnit: Unit = 'ft'
 ): PlasterEstimate => {
   const model = project.buildingModel;
-  const globalPlasterConfig: PlasterConfig = {
-    ...DEFAULT_PLASTER_CONFIG,
-    ...(settings.plaster || {}),
-    ...(model?.plaster || {})
-  };
+  const resolvedGlobal = resolvePlasterConfig(model, undefined, settings.plaster);
+  const plasterMode = resolvedGlobal.mode;
+  const globalPlasterConfig: PlasterConfig = resolvedGlobal;
 
-  const isEnabled = globalPlasterConfig.enabled !== false;
+  const isEnabled = plasterMode !== 'none' && globalPlasterConfig.enabled !== false;
   const scope = globalPlasterConfig.scope || 'both';
   const dryFactor = globalPlasterConfig.dryVolumeFactor || settings.dryVolumeFactor || 1.33;
 
@@ -4174,12 +4210,13 @@ export const calculatePlasterEstimate = (
   const floorPlasterEstimates: FloorPlasterEstimate[] = [];
 
   floors.forEach((floor) => {
-    const floorPlasterConfig: PlasterConfig = {
-      ...globalPlasterConfig,
-      ...(floor.plaster || {})
-    };
+    // standard plaster (Structural Config) covers every floor the same way; the editor mode keeps each floor's own settings
+    const floorPlasterConfig: PlasterConfig = plasterMode === 'editor' ? { ...globalPlasterConfig, ...(floor.plaster || {}) } : globalPlasterConfig;
 
-    const isFloorEnabled = (globalPlasterConfig.enabled !== false && floorPlasterConfig.enabled !== false) || (floor.plaster?.enabled === true);
+    const isFloorEnabled = plasterMode === 'none' ? false
+      : plasterMode === 'standard' ? true
+      : (globalPlasterConfig.enabled !== false && floorPlasterConfig.enabled !== false) || (floor.plaster?.enabled === true);
+    const wallOv = (w: Wall) => (plasterMode === 'editor' ? w.plasterOverrides : undefined);
 
     const innerCfg = { ...floorPlasterConfig.inner };
     const outerCfg = { ...floorPlasterConfig.outer };
@@ -4212,8 +4249,8 @@ export const calculatePlasterEstimate = (
       };
       const m = calculateWallMetrics(effW);
       
-      const isWallOuterEnabled = isFloorEnabled && (w.plasterOverrides?.outer?.enabled !== undefined ? w.plasterOverrides.outer.enabled : outerCfg.enabled);
-      const isWallInnerEnabled = isFloorEnabled && (w.plasterOverrides?.inner?.enabled !== undefined ? w.plasterOverrides.inner.enabled : innerCfg.enabled);
+      const isWallOuterEnabled = isFloorEnabled && (wallOv(w)?.outer?.enabled !== undefined ? wallOv(w)!.outer!.enabled : outerCfg.enabled);
+      const isWallInnerEnabled = isFloorEnabled && (wallOv(w)?.inner?.enabled !== undefined ? wallOv(w)!.inner!.enabled : innerCfg.enabled);
 
       // Outer Face
       if (isWallOuterEnabled) {
@@ -4242,7 +4279,7 @@ export const calculatePlasterEstimate = (
       };
       const m = calculateWallMetrics(effW);
 
-      const isWallInnerEnabled = isFloorEnabled && (w.plasterOverrides?.inner?.enabled !== undefined ? w.plasterOverrides.inner.enabled : innerCfg.enabled);
+      const isWallInnerEnabled = isFloorEnabled && (wallOv(w)?.inner?.enabled !== undefined ? wallOv(w)!.inner!.enabled : innerCfg.enabled);
 
       if (isWallInnerEnabled) {
         // Face A
@@ -4339,14 +4376,26 @@ export const calculatePlasterEstimate = (
       estimationParams
     );
 
-    const flTotAreaM2 = innerEst.netAreaSqM + outerEst.netAreaSqM + rccEst.netAreaSqM + rccSideBeamEst.netAreaSqM;
-    const flTotAreaSqFt = innerEst.netAreaSqFt + outerEst.netAreaSqFt + rccEst.netAreaSqFt + rccSideBeamEst.netAreaSqFt;
-    const flTotWetM3 = innerEst.wetVolumeM3 + outerEst.wetVolumeM3 + rccEst.wetVolumeM3 + rccSideBeamEst.wetVolumeM3;
-    const flTotDryM3 = innerEst.dryMortarVolumeM3 + outerEst.dryMortarVolumeM3 + rccEst.dryMortarVolumeM3 + rccSideBeamEst.dryMortarVolumeM3;
-    const flTotCementBags = innerEst.cementBags + outerEst.cementBags + rccEst.cementBags + rccSideBeamEst.cementBags;
-    const flTotSandCft = innerEst.sandCft + outerEst.sandCft + rccEst.sandCft + rccSideBeamEst.sandCft;
-    const flTotWaterL = innerEst.waterLitres + outerEst.waterLitres + rccEst.waterLitres + rccSideBeamEst.waterLitres;
-    const flTotLabourDays = innerEst.masonDays + outerEst.masonDays + rccEst.masonDays + rccSideBeamEst.masonDays;
+    // 5. Ceiling plaster: the soffit of the slab over this floor (building plan area)
+    const planL = model ? toMeters(model.buildingLength, model.buildingUnit || buildingUnit) : 0;
+    const planW = model ? toMeters(model.buildingWidth, model.buildingUnit || buildingUnit) : 0;
+    const ceilingEst = calculatePlasterSurfaceMaterials(
+      'ceiling',
+      `${floor.name} Ceiling Plaster`,
+      plasterMode !== 'none' ? planL * planW : 0,
+      0,
+      resolvedGlobal.ceilingCfg,
+      estimationParams
+    );
+
+    const flTotAreaM2 = innerEst.netAreaSqM + outerEst.netAreaSqM + rccEst.netAreaSqM + rccSideBeamEst.netAreaSqM + ceilingEst.netAreaSqM;
+    const flTotAreaSqFt = innerEst.netAreaSqFt + outerEst.netAreaSqFt + rccEst.netAreaSqFt + rccSideBeamEst.netAreaSqFt + ceilingEst.netAreaSqFt;
+    const flTotWetM3 = innerEst.wetVolumeM3 + outerEst.wetVolumeM3 + rccEst.wetVolumeM3 + rccSideBeamEst.wetVolumeM3 + ceilingEst.wetVolumeM3;
+    const flTotDryM3 = innerEst.dryMortarVolumeM3 + outerEst.dryMortarVolumeM3 + rccEst.dryMortarVolumeM3 + rccSideBeamEst.dryMortarVolumeM3 + ceilingEst.dryMortarVolumeM3;
+    const flTotCementBags = innerEst.cementBags + outerEst.cementBags + rccEst.cementBags + rccSideBeamEst.cementBags + ceilingEst.cementBags;
+    const flTotSandCft = innerEst.sandCft + outerEst.sandCft + rccEst.sandCft + rccSideBeamEst.sandCft + ceilingEst.sandCft;
+    const flTotWaterL = innerEst.waterLitres + outerEst.waterLitres + rccEst.waterLitres + rccSideBeamEst.waterLitres + ceilingEst.waterLitres;
+    const flTotLabourDays = innerEst.masonDays + outerEst.masonDays + rccEst.masonDays + rccSideBeamEst.masonDays + ceilingEst.masonDays;
 
     floorPlasterEstimates.push({
       floorId: floor.id,
@@ -4356,6 +4405,7 @@ export const calculatePlasterEstimate = (
       outer: outerEst,
       rcc: rccEst,
       rccSideBeam: rccSideBeamEst,
+      ceiling: ceilingEst,
       totalAreaSqM: flTotAreaM2,
       totalAreaSqFt: flTotAreaSqFt,
       totalWetVolumeM3: flTotWetM3,
@@ -4369,40 +4419,42 @@ export const calculatePlasterEstimate = (
         outer: outerEst.costs.total,
         rcc: rccEst.costs.total,
         rccSideBeam: rccSideBeamEst.costs.total,
-        cement: innerEst.costs.cement + outerEst.costs.cement + rccEst.costs.cement + rccSideBeamEst.costs.cement,
-        sand: innerEst.costs.sand + outerEst.costs.sand + rccEst.costs.sand + rccSideBeamEst.costs.sand,
-        labour: innerEst.costs.labour + outerEst.costs.labour + rccEst.costs.labour + rccSideBeamEst.costs.labour,
-        total: innerEst.costs.total + outerEst.costs.total + rccEst.costs.total + rccSideBeamEst.costs.total
+        ceiling: ceilingEst.costs.total,
+        cement: innerEst.costs.cement + outerEst.costs.cement + rccEst.costs.cement + rccSideBeamEst.costs.cement + ceilingEst.costs.cement,
+        sand: innerEst.costs.sand + outerEst.costs.sand + rccEst.costs.sand + rccSideBeamEst.costs.sand + ceilingEst.costs.sand,
+        labour: innerEst.costs.labour + outerEst.costs.labour + rccEst.costs.labour + rccSideBeamEst.costs.labour + ceilingEst.costs.labour,
+        total: innerEst.costs.total + outerEst.costs.total + rccEst.costs.total + rccSideBeamEst.costs.total + ceilingEst.costs.total
       }
     });
   });
 
   // Cumulative Totals
-  const totGrossM2 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.grossAreaSqM + f.outer.grossAreaSqM + f.rcc.grossAreaSqM + f.rccSideBeam.grossAreaSqM, 0);
-  const totOpeningDeductionM2 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.openingDeductionSqM + f.outer.openingDeductionSqM + f.rcc.openingDeductionSqM + f.rccSideBeam.openingDeductionSqM, 0);
+  const totGrossM2 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.grossAreaSqM + f.outer.grossAreaSqM + f.rcc.grossAreaSqM + f.rccSideBeam.grossAreaSqM + f.ceiling.grossAreaSqM, 0);
+  const totOpeningDeductionM2 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.openingDeductionSqM + f.outer.openingDeductionSqM + f.rcc.openingDeductionSqM + f.rccSideBeam.openingDeductionSqM + f.ceiling.openingDeductionSqM, 0);
   const totNetM2 = floorPlasterEstimates.reduce((sum, f) => sum + f.totalAreaSqM, 0);
   const totNetSqFt = totNetM2 * 10.7639;
 
   const totWetM3 = floorPlasterEstimates.reduce((sum, f) => sum + f.totalWetVolumeM3, 0);
   const totDryM3 = floorPlasterEstimates.reduce((sum, f) => sum + f.totalDryMortarM3, 0);
 
-  const totCementExactBags = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.cementExactBags + f.outer.cementExactBags + f.rcc.cementExactBags + f.rccSideBeam.cementExactBags, 0);
+  const totCementExactBags = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.cementExactBags + f.outer.cementExactBags + f.rcc.cementExactBags + f.rccSideBeam.cementExactBags + f.ceiling.cementExactBags, 0);
   const totCementBags = Math.ceil(totCementExactBags);
-  const recCementBags = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.recommendedPurchaseCementBags + f.outer.recommendedPurchaseCementBags + f.rcc.recommendedPurchaseCementBags + f.rccSideBeam.recommendedPurchaseCementBags, 0);
+  const recCementBags = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.recommendedPurchaseCementBags + f.outer.recommendedPurchaseCementBags + f.rcc.recommendedPurchaseCementBags + f.rccSideBeam.recommendedPurchaseCementBags + f.ceiling.recommendedPurchaseCementBags, 0);
 
-  const totSandM3 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.sandVolumeM3 + f.outer.sandVolumeM3 + f.rcc.sandVolumeM3 + f.rccSideBeam.sandVolumeM3, 0);
+  const totSandM3 = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.sandVolumeM3 + f.outer.sandVolumeM3 + f.rcc.sandVolumeM3 + f.rccSideBeam.sandVolumeM3 + f.ceiling.sandVolumeM3, 0);
   const totSandCft = totSandM3 * 35.3147;
-  const recSandCft = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.recommendedPurchaseSandCft + f.outer.recommendedPurchaseSandCft + f.rcc.recommendedPurchaseSandCft + f.rccSideBeam.recommendedPurchaseSandCft, 0);
+  const recSandCft = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.recommendedPurchaseSandCft + f.outer.recommendedPurchaseSandCft + f.rcc.recommendedPurchaseSandCft + f.rccSideBeam.recommendedPurchaseSandCft + f.ceiling.recommendedPurchaseSandCft, 0);
 
   const totWaterL = floorPlasterEstimates.reduce((sum, f) => sum + f.totalWaterLitres, 0);
-  const totMasonDays = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.masonDays + f.outer.masonDays + f.rcc.masonDays + f.rccSideBeam.masonDays, 0);
-  const totHelperDays = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.helperDays + f.outer.helperDays + f.rcc.helperDays + f.rccSideBeam.helperDays, 0);
+  const totMasonDays = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.masonDays + f.outer.masonDays + f.rcc.masonDays + f.rccSideBeam.masonDays + f.ceiling.masonDays, 0);
+  const totHelperDays = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.helperDays + f.outer.helperDays + f.rcc.helperDays + f.rccSideBeam.helperDays + f.ceiling.helperDays, 0);
   const totLabourDays = totMasonDays;
 
   const costInner = floorPlasterEstimates.reduce((sum, f) => sum + f.inner.costs.total, 0);
   const costOuter = floorPlasterEstimates.reduce((sum, f) => sum + f.outer.costs.total, 0);
   const costRcc = floorPlasterEstimates.reduce((sum, f) => sum + f.rcc.costs.total, 0);
   const costRccSideBeam = floorPlasterEstimates.reduce((sum, f) => sum + f.rccSideBeam.costs.total, 0);
+  const costCeiling = floorPlasterEstimates.reduce((sum, f) => sum + f.ceiling.costs.total, 0);
   const costCement = floorPlasterEstimates.reduce((sum, f) => sum + f.costs.cement, 0);
   const costSand = floorPlasterEstimates.reduce((sum, f) => sum + f.costs.sand, 0);
   const costLabour = floorPlasterEstimates.reduce((sum, f) => sum + f.costs.labour, 0);
@@ -4532,12 +4584,31 @@ export const calculatePlasterEstimate = (
     }
   }), { ...floorPlasterEstimates[0].rccSideBeam, grossAreaSqM: 0, grossAreaSqFt: 0, openingDeductionSqM: 0, openingDeductionSqFt: 0, netAreaSqM: 0, netAreaSqFt: 0, wetVolumeM3: 0, wetVolumeCft: 0, dryMortarVolumeM3: 0, dryMortarVolumeCft: 0, cementVolumeM3: 0, cementExactBags: 0, cementBags: 0, recommendedPurchaseCementBags: 0, sandVolumeM3: 0, sandM3: 0, sandCft: 0, recommendedPurchaseSandCft: 0, waterLitres: 0, masonDays: 0, helperDays: 0, costs: { cement: 0, sand: 0, labour: 0, total: 0 } });
 
+  const sumSurface = (key: 'ceiling'): PlasterSurfaceEstimate => {
+    const first = floorPlasterEstimates[0][key];
+    const num = (k: keyof PlasterSurfaceEstimate) => floorPlasterEstimates.reduce((a, f) => a + ((f[key][k] as number) || 0), 0);
+    return {
+      ...first,
+      grossAreaSqM: num('grossAreaSqM'), grossAreaSqFt: num('grossAreaSqFt'), openingDeductionSqM: 0, openingDeductionSqFt: 0,
+      netAreaSqM: num('netAreaSqM'), netAreaSqFt: num('netAreaSqFt'), wetVolumeM3: num('wetVolumeM3'), wetVolumeCft: num('wetVolumeCft'),
+      dryMortarVolumeM3: num('dryMortarVolumeM3'), dryMortarVolumeCft: num('dryMortarVolumeCft'), cementVolumeM3: num('cementVolumeM3'),
+      cementExactBags: num('cementExactBags'), cementBags: num('cementBags'), recommendedPurchaseCementBags: num('recommendedPurchaseCementBags'),
+      sandVolumeM3: num('sandVolumeM3'), sandM3: num('sandM3'), sandCft: num('sandCft'), recommendedPurchaseSandCft: num('recommendedPurchaseSandCft'),
+      waterLitres: num('waterLitres'), masonDays: num('masonDays'), helperDays: num('helperDays'),
+      costs: {
+        cement: floorPlasterEstimates.reduce((a, f) => a + f[key].costs.cement, 0), sand: floorPlasterEstimates.reduce((a, f) => a + f[key].costs.sand, 0),
+        labour: floorPlasterEstimates.reduce((a, f) => a + f[key].costs.labour, 0), total: floorPlasterEstimates.reduce((a, f) => a + f[key].costs.total, 0),
+      },
+    };
+  };
+
   return {
     enabled: isEnabled,
     inner: combinedInner,
     outer: combinedOuter,
     rcc: combinedRcc,
     rccSideBeam: combinedRccSideBeam,
+    ceiling: sumSurface('ceiling'),
     floors: floorPlasterEstimates,
     totalGrossAreaSqM: totGrossM2,
     totalOpeningDeductionSqM: totOpeningDeductionM2,
@@ -4560,6 +4631,7 @@ export const calculatePlasterEstimate = (
       outerPlaster: costOuter,
       rccPlaster: costRcc,
       rccSideBeamPlaster: costRccSideBeam,
+      ceilingPlaster: costCeiling,
       cement: costCement,
       sand: costSand,
       labour: costLabour,

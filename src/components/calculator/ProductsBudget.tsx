@@ -164,7 +164,7 @@ export function ProductsBudget({ budget, onRate, extra }: {
               {budget.mixPlaces.map(m => (
                 <tr key={m.place} className="border-b border-slate-50" data-testid={`mix-row-${m.place}`}>
                   <td className="px-3 py-2 font-bold">{m.place}</td>
-                  <td className="px-3 py-2 text-slate-700">{m.mix}</td>
+                  <td className="px-3 py-2 text-slate-700">{m.mix}{m.areaM2 !== undefined ? ` · ${num(m.areaM2, 1)} m²` : ''}</td>
                   <td className="px-3 py-2 text-right font-mono">{num(m.volumeM3, 2)}</td>
                   <td className="px-3 py-2 text-right font-mono">{m.cementBags ? num(m.cementBags, 1) : '—'}</td>
                   <td className="px-3 py-2 text-right font-mono">{m.sandCft ? num(m.sandCft, 1) : '—'}</td>

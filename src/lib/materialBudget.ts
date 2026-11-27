@@ -13,7 +13,7 @@
  *  - Cover blocks: counted with site-practice spacings (IS 456 Cl. 26.4 fixes only the cover THICKNESS): footings 4 per m², slabs 1 per m²,
  *    beams 2 per metre, columns 4 per metre of height.
  */
-import type { BuildingBOQSummary, BOQProductItem } from './brickCalculator';
+import type { BuildingBOQSummary, BOQProductItem, PlasterEstimate } from './brickCalculator';
 import type { BuildingStructuralSummary } from './structuralCalculationService';
 import { CEMENT_BAG_KG, CFT_PER_M3, SAND_BULK_KG_M3, JALLI_BULK_KG_M3 } from './concreteMix';
 
@@ -49,6 +49,8 @@ export interface MixPlace {
   mix: string;
   /** m³ of wet concrete / mortar, or compacted sand for the filling */
   volumeM3: number;
+  /** plastered area, m² (plaster rows) */
+  areaM2?: number;
   cementBags: number;
   sandCft: number;
   jalliCft: number;
@@ -94,6 +96,8 @@ export interface MaterialBudgetInput {
   structural?: BuildingStructuralSummary;
   /** Footing plan areas (m²) and the footing cover (mm) from the foundation design, when it is used */
   footings?: { areasM2: number[]; coverMm: number };
+  /** Plaster estimate (surfaces, thickness, mix): gives the plaster rows place by place */
+  plaster?: PlasterEstimate;
   /** Brickwork mortar cement:sand, for the label (e.g. '1:5') */
   masonryRatio?: string;
   /** Formwork rate per m² (default 350, as the BOQ) */
@@ -169,7 +173,7 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
     { place: PLACE.pcc, quantity: r(vol.pcc * pcc.waterL) },
     ...rccPlaces.map(k => ({ place: PLACE[k], quantity: r(vol[k] * rcc.waterL) })),
     { place: PLACE.masonry, quantity: r((cementSrc.masonry ?? 0) * CEMENT_BAG_KG * 0.5) },
-    { place: PLACE.plaster, quantity: r((cementSrc.plaster ?? 0) * CEMENT_BAG_KG * 0.5) },
+    { place: PLACE.plaster, quantity: r(input.plaster?.enabled ? input.plaster.totalWaterLitres : (cementSrc.plaster ?? 0) * CEMENT_BAG_KG * 0.5) },
   ]);
   const waterL = waterUses.reduce((a, u) => a + u.quantity, 0);
 
@@ -204,7 +208,19 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
   const masonryBags = cementSrc.masonry ?? 0, plasterBags = cementSrc.plaster ?? 0;
   const mortarM3 = prod('mortar')?.sourceBreakdown ?? {};
   if (masonryBags > 0) mixPlaces.push({ place: PLACE.masonry, kind: 'mortar', mix: `mortar ${input.masonryRatio ?? '1:5'} by volume`, volumeM3: r(mortarM3.masonry ?? 0, 2), cementBags: r(masonryBags, 1), sandCft: r(sandSrc.masonry ?? 0, 1), jalliCft: 0, waterL: r(masonryBags * CEMENT_BAG_KG * 0.5), steelKg: 0 });
-  if (plasterBags > 0) mixPlaces.push({ place: PLACE.plaster, kind: 'mortar', mix: 'plaster mortar (ratios of the plaster settings)', volumeM3: r(mortarM3.plaster ?? 0, 2), cementBags: r(plasterBags, 1), sandCft: r(sandSrc.plaster ?? 0, 1), jalliCft: 0, waterL: r(plasterBags * CEMENT_BAG_KG * 0.5), steelKg: 0 });
+  const pl = input.plaster;
+  const plasterSurfaces = pl?.enabled ? ([
+    ['Plaster: inside walls', pl.inner], ['Plaster: outside walls', pl.outer], ['Plaster: RCC columns', pl.rcc],
+    ['Plaster: beam sides', pl.rccSideBeam], ['Plaster: ceiling', pl.ceiling],
+  ] as const).filter(([, e]) => e && e.netAreaSqM > 0.01) : [];
+  if (plasterSurfaces.length) {
+    for (const [place, e] of plasterSurfaces) {
+      mixPlaces.push({ place, kind: 'mortar', mix: `${e.thicknessMm} mm · ${e.mixRatio}`, areaM2: r(e.netAreaSqM, 1), volumeM3: r(e.wetVolumeM3, 2),
+        cementBags: r(e.cementExactBags, 1), sandCft: r(e.sandCft, 1), jalliCft: 0, waterL: r(e.waterLitres), steelKg: 0 });
+    }
+  } else if (plasterBags > 0) {
+    mixPlaces.push({ place: PLACE.plaster, kind: 'mortar', mix: 'plaster mortar (ratios of the plaster settings)', volumeM3: r(mortarM3.plaster ?? 0, 2), cementBags: r(plasterBags, 1), sandCft: r(sandSrc.plaster ?? 0, 1), jalliCft: 0, waterL: r(plasterBags * CEMENT_BAG_KG * 0.5), steelKg: 0 });
+  }
   if ((sandSrc.plinthFill ?? 0) > 0) mixPlaces.push({ place: PLACE.plinthFill, kind: 'filling', mix: 'compacted sand', volumeM3: r((sandSrc.plinthFill ?? 0) / 1.15 / CFT_PER_M3, 2), cementBags: 0, sandCft: r(sandSrc.plinthFill ?? 0, 1), jalliCft: 0, waterL: 0, steelKg: 0 });
 
   const methodNotes = [
@@ -212,7 +228,7 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
     `Lean concrete (P.C.C.): ${pcc.grade}, ${pcc.label}. ${pcc.note}`,
     'Batching by volume: 1 bag of cement = 50 kg = 34.7 litres = about 1.22 cft (cement 1440 kg/m³); the dry volume of the materials is 1.54 m³ for every 1 m³ of wet concrete (1.33 for mortar), so a 1:1.5:3 mix gives about 8 bags, 14.8 cft sand and 29.7 cft jalli per m³.',
     'Water is the maximum of IS 456 Table 9 per 50 kg bag for the nominal mixes (hand or machine mixing), and the mix-design water for design mixes; mortar water is cement × 0.5. Curing water is not included.',
-    'Brickwork and plaster mortar are measured from the wall and plaster areas with the ratios chosen in the Structural Config and plaster settings.',
+    'Brickwork mortar is measured from the wall volume; plaster from the plastered areas of the 2D plan (openings deducted) × thickness, dry volume 1.33, with the thickness and mix of each surface (Structural Config → Plastering). Plaster water = cement × the plaster w/c ratio (0.55).',
   ];
 
   // shuttering: areas from the member designs (columns, beams, slab soffits) and the designed footings

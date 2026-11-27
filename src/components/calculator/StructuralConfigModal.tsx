@@ -1258,6 +1258,61 @@ export function StructuralConfigModal({
                 </p>
               </div>
 
+              {/* Plastering of the whole building (drives the 3D plaster skins and the plaster cement / sand / water of the BOQ) */}
+              {(() => {
+                const ps = localConfig.plasterSpec || {};
+                const mode = ps.mode ?? 'standard';
+                const setPs = (patch: NonNullable<BuildingConfig['plasterSpec']>) => setLocalConfig(prev => ({ ...prev, plasterSpec: { ...(prev.plasterSpec || {}), ...patch } }));
+                const rows: Array<['inner' | 'outer' | 'rcc' | 'ceiling', string, number, string]> = [
+                  ['inner', 'Inside walls', 12, '1:6'],
+                  ['outer', 'Outside walls', 15, '1:4'],
+                  ['rcc', 'RCC columns & beams', 6, '1:4'],
+                  ['ceiling', 'Ceiling (slab soffit)', 6, '1:3'],
+                ];
+                return (
+                  <div data-testid="plaster-inputs" className="rounded-xl border border-slate-200 bg-slate-50/60 p-3.5 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">Plastering</label>
+                      <select data-testid="plaster-mode" className="border border-slate-300 rounded-lg px-2 py-1.5 text-xs bg-white text-slate-900"
+                        value={mode} onChange={e => setPs({ mode: e.target.value as 'standard' | 'editor' | 'none' })}>
+                        <option value="standard">Standard plaster for the whole building</option>
+                        <option value="editor">Use the 2D editor plaster settings</option>
+                        <option value="none">No plaster</option>
+                      </select>
+                    </div>
+                    {mode === 'standard' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        {rows.map(([key, label, dT, dR]) => {
+                          const cur = (ps[key] || {}) as { thicknessMm?: number; ratio?: string; enabled?: boolean };
+                          return (
+                            <div key={key} className="text-xs" data-testid={`plaster-${key}`}>
+                              <div className="font-semibold text-slate-700 flex items-center gap-1.5">
+                                {key === 'ceiling' && (
+                                  <input type="checkbox" checked={cur.enabled !== false} onChange={e => setPs({ ceiling: { ...cur, enabled: e.target.checked } })} />
+                                )}
+                                {label}
+                              </div>
+                              <div className="mt-1 flex items-center gap-1.5">
+                                <input type="number" min={3} max={40} step={1} className="w-16 border border-slate-300 rounded px-1.5 py-1 bg-white text-slate-900"
+                                  value={cur.thicknessMm ?? dT} onChange={e => setPs({ [key]: { ...cur, thicknessMm: Math.max(3, Math.min(40, Number(e.target.value) || dT)) } })} />
+                                <span className="text-slate-500">mm</span>
+                                <select className="border border-slate-300 rounded px-1 py-1 bg-white text-slate-900" value={cur.ratio ?? dR}
+                                  onChange={e => setPs({ [key]: { ...cur, ratio: e.target.value } })}>
+                                  {['1:3', '1:4', '1:5', '1:6'].map(r => <option key={r} value={r}>{r}</option>)}
+                                </select>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <p className="text-[11px] text-slate-500">
+                      Usual practice: inside walls 12 mm 1:6, outside walls 15 mm 1:4 (two coats where needed), RCC faces 6 mm 1:4, ceiling 6 mm 1:3. Areas come from the 2D plan (openings deducted); the 3D view and the products page show the same plaster.
+                    </p>
+                  </div>
+                );
+              })()}
+
               {/* Steel Reinforcement Grade */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">

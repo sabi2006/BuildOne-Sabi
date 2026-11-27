@@ -211,6 +211,17 @@ export interface BuildingConfig {
   pccGrade?: 'M5' | 'M7.5' | 'M10' | 'M15';
   /** Brickwork mortar, cement:sand by volume (default 1:5) */
   masonryMortarRatio?: string;
+  /**
+   * Plastering of the whole building. 'standard' (default): every wall face, RCC column and beam face and the ceilings are plastered with the
+   * thicknesses / mixes below; 'editor': the 2D editor's plaster settings per floor and wall; 'none': no plaster.
+   */
+  plasterSpec?: {
+    mode?: 'standard' | 'editor' | 'none';
+    inner?: { thicknessMm?: number; ratio?: string };
+    outer?: { thicknessMm?: number; ratio?: string };
+    rcc?: { thicknessMm?: number; ratio?: string };
+    ceiling?: { enabled?: boolean; thicknessMm?: number; ratio?: string };
+  };
   steelGrade: SteelGrade;
   fineAggregateType: FineAggregateType;
   foundationType: FoundationType;

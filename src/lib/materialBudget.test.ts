@@ -245,3 +245,19 @@ describe('shuttering and sand bulking', () => {
     expect(a.buildingBOQ!.assumptions.join(' ')).toContain('No sand bulking added');
   });
 });
+
+describe('plaster in the products & budget', () => {
+  it('standard plaster is in the BOQ cement / sand and in the mix table surface by surface (incl. the ceiling)', () => {
+    const r = calculateProject(project());
+    const b = buildMaterialBudget({ boq: r.buildingBOQ!, structural: r.structuralSummary, plaster: r.plasterEstimate });
+    expect(r.plasterEstimate!.enabled).toBe(true);
+    const cementPlaster = b.products.find(p => p.id === 'cement')!.uses.find(u => u.place === 'Plaster');
+    expect(cementPlaster!.quantity).toBeGreaterThan(0);
+    const rows = b.mixPlaces.filter(m => m.place.startsWith('Plaster:'));
+    expect(rows.map(m => m.place)).toContain('Plaster: ceiling');
+    const ceil = rows.find(m => m.place === 'Plaster: ceiling')!;
+    expect(ceil.mix).toBe('6 mm · 1:3');
+    expect(ceil.areaM2).toBeCloseTo(r.plasterEstimate!.ceiling.netAreaSqM, 0);
+    expect(b.products.find(p => p.id === 'water')!.uses.find(u => u.place === 'Plaster')!.quantity).toBe(Math.round(r.plasterEstimate!.totalWaterLitres));
+  });
+});

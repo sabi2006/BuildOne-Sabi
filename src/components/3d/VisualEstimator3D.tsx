@@ -40,6 +40,7 @@ import {
   DEFAULT_PLASTER_CONFIG,
   PlasterConfig,
   toMetersPlaster,
+  resolvePlasterConfig,
   getRingBeamJunction,
   getFullRoofJunction,
   getTopRccStructuralJunction,
@@ -1409,10 +1410,15 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
   const isConcreteDepthWrite = isConcreteSolid || isWireframe;
 
   // Plaster 3D Visualization States
-  const [showInnerPlaster, setShowInnerPlaster] = useState(model.plaster?.inner?.enabled ?? (model.plaster as any)?.innerMasonry?.enabled ?? false);
-  const [showOuterPlaster, setShowOuterPlaster] = useState(model.plaster?.outer?.enabled ?? (model.plaster as any)?.outerMasonry?.enabled ?? false);
-  const [showRccPlaster, setShowRccPlaster] = useState(model.plaster?.rcc?.enabled ?? (model.plaster as any)?.rccSurfaces?.enabled ?? false);
-  const [showRccSideBeamPlaster, setShowRccSideBeamPlaster] = useState(model.plaster?.rccSideBeam?.enabled ?? false);
+  // the plaster the estimate uses (standard plaster of the Structural Config, or the 2D editor's settings)
+  const effPlaster = useMemo(() => resolvePlasterConfig(model), [model]);
+  const plasterOn = effPlaster.mode !== 'none' && effPlaster.enabled !== false;
+  const [showInnerPlaster, setShowInnerPlaster] = useState(plasterOn && (effPlaster.inner?.enabled ?? false));
+  const [showOuterPlaster, setShowOuterPlaster] = useState(plasterOn && (effPlaster.outer?.enabled ?? false));
+  const [showRccPlaster, setShowRccPlaster] = useState(plasterOn && (effPlaster.rcc?.enabled ?? false));
+  const [showRccSideBeamPlaster, setShowRccSideBeamPlaster] = useState(plasterOn && (effPlaster.rccSideBeam?.enabled ?? false));
+  const [showCeilingPlaster, setShowCeilingPlaster] = useState(effPlaster.ceilingCfg.enabled);
+  const ceilingPlasterM = Math.max(0.003, toMetersPlaster(effPlaster.ceilingCfg.thickness, effPlaster.ceilingCfg.unit));
   const [plasterXRay, setPlasterXRay] = useState(false);
 
   useEffect(() => {
@@ -1959,19 +1965,23 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                 </span>
                 <label className="flex items-center space-x-2 cursor-pointer text-teal-900 font-semibold bg-teal-50/80 px-1.5 py-0.5 rounded border border-teal-200/80 mb-0.5">
                   <input type="checkbox" checked={showInnerPlaster} onChange={(e) => setShowInnerPlaster(e.target.checked)} className="rounded text-teal-600 focus:ring-teal-500" />
-                  <span>Inner Plaster ({model.plaster?.inner?.thickness ?? (model.plaster?.inner as any)?.thicknessMm ?? 12}mm)</span>
+                  <span>Inner Plaster ({effPlaster.inner?.thickness ?? 12}mm)</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer text-sky-900 font-semibold bg-sky-50/80 px-1.5 py-0.5 rounded border border-sky-200/80 mb-0.5">
                   <input type="checkbox" checked={showOuterPlaster} onChange={(e) => setShowOuterPlaster(e.target.checked)} className="rounded text-sky-600 focus:ring-sky-500" />
-                  <span>Outer Plaster ({model.plaster?.outer?.thickness ?? (model.plaster?.outer as any)?.thicknessMm ?? 15}mm)</span>
+                  <span>Outer Plaster ({effPlaster.outer?.thickness ?? 15}mm)</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer text-slate-800 font-semibold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200 mb-0.5">
                   <input type="checkbox" checked={showRccPlaster} onChange={(e) => setShowRccPlaster(e.target.checked)} className="rounded text-slate-600 focus:ring-slate-500" />
-                  <span>RCC Column Plaster ({model.plaster?.rcc?.thickness ?? (model.plaster?.rcc as any)?.thicknessMm ?? 6}mm)</span>
+                  <span>RCC Column Plaster ({effPlaster.rcc?.thickness ?? 6}mm)</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer text-emerald-900 font-semibold bg-emerald-50/80 px-1.5 py-0.5 rounded border border-emerald-200/80 mb-0.5">
                   <input type="checkbox" checked={showRccSideBeamPlaster} onChange={(e) => setShowRccSideBeamPlaster(e.target.checked)} className="rounded text-emerald-600 focus:ring-emerald-500" />
-                  <span>RCC Side Beam Plaster ({model.plaster?.rccSideBeam?.thickness ?? 6}mm)</span>
+                  <span>RCC Side Beam Plaster ({effPlaster.rccSideBeam?.thickness ?? 6}mm)</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer text-slate-700 font-medium py-0.5">
+                  <input type="checkbox" data-testid="toggle-ceiling-plaster" checked={showCeilingPlaster} onChange={(e) => setShowCeilingPlaster(e.target.checked)} className="rounded text-teal-600 focus:ring-teal-500" />
+                  <span>Ceiling Plaster ({effPlaster.ceilingCfg.thickness}mm)</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer text-emerald-800 font-medium py-0.5">
                   <input type="checkbox" checked={plasterXRay} onChange={(e) => setPlasterXRay(e.target.checked)} className="rounded text-emerald-600 focus:ring-emerald-500" />
@@ -2666,7 +2676,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                           showInnerPlaster={showInnerPlaster}
                           showOuterPlaster={showOuterPlaster}
                           plasterXRay={plasterXRay}
-                          plasterConfig={floor.plaster || model.plaster}
+                          plasterConfig={resolvePlasterConfig(model, floor)}
                           buildingCenter={{ x: toM(model.buildingLength) / 2, y: toM(model.buildingWidth) / 2 }}
                           targetHeightM={floorWallHeightM}
                         />
@@ -2682,7 +2692,7 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                           showInnerPlaster={showInnerPlaster}
                           showOuterPlaster={showOuterPlaster}
                           plasterXRay={plasterXRay}
-                          plasterConfig={floor.plaster || model.plaster}
+                          plasterConfig={resolvePlasterConfig(model, floor)}
                           buildingCenter={{ x: toM(model.buildingLength) / 2, y: toM(model.buildingWidth) / 2 }}
                           targetHeightM={floorWallHeightM}
                         />
@@ -2690,8 +2700,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                       {/* 3D RCC Side Beam Plaster Configuration & Visibility for this floor */}
                       {(() => {
-                        const beamPlasterThickMm = (floor.plaster?.rccSideBeam?.thickness ?? model.plaster?.rccSideBeam?.thickness ?? 6);
-                        const beamPlasterUnit = (floor.plaster?.rccSideBeam?.unit ?? model.plaster?.rccSideBeam?.unit ?? 'mm');
+                        const beamPlasterThickMm = (resolvePlasterConfig(model, floor).rccSideBeam?.thickness ?? 6);
+                        const beamPlasterUnit = (resolvePlasterConfig(model, floor).rccSideBeam?.unit ?? 'mm');
                         const beamPlasterThickM = Math.max(0.002, toMetersPlaster(beamPlasterThickMm, beamPlasterUnit));
                         const isSideBeamPlasterVisible = showRccSideBeamPlaster;
 
@@ -3289,6 +3299,13 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
                                   key={slabUniqueId}
                                   position={[slab.centerX, slabCenterY, -slab.centerY]}
                                 >
+                                  {/* Ceiling plaster: a thin coat on the soffit of the slab */}
+                                  {showCeilingPlaster && isSlabEnabled && (
+                                    <mesh name="ceilingPlasterMesh" position={[0, -slab.thicknessM / 2 - ceilingPlasterM / 2 - 0.001, 0]} renderOrder={3}>
+                                      <boxGeometry args={[slab.widthM, ceilingPlasterM, slab.depthM]} />
+                                      <meshStandardMaterial color="#e7e5e4" roughness={0.95} transparent={plasterXRay} opacity={plasterXRay ? 0.4 : 1} />
+                                    </mesh>
+                                  )}
                                   {/* Solid / Translucent Concrete Slab */}
                                   {isSlabEnabled && (() => {
                                     const isThisSlabSelected = selectedSlab?.id === slabUniqueId;
@@ -3483,8 +3500,8 @@ export function VisualEstimator3D({ model }: VisualEstimator3DProps) {
 
                             {/* 1b. 6mm RCC Surface Plaster Finish Layer: Exposed Faces ONLY, never embedded faces */}
                             {showRccPlaster && !isSpecialColumn(p) && !isSegmented(p) && (() => {
-                              const colPlasterThickMm = (floor.plaster?.rcc?.thickness ?? model.plaster?.rcc?.thickness ?? (floor.plaster as any)?.rccSurfaces?.thickness ?? 6);
-                              const colPlasterUnit = (floor.plaster?.rcc?.unit ?? model.plaster?.rcc?.unit ?? 'mm');
+                              const colPlasterThickMm = (resolvePlasterConfig(model, floor).rcc?.thickness ?? 6);
+                              const colPlasterUnit = (resolvePlasterConfig(model, floor).rcc?.unit ?? 'mm');
                               const colPlasterThickM = Math.max(0.002, toMetersPlaster(colPlasterThickMm, colPlasterUnit));
                               const floorAllWalls = [...floor.externalWalls, ...(showInternal ? floor.internalWalls : floor.internalWalls)];
                               const exposed = getColumnExposedFaces(toM(effPos.x), toM(effPos.y), pW_M, pD_M, floorAllWalls, model.buildingUnit);

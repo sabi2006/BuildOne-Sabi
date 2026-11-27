@@ -264,6 +264,7 @@ export function VisualEstimatorResults({ onBack, view = '3d', onOpenBudget, onOp
             ? { areasM2: fEls.map(e => e.sizeXM! * e.sizeYM!), coverMm: fbd!.summary.clearCoverMm }
             : undefined,
           masonryRatio: bConfig.masonryMortarRatio ?? '1:5',
+          plaster: computedResult.plasterEstimate,
           formworkRatePerM2: bConfig.customRates?.formworkRatePerM2,
           waterRatePerKl: bConfig.customRates?.waterRatePerKl,
           coverBlockRatePerNo: bConfig.customRates?.coverBlockRatePerNo,
