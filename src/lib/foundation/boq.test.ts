@@ -52,7 +52,10 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
   it('uses the design: PCC, excavation and footing RCC equal the element quantities', () => {
     expect(fb.replacedLegacyFoundation).toBe(true);
     expect(fb.quantities.pccM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.pccM3, 0), 2);
-    expect(fb.quantities.excavationM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.excavationM3, 0), 2);
+    // excavation = the element pits + the extra depth of the sand bed under each P.C.C. (P.C.C. plan area × bed thickness)
+    const bed = (design.summary.sandBedMm ?? 0) / 1000;
+    const pccT = design.summary.pccThicknessMm / 1000;
+    expect(fb.quantities.excavationM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.excavationM3 + (e.quantities!.pccM3 / pccT) * bed, 0), 2);
     expect(fb.quantities.footingRccM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.concreteM3, 0), 2);
   });
 
@@ -118,13 +121,32 @@ describe('Detailed foundation replaces the legacy foundation quantities (no base
       const c = design.loadPath.columns.find(x => x.id === e.columnIds[0])!;
       return s + (c.widthMm / 1000) * (c.depthMm / 1000) * (design.summary.plinthHeightM ?? 0);
     }, 0);
-    expect(q.backfillM3).toBeCloseTo(q.excavationM3 - q.pccM3 - q.footingRccM3 - (q.pedestalRccM3 - aboveGl), 1);
+    // the sand bed is excavated too, but it is not backfilled (it stays as sand under the P.C.C.): it is taken off the excavation here
+    expect(q.backfillM3).toBeCloseTo(q.excavationM3 - q.sandBedM3 - q.pccM3 - q.footingRccM3 - (q.pedestalRccM3 - aboveGl), 1);
   });
 
-  it('the sand bed of the legacy foundation is dropped, with a note', () => {
+  it('foundation sand: a sand bed under the P.C.C. (default 50 mm, area = P.C.C. plan, loose = compacted × 1.15) is in the sand product, the notes and the schedule', () => {
     const sand = d.buildingBOQ!.products.find(p => p.id === 'sand')!.sourceBreakdown!;
-    expect(sand.bedding).toBe(0);
-    expect(fb.quantities.notes.join(' ')).toContain('Sand bedding');
+    const pccT = design.summary.pccThicknessMm / 1000;
+    const area = els.reduce((s, e) => s + e.quantities!.pccM3 / pccT, 0);
+    expect(design.summary.sandBedMm).toBe(50);
+    expect(fb.quantities.sandBedM3).toBeCloseTo(area * 0.05, 2);
+    expect(sand.bedding!).toBeCloseTo(area * 0.05 * 1.15 * 35.3147, 0);
+    expect(fb.quantities.notes.join(' ')).toContain('Sand bed 50 mm');
+    expect(sand.sandBackfill ?? 0).toBe(0);
+    // the foundation floor-schedule row carries all the foundation sand (bed + plinth filling + the sand of the concrete)
+    const row = d.buildingBOQ!.floorSchedules.find(f => f.isFoundation)!;
+    expect(row.products.sand.cft).toBeGreaterThanOrEqual(sand.bedding! + (sand.plinthFill ?? 0) - 0.2);
+  });
+
+  it('sand bed 0 removes the bed and its excavation; sand backfill moves the backfill volume into the sand product', () => {
+    const none = run({ foundationDetails: { ...fd, sandBedMm: 0 } }).buildingBOQ!.foundationBasement!.quantities;
+    expect(none.sandBedM3).toBe(0);
+    expect(none.excavationM3).toBeCloseTo(els.reduce((s, e) => s + e.quantities!.excavationM3, 0), 2);
+    const sb = run({ foundationDetails: { ...fd, sandBackfill: true } });
+    const q2 = sb.buildingBOQ!.foundationBasement!.quantities;
+    expect(q2.sandBackfillM3).toBeCloseTo(q2.backfillM3, 3);
+    expect(sb.buildingBOQ!.products.find(p => p.id === 'sand')!.sourceBreakdown!.sandBackfill!).toBeCloseTo(q2.backfillM3 * 1.15 * 35.3147, 0);
   });
 });
 
@@ -148,7 +170,8 @@ describe('Basement quantities (hand derivations)', () => {
     const els = design.foundation!.elements;
     const pits = els.reduce((s, e) => s + (e.sizeXM! + 0.6) * (e.sizeYM! + 0.6) * (e.depthMm! / 1000 + pcc), 0);
     expect(q.pccM3).toBeCloseTo(L * W * pcc + els.reduce((s, e) => s + e.quantities!.pccM3, 0), 2);
-    expect(q.excavationM3).toBeCloseTo((L + 0.6) * (W + 0.6) * Df + pits, 2);
+    expect(q.excavationM3).toBeCloseTo((L + 0.6) * (W + 0.6) * Df + pits + q.sandBedM3, 2); // + the sand bed under the P.C.C.
+    expect(q.sandBedM3).toBeCloseTo((L * W + els.reduce((s, e) => s + e.quantities!.pccM3, 0) / pcc) * (q.sandBedMm / 1000), 2);
     expect(q.backfillM3).toBeCloseTo(((L + 0.6) * (W + 0.6) - L * W) * Df, 2);
   });
 

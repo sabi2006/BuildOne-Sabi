@@ -35,6 +35,11 @@ export interface FoundationBasementQuantities {
   pccM3: number;
   /** Sand filling of the plinth: footprint × (plinth height − flooring thickness), m³ (0 with a basement) */
   plinthFillM3: number;
+  /** Sand bed (blinding) under the P.C.C.: area of the P.C.C. × bed thickness, compacted m³ */
+  sandBedM3: number;
+  sandBedMm: number;
+  /** Sand used to backfill the footing pits / basement ring instead of soil (compacted m³; 0 unless chosen) */
+  sandBackfillM3: number;
   /** Footings/rafts (above the base slab when a basement exists) + pedestals */
   foundationRccM3: number;
   footingRccM3: number;
@@ -106,6 +111,7 @@ export function buildFoundationBasementQuantities(
   const colInfo = new Map(design.loadPath.columns.map(c => [c.id, c]));
 
   let pccM3 = 0, excavationM3 = 0, backfillM3 = 0;
+  let sandBedAreaM2 = 0;
   let pitPccM3 = 0, pitExcavationM3 = 0; // footings under a basement: their own PCC and pits below the basement floor
   let footingRccM3 = 0, pedestalRccM3 = 0;
   let foundationFormworkM2 = 0;
@@ -159,6 +165,7 @@ export function buildFoundationBasementQuantities(
 
     if (!basementOn) {
       pccM3 += e.quantities!.pccM3;
+      sandBedAreaM2 += pcc > 0 ? e.quantities!.pccM3 / pcc : 0; // plan of this footing's P.C.C.
       excavationM3 += e.quantities!.excavationM3;
       const pedFrac = elPed > 0 ? pedBelowGl(-plinth - footTop) / Math.max(1e-9, -plinth - footTop) : 0;
       backfillM3 += Math.max(0, e.quantities!.excavationM3 - e.quantities!.pccM3 - e.quantities!.concreteM3 - elPed * pedFrac);
@@ -169,6 +176,7 @@ export function buildFoundationBasementQuantities(
   let waterproofingM2 = 0, drainPerimeterM = 0, sumpCount = 0;
   if (basementOn && L > 0 && B > 0) {
     pccM3 = L * B * pcc + pitPccM3;
+    sandBedAreaM2 = L * B + (pcc > 0 ? pitPccM3 / pcc : 0); // under the basement P.C.C. and under each footing pit's P.C.C.
     excavationM3 = (L + 2 * ws) * (B + 2 * ws) * Dg + pitExcavationM3;
     backfillM3 = ((L + 2 * ws) * (B + 2 * ws) - L * B) * Dg;
     for (const w of wallsDesigned) {
@@ -187,7 +195,14 @@ export function buildFoundationBasementQuantities(
     notes.push('Sand bedding under the PCC is not part of the detailed design and is not carried.');
     notes.push('Footing/raft concrete beyond the inside faces of the basement walls is not counted separately: it is monolithic with the walls and base slab.');
   }
-  if (!basementOn) notes.push('Sand bedding under the PCC is not part of the detailed design; the legacy sand bed quantity is dropped while the detailed foundation is used.');
+  // sand bed under the P.C.C. (below the founding level, so it is excavated as well)
+  const sandBedMm = Math.max(0, sum.sandBedMm ?? 0);
+  const sandBedM3 = sandBedAreaM2 * (sandBedMm / 1000);
+  excavationM3 += sandBedM3;
+  if (sandBedMm > 0) notes.push(`Sand bed ${sandBedMm} mm under the P.C.C. over ${r3(sandBedAreaM2)} m² (site practice, adjustable): extra excavation and sand, compacted volume.`);
+  else notes.push('No sand bed under the P.C.C. (set to 0 in the foundation inputs).');
+  const sandBackfillM3 = sum.sandBackfill ? backfillM3 : 0;
+  if (sandBackfillM3 > 0) notes.push('Footing pits / basement ring are backfilled with sand instead of the excavated soil (option chosen): the backfill volume is carried as sand.');
 
   // steel from the BBS (net weight)
   const fIds = new Set(els.map(e => e.id));
@@ -206,6 +221,7 @@ export function buildFoundationBasementQuantities(
 
   return {
     hasQuantities, foundationComplete, basementComplete, basementEnabled: basementOn,
+    sandBedM3: r3(sandBedM3), sandBedMm, sandBackfillM3: r3(sandBackfillM3),
     excavationM3: r3(excavationM3), backfillM3: r3(backfillM3), pccM3: r3(pccM3), plinthFillM3: r3(!basementOn && L > 0 && B > 0 ? L * B * Math.max(0, plinthH - plinth) : 0),
     foundationRccM3: r3(rcc), footingRccM3: r3(footingRccM3), pedestalRccM3: r3(pedestalRccM3),
     basementWallRccM3: r3(basementWallRccM3), basementSlabRccM3: r3(basementSlabRccM3),

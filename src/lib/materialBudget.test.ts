@@ -261,3 +261,25 @@ describe('plaster in the products & budget', () => {
     expect(b.products.find(p => p.id === 'water')!.uses.find(u => u.place === 'Plaster')!.quantity).toBe(Math.round(r.plasterEstimate!.totalWaterLitres));
   });
 });
+
+describe('foundation sand in the products & budget', () => {
+  it('lists the sand bed under the P.C.C. and the plinth filling, as places and as filling rows, and the sand total includes them', () => {
+    const r = calculateProject(project());
+    const b = buildMaterialBudget({ boq: r.buildingBOQ!, structural: r.structuralSummary, plaster: r.plasterEstimate });
+    const sandP = b.products.find(p => p.id === 'sand')!;
+    const bed = sandP.uses.find(u => u.place === 'Sand bed under the P.C.C.')!;
+    expect(bed.quantity).toBeGreaterThan(0);
+    expect(sandP.uses.some(u => u.place === 'Sand filling of the plinth')).toBe(true);
+    expect(b.mixPlaces.filter(m => m.kind === 'filling').map(m => m.place)).toEqual(expect.arrayContaining(['Sand bed under the P.C.C.', 'Sand filling of the plinth']));
+    expect(Math.abs(sandP.uses.reduce((a, u) => a + u.quantity, 0) - sandP.quantity)).toBeLessThan(1);
+    expect(r.buildingBOQ!.assumptions.join(' ')).toContain('sand bed 50 mm under the P.C.C.');
+  });
+  it('sand backfill adds its own place; the foundation row of the floor schedule carries the foundation sand', () => {
+    const r = calculateProject(project({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8, sandBackfill: true } as any }));
+    const b = buildMaterialBudget({ boq: r.buildingBOQ!, structural: r.structuralSummary });
+    expect(b.products.find(p => p.id === 'sand')!.uses.some(u => u.place === 'Sand backfill of the footing pits')).toBe(true);
+    const row = r.buildingBOQ!.floorSchedules.find(f => f.isFoundation)!;
+    const sb = r.buildingBOQ!.products.find(p => p.id === 'sand')!.sourceBreakdown!;
+    expect(row.products.sand.cft).toBeGreaterThanOrEqual((sb.bedding ?? 0) + (sb.plinthFill ?? 0) + (sb.sandBackfill ?? 0) - 0.5);
+  });
+});

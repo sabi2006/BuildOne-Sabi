@@ -118,7 +118,8 @@ const PLACE = {
   slabs: 'Slabs & roof',
   masonry: 'Brick walls (mortar)',
   plaster: 'Plaster',
-  bedding: 'Sand bed under footings',
+  bedding: 'Sand bed under the P.C.C.',
+  sandBackfill: 'Sand backfill of the footing pits',
   plinthFill: 'Sand filling of the plinth',
 } as const;
 
@@ -152,6 +153,7 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
   const sandUses = keep([
     { place: PLACE.bedding, quantity: r(sandSrc.bedding ?? 0, 1) },
     { place: PLACE.plinthFill, quantity: r(sandSrc.plinthFill ?? 0, 1), note: 'compacted volume × 1.15' },
+    { place: PLACE.sandBackfill, quantity: r(sandSrc.sandBackfill ?? 0, 1), note: 'compacted volume × 1.15' },
     { place: PLACE.pcc, quantity: r(sandCftOf(vol.pcc * pcc.sandKg), 1) },
     ...rccPlaces.map(k => ({ place: PLACE[k], quantity: r(sandCftOf(vol[k] * rcc.sandKg), 1) })),
     { place: PLACE.masonry, quantity: r(sandSrc.masonry ?? 0, 1) },
@@ -220,6 +222,9 @@ export function buildMaterialBudget(input: MaterialBudgetInput): MaterialBudget 
     }
   } else if (plasterBags > 0) {
     mixPlaces.push({ place: PLACE.plaster, kind: 'mortar', mix: 'plaster mortar (ratios of the plaster settings)', volumeM3: r(mortarM3.plaster ?? 0, 2), cementBags: r(plasterBags, 1), sandCft: r(sandSrc.plaster ?? 0, 1), jalliCft: 0, waterL: r(plasterBags * CEMENT_BAG_KG * 0.5), steelKg: 0 });
+  }
+  for (const [place, cft] of [[PLACE.bedding, sandSrc.bedding ?? 0], [PLACE.sandBackfill, sandSrc.sandBackfill ?? 0]] as const) {
+    if (cft > 0) mixPlaces.push({ place, kind: 'filling', mix: 'compacted sand', volumeM3: r(cft / 1.15 / CFT_PER_M3, 2), cementBags: 0, sandCft: r(cft, 1), jalliCft: 0, waterL: 0, steelKg: 0 });
   }
   if ((sandSrc.plinthFill ?? 0) > 0) mixPlaces.push({ place: PLACE.plinthFill, kind: 'filling', mix: 'compacted sand', volumeM3: r((sandSrc.plinthFill ?? 0) / 1.15 / CFT_PER_M3, 2), cementBags: 0, sandCft: r(sandSrc.plinthFill ?? 0, 1), jalliCft: 0, waterL: 0, steelKg: 0 });
 

@@ -63,7 +63,7 @@ export interface Foundation3DModel {
   /** lowest Y of any solid, m (negative) */
   minY: number;
   /** Levels in the scene frame (Y = 0 is the plinth level): ground level, underside of the flooring, foundation bed */
-  levels: { plinthY: number; glY: number; floorUnderY: number; bedY: number; plinthHeightM: number };
+  levels: { plinthY: number; glY: number; floorUnderY: number; bedY: number; plinthHeightM: number; sandBedM: number };
 }
 
 export interface Geometry3DArgs {
@@ -602,6 +602,17 @@ export function buildFoundation3DModel(args: Geometry3DArgs): Foundation3DModel 
   if (thinned) warnings.push(`Reinforcement is drawn at reduced density (more than ${maxBars} bars): the schedule (BBS) still counts every bar.`);
 
   if (basementOn && (design.summary.plinthHeightM ?? 0) > 0) warnings.push('Plinth height is not applied with a basement: the basement walls rise from the base slab to the plinth level.');
+  // sand bed (blinding) under every P.C.C. (below the founding level): same plan as the P.C.C. above it
+  const sandBedM = Math.max(0, (design.summary.sandBedMm ?? 0) / 1000);
+  if (sandBedM > 0) {
+    for (const pb of boxes.filter(b => b.kind === 'pcc')) {
+      boxes.push({
+        ...pb, id: `${pb.id}-sand`, kind: 'fill', status: 'NOT_VERIFIED',
+        center: [pb.center[0], r4(pb.center[1] - pb.size[1] / 2 - sandBedM / 2), pb.center[2]], size: [pb.size[0], r4(sandBedM), pb.size[2]],
+        label: `Sand bed ${Math.round(sandBedM * 1000)} mm under the P.C.C.`, note: 'Compacted sand blinding below the founding level. Site practice, not a designed element.',
+      });
+    }
+  }
   const minY = boxes.length ? Math.min(...boxes.map(b => b.center[1] - b.size[1] / 2)) : 0;
-  return { boxes, bars, warnings, integralElementIds: [...droppedElements], minY: r4(minY), levels: { plinthY: 0, glY: r4(-plinthH), floorUnderY: r4(-plinth), bedY: r4(-Df), plinthHeightM: r4(plinthH) } };
+  return { boxes, bars, warnings, integralElementIds: [...droppedElements], minY: r4(minY), levels: { plinthY: 0, glY: r4(-plinthH), floorUnderY: r4(-plinth), bedY: r4(-Df), plinthHeightM: r4(plinthH), sandBedM: r4(sandBedM) } };
 }

@@ -115,6 +115,10 @@ export interface FoundationDetailsConfig {
   finish?: { kind: 'raw' | 'smooth' | 'painted'; colour?: string };
   /** Plinth height: the plinth level (top of the plinth beam / flooring) above the ground level G.L., m. Practice value 0.45 m, not a code clause; the founding depth is measured from G.L. */
   plinthHeightM?: number;
+  /** Sand bed (blinding) under the P.C.C. of every footing / raft / basement base, mm. Site practice (not a code clause), default 50; 0 = none. It lies below the founding level. */
+  sandBedMm?: number;
+  /** Backfill the footing pits and the ring around the basement with sand instead of the excavated soil (poor / black cotton soil practice). Default off. */
+  sandBackfill?: boolean;
   /** Foundation–soil contact (base friction δ, adhesion) used by the sliding check */
   soilInterface?: { contact: 'cast_on_soil' | 'on_pcc' | 'membrane'; baseFrictionAngleDeg?: number; adhesionKnM2?: number };
   /** Plan shape for the 'custom' foundation type */
@@ -183,6 +187,7 @@ export const DEFAULT_FOUNDATION_DETAILS: FoundationDetailsConfig = {
   clearCoverMm: 50,
   pccThicknessMm: 100,
   plinthHeightM: 0.45,
+  sandBedMm: 50,
   designPreference: 'balanced'
 };
 

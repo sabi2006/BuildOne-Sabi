@@ -289,6 +289,15 @@ export function FoundationBasementPanel({ config, onChange, design }: Props) {
           <NumField label="Plinth Height (G.L. to plinth level)" unit="m" value={fd.plinthHeightM ?? 0.45} step={0.05} min={0}
             hint="Height of the plinth level above the ground level G.L. (practice value 0.45 m, not a code clause). The founding depth is measured from G.L.; the pedestal and the sand filling use this height. Not applied with a basement."
             onChange={(v) => setFd({ plinthHeightM: v ?? 0.45 })} />
+          <NumField label="Sand Bed under P.C.C." unit="mm" value={fd.sandBedMm ?? 50} step={10} min={0}
+            hint="Compacted sand blinding below the founding level under every footing / raft / basement P.C.C. (site practice, default 50 mm; 0 = none). It adds excavation and sand to the BOQ."
+            onChange={(v) => setFd({ sandBedMm: Math.max(0, v ?? 50) })} />
+          <label className="flex items-start gap-2 text-xs font-semibold text-slate-700 cursor-pointer sm:col-span-2" data-testid="sand-backfill">
+            <input type="checkbox" className="mt-0.5" checked={!!fd.sandBackfill} onChange={(e) => setFd({ sandBackfill: e.target.checked || undefined })} />
+            <span>Backfill the footing pits with sand instead of the excavated soil
+              <span className="block font-normal text-[11px] text-slate-500">For poor or black cotton soil. The backfill volume is then bought as sand (× 1.15 compaction).</span>
+            </span>
+          </label>
           <SelectField
             label="Concrete Finish (3D look)"
             value={fd.finish?.kind ?? 'raw'}

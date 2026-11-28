@@ -12,7 +12,7 @@ import type { FoundationElementResult } from './foundationDesignService';
 import { footingBelowBasement } from './geometry3d';
 
 export interface SectionLayer {
-  id: 'pcc' | 'footing' | 'pedestal' | 'fill' | 'flooring' | 'dpc' | 'bpcc' | 'slab';
+  id: 'pcc' | 'footing' | 'pedestal' | 'fill' | 'flooring' | 'dpc' | 'bpcc' | 'slab' | 'sandbed';
   label: string;
   /** top and bottom, m relative to the plinth level */
   topM: number;
@@ -79,6 +79,9 @@ export function buildFoundationSection(design: FoundationBasementIntegration): F
     { id: 'pcc', label: below ? 'P.C.C. under the footing' : 'Base concrete (P.C.C.)', topM: r2(footBottom), bottomM: r2(pccBottom), designed: true },
     { id: 'footing', label: 'Footing', topM: r2(footTop), bottomM: r2(footBottom), designed: true },
   ];
+  const sandBedM = Math.max(0, (sum.sandBedMm ?? 0) / 1000);
+  if (sandBedM > 0) layers.push({ id: 'sandbed', label: 'Sand bed (blinding)', topM: r2(pccBottom), bottomM: r2(pccBottom - sandBedM), designed: false });
+  const sandMm = Math.round(sandBedM * 1000);
   if (below) {
     layers.push({ id: 'bpcc', label: 'Basement P.C.C.', topM: r2(-Df + pcc), bottomM: r2(-Df), designed: true });
     layers.push({ id: 'slab', label: 'Basement base slab', topM: r2(-Df + pcc + slabT!), bottomM: r2(-Df + pcc), designed: true });
@@ -97,9 +100,9 @@ export function buildFoundationSection(design: FoundationBasementIntegration): F
   const steps: string[] = [
     ...(below
       ? [`Set out the column centres and excavate to the basement floor level: ${r2(Dg)} m below ground level (G.L.), then dig a pit for each footing a further ${r2(D + pcc)} m down (footing ${el.depthMm} mm + P.C.C. ${Math.round(pcc * 1000)} mm), working space around each. The foundation bed level is the bottom of these pits. Check the bed soil against the assumed bearing capacity.`,
-         `Level and compact each pit bed, then cast the P.C.C. ${Math.round(pcc * 1000)} mm thick under the footing.`]
-      : [`Set out the column centres and excavate to the foundation bed level: ${r2(Dg)} m below ground level (G.L.), working space around each footing. Check the bed soil against the assumed bearing capacity.`,
-         `Level and compact the bed, then cast the base concrete (P.C.C.) ${Math.round(pcc * 1000)} mm thick, ${Math.round(PCC_PROJECTION_M * 1000)} mm wider than the footing on every side.`]),
+         `Level and compact each pit bed${sandMm > 0 ? `, spread and compact a ${sandMm} mm sand bed (blinding)` : ''}, then cast the P.C.C. ${Math.round(pcc * 1000)} mm thick under the footing.`]
+      : [`Set out the column centres and excavate to the foundation bed level: ${r2(Dg)} m below ground level (G.L.), working space around each footing${sandMm > 0 ? ` (dig ${sandMm} mm deeper for the sand bed)` : ''}. Check the bed soil against the assumed bearing capacity.`,
+         `Level and compact the bed${sandMm > 0 ? `, spread and compact a ${sandMm} mm sand bed (blinding)` : ''}, then cast the base concrete (P.C.C.) ${Math.round(pcc * 1000)} mm thick, ${Math.round(PCC_PROJECTION_M * 1000)} mm wider than the footing on every side.`]),
     `Footing ${r2(el.sizeXM!)} × ${r2(el.sizeYM!)} m, ${el.depthMm} mm thick${el.profile ? ` (${el.profile.kind}, edge ${el.profile.edgeThicknessMm} mm)` : ''}: place the bars on spacers (${cover} mm cover)${steel.length ? ` - ${steel.join('; ')}` : ''}, and the column starter bars (dowels), then cast.`,
     ...(below
       ? [`Backfill the pits with the footing top at ${r2(footTop)} m, then cast the basement P.C.C. (${Math.round(pcc * 1000)} mm) over the whole floor and the base slab (${Math.round(slabT! * 1000)} mm) on it, monolithic with the footings. Basement floor top is ${r2(pedBottom)} m.`]
@@ -107,14 +110,14 @@ export function buildFoundationSection(design: FoundationBasementIntegration): F
     ...(col && pedH >= 0.05
       ? [`${below ? 'Column' : 'Pedestal / column'} ${col.widthMm} × ${col.depthMm} mm from ${below ? 'the base slab top' : 'the footing top'} (${r2(pedBottom)} m) up to the plinth: ${r2(pedH)} m high. Plinth level is ±0.00${below ? '' : `; G.L. is ${r2(-plinthH)} m`}.`]
       : [`The support top (${r2(pedBottom)} m) is at or above the underside of the flooring: no pedestal is drawn; increase the founding depth.`]),
-    ...(below ? ['Build the basement walls from the base slab up to the plinth level (see the basement walls in this report).'] : ['Backfill the excavation around the pedestals in layers and compact each layer.']),
+    ...(below ? ['Build the basement walls from the base slab up to the plinth level (see the basement walls in this report).'] : [sum.sandBackfill ? 'Backfill the excavation around the pedestals with sand in layers, watered and compacted.' : 'Backfill the excavation around the pedestals in layers and compact each layer.']),
     ...(!basement ? [
       'Cast the plinth beam on the pedestals at the plinth level, and lay the damp-proof course (D.P.C.) on it under the brick wall.',
       ...(plinthH > FLOORING_THICKNESS_M + 0.05 ? [`Fill the plinth with sand, ${Math.round((plinthH - FLOORING_THICKNESS_M) * 1000)} mm from G.L. up to the underside of the flooring, in layers, watered and compacted.`] : []),
       `Cast the flooring (PCC ${Math.round(FLOORING_THICKNESS_M * 1000)} mm) at the plinth level, then start the brick wall above the D.P.C.`,
     ] : []),
   ];
-  notes.push('Footing, base concrete and pedestal come from the design. The sand filling, flooring and D.P.C. thicknesses are drawing conventions (not designed or checked), and the plinth beam is shown in the 3D view and designed with the frame beams.');
+  notes.push('Footing, base concrete and pedestal come from the design. The sand bed, sand filling, flooring and D.P.C. thicknesses are drawing conventions (not designed or checked), and the plinth beam is shown in the 3D view and designed with the frame beams.');
   if (el.system === 'raft' || el.system === 'combined' || el.system === 'strip') notes.push(`Shown for ${el.id} (${el.system}); the section across other element types differs.`);
 
   return {

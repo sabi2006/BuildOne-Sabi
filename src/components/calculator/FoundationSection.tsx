@@ -23,9 +23,10 @@ export function FoundationSection({ design }: { design: FoundationBasementIntegr
   const f = s.footing;
   // drawing frame: x in metres from the centre of the footing, y in metres relative to the plinth level (up)
   const wallStub = 0.35; // brick wall stub drawn above the plinth level
-  const yTop = wallStub, yBot = s.levels.bedM - 0.15;
+  const sandBedL = s.layers.find(l => l.id === 'sandbed');
+  const yTop = wallStub, yBot = (sandBedL ? sandBedL.bottomM : s.levels.bedM) - 0.3;
   const halfW = Math.max(f.lengthM / 2 + PCC_MARGIN + 0.55, 1.3);
-  const W = 640, H = 330, padL = 14, padR = 150, padT = 12, padB = 12;
+  const W = 640, H = 350, padL = 14, padR = 150, padT = 12, padB = 12;
   const sx = (W - padL - padR) / (2 * halfW), sy = (H - padT - padB) / (yTop - yBot);
   const k = Math.min(sx, sy * 1.0);
   const X = (x: number) => padL + (W - padL - padR) / 2 + x * k;
@@ -48,6 +49,7 @@ export function FoundationSection({ design }: { design: FoundationBasementIntegr
     ...(slab ? [{ y: (slab.topM + slab.bottomM) / 2, text: 'Basement base slab', sub: `${Math.round((slab.topM - slab.bottomM) * 1000)} mm`, c: '#0369a1' }] : []),
     { y: (pcc.topM + pcc.bottomM) / 2, text: pcc.label, sub: `${Math.round((pcc.topM - pcc.bottomM) * 1000)} mm`, c: '#0f172a' },
     ...(slab ? [{ y: -s.foundationDepthM, text: `Basement floor level ${fm(-s.foundationDepthM)}`, sub: undefined, c: '#0369a1' }] : []),
+    ...(sandBedL ? [{ y: sandBedL.bottomM, text: 'Sand bed', sub: `${Math.round((sandBedL.topM - sandBedL.bottomM) * 1000)} mm (convention)`, c: '#92400e' }] : []),
     { y: s.levels.bedM, text: `Foundation bed level ${fm(s.levels.bedM)}`, sub: undefined, c: '#92400e' },
   ].sort((p, q) => q.y - p.y);
   const placed: Array<(typeof wanted)[number] & { py: number }> = [];
@@ -70,6 +72,8 @@ export function FoundationSection({ design }: { design: FoundationBasementIntegr
         {fill && <rect data-layer="fill" {...rect(-halfW, halfW, fill.bottomM, fill.topM)} fill="url(#fs-dots)" stroke="#d6b27a" strokeWidth={0.5} />}
         {/* flooring */}
         {floor && <rect data-layer="flooring" {...rect(-halfW, halfW, floor.bottomM, floor.topM)} fill="#cbd5e1" stroke="#475569" strokeWidth={0.8} />}
+        {/* sand bed (blinding) under the P.C.C. */}
+        {sandBedL && <rect data-layer="sandbed" {...rect(-hf - f.pccProjectionM, hf + f.pccProjectionM, sandBedL.bottomM, sandBedL.topM)} fill="url(#fs-dots)" stroke="#d6b27a" strokeWidth={0.5} />}
         {/* base concrete (PCC) */}
         <rect data-layer="pcc" {...rect(-hf - f.pccProjectionM, hf + f.pccProjectionM, pcc.bottomM, pcc.topM)} fill="#e2e8f0" stroke="#334155" strokeWidth={1} />
         {/* basement: P.C.C. and base slab over the whole width, the footing hangs below them */}

@@ -2375,6 +2375,7 @@ export interface BOQProductItem {
     plaster?: number;
     bedding?: number;
     plinthFill?: number;
+    sandBackfill?: number;
     concrete?: number;
     total?: number;
     rcc?: number;
@@ -4736,7 +4737,7 @@ export function calculateBuildingBOQ(params: {
   // 3. Foundation Sand Bedding
   let footingBedSandM3 = 0;
   if (useFbFoundation) {
-    footingBedSandM3 = 0; // the detailed foundation has no sand bed (PCC on the founding level)
+    footingBedSandM3 = (fbq!.sandBedM3 || 0) * 1.15; // sand bed under the P.C.C., loose volume = compacted × 1.15 (the app's sand compaction factor)
   } else if (s && s.pillarsCalculations && s.pillarsCalculations.length > 0) {
     footingBedSandM3 = s.pillarsCalculations.reduce((sum, c) => sum + (c.providedFootingLengthM * c.providedFootingWidthM * 0.1), 0);
   } else if (params.foundationEstimate) {
@@ -4745,6 +4746,8 @@ export function calculateBuildingBOQ(params: {
   const footingBedSandCft = footingBedSandM3 * 35.3147;
   // Sand filling inside the plinth (G.L. to the underside of the flooring), loose volume = compacted × 1.15 (the app's sand compaction factor)
   const plinthSandCft = useFbFoundation ? (fbq!.plinthFillM3 || 0) * 1.15 * 35.3147 : 0;
+  // sand backfill of the footing pits (option): the backfill volume is sand instead of soil
+  const sandBackfillCft = useFbFoundation ? (fbq!.sandBackfillM3 || 0) * 1.15 * 35.3147 : 0;
 
   // 4. Masonry Constituents
   const flMasonry = params.floorMasonryEstimates;
@@ -4793,7 +4796,7 @@ export function calculateBuildingBOQ(params: {
   const totalCementBags = concreteCementBags + masonryCementBags + plasterCementBags;
   const cementAmount = Math.round(totalCementBags * cementRate);
 
-  const totalSandCft = Math.round((footingBedSandCft + plinthSandCft + concreteFineAggCft + masonrySandCft + plasterSandCft) * 10) / 10;
+  const totalSandCft = Math.round((footingBedSandCft + plinthSandCft + sandBackfillCft + concreteFineAggCft + masonrySandCft + plasterSandCft) * 10) / 10;
   const totalSandM3 = Math.round((totalSandCft / 35.3147) * 100) / 100;
   const sandAmount = Math.round(totalSandCft * sandRate);
 
@@ -4849,6 +4852,7 @@ export function calculateBuildingBOQ(params: {
       sourceBreakdown: {
         bedding: Math.round(footingBedSandCft * 10) / 10,
         plinthFill: Math.round(plinthSandCft * 10) / 10,
+        sandBackfill: Math.round(sandBackfillCft * 10) / 10,
         concrete: Math.round(concreteFineAggCft * 10) / 10,
         masonry: Math.round(masonrySandCft * 10) / 10,
         plaster: Math.round(plasterSandCft * 10) / 10
@@ -4974,7 +4978,7 @@ export function calculateBuildingBOQ(params: {
     const fCementBags = fPccCement + fRccCement;
     const fCementCost = fCementBags * cementRate;
 
-    const fSandCft = Math.round((footingBedSandCft + (((pccM3 * pccMixSpec.sandKg) / 1600) + ((footingRccM3 * mix.fineAggKgPerM3) / 1600)) * 35.3147) * 10) / 10;
+    const fSandCft = Math.round((footingBedSandCft + plinthSandCft + sandBackfillCft + (((pccM3 * pccMixSpec.sandKg) / 1600) + ((footingRccM3 * mix.fineAggKgPerM3) / 1600)) * 35.3147) * 10) / 10;
     const fSandM3 = Math.round((fSandCft / 35.3147) * 100) / 100;
     const fSandCost = Math.round(fSandCft * sandRate);
 
@@ -5291,6 +5295,9 @@ export function calculateBuildingBOQ(params: {
     `Binding wire ${r1(bindingWireFactor * 1000)} kg per tonne of steel (practice value, adjustable).`,
     `Overheads ${overheadPercent}%, contingency ${contingencyPercent}%, GST ${taxPercent}%, material wastage allowance ${wastagePercent}% (all adjustable in the Structural Config rates).`,
     'Cover blocks are counted by site-practice spacing (IS 456 fixes only the cover thickness); curing water is not counted.',
+    useFbFoundation
+      ? `Foundation sand (site practice, not code values): sand bed ${fbq!.sandBedMm} mm under the P.C.C. and the plinth filling, each × 1.15 (loose = compacted × 1.15)${fbq!.sandBackfillM3 > 0 ? '; pits backfilled with sand' : '; pits backfilled with excavated soil'}.`
+      : 'Foundation sand follows the legacy footing estimate (sand bed per footing).',
     sandBulk > 1
       ? `Sand bulking ${r1(sandBulk * 100 - 100)}% added to the sand of volume-batched concrete and of mortar (damp sand measured loose).`
       : 'No sand bulking added (dry-volume factors 1.54 / 1.33 already allow for voids); set a bulking % in the rates if damp sand is measured loose.',

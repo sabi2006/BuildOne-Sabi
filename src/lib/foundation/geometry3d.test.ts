@@ -453,7 +453,7 @@ describe('Plinth zone: G.L., plinth level, sand filling and DPC (the section of 
 
   it('the plinth height is 0.45 m above G.L. by default and is carried by the design', () => {
     expect(h).toBe(0.45);
-    expect(g.levels).toEqual({ plinthY: 0, glY: -0.45, floorUnderY: -0.1, bedY: -(d.summary.foundationDepthM + 0.45), plinthHeightM: 0.45 });
+    expect(g.levels).toEqual({ plinthY: 0, glY: -0.45, floorUnderY: -0.1, bedY: -(d.summary.foundationDepthM + 0.45), plinthHeightM: 0.45, sandBedM: 0.05 });
   });
 
   it('the founding depth is measured from G.L.: the PCC bottom lies Df below G.L., i.e. Df + plinth height below the plinth level', () => {
@@ -489,7 +489,7 @@ describe('Plinth zone: G.L., plinth level, sand filling and DPC (the section of 
   it('with no plinth height there is no filling, DPC or G.L. offset (legacy frame)', () => {
     const z = designOf({ foundationDetails: { ...fd, plinthHeightM: 0 } });
     const gz = buildFoundation3DModel({ design: z, buildingLengthM: L, buildingWidthM: W, columnPositions: sceneCols(z), plinthWalls: walls });
-    expect(gz.boxes.some(b => b.kind === 'fill' || b.kind === 'dpc')).toBe(false);
+    expect(gz.boxes.some(b => b.id === 'plinth-fill' || b.kind === 'dpc')).toBe(false); // (the sand bed under the P.C.C. is separate)
     expect(gz.levels.bedY).toBeCloseTo(-z.summary.foundationDepthM, 4);
   });
 
@@ -497,7 +497,32 @@ describe('Plinth zone: G.L., plinth level, sand filling and DPC (the section of 
     const b = designOf({ foundationDetails: { selectionMode: 'manual', columnLoadSource: 'tributary', groundwaterDepthM: 8 } as any, basement: basementCfg as any }, 3, INNER);
     const gb = buildFoundation3DModel({ design: b, buildingLengthM: L, buildingWidthM: W, columnPositions: sceneCols(b), plinthWalls: walls });
     expect(gb.levels.plinthHeightM).toBe(0);
-    expect(gb.boxes.some(x => x.kind === 'fill' || x.kind === 'dpc')).toBe(false);
+    expect(gb.boxes.some(x => x.id === 'plinth-fill' || x.kind === 'dpc')).toBe(false);
     expect(gb.warnings.join(' ')).toContain('Plinth height is not applied with a basement');
+  });
+});
+
+describe('Sand bed under the P.C.C.', () => {
+  const d = designOf({ foundationDetails: fd });
+  const g = geo(d, sceneCols(d));
+  const sands = g.boxes.filter(b => b.id.endsWith('-sand'));
+
+  it('every P.C.C. has a 50 mm sand bed directly under it, same plan, below the founding level', () => {
+    const pccs = g.boxes.filter(b => b.kind === 'pcc');
+    expect(sands.length).toBe(pccs.length);
+    for (const pb of pccs) {
+      const sb = sands.find(x => x.id === `${pb.id}-sand`)!;
+      expect(sb.size[1]).toBeCloseTo(0.05, 4);
+      expect(sb.size[0]).toBeCloseTo(pb.size[0], 4);
+      expect(sb.center[1] + sb.size[1] / 2).toBeCloseTo(pb.center[1] - pb.size[1] / 2, 4);
+      expect(sb.status).toBe('NOT_VERIFIED');
+    }
+    expect(g.minY).toBeCloseTo(-(d.summary.foundationDepthM + 0.45) - 0.05, 3);
+  });
+
+  it('sand bed 0 draws none; the sand layers never count as overlaps', () => {
+    const z = designOf({ foundationDetails: { ...fd, sandBedMm: 0 } });
+    expect(geo(z, sceneCols(z)).boxes.some(b => b.id.endsWith('-sand'))).toBe(false);
+    expect(findBoxOverlaps(g.boxes)).toEqual([]);
   });
 });

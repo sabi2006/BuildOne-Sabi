@@ -129,3 +129,26 @@ describe('Foundation section: other configurations', () => {
     expect(renderToStaticMarkup(<FoundationSection design={design({ foundationDetails: fd, foundationType: 'pile' })} />)).toContain('foundation-section-empty');
   });
 });
+
+describe('Foundation section: sand bed under the P.C.C.', () => {
+  it('a 50 mm sand bed lies directly under the P.C.C., is drawn, labelled a convention and mentioned in the steps', () => {
+    const d = design({});
+    const s = buildFoundationSection(d);
+    const sand = s.layers.find(l => l.id === 'sandbed')!;
+    const pcc = s.layers.find(l => l.id === 'pcc')!;
+    expect(sand.topM).toBe(pcc.bottomM);
+    expect(Math.round((sand.topM - sand.bottomM) * 1000)).toBe(50);
+    expect(sand.designed).toBe(false);
+    expect(s.steps.join(' ')).toContain('50 mm sand bed');
+    const out = renderToStaticMarkup(<FoundationSection design={d} />);
+    expect(out).toContain('data-layer="sandbed"');
+    expect(out).toContain('Sand bed');
+  });
+  it('sand bed 0 has no sand layer and no sand step; sand backfill changes the backfill step', () => {
+    const none = buildFoundationSection(design({ foundationDetails: { ...fd, sandBedMm: 0 } }));
+    expect(none.layers.some(l => l.id === 'sandbed')).toBe(false);
+    expect(none.steps.join(' ')).not.toContain('sand bed (blinding)');
+    const sb = buildFoundationSection(design({ foundationDetails: { ...fd, sandBackfill: true } }));
+    expect(sb.steps.join(' ')).toContain('with sand in layers');
+  });
+});
